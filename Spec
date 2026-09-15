@@ -1,0 +1,173 @@
+# NovaForge — Novel Configuration Spec (CFG)
+
+**Spec ID prefix:** `CFG`
+**Status:** required before any change to `stages/chapters.py` or `export/`
+**Principle:** *the code never changes to make a novel longer, shorter or shaped differently; only `novel.config.json` changes.* Anything a user might want to tune between runs MUST live in the config file. If a value is hardcoded in Python and someone wants to change it, that is a bug against this spec.
+
+---
+
+## CFG-1 · The configuration file
+
+Path: `config/novel.config.json` (default) or any path passed with `--config <file>`.
+Format: JSON, UTF-8, no comments. Schema is versioned by `schema_version`.
+
+The reference file for the `tiny` profile lives next to this spec at
+[`config/novel.config.json`](../config/novel.config.json). It is the canonical example: every
+field it contains is defined in CFG-2, and CFG-T1 asserts that it loads without error. The spec
+describes the fields; the JSON file holds the values. Neither duplicates the other.
+
+---
+
+## CFG-2 · Field-by-field contract
+
+Every field below is **required unless marked optional**. Loading fails loudly (`ConfigError`) on a missing required field, unknown field, or wrong type. Silent defaults are forbidden for required fields — the point is that the file is the truth.
+
+### `schema_version` (int)
+Must equal the version the code supports. If lower → run `tools/migrate_config.py` (see CFG-8). If higher → refuse to start.
+
+### `profile` (string, optional)
+Name of a preset under `config/profiles/<name>.json`. Values in the main file **override** profile values (deep merge). Profiles shipped: `tiny`, `small`, `medium`, `full` (see CFG-6).
+
+### `novel`
+| field | type | rule | who enforces |
+|---|---|---|---|
+| `chapters` | int | 1 ≤ n ≤ 200 | validation (Layer 1) |
+| `words_per_chapter.target` | int | min ≤ target ≤ max | Length Critic |
+| `words_per_chapter.min` | int | ≥ 50 | Length Critic — draft below min is a **hard fail** (score 0) |
+| `words_per_chapter.max` | int | ≤ 8000 | Length Critic — draft above max is a hard fail |
+| `lines_per_chapter.max` | int | ≥ 5 | Length Critic — a "line" = a physical line after wrapping at `chars_per_line.max` |
+| `chars_per_line.max` | int | 40 ≤ n ≤ 160 | Style Editor wraps prose to this; PDF exporter uses it for layout |
+| `paragraphs_per_chapter.min/max` | int | min ≥ 1 | Length Critic |
+| `sentences_per_paragraph.max` | int | ≥ 1 | Length Critic (soft: −1 point per violation, floor 5) |
+| `pov` | enum | `first`, `third-limited`, `third-omniscient` | injected into Chapter Writer prompt |
+| `tense` | enum | `past`, `present` | injected into Chapter Writer prompt |
+
+### `bible`
+Caps the size of every Bible artefact so a tiny novel does not get a 3 000-word world doc. Enforced by a **pure-code post-check** after Fase 1: if a Bible file exceeds its cap, the producing agent is re-run once with the cap quoted in the prompt; if it still exceeds, the file is truncated at the last complete heading and the run logs `bible_truncated`.
+
+### `context`
+- `prior_summary_max_words` — rolling summary cap. Test `CFG-T3` asserts the summary passed to the writer never exceeds it.
+- `include_bible_files` — ordered list; anything not listed is invisible to the writer.
+- `include_full_outline` — `false` means the writer sees only its own chapter's outline slice.
+
+### `quality_gate`
+- `threshold` — 1 ≤ n ≤ 10.
+- `max_revisions` — 0 ≤ n ≤ 10. `0` means "critique once, never rewrite" (useful for smoke tests).
+- `critics` — ordered subset of `["continuity", "science", "length", "reader"]`. Gate = `min(score of listed critics) ≥ threshold`. `length` is pure code (no LLM); `reader` is the optional Reader Simulator.
+- `on_exhausted` — `accept_with_warnings` | `halt`. `halt` saves state and exits non-zero; run stays resumable.
+
+### `engine`
+- `name` — `mock` | `anthropic`.
+- `model` — must exist in `pricing.py`. Ignored by `mock` except for cost simulation.
+- `max_tokens_per_call` — hard cap passed to the engine. `mock` truncates to it.
+- `temperature` — 0.0–1.0 (optional, default 0.7).
+
+### `budget`
+`BudgetGuard` (Layer 6) reads these. Breaching either value → `BudgetExceeded`, state saved, clean stop.
+
+### `outputs`
+- `formats` — non-empty subset of `["markdown", "pdf"]`. **EPUB and SVG cover are removed from the exporter registry**; requesting them is a `ConfigError`.
+- `markdown.single_file` — `true` → one `book.md`; `false` → `chapters/NN.md` copied into `dist/markdown/` plus an `index.md`.
+- `markdown.include_bible_appendix` — appends the Bible as an appendix (useful while debugging small runs).
+- `pdf.page_size` — `A4` | `A5` | `letter`.
+- `pdf.chars_per_line` is **not** a field: the PDF exporter derives wrapping from `novel.chars_per_line.max`, so both outputs wrap identically.
+
+---
+
+## CFG-3 · Precedence and immutability
+
+1. **Precedence** (highest first): CLI flag → `novel.config.json` → `profile` preset → nothing (error). The only CLI flags allowed to override config are `--chapters`, `--engine`, `--max-cost-usd`, `--tone`; everything else must be changed in the file. This keeps the file the single source of truth while still allowing quick experiments.
+2. **Snapshot**: at `novaforge new`, the fully-resolved config is written to `output/<slug>/config.snapshot.json`. **`resume` always reads the snapshot, never the live file**, so editing the config mid-run cannot corrupt a run. Test `CFG-T5`.
+3. **Fingerprint**: the snapshot's SHA-256 is stored in `state.json` and in every audit row (`config_hash`), so any artefact can be traced to the exact configuration that produced it.
+
+---
+
+## CFG-4 · The Length Critic (new, pure code)
+
+Module: `critics/length.py`. Implements `CritiqueAgent` **without calling the engine**.
+
+Input: chapter draft + `novel` section of config.
+Output: same JSON shape as the other critics:
+
+```json
+{
+  "score": 6,
+  "issues": [
+    { "rule": "words_per_chapter.max", "expected": "≤ 550", "actual": 712, "severity": "hard", "fix": "Cut ~160 words; the second scene repeats the airlock description." },
+    { "rule": "sentences_per_paragraph.max", "expected": "≤ 6", "actual": 9, "severity": "soft", "location": "paragraph 3" }
+  ]
+}
+```
+
+Scoring: start at 10; any `hard` issue → 0; each `soft` issue −1, floor 5.
+Its issues are appended to the rewrite prompt exactly like continuity issues, so the writer gets *"cut 160 words"* as an instruction. This is what makes chapter length a reliably enforced parameter instead of a hope.
+
+---
+
+## CFG-5 · How the config reaches the agents
+
+`skills.py` exposes template variables to every SKILL.md: `{{words_target}}`, `{{words_min}}`, `{{words_max}}`, `{{paragraphs_min}}`, `{{paragraphs_max}}`, `{{pov}}`, `{{tense}}`, `{{chapters_total}}`, `{{chapter_number}}`, `{{tone}}`. A SKILL.md that hardcodes a number where a variable exists fails `tools/check_specs.py`.
+
+---
+
+## CFG-6 · Shipped profiles (the growth ladder)
+
+| profile | chapters | words/ch | max_revisions | prior_summary | max_cost_usd | purpose |
+|---|---|---|---|---|---|---|
+| `tiny` | 3 | 300–550 (400) | 2 | 120 | 2 | prove the loop; every demo and test |
+| `small` | 6 | 700–1100 (900) | 3 | 200 | 8 | first real story arc |
+| `medium` | 12 | 1500–2500 (2000) | 3 | 250 | 25 | novella |
+| `full` | 24 | 2500–4000 (3200) | 3 | 300 | 80 | full novel |
+
+Moving up a rung is a one-word change (`"profile": "small"`). **No Python file changes between rungs** — test `CFG-T7` runs the whole pipeline under `mock` for all four profiles and asserts identical code path, only different limits.
+
+---
+
+## CFG-7 · Change specs (how the harness improves incrementally)
+
+Every improvement is a small file in `specs/changes/CHG-NNN-<slug>.md` using this template:
+
+```
+# CHG-014 · Raise continuity threshold for medium+ profiles
+Motivation: at 12 chapters, drift in character voice slips through at threshold 8.
+Change: config only — profiles/medium.json and full.json set quality_gate.threshold = 9.
+Code touched: none.
+Spec touched: CFG-6 table.
+Verification: run tiny (unchanged) and medium under mock; medium shows ≥1 extra rewrite in logs; tiny identical to previous run (same config_hash → same output).
+Rollback: revert the two profile files.
+```
+
+Rules: one concern per change; `Code touched: none` is the goal and the default; a change that needs code must say which spec ID it amends. `tools/check_specs.py` fails if a `CHG` file lacks any of the six headings.
+
+---
+
+## CFG-8 · Migration
+
+When `schema_version` bumps, ship `tools/migrate_config.py vN → vN+1` that rewrites old files, and add a row to `specs/changes/`. Old snapshots stay readable by the version that wrote them (resume never migrates).
+
+---
+
+## CFG-9 · Tests
+
+| id | asserts |
+|---|---|
+| CFG-T1 | unknown field, missing required field, wrong type → `ConfigError` with the field path |
+| CFG-T2 | `min ≤ target ≤ max` and all ranges above are validated |
+| CFG-T3 | writer prompt contains ≤ `prior_summary_max_words` words of summary and only listed Bible files |
+| CFG-T4 | Length Critic: draft of 712 words vs max 550 → score 0 and a `words_per_chapter.max` issue; draft in range → 10 |
+| CFG-T5 | edit live config during a run → `resume` still uses snapshot values |
+| CFG-T6 | `outputs.formats: ["markdown","pdf"]` produces exactly `book.md` and `book.pdf`; requesting `epub` → `ConfigError` |
+| CFG-T7 | pipeline runs under `mock` for all four profiles with zero code differences |
+| CFG-T8 | PDF and Markdown wrap at the same `chars_per_line.max`; PDF starts `%PDF-`, xref resolves, page count > 0 |
+| CFG-T9 | every `{{variable}}` in CFG-5 is substituted in the assembled prompt; no literal `{{` remains |
+
+---
+
+## CFG-10 · Acceptance for the first (tiny) run
+
+`novaforge new "..." --config config/novel.config.json` with the file above must produce:
+- `state.json`: 3 chapters `approved`, `config_hash` present, no secrets.
+- `critiques/chNN.length.json` for every chapter, every accepted draft within 300–550 words and ≤ 70 lines.
+- `dist/book.md` and `dist/book.pdf`, nothing else in `dist/`.
+- `logs/cost.json` total ≤ 2.0 USD (simulated under mock).
+- Changing only `"profile": "small"` and re-running produces 6 chapters of 700–1100 words with no code diff (`git diff --stat -- '*.py'` empty).
