@@ -1,4 +1,4 @@
-# My-story# NovaForge
+# NovaForge
 
 A multi-agent harness that writes short science-fiction novels.
 
@@ -51,8 +51,9 @@ flowchart TD
 
 ## Specs
 
-- [`specs/CONFIG-SPEC.md`](specs/CONFIG-SPEC.md) — the configuration file that parametrises
-  chapter count, chapter length (words, lines, paragraphs), quality gate, budget, growth
-  profiles (`tiny` → `full`) and outputs (Markdown + PDF only).
-
-More specs will be added incrementally as the harness matures.
+- [`specs/NOVAFORGE-SPEC.md`](specs/NOVAFORGE-SPEC.md) — the harness specification: memory
+  architecture (short-term context, long-term Bible, summaries, episodic critiques, state),
+  the agents with comparable input/output contracts, skills, runtime and development tools,
+  configuration, quality gate, observability, tests and recommendations.
+- [`config/novel.config.json`](config/novel.config.json) — the configuration file itself
+  (`tiny` profile: 3 chapters, 300–550 words each, Markdown + PDF output).
