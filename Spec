@@ -1,173 +1,205 @@
-# NovaForge — Novel Configuration Spec (CFG)
+# NovaForge — Harness Specification
 
-**Spec ID prefix:** `CFG`
-**Status:** required before any change to `stages/chapters.py` or `export/`
-**Principle:** *the code never changes to make a novel longer, shorter or shaped differently; only `novel.config.json` changes.* Anything a user might want to tune between runs MUST live in the config file. If a value is hardcoded in Python and someone wants to change it, that is a bug against this spec.
+**Version:** 0.1 · **Scope:** the first working harness (`tiny` profile) and the rules for growing it
+**Companion file:** [`config/novel.config.json`](../config/novel.config.json) — the values; this document defines the fields and the behaviour.
 
----
-
-## CFG-1 · The configuration file
-
-Path: `config/novel.config.json` (default) or any path passed with `--config <file>`.
-Format: JSON, UTF-8, no comments. Schema is versioned by `schema_version`.
-
-The reference file for the `tiny` profile lives next to this spec at
-[`config/novel.config.json`](../config/novel.config.json). It is the canonical example: every
-field it contains is defined in CFG-2, and CFG-T1 asserts that it loads without error. The spec
-describes the fields; the JSON file holds the values. Neither duplicates the other.
+Every requirement has an ID (`MEM-`, `AGT-`, `SKL-`, `TOOL-`, `CFG-`, `GATE-`, `OBS-`, `TST-`). Tests reference these IDs.
 
 ---
 
-## CFG-2 · Field-by-field contract
+## 1 · Purpose and principles
 
-Every field below is **required unless marked optional**. Loading fails loudly (`ConfigError`) on a missing required field, unknown field, or wrong type. Silent defaults are forbidden for required fields — the point is that the file is the truth.
+NovaForge is a multi-agent harness that writes short science-fiction novels. The harness — not the model — is responsible for coherence, cost and safety.
 
-### `schema_version` (int)
-Must equal the version the code supports. If lower → run `tools/migrate_config.py` (see CFG-8). If higher → refuse to start.
+- **P1 · Small first.** The harness ships working on 3 chapters of ~400 words. Growth is configuration, never code.
+- **P2 · One source of truth per concern.** Story facts live in the Story Bible, progress in `state.json`, tunables in `novel.config.json`, agent behaviour in `SKILL.md`.
+- **P3 · Verified, not trusted.** Every chapter passes through critics; every claim in this spec has a test.
+- **P4 · Model is a plug.** A deterministic offline `mock` engine and the Anthropic engine are interchangeable.
+- **P5 · Zero runtime dependencies.** Standard library only; `anthropic` optional, `pytest` dev-only.
 
-### `profile` (string, optional)
-Name of a preset under `config/profiles/<name>.json`. Values in the main file **override** profile values (deep merge). Profiles shipped: `tiny`, `small`, `medium`, `full` (see CFG-6).
+---
 
-### `novel`
-| field | type | rule | who enforces |
+## 2 · Memory architecture (MEM)
+
+The harness distinguishes four kinds of memory. Each has an owner, a location, a lifetime and a size cap — an agent never receives "everything".
+
+| ID | Memory | What it holds | Location | Lifetime | Written by | Read by | Cap (tiny) |
+|---|---|---|---|---|---|---|---|
+| MEM-1 | **Short-term (working context)** | What one agent sees in one call: its SKILL prompt + the slice of long-term memory it needs + the current task | assembled in RAM by `build_context()`, never persisted | one call | context builder | the calling agent | writer: 4 Bible files + own outline slice + rolling summary ≤120 words |
+| MEM-2 | **Long-term canonical (Story Bible)** | World rules, characters, timeline, mysteries, outline — the facts of the novel | `output/<slug>/bible/*.md` + `entities.json` | whole run and beyond | Worldbuilder, Character Architect, Plot Architect only | every agent (read-only) | world ≤350 words, ≤3 characters × 80 words, ≤8 timeline events, ≤3 mysteries |
+| MEM-3 | **Long-term narrative (rolling summaries)** | What has already happened, compressed | `output/<slug>/summaries/chNN.md` + `running.md` | whole run | Summarizer (pure code + optional LLM) after each accepted chapter | Chapter Writer, Style Editor | each ≤60 words; `running.md` ≤ `prior_summary_max_words` |
+| MEM-4 | **Episodic (critiques and decisions)** | Every critic verdict, every gate decision, every rewrite instruction | `output/<slug>/critiques/chNN.<critic>.json`, `logs/agents.jsonl` | whole run; append-only | critics, orchestrator | rewrite prompt (last critique only), humans, tests | last critique injected verbatim; older ones never re-fed |
+| MEM-5 | **Procedural (state)** | Where the run is: stage, per-chapter status, iteration, cost so far | `output/<slug>/state.json` | whole run | orchestrator only | orchestrator (`resume`, `status`) | — |
+
+Rules:
+
+- **MEM-6 · No prose leaks.** Prior chapter text never enters a prompt; only MEM-3 summaries do. Test TST-3.
+- **MEM-7 · Structured shadow of the Bible.** Alongside the Markdown, `bible/entities.json` holds machine-readable canon: `{characters:[{name, aliases[], role, first_chapter}], places:[…], tech:[{name, rule}], timeline:[{event, order}]}`. Critics check against the JSON; humans read the Markdown. Both are written by the same agent call (the SKILL requires both outputs).
+- **MEM-8 · Memory budget.** `build_context()` reports the token estimate of each memory slice in the audit row (`ctx_bible_tokens`, `ctx_summary_tokens`, `ctx_task_tokens`). A slice over its cap raises `ContextBudgetExceeded` before the call is made.
+- **MEM-9 · Forgetting is explicit.** Summaries are regenerated when a chapter is rewritten; the old summary is kept as `chNN.v<k>.md` so the episodic trail is complete.
+
+---
+
+## 3 · Agents (AGT) — comparable I/O contracts
+
+Every agent is specified with the same eight fields so agents can be compared side by side. `Engine` = whether the agent calls the model. `Writes` lists the only memory it may modify.
+
+| ID | Agent | Phase | Engine | Reads | Writes | Input contract | Output contract | Acceptance |
+|---|---|---|---|---|---|---|---|---|
+| AGT-1 | Worldbuilder | 1 | LLM | premise, tone, config caps | MEM-2 `world.md`, `entities.json[tech, places]` | `{premise, tone, world_max_words}` | Markdown with headings `# Setting`, `# Physics & Technology`, `# Rules that cannot be broken`, `# Society` + JSON block for entities | ≤ cap words; ≥3 explicit rules; JSON parses |
+| AGT-2 | Character Architect | 1 | LLM | premise, `world.md`, config caps | MEM-2 `characters.md`, `timeline.md`, `mysteries.md`, `entities.json[characters, timeline]` | `{premise, world_md, characters_max, …}` | Per character: name, role, want, secret, voice note; timeline as ordered list; mysteries as numbered questions | count ≤ cap; every name appears in `entities.json`; every mystery is a question |
+| AGT-3 | Plot Architect | 1 | LLM | all Bible files, `chapters`, beats range | MEM-2 `outline.md` | `{bible, chapters, beats_min, beats_max}` | Per chapter: `## Chapter N — title`, `tension: 1-10`, `pov:`, `beats:` (2–4), `promise:` | exactly `chapters` sections; tension curve not monotonic-flat; each beat references a known entity |
+| AGT-4 | Chapter Writer | 2 | LLM | MEM-1 slice: Bible + own outline slice + `running.md` (+ last critique on rewrite) | `chapters/chNN.md` (draft) | `{context, chapter_no, words_target/min/max, pov, tense, critique?}` | Prose only, no headings beyond `## Chapter N`, no meta-commentary | within word/paragraph caps (checked by AGT-7) |
+| AGT-5 | Continuity Critic | 2 | LLM (mock: real name/timeline checker) | draft, `entities.json`, `timeline.md`, `running.md` | MEM-4 `chNN.continuity.json` | `{draft, entities, timeline, summary}` | `{score:1-10, contradictions:[{quote, bible_ref, severity:hard/soft, fix}]}` (JSON schema enforced) | schema valid; every `quote` is a substring of the draft |
+| AGT-6 | Science Auditor | 2 | LLM (mock: rule table by tone) | draft, `world.md` rules, tone | MEM-4 `chNN.science.json` | `{draft, world_rules, tone}` | `{score, issues:[{claim, problem, severity, fix}]}` | schema valid |
+| AGT-7 | Length Critic | 2 | **pure code** | draft, `novel` config section | MEM-4 `chNN.length.json` | `{draft, novel_cfg}` | `{score, issues:[{rule, expected, actual, severity, location?, fix}]}` | deterministic; hard violation → score 0 |
+| AGT-8 | Summarizer | 2 | pure code (extractive) by default; LLM optional via config | accepted draft, `running.md` | MEM-3 `summaries/chNN.md`, `running.md` | `{draft, running, max_words}` | plain text ≤ cap | ≤ cap words; mentions every entity introduced in the chapter |
+| AGT-9 | Style Editor | 3 | LLM (mock: deterministic passes) | all accepted chapters, `characters.md` voice notes, `chars_per_line` | `chapters/chNN.md` (final) | `{chapters[], voice_notes, wrap_width}` | same chapter count; prose wrapped at width | word count changes ≤ ±10 % per chapter; no entity renamed (AGT-5 re-run once as a check) |
+| AGT-10 | Publisher | 3 | pure code | final chapters, `synopsis`, config `outputs` | `dist/book.md`, `dist/book.pdf` | `{chapters[], title, synopsis, outputs_cfg}` | valid Markdown; valid PDF (`%PDF-`, resolvable xref) | files exist; nothing else in `dist/` |
+
+**AGT-11 · Uniform interface.** All LLM agents implement `ProducerAgent.run(ctx) -> Markdown` or `CritiqueAgent.run(ctx) -> dict`. Pure-code agents implement the same Protocols so the orchestrator cannot tell them apart. This is what makes AGT-7 and AGT-8 swappable for LLM versions later by config only.
+
+**AGT-12 · Write permissions are typed.** Only AGT-1/2/3 receive a `BibleWriter`. Any other agent attempting a Bible write raises `BibleWriteDenied`. Test TST-6.
+
+---
+
+## 4 · Skills (SKL)
+
+A skill is the behavioural definition of one LLM agent. Location: `.claude/skills/<skill>/SKILL.md`.
+
+| ID | Skill | Agent | Required template variables |
 |---|---|---|---|
-| `chapters` | int | 1 ≤ n ≤ 200 | validation (Layer 1) |
-| `words_per_chapter.target` | int | min ≤ target ≤ max | Length Critic |
-| `words_per_chapter.min` | int | ≥ 50 | Length Critic — draft below min is a **hard fail** (score 0) |
-| `words_per_chapter.max` | int | ≤ 8000 | Length Critic — draft above max is a hard fail |
-| `lines_per_chapter.max` | int | ≥ 5 | Length Critic — a "line" = a physical line after wrapping at `chars_per_line.max` |
-| `chars_per_line.max` | int | 40 ≤ n ≤ 160 | Style Editor wraps prose to this; PDF exporter uses it for layout |
-| `paragraphs_per_chapter.min/max` | int | min ≥ 1 | Length Critic |
-| `sentences_per_paragraph.max` | int | ≥ 1 | Length Critic (soft: −1 point per violation, floor 5) |
-| `pov` | enum | `first`, `third-limited`, `third-omniscient` | injected into Chapter Writer prompt |
-| `tense` | enum | `past`, `present` | injected into Chapter Writer prompt |
+| SKL-1 | `worldbuilding` | AGT-1 | `{{premise}} {{tone}} {{world_max_words}}` |
+| SKL-2 | `character-design` | AGT-2 | `{{characters_max}} {{characters_max_words_each}} {{mysteries_max}}` |
+| SKL-3 | `plot-structure` | AGT-3 | `{{chapters_total}} {{beats_min}} {{beats_max}}` |
+| SKL-4 | `chapter-writing` | AGT-4 | `{{chapter_number}} {{words_target}} {{words_min}} {{words_max}} {{pov}} {{tense}}` |
+| SKL-5 | `continuity-check` | AGT-5 | `{{threshold}}` |
+| SKL-6 | `science-audit` | AGT-6 | `{{tone}}` |
+| SKL-7 | `prose-editing` | AGT-9 | `{{chars_per_line}}` |
+| SKL-8 | `summarize-chapter` | AGT-8 (LLM mode) | `{{summary_max_words}}` |
 
-### `bible`
-Caps the size of every Bible artefact so a tiny novel does not get a 3 000-word world doc. Enforced by a **pure-code post-check** after Fase 1: if a Bible file exceeds its cap, the producing agent is re-run once with the cap quoted in the prompt; if it still exceeds, the file is truncated at the last complete heading and the run logs `bible_truncated`.
-
-### `context`
-- `prior_summary_max_words` — rolling summary cap. Test `CFG-T3` asserts the summary passed to the writer never exceeds it.
-- `include_bible_files` — ordered list; anything not listed is invisible to the writer.
-- `include_full_outline` — `false` means the writer sees only its own chapter's outline slice.
-
-### `quality_gate`
-- `threshold` — 1 ≤ n ≤ 10.
-- `max_revisions` — 0 ≤ n ≤ 10. `0` means "critique once, never rewrite" (useful for smoke tests).
-- `critics` — ordered subset of `["continuity", "science", "length", "reader"]`. Gate = `min(score of listed critics) ≥ threshold`. `length` is pure code (no LLM); `reader` is the optional Reader Simulator.
-- `on_exhausted` — `accept_with_warnings` | `halt`. `halt` saves state and exits non-zero; run stays resumable.
-
-### `engine`
-- `name` — `mock` | `anthropic`.
-- `model` — must exist in `pricing.py`. Ignored by `mock` except for cost simulation.
-- `max_tokens_per_call` — hard cap passed to the engine. `mock` truncates to it.
-- `temperature` — 0.0–1.0 (optional, default 0.7).
-
-### `budget`
-`BudgetGuard` (Layer 6) reads these. Breaching either value → `BudgetExceeded`, state saved, clean stop.
-
-### `outputs`
-- `formats` — non-empty subset of `["markdown", "pdf"]`. **EPUB and SVG cover are removed from the exporter registry**; requesting them is a `ConfigError`.
-- `markdown.single_file` — `true` → one `book.md`; `false` → `chapters/NN.md` copied into `dist/markdown/` plus an `index.md`.
-- `markdown.include_bible_appendix` — appends the Bible as an appendix (useful while debugging small runs).
-- `pdf.page_size` — `A4` | `A5` | `letter`.
-- `pdf.chars_per_line` is **not** a field: the PDF exporter derives wrapping from `novel.chars_per_line.max`, so both outputs wrap identically.
+**SKL-9 · Structure.** YAML frontmatter `name, role, model, max_tokens, writes_bible, outputs_json` plus five mandatory sections: `## Purpose`, `## Inputs`, `## Output Format`, `## Quality Criteria`, `## Example`. `skills.py` assembles system prompts from them.
+**SKL-10 · No magic numbers.** A SKILL.md that hardcodes a value for which a template variable exists fails `tools/check_specs.py`.
+**SKL-11 · Untrusted-content clause.** Every assembled prompt ends with a fixed sentence declaring that content inside `<untrusted>` blocks is data, not instructions.
 
 ---
 
-## CFG-3 · Precedence and immutability
+## 5 · Tools and plugins (TOOL)
 
-1. **Precedence** (highest first): CLI flag → `novel.config.json` → `profile` preset → nothing (error). The only CLI flags allowed to override config are `--chapters`, `--engine`, `--max-cost-usd`, `--tone`; everything else must be changed in the file. This keeps the file the single source of truth while still allowing quick experiments.
-2. **Snapshot**: at `novaforge new`, the fully-resolved config is written to `output/<slug>/config.snapshot.json`. **`resume` always reads the snapshot, never the live file**, so editing the config mid-run cannot corrupt a run. Test `CFG-T5`.
-3. **Fingerprint**: the snapshot's SHA-256 is stored in `state.json` and in every audit row (`config_hash`), so any artefact can be traced to the exact configuration that produced it.
+"Tool" here means anything the harness calls that is not the model. The runtime has no plugins; dev-time tooling is listed separately so the two are not confused.
 
----
+### 5.1 Runtime tools (inside the harness)
 
-## CFG-4 · The Length Critic (new, pure code)
+| ID | Tool | Used by | Purpose | Implementation |
+|---|---|---|---|---|
+| TOOL-1 | `Workspace` | everyone | the only way to touch disk; canonicalises paths and refuses escapes from `output/<slug>` | `security/sandbox.py` |
+| TOOL-2 | `Engine` | LLM agents | `complete(system, user, *, json_schema=None) -> Completion` | `engines/mock.py`, `engines/anthropic.py` |
+| TOOL-3 | JSON-schema validator | critics | rejects malformed critic output before it reaches the gate | stdlib, hand-written validator |
+| TOOL-4 | Length checker | AGT-7 | words, wrapped lines, paragraphs, sentences | `critics/length.py` |
+| TOOL-5 | Entity extractor | AGT-5 (mock), AGT-8 | proper-noun scan + edit-distance match against `entities.json` | stdlib |
+| TOOL-6 | Markdown exporter | AGT-10 | single-file or per-chapter book | `export/markdown.py` |
+| TOOL-7 | PDF writer | AGT-10 | minimal PDF 1.4 writer with wrapping, page numbers, title page | `export/pdf.py` |
+| TOOL-8 | `RunLog` | orchestrator | append-only JSONL with hash chain, cost rollup | `runlog.py`, `security/audit.py` |
+| TOOL-9 | `BudgetGuard` | orchestrator | stops the run cleanly on cost/token breach | `security/audit.py` |
 
-Module: `critics/length.py`. Implements `CritiqueAgent` **without calling the engine**.
+### 5.2 Development tools (outside the harness)
 
-Input: chapter draft + `novel` section of config.
-Output: same JSON shape as the other critics:
+| ID | Tool | Purpose |
+|---|---|---|
+| TOOL-10 | Claude Code | builds the project from this spec; the `.claude/skills` folder is shared with the runtime |
+| TOOL-11 | `pytest` | runs TST-*; `-m live` selects tests that need an API key |
+| TOOL-12 | `tools/check_specs.py` | spec ↔ skill ↔ test consistency |
+| TOOL-13 | `git` / GitHub | versioning; every `specs/changes/CHG-*.md` is one commit |
+| TOOL-14 | Mermaid (in README) | the flow diagram, rendered by GitHub |
 
-```json
-{
-  "score": 6,
-  "issues": [
-    { "rule": "words_per_chapter.max", "expected": "≤ 550", "actual": 712, "severity": "hard", "fix": "Cut ~160 words; the second scene repeats the airlock description." },
-    { "rule": "sentences_per_paragraph.max", "expected": "≤ 6", "actual": 9, "severity": "soft", "location": "paragraph 3" }
-  ]
-}
-```
-
-Scoring: start at 10; any `hard` issue → 0; each `soft` issue −1, floor 5.
-Its issues are appended to the rewrite prompt exactly like continuity issues, so the writer gets *"cut 160 words"* as an instruction. This is what makes chapter length a reliably enforced parameter instead of a hope.
-
----
-
-## CFG-5 · How the config reaches the agents
-
-`skills.py` exposes template variables to every SKILL.md: `{{words_target}}`, `{{words_min}}`, `{{words_max}}`, `{{paragraphs_min}}`, `{{paragraphs_max}}`, `{{pov}}`, `{{tense}}`, `{{chapters_total}}`, `{{chapter_number}}`, `{{tone}}`. A SKILL.md that hardcodes a number where a variable exists fails `tools/check_specs.py`.
+**TOOL-15 · Future plugins (not in v0.1).** Kept out on purpose; listed so the extension point is known: web search via MCP for the Science Auditor to verify real physics; a vector store for MEM-3 once `full` profile summaries exceed the context cap. Each would enter as a new `Tool` implementation behind a config flag, no change to agents.
 
 ---
 
-## CFG-6 · Shipped profiles (the growth ladder)
+## 6 · Configuration (CFG)
 
-| profile | chapters | words/ch | max_revisions | prior_summary | max_cost_usd | purpose |
-|---|---|---|---|---|---|---|
-| `tiny` | 3 | 300–550 (400) | 2 | 120 | 2 | prove the loop; every demo and test |
-| `small` | 6 | 700–1100 (900) | 3 | 200 | 8 | first real story arc |
-| `medium` | 12 | 1500–2500 (2000) | 3 | 250 | 25 | novella |
-| `full` | 24 | 2500–4000 (3200) | 3 | 300 | 80 | full novel |
+Values live in `config/novel.config.json`; this section defines them. Loading is strict: unknown, missing or wrongly typed fields raise `ConfigError` with the field path. **Nothing in this table may be hardcoded in Python.**
 
-Moving up a rung is a one-word change (`"profile": "small"`). **No Python file changes between rungs** — test `CFG-T7` runs the whole pipeline under `mock` for all four profiles and asserts identical code path, only different limits.
+| Section | Fields | Rule | Enforced by |
+|---|---|---|---|
+| `schema_version` | int | must match supported version | loader |
+| `profile` | `tiny` · `small` · `medium` · `full` | preset under `config/profiles/`; file values override preset | loader |
+| `novel` | `chapters` (1–200); `words_per_chapter{target,min,max}` (min≤target≤max, min≥50, max≤8000); `lines_per_chapter.max` (≥5); `chars_per_line.max` (40–160); `paragraphs_per_chapter{min,max}`; `sentences_per_paragraph.max`; `pov` enum; `tense` enum | ranges | validation + AGT-7 |
+| `bible` | `world_max_words`, `characters_max`, `characters_max_words_each`, `timeline_max_events`, `mysteries_max`, `outline_beats_per_chapter{min,max}` | caps | post-check after Phase 1 (re-run once, then truncate at last heading, log `bible_truncated`) |
+| `context` | `prior_summary_max_words`, `include_bible_files[]`, `include_full_outline` | MEM-1 slice | `build_context()` + MEM-8 |
+| `quality_gate` | `threshold` (1–10), `max_revisions` (0–10), `critics[]` ⊆ {continuity, science, length, reader}, `on_exhausted` ∈ {accept_with_warnings, halt} | gate | orchestrator |
+| `engine` | `name` ∈ {mock, anthropic}, `model` (must exist in `pricing.py`), `max_tokens_per_call`, `temperature` | — | composition |
+| `budget` | `max_cost_usd`, `max_total_tokens` | breach → `BudgetExceeded`, state saved | TOOL-9 |
+| `outputs` | `formats[]` ⊆ {markdown, pdf} (non-empty); `markdown{single_file, filename, include_synopsis, include_bible_appendix, chapter_heading_level}`; `pdf{filename, page_size ∈ A4/A5/letter, font_size_pt, line_spacing, margins_mm, chapter_starts_new_page, page_numbers, title_page}` | EPUB/SVG not accepted | AGT-10 |
 
----
+- **CFG-1 · Precedence:** CLI flag (`--chapters --engine --max-cost-usd --tone` only) → file → profile.
+- **CFG-2 · Snapshot:** resolved config is written to `output/<slug>/config.snapshot.json`; `resume` reads only the snapshot; its SHA-256 (`config_hash`) is stored in `state.json` and every audit row.
+- **CFG-3 · Growth ladder:**
 
-## CFG-7 · Change specs (how the harness improves incrementally)
+| profile | chapters | words/chapter | max_revisions | summary cap | max_cost_usd |
+|---|---|---|---|---|---|
+| tiny | 3 | 300–550 | 2 | 120 | 2 |
+| small | 6 | 700–1100 | 3 | 200 | 8 |
+| medium | 12 | 1500–2500 | 3 | 250 | 25 |
+| full | 24 | 2500–4000 | 3 | 300 | 80 |
 
-Every improvement is a small file in `specs/changes/CHG-NNN-<slug>.md` using this template:
-
-```
-# CHG-014 · Raise continuity threshold for medium+ profiles
-Motivation: at 12 chapters, drift in character voice slips through at threshold 8.
-Change: config only — profiles/medium.json and full.json set quality_gate.threshold = 9.
-Code touched: none.
-Spec touched: CFG-6 table.
-Verification: run tiny (unchanged) and medium under mock; medium shows ≥1 extra rewrite in logs; tiny identical to previous run (same config_hash → same output).
-Rollback: revert the two profile files.
-```
-
-Rules: one concern per change; `Code touched: none` is the goal and the default; a change that needs code must say which spec ID it amends. `tools/check_specs.py` fails if a `CHG` file lacks any of the six headings.
-
----
-
-## CFG-8 · Migration
-
-When `schema_version` bumps, ship `tools/migrate_config.py vN → vN+1` that rewrites old files, and add a row to `specs/changes/`. Old snapshots stay readable by the version that wrote them (resume never migrates).
+- **CFG-4 · Change process:** every improvement is `specs/changes/CHG-NNN-<slug>.md` with headings `Motivation, Change, Code touched, Spec touched, Verification, Rollback`. Default goal: `Code touched: none`.
 
 ---
 
-## CFG-9 · Tests
+## 7 · Quality gate (GATE)
 
-| id | asserts |
-|---|---|
-| CFG-T1 | unknown field, missing required field, wrong type → `ConfigError` with the field path |
-| CFG-T2 | `min ≤ target ≤ max` and all ranges above are validated |
-| CFG-T3 | writer prompt contains ≤ `prior_summary_max_words` words of summary and only listed Bible files |
-| CFG-T4 | Length Critic: draft of 712 words vs max 550 → score 0 and a `words_per_chapter.max` issue; draft in range → 10 |
-| CFG-T5 | edit live config during a run → `resume` still uses snapshot values |
-| CFG-T6 | `outputs.formats: ["markdown","pdf"]` produces exactly `book.md` and `book.pdf`; requesting `epub` → `ConfigError` |
-| CFG-T7 | pipeline runs under `mock` for all four profiles with zero code differences |
-| CFG-T8 | PDF and Markdown wrap at the same `chars_per_line.max`; PDF starts `%PDF-`, xref resolves, page count > 0 |
-| CFG-T9 | every `{{variable}}` in CFG-5 is substituted in the assembled prompt; no literal `{{` remains |
+- **GATE-1** For each chapter: run every critic in `quality_gate.critics`; gate passes iff `min(score) ≥ threshold`.
+- **GATE-2** On fail: append the failing critiques (last iteration only, MEM-4 rule) to the writer prompt and rewrite; at most `max_revisions` times.
+- **GATE-3** On exhaustion: keep the best-scoring draft, mark `accepted_with_warnings` (or `halt` per config). The run never crashes on quality.
+- **GATE-4** After Style Editor: re-run Continuity Critic once over the edited chapters; a drop below threshold restores the pre-edit chapter and logs `style_reverted`.
+- **GATE-5** Every gate decision is one audit row: `{chapter, iteration, scores{}, decision, config_hash}`.
 
 ---
 
-## CFG-10 · Acceptance for the first (tiny) run
+## 8 · Observability (OBS)
 
-`novaforge new "..." --config config/novel.config.json` with the file above must produce:
-- `state.json`: 3 chapters `approved`, `config_hash` present, no secrets.
-- `critiques/chNN.length.json` for every chapter, every accepted draft within 300–550 words and ≤ 70 lines.
-- `dist/book.md` and `dist/book.pdf`, nothing else in `dist/`.
-- `logs/cost.json` total ≤ 2.0 USD (simulated under mock).
-- Changing only `"profile": "small"` and re-running produces 6 chapters of 700–1100 words with no code diff (`git diff --stat -- '*.py'` empty).
+- **OBS-1** `logs/agents.jsonl`: one row per model call — `ts, agent, model, chapter, iteration, input_tokens, output_tokens, cost_usd, duration_ms, engine, ctx_*_tokens, prev_hash, hash, config_hash`.
+- **OBS-2** `logs/cost.json`: rollup per chapter and per agent; printed by the CLI at the end.
+- **OBS-3** `novaforge status <slug>`: current stage, per-chapter status, iterations used, cost so far, budget remaining.
+- **OBS-4** `novaforge diff <slug> <chapter>`: shows draft v1 → vN alongside the critiques that caused each rewrite (reads MEM-4 only). Cheap to build; makes the loop visible in a demo.
+
+---
+
+## 9 · Tests (TST)
+
+| ID | Asserts | Spec |
+|---|---|---|
+| TST-1 | config loads; unknown/missing/wrong-type → `ConfigError` with path; ranges validated | CFG |
+| TST-2 | all four profiles run end-to-end under `mock` with zero Python differences | CFG-3, P1 |
+| TST-3 | writer prompt contains no prior chapter prose; summary ≤ cap; only listed Bible files | MEM-6, MEM-1 |
+| TST-4 | context over cap → `ContextBudgetExceeded` before any engine call | MEM-8 |
+| TST-5 | Bible caps enforced: oversize world → re-run, then truncated + logged | CFG bible |
+| TST-6 | non-writer agent Bible write → `BibleWriteDenied` | AGT-12 |
+| TST-7 | **injected contradiction**: canon `Iven Sarkady`, draft drifts to `Iven Sarkane` → continuity score < 8, contradiction named, rewrite triggered; clean control ≥ 8 (`live` twin against the real model) | AGT-5, GATE |
+| TST-8 | Length Critic: 712 words vs max 550 → score 0 with `words_per_chapter.max` issue; in-range → 10 | AGT-7 |
+| TST-9 | critic output failing JSON schema is rejected and re-requested once, then treated as score 0 | TOOL-3 |
+| TST-10 | kill after chapter 2 → `resume` starts at 3, chapters 1–2 untouched, snapshot used even if live config edited | MEM-5, CFG-2 |
+| TST-11 | `entities.json` and `characters.md` name sets are identical | MEM-7 |
+| TST-12 | outputs: exactly `book.md` + `book.pdf`; PDF header/xref valid; both wrap at `chars_per_line.max`; `epub` requested → `ConfigError` | AGT-10 |
+| TST-13 | all 8 SKILL.md parse with 5 sections; every `{{var}}` substituted; no hardcoded number where a var exists | SKL |
+| TST-14 | audit chain verifies; an in-place edit breaks verification; no secret string in any log or `state.json` | OBS-1 |
+| TST-15 | style edit that renames an entity is reverted and logged | GATE-4 |
+
+---
+
+## 10 · Recommendations (each one small, each one useful)
+
+1. **Entity registry first.** MEM-7 is the cheapest thing that makes the Continuity Critic reliable under `mock` and sharper under the real model. Build it in v0.1.
+2. **Extractive summarizer by default.** A pure-code summarizer (first sentence of each paragraph + all sentences mentioning a new entity, trimmed to cap) costs nothing and is deterministic. Switch to LLM summaries per profile via config when quality demands it.
+3. **`novaforge diff`.** OBS-4 turns the quality loop into something you can show on a screen in ten seconds.
+4. **Golden run.** Commit `output/golden-tiny/` produced under `mock`. A test re-runs the tiny profile and diffs against it — any change in the harness that alters output is caught immediately.
+5. **Reader Simulator as the first CHG.** Adding it is one SKILL.md, one row in the agents table, one entry in `quality_gate.critics`. Use it as the worked example that proves "growth without code".
+6. **Two-model split later, not now.** When moving to `medium`, consider a cheaper model for critics via `engine.model_by_role` — a config key, no code.
+7. **Keep humans in the episodic loop.** `critiques/` is readable Markdown-adjacent JSON; a `--pause-on-warning` flag that stops before accepting a chapter with warnings lets a human decide, without changing the pipeline.
+
+---
+
+## 11 · Acceptance for v0.1 (tiny)
+
+`novaforge new "…" --config config/novel.config.json` must yield: 3 chapters `approved` in `state.json` with `config_hash`; `critiques/chNN.{continuity,science,length}.json` for every chapter; `bible/entities.json` consistent with `characters.md`; `summaries/running.md` ≤ 120 words; `dist/book.md` and `dist/book.pdf` and nothing else; `logs/cost.json` ≤ 2.0 USD; audit chain valid. Changing only `"profile": "small"` re-runs with 6 chapters and an empty `git diff -- '*.py'`.
