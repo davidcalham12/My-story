@@ -6,27 +6,44 @@ from backend.commons.llm.engine import MockEngine, Plan
 from backend.commons.log.calls import CallRow, write_call
 
 
-def _prompt(chapter: int, attempt: int = 1, critic: str | None = None) -> str:
-    head = "Premise: a lighthouse keeper on Titan receives her own distress calls"
-    if critic:
-        return f"{head}\nReturn JSON only. {critic}. chapter {chapter}. ATTEMPT {attempt}"
-    return f"{head}\nYou are writing chapter {chapter}"
+HEAD = "Premise: a lighthouse keeper on Titan receives her own distress calls"
+
+
+def _writer(engine, chapter: int):
+    """The mock is TOLD the chapter; it no longer reads it out of the prompt.
+
+    Both the agent and the chapter used to be guessed from the text, and both
+    guesses were wrong for the same reason: an agent's prompt file talks about
+    the other agents and about chapters in general, so every critic answered as
+    continuity and thought it was judging whichever chapter its own instructions
+    happened to mention. A plan naming a failure could then never produce it.
+    """
+    return engine.complete(
+        HEAD + "\nYou are writing chapter " + str(chapter),
+        model="m", max_tokens=99, agent="chapter-writer", chapter=chapter,
+    )
+
+
+def _critic(engine, which: str, chapter: int, attempt: int):
+    return engine.complete(
+        HEAD + "\nReturn JSON only.",
+        model="m", max_tokens=99, agent=which + "-critic",
+        chapter=chapter, attempt=attempt,
+    )
 
 
 def test_mock_respects_the_premise():
     """v1's mock ignored the premise, which is why it never demonstrated
     anything. An artefact that mentions nothing from the brief cannot show the
     pipeline carried the brief through."""
-    engine = MockEngine()
-    reply = engine.complete(_prompt(1), model="m", max_tokens=100)
-    assert "lighthouse" in reply.text
+    assert "lighthouse" in _writer(MockEngine(), 1).text
 
 
 def test_plan_drives_named_failures_only():
     engine = MockEngine(Plan(fail={(2, 1): ["outline"]}))
-    failed = engine.complete(_prompt(2, 1, "outline"), model="m", max_tokens=99)
-    passed = engine.complete(_prompt(2, 2, "outline"), model="m", max_tokens=99)
-    other = engine.complete(_prompt(2, 1, "science"), model="m", max_tokens=99)
+    failed = _critic(engine, "outline", 2, 1)
+    passed = _critic(engine, "outline", 2, 2)
+    other = _critic(engine, "science", 2, 1)
     assert '"score": 4' in failed.text
     assert '"score": 10' in passed.text
     assert '"score": 10' in other.text, "only the named critic fails"
@@ -36,22 +53,19 @@ def test_mock_emits_out_of_band_and_headingless_text():
     """`length` and `chatter` are real code and must run on real text. Scripting
     the two characteristics that reproduce would be not testing them."""
     engine = MockEngine(Plan(out_of_band={3}, headingless={4}))
-    short = engine.complete(_prompt(3), model="m", max_tokens=99).text
-    bare = engine.complete(_prompt(4), model="m", max_tokens=99).text
+    short = _writer(engine, 3).text
+    bare = _writer(engine, 4).text
     assert len(short.split()) < 50
     assert not bare.startswith("# Chapter")
 
 
 def test_mock_is_deterministic():
-    a = MockEngine().complete(_prompt(1), model="m", max_tokens=99).text
-    b = MockEngine().complete(_prompt(1), model="m", max_tokens=99).text
-    assert a == b
+    assert _writer(MockEngine(), 1).text == _writer(MockEngine(), 1).text
 
 
 def test_mock_reports_its_provenance_honestly():
     """A counter is not an API. `estimated`, not `measured`."""
-    reply = MockEngine().complete(_prompt(1), model="m", max_tokens=99)
-    assert reply.provenance == "estimated"
+    assert _writer(MockEngine(), 1).provenance == "estimated"
 
 
 # ------------------------------------------------------------------ budget

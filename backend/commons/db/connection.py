@@ -11,7 +11,12 @@ from typing import Iterator
 
 
 def connect(path: Path | str) -> sqlite3.Connection:
-    conn = sqlite3.connect(path, isolation_level=None)  # we own the transactions
+    # `check_same_thread=False` because the three model critics are dispatched in
+    # parallel and each records its own call row. SQLite allows ONE writer, so
+    # the caller serialises writes with a lock (see `Dispatcher`) rather than
+    # hoping; sharing a connection across threads without one is the failure this
+    # flag otherwise invites.
+    conn = sqlite3.connect(path, isolation_level=None, check_same_thread=False)
     conn.row_factory = sqlite3.Row                      # rows index by name
     conn.execute("PRAGMA journal_mode = WAL")           # readers do not block the writer
     conn.execute("PRAGMA foreign_keys = ON")            # OFF by default, per connection
@@ -21,7 +26,7 @@ def connect(path: Path | str) -> sqlite3.Connection:
 
 def memory() -> sqlite3.Connection:
     """A fresh database per test. WAL is unavailable in memory and unneeded."""
-    conn = sqlite3.connect(":memory:", isolation_level=None)
+    conn = sqlite3.connect(":memory:", isolation_level=None, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn

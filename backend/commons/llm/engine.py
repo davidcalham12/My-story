@@ -31,7 +31,9 @@ class Reply:
 class Engine(Protocol):
     name: str
 
-    def complete(self, prompt: str, *, model: str, max_tokens: int) -> Reply: ...
+    def complete(self, prompt: str, *, model: str, max_tokens: int,
+                 agent: str = "", chapter: int | None = None,
+                 attempt: int | None = None) -> Reply: ...
 
 
 # --------------------------------------------------------------------- mock
@@ -82,10 +84,22 @@ class MockEngine:
         self.counter = counter or DeterministicCounter()
         self.calls: list[str] = []
 
-    def complete(self, prompt: str, *, model: str, max_tokens: int) -> Reply:
+    def complete(self, prompt: str, *, model: str, max_tokens: int,
+                 agent: str = "", chapter: int | None = None,
+                 attempt: int | None = None) -> Reply:
+        """The mock is TOLD which agent, chapter and attempt it is answering as.
+
+        It used to read all three out of the prompt text, and both guesses were
+        wrong for the same reason: an agent's prompt file talks about the other
+        agents and about chapters in general, so `outline-critic` answered as
+        continuity and every critic thought it was judging chapter 3. A plan that
+        names a failure could then never produce it.
+
+        Guessing a fact the caller already knows is a bug with a long fuse.
+        """
         started = time.monotonic()
         self.calls.append(prompt)
-        text = self._respond(prompt)
+        text = self._respond(prompt, agent, chapter, attempt)
         return Reply(
             text=text,
             input_tokens=self.counter.count(prompt),
@@ -105,56 +119,157 @@ class MockEngine:
                 return [w for w in words if len(w) > 4][:n]
         return []
 
-    def _respond(self, prompt: str) -> str:
+    def _respond(self, prompt: str, agent: str = "", chapter: int | None = None,
+                 attempt: int | None = None) -> str:
         if "Return JSON only" in prompt:
-            return self._critic_reply(prompt)
-        if "# Chapter" in prompt or "You are writing chapter" in prompt:
-            return self._chapter(prompt)
-        return self._document(prompt)
+            if "facts" in prompt:
+                return self._facts(prompt, chapter)
+            return self._critic_reply(prompt, agent, chapter, attempt)
+        if "You are writing chapter" in prompt:
+            return self._chapter(prompt, chapter)
+        if "chapter entries" in prompt:
+            return self._outline(prompt)
+        if "synopsis" in prompt:
+            return self._synopsis(prompt)
+        if "Normalise punctuation" in prompt:
+            return self._style(prompt)
+        if "Characters:" in prompt:
+            return self._cast(prompt)
+        return self._world(prompt)
 
-    def _document(self, prompt: str) -> str:
+    # -- the shapes the pipeline actually parses ------------------------
+    #
+    # Respecting the premise is not enough on its own: a mock that returns
+    # plausible prose but not the SHAPE the orchestrator splits on tests the
+    # prose path and nothing else. These read the counts out of the brief they
+    # were given, so the artefacts satisfy the same checks a real reply must.
+
+    @staticmethod
+    def _band(prompt: str, label: str, fallback: tuple[int, int]) -> tuple[int, int]:
+        import re
+
+        m = re.search(rf"{label}:?\s*(\d+)\s*-\s*(\d+)", prompt)
+        return (int(m.group(1)), int(m.group(2))) if m else fallback
+
+    def _world(self, prompt: str) -> str:
         terms = self._terms(prompt) or ["the", "premise"]
-        body = " ".join(terms)
-        return (
-            f"# Generated from the premise\n\n{body}.\n\n"
-            "## Factions\n\n- **A Faction** - wants one thing, gets it one way\n"
-            "- **Another** - wants the opposite\n\n"
-            "## Means\n\n- **A means** - what the plot turns on\n\n"
-            "## Rules\n\n"
-            "- A rule a scene could break\n- A second rule\n"
-            "- A third rule\n- A fourth rule\n\n"
-            "## Texture\n\nWhat it feels like from inside.\n"
-        )
+        low, high = self._band(prompt, "Length", (250, 450))
+        rules_low, _ = self._band(prompt, r'Rules under "## Rules"', (4, 5))
+        factions_low, _ = self._band(prompt, "Factions", (2, 2))
+        means_low, _ = self._band(prompt, "Means entries", (2, 3))
 
-    def _chapter(self, prompt: str) -> str:
-        chapter = self._chapter_number(prompt)
+        target = (low + high) // 2
+        opening = " ".join(
+            f"The {terms[i % len(terms)]} matters here and is written down."
+            for i in range(max(6, target // 12))
+        )
+        parts = [f"# The world of {terms[0]}", "", opening, "", "## Factions", ""]
+        parts += [f"- **Faction {i + 1}** - wants {terms[i % len(terms)]}, "
+                  f"and gets it by holding the ledger"
+                  for i in range(factions_low)]
+        parts += ["", "## Means", ""]
+        parts += [f"- **Means {i + 1}** - the {terms[i % len(terms)]} the plot turns on"
+                  for i in range(means_low)]
+        parts += ["", "## Rules", ""]
+        parts += [f"- Rule {i + 1}: no {terms[i % len(terms)]} without a signature, "
+                  f"and a scene could break it"
+                  for i in range(rules_low)]
+        parts += ["", "## Texture", "",
+                  f"It smells of {terms[-1]} and sounds like a pump at night."]
+        text = "\n".join(parts)
+
+        # Pad to the band, because the orchestrator MEASURES rather than
+        # believing a reply about itself - and a mock that cannot satisfy the
+        # brief would send every run into a redraft loop that tests nothing.
+        while len(text.split()) < low:
+            text += f"\n\nA further note about {terms[0]}, recorded for the record."
+        return text
+
+    def _cast(self, prompt: str) -> str:
+        terms = self._terms(prompt) or ["premise"]
+        count, _ = self._band(prompt, "Characters", (3, 4))
+        names = ["Nora Pike", "Sam Okoye", "Hannah Brede", "Theo Vance",
+                 "Gil Marchetti", "Ada Salas", "Leo Fenn"]
+        out = ["# Characters", ""]
+        out += [f"- **{names[i % len(names)]}** - {terms[i % len(terms)]} keeper; "
+                f"stubborn, exact" for i in range(count)]
+        out += ["", "# Timeline", ""]
+        out += [f"- Day {i}: something about {terms[i % len(terms)]}" for i in range(4)]
+        out += ["", "# Mysteries", ""]
+        out += [f"- Why the {terms[i % len(terms)]} does not add up" for i in range(2)]
+        return "\n".join(out)
+
+    def _outline(self, prompt: str) -> str:
+        import re
+
+        terms = self._terms(prompt) or ["premise"]
+        m = re.search(r"exactly (\d+) chapter entries", prompt)
+        count = int(m.group(1)) if m else 3
+        out = ["# Outline", ""]
+        for n in range(1, count + 1):
+            out += [
+                f"### Chapter {n} \u2014 The {terms[(n - 1) % len(terms)].title()}",
+                f"- **POV:** {terms[0]}",
+                f"- **Tension:** {min(9, 3 + n)}/10",
+                "- **Promise advanced:** P1",
+                "- **Beats:**",
+                f"  1. Someone notices the {terms[(n - 1) % len(terms)]}.",
+                f"  2. The number is checked and does not agree.",
+                f"  3. A decision is made that cannot be taken back.",
+                "- **Must establish:** the discrepancy is real",
+                "",
+            ]
+        return "\n".join(out)
+
+    def _synopsis(self, prompt: str) -> str:
+        terms = self._terms(prompt) or ["premise"]
+        body = " ".join(f"The {t} is at stake." for t in terms * 20)
+        return body
+
+    def _style(self, prompt: str) -> str:
+        """Returns the chapter unchanged.
+
+        The style pass may not change a word, and the orchestrator checks that
+        with a word count. A mock that altered the text would make every run
+        discard every pass, which would test the discard and nothing else.
+        """
+        body = prompt.split("\n\n", 1)[-1]
+        return body.strip()
+
+    def _facts(self, prompt: str, chapter: int | None = None) -> str:
+        import json
+
+        chapter = chapter or 1
+        terms = self._terms(prompt) or ["premise"]
+        return json.dumps({"facts": [
+            {"fact": f"chapter {chapter}: the {terms[0]} was measured", "kind": "event"},
+            {"fact": f"the discrepancy in chapter {chapter} is now known",
+             "kind": "knowledge", "who": "Nora Pike"},
+            {"fact": f"what caused it, as of chapter {chapter}", "kind": "open-question"},
+        ]})
+
+    def _chapter(self, prompt: str, chapter: int | None = None) -> str:
+        chapter = chapter or 1
         terms = self._terms(prompt) or ["premise"]
         heading = "" if chapter in self.plan.headingless else f"# Chapter {chapter}\n\n"
         sentences = 4 if chapter in self.plan.out_of_band else 120
         body = " ".join(f"{terms[i % len(terms)]} happened." for i in range(sentences))
         return heading + body
 
-    @staticmethod
-    def _chapter_number(prompt: str) -> int:
-        import re
-
-        m = re.search(r"chapter (\d+)", prompt, re.I)
-        return int(m.group(1)) if m else 1
-
-    def _critic_reply(self, prompt: str) -> str:
+    def _critic_reply(self, prompt: str, agent: str = "", chapter: int | None = None,
+                      attempt: int | None = None) -> str:
         import json
-        import re
 
-        chapter = self._chapter_number(prompt)
-        attempt = 1
-        m = re.search(r"ATTEMPT (\d+)", prompt)
-        if m:
-            attempt = int(m.group(1))
-        which = "continuity"
-        for name in ("continuity", "science", "outline"):
-            if name in prompt.lower():
-                which = name
-                break
+        chapter = chapter or 1
+        attempt = attempt or 1
+        # The agent name is PASSED, not guessed from the text. Guessing it by
+        # searching the prompt for "continuity" found the wrong critic every
+        # time, because outline-critic's own prompt explains what continuity
+        # checks - so every critic answered as continuity and the plan could
+        # never fail the one it named.
+        which = agent.replace("-critic", "") if agent else "continuity"
+        if which not in ("continuity", "science", "outline"):
+            which = "continuity"
         failing = which in self.plan.failures_for(chapter, attempt)
         return json.dumps(
             {
@@ -188,7 +303,9 @@ class AnthropicEngine:
 
         self._client = anthropic.Anthropic(api_key=api_key)
 
-    def complete(self, prompt: str, *, model: str, max_tokens: int) -> Reply:
+    def complete(self, prompt: str, *, model: str, max_tokens: int,
+                 agent: str = "", chapter: int | None = None,
+                 attempt: int | None = None) -> Reply:
         started = time.monotonic()
         message = self._client.messages.create(
             model=model,
