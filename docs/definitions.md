@@ -277,5 +277,28 @@ because something new can always appear.
 `reconstructed`, `estimated`, `absent`. What cannot be measured is reported as
 unmeasurable, never as zero.
 
-**Halt** — a run stopped deliberately: a chapter that failed three attempts and
-the patch, or a budget ceiling reached. What was produced stays readable.
+**Halt** — a run stopped deliberately, always with its artefacts left readable.
+Four kinds, and the kind is recorded:
+
+- `halted: gate` — a chapter failed three attempts and the patch. No chapter
+  file is promoted; the best draft stays at `chNN.attemptK.md`.
+- `halted: budget` — the ceiling was reached. The attempt in flight is **kept**,
+  marked, unpromoted: it is already paid for.
+- `halted: context` — a context packet exceeded 100,000 tokens. Raised where the
+  packet is built, not where it is sent.
+- `halted: interrupted` — the process died. Artefacts readable; resume is not
+  implemented, and the state is sufficient for it to be added without migration.
+
+**Fact** — one entry in the rolling summary: `{fact, chapter, kind}`, with four
+closed kinds — `event`, `state-change`, `knowledge`, `open-question` — and
+`who` on `knowledge` facts. This is the only channel between chapters. When the
+cap bites, every `open-question` survives first; dropping one is recorded as a
+run warning, because an abandoned promise is the ontology's foreshadowing failure
+arriving quietly.
+
+**pre-loop003** — a run imported from the previous implementation. Readable and
+queryable; **excluded from LOOP-003's statistics**, because it was judged by a
+different set of characteristics. Evidence, not sample.
+
+**Completeness record** — what an imported run did *not* carry: gate rows,
+durations, a critic. Kept per run so a gap reads as a gap rather than as a zero.

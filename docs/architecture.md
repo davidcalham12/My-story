@@ -229,6 +229,77 @@ still reading from it would be an avoidable risk.
 the skill can be read, which the brief's own security rule forbids. The
 repository was cloned, read, and copied by hand.
 
+**The embedding model is `all-MiniLM-L6-v2`, 384 dimensions.** Permanent, because
+a `vec0` table fixes its dimension at creation and changing it means a re-index.
+Taken as the simplest option rather than asked, per the brief's §0. The model
+name is recorded beside every vector table: two different models of the same
+dimension are accepted by the store and return confident nonsense, and nothing
+but that record catches it.
+
+**The unit of drafting stays the chapter, not the scene.** The ontology models
+scenes; changing to them would restructure `flow.yaml` and all nine context
+packets. The brief asks for the same project, improved.
+
+### 6.1 Settled in the grilling round
+
+Fifteen decisions the brief left open, closed with the user before Phase 2.
+
+**The rolling summary is structured facts.** The call that already writes
+`chNN.summary.md` returns JSON instead of prose: `{fact, chapter, kind}` with four
+closed kinds - `event`, `state-change`, `knowledge`, `open-question` - and `who`
+on `knowledge` facts only. No extra model call; one that was already paid for now
+returns something queryable, and `who` is what fills `character_knowledge` in the
+same transaction that writes the chapter.
+
+**The cap drops by kind, never by age alone.** Survival order: every
+`open-question`, then recent `state-change`, then `event`. Dropping an
+`open-question` is a promise silently abandoned - the failure the ontology calls
+the foreshadowing ledger - so it **warns and is recorded at run level, and does
+not halt**. Halting because a novel opened many threads is the wrong trade; the
+cap exists to hold the context flat, not to govern the story. Widening it
+silently would make the flat-context claim unverifiable.
+
+**The importer imports what is common and records what was missing, per run.**
+The eight runs carry three critique shapes, eight chapter schemas and five critic
+sets; three wrote no gate rows at all. Each imported run gets a completeness
+record, and the interface says "not recorded" rather than zero. They are marked
+`pre-loop003` and **excluded from LOOP-003's statistics**: a pass rate computed
+over runs judged by three critics does not measure what it claims. Evidence, not
+sample - the same rule `stress.json` already carries. The importer does **not**
+backfill `knowledge` facts from their prose summaries; that would be invented data
+wearing the appearance of measurement.
+
+**The mock engine takes an explicit plan**, `{chapter, attempt, fail: [...]}`,
+not a seed. The tests that matter are specific - a chapter that fails `outline`
+twice then passes, one that can never pass - and random failure tests nothing in
+particular. The split between what the plan controls falls out of the existing
+boundary: `length` and `chatter` are real code and always compute over the text
+the mock actually produced, so the mock must be able to emit out-of-band and
+heading-less text on demand; the three model critics have their scores scripted.
+Scripting the two that reproduce would be not testing them.
+
+**Three halts, each with its mark and its readable artefacts.**
+`halted: budget` keeps the partial attempt - it is already paid for, and evidence
+bought is not thrown away. `halted: context` is raised **by the packet builder,
+not at send**: a packet over 100,000 tokens means something upstream broke, and
+trimming to fit hides exactly that, besides silently weakening the one thing that
+must stay predictable chapter to chapter. `halted: interrupted` marks a run whose
+process died; **resume is not implemented in v1**, but the persisted state is
+sufficient for it, so adding it later needs no migration. Persisting well and
+resuming are two things and the brief only requires the first.
+
+**SSE sends a `snapshot` built from the database on connect, then live events.**
+The client never accumulates, so a reconnection cannot leave half a state. A
+cursor would need per-event ids and an in-memory buffer, which is the thing a
+restart loses; replaying from the start costs more on every blip. It reinforces
+the rule: the stream is a view, the database is the record.
+
+**The budget projects worst case** - exact input tokens plus `max_tokens` as the
+output bound. A ceiling computed from an assumed output is broken by one long
+reply, and a ceiling that can be exceeded is not a ceiling. Worst case stops
+slightly early, which is the correct direction to be wrong in, and the real cost
+is recorded afterwards so the gap between projection and spend stays visible.
+
 ---
 
 ## 7. Limits

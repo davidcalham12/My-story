@@ -114,12 +114,18 @@ Tested by driving a failing chapter through the mock engine.
 sheet carries `Replacement:` and attempt 2's does not; every sheet kept at
 `specs/loops/LOOP-003/sheets/<slug>/`.
 
-**Not covered, and this is the important row.** LOOP-003 §2 claims *a chapter
-comes out valid by the third attempt*. **That claim is false, and there is a
-counterexample.** A run halted at chapter 3 having exhausted three attempts and
-the patch — not because the writer underperformed, but because the outline
-commissioned an event the world's rules did not admit, and the underlying rule
-read two ways. Class **U**, with a demonstration of its falsity on record.
+**The guarantee, restated.** LOOP-003 §2 used to claim *a chapter comes out
+valid by the third attempt*. That is false and there is a counterexample: a run
+halted at chapter 3 having exhausted three attempts and the patch — not because
+the writer underperformed, but because the outline commissioned an event the
+world's rules did not admit, and the underlying rule read two ways.
+
+It now reads: **a chapter that CAN pass will pass by the third attempt; a chapter
+that cannot halts the run rather than entering the book.** The second half is
+**D**, demonstrated at G6 and testable; the first half is **U**, because "can
+pass" is not decidable in advance. Two honest claims where there was one false
+one, and it no longer rests on the FLOW-3 audit being exhaustive — which it
+measurably is not.
 
 ---
 
