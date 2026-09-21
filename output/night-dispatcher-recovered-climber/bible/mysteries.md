@@ -1,0 +1,7 @@
+# Mysteries
+
+- **How does a call from a man logged RECOVERED reach the post at 02:52?** *(Raised ch.1 — Roth hears a live voice give the name on line 0447. Complicated ch.2 — the call's own stamp says 23:12, hours after the RECOVERED line, and nothing in the message marks a delay. Answered ch.3.)* The truth: the Ostgrat mast is store-and-forward. The Observatory's maintenance window held the hop from 18:00, so Wenger's 23:12 call sat in the queue and retried every 20 minutes until the batch cleared at 02:44; the 02:52 retry delivered it carrying its original clock stamp. The mountain is three and a half hours behind the desk, and only the desk knows it.
+
+- **If Wenger is alive, who was recovered from the couloir?** *(Raised ch.2 when Roth pulls the confirmations behind line 0447. Answered ch.3.)* The tag read at 16:18 was 7-1142, and tags are identity here — but Wenger and Voss swapped harnesses at 05:52. The casualty is Lena Voss. Voss's tag, 7-1150, has been bursting all night from the man everyone believes is dead, and the 4-minute moving run at 20:44 is proof that its wearer was walking four hours after the RECOVERED line was set.
+
+- **Can Roth get the line corrected when she is forbidden to confirm her own call?** *(Raised ch.2. Answered ch.3.)* She cannot — so the fix comes from the rule she breaks: her post check lapses past 20 minutes, the automatic valley callout fires at 03:05 and raises Bauer, who is the only person permitted to write line 0471. The correction is a new line. Line 0447 stays on the log forever.

@@ -1,0 +1,34 @@
+{
+  "premise": "the beginning after the end",
+  "profile": "tiny",
+  "slug": "the-beginning-after-the-end",
+  "tone": "quiet post-collapse literary fiction — human-scale, unhurried, hopeful without being sentimental; the disaster is long over and the story is about what grows back",
+  "chapters_planned": 3,
+  "stage": "complete",
+  "started_utc": "2026-09-18T20:26:13Z",
+  "finished_utc": "2026-09-18T20:45:05Z",
+  "canonical_names": ["Martha Gale", "Owen Pike", "Ruth Vance", "Tom Leary"],
+  "chapters": [
+    {"n": 1, "title": "Fed at the First House", "words": 464, "drafts": 1,
+     "scores": {"length": 10, "chatter": 10, "continuity": 10, "science": 8},
+     "aggregate": 8, "verdict": "accept", "style_pass": "kept"},
+    {"n": 2, "title": "What the Pipe Turned Up", "words": 458, "drafts": 1,
+     "scores": {"length": 10, "chatter": 10, "continuity": 10, "science": 10},
+     "aggregate": 10, "verdict": "accept", "style_pass": "kept"},
+    {"n": 3, "title": "Sunday, Two Names", "words": 452, "drafts": 1,
+     "scores": {"length": 10, "chatter": 10, "continuity": 10, "science": 10},
+     "aggregate": 10, "verdict": "accept", "style_pass": "kept"}
+  ],
+  "totals": {
+    "chapter_words": 1374,
+    "synopsis_words": 242,
+    "book_words": 1616,
+    "subagent_calls": 17,
+    "subagent_tokens": 146279,
+    "_tokens_note": "Sum of the per-attempt `tokens` in logs/agents.jsonl. The worldbuilder's two rows are one dispatch plus one resume, and the second row holds the difference from its cumulative total rather than the total itself, so this sum is 17 attempts and not double-counted.",
+    "chapters_accepted": 3,
+    "chapters_accepted_with_warnings": 0,
+    "chapter_redrafts": 0
+  },
+  "outputs": {"formats": ["markdown"], "book": "dist/book.md", "pdf": null}
+}

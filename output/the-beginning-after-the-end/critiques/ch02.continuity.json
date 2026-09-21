@@ -1,0 +1,3 @@
+{"critic": "continuity", "chapter": 2, "kind": "model", "agent": "continuity-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []}]}

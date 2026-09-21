@@ -1,0 +1,70 @@
+{
+  "_comment": "Merged configuration for this run: config/novel.config.json with config/profiles/tiny.json overlaid key by key. The `bible` block comes wholly from the profile, as CFG-2a requires.",
+  "_premise": "the beginning after the end",
+  "_slug": "the-beginning-after-the-end",
+  "_generated_utc": "2026-09-18T20:26:13Z",
+  "profile": "tiny",
+
+  "_comment_tone": "novel.tone was null in the base config. The orchestrator read the genre off the premise and recorded it here. The premise is the words themselves: a story that starts once the ending is already over. That is aftermath, not apocalypse — the collapse is offstage and finished, and the book is about what people build in the quiet afterwards.",
+
+  "novel": {
+    "chapters": 3,
+    "tone": "quiet post-collapse literary fiction — human-scale, unhurried, hopeful without being sentimental; the disaster is long over and the story is about what grows back",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": { "min": 300, "target": 420, "max": 550 },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": { "min": 5, "max": 24 },
+    "sentences_per_paragraph": { "min": 1, "max": 5 },
+    "lines_per_chapter": { "min": 25, "max": 95 },
+    "chars_per_line": { "max": 64 },
+    "beats_per_chapter": { "min": 3, "max": 5 },
+    "promises": { "min": 3, "max": 5 }
+  },
+
+  "bible": {
+    "world_min_words": 250,
+    "world_max_words": 450,
+    "technology_entries": { "min": 2, "max": 3 },
+    "factions": { "min": 2, "max": 2 },
+    "world_rules": { "min": 4, "max": 5 },
+    "characters": { "min": 3, "max": 4 },
+    "timeline_rows": { "min": 4, "max": 6 },
+    "mysteries": { "min": 2, "max": 3 }
+  },
+
+  "context": {
+    "max_summary_words": 120,
+    "forbid_prior_chapter_prose": true
+  },
+
+  "quality_gate": {
+    "critics": ["continuity", "science", "length", "chatter"],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "accept_with_warnings"
+  },
+
+  "_comment_length_band": "words_per_chapter.min/max widened by tolerance_pct: 225 to 687 words inclusive.",
+  "_length_band": { "min": 225, "max": 687 },
+
+  "style": { "word_count_tolerance_pct": 0 },
+
+  "budget": { "max_cost_usd": 5.0, "max_calls": 120 },
+
+  "outputs": {
+    "formats": ["markdown"],
+    "synopsis": {
+      "words": { "min": 150, "max": 250 },
+      "comparables": { "min": 2, "max": 3 }
+    },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  }
+}

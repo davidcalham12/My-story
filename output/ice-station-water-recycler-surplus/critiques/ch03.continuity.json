@@ -1,0 +1,15 @@
+{"critic": "continuity", "chapter": 3, "kind": "model", "agent": "continuity-critic", "drafts": 3,
+ "iterations": [
+   {"iteration": 1, "score": 6, "findings": [
+     {"kind": "timeline-arithmetic", "severity": "medium", "upheld": true,
+      "quote": "a stack had failed forty days back",
+      "claim": "Stack B failed on Day −40 and the story present is Day +6, so the interval is forty-six days, not forty.",
+      "fix": "Change the numeral to the true interval; the clause is otherwise correct.",
+      "reference": "bible/timeline.md, Day −40"},
+     {"kind": "timeline-arithmetic", "severity": "medium", "upheld": true,
+      "quote": "a loop had started coming back rich eleven days back",
+      "claim": "The surplus began on Day −11 and the story present is Day +6, so the interval is seventeen days, not eleven.",
+      "fix": "Change the numeral to the true interval.",
+      "reference": "bible/timeline.md, Day −11"}]},
+   {"iteration": 2, "score": 10, "findings": []},
+   {"iteration": 3, "score": 10, "findings": []}]}

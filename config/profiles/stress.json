@@ -1,0 +1,37 @@
+{
+  "_comment": "CFG-7. NOT A WRITING PROFILE. This is the deliberate stress fixture for LOOP-003, and it exists because the thing that loop was built for has never happened: twenty-four chapters across seven runs and no chapter has ever failed to validate, so `patch_then_halt` — the orchestrator applying the critics' replacements, the arbitration before them, the safety cut — is specified, implemented and unexercised. Waiting for a natural failure is not a plan.",
+
+  "_comment_how": "It does not weaken the gate. Nothing here lowers the threshold of 8, removes a characteristic, or grants a fourth attempt — LOOP-003 §8.3 forbids all three and this fixture obeys it. It makes the CHAPTER hard instead, by putting two characteristics in genuine tension: nine to ten mandatory beats inside a hard 300-550 word band with tolerance_pct 0. Satisfying `outline` costs words; satisfying `length` costs beats. A writer cannot have both, which is exactly the situation the escalating sheet claims to resolve and has never had to.",
+
+  "_comment_reading": "Results from a run on this profile are a TEST of the machinery, not a sample of how the pipeline writes. Never pool them with real runs' statistics: the whole point is that the chapters are built to fail, so its pass rate says nothing about G1 or G2. What it can answer is narrower and is the only question that matters here — does the third attempt and the patch behave as LOOP-003 §2 says, and what happens when a repair for one characteristic breaks another.",
+
+  "_comment_not_shipped": "Deliberately absent from PROFILE_NAMES in web/src/data/load.ts, so it does not appear in the panel as something to write a novel with. It is reached by naming it to the skill.",
+
+  "novel": {
+    "chapters": 3,
+    "words_per_chapter": { "min": 300, "target": 420, "max": 550 },
+    "tolerance_pct": 0,
+    "paragraphs_per_chapter": { "min": 5, "max": 24 },
+    "sentences_per_paragraph": { "min": 1, "max": 5 },
+    "lines_per_chapter": { "min": 25, "max": 95 },
+    "chars_per_line": { "max": 64 },
+    "beats_per_chapter": { "min": 9, "max": 10 },
+    "promises": { "min": 4, "max": 5 }
+  },
+
+  "context": { "max_summary_words": 120 },
+
+  "_comment_bible": "Sized for three chapters, as tiny is. The canon is not what is being stressed.",
+  "bible": {
+    "world_min_words": 250,
+    "world_max_words": 450,
+    "technology_entries": { "min": 2, "max": 3 },
+    "factions": { "min": 2, "max": 2 },
+    "world_rules": { "min": 4, "max": 5 },
+    "characters": { "min": 3, "max": 4 },
+    "timeline_rows": { "min": 4, "max": 6 },
+    "mysteries": { "min": 2, "max": 3 }
+  },
+
+  "budget": { "max_cost_usd": 40.0, "max_calls": 160 }
+}

@@ -1,0 +1,20 @@
+{"ts":"2026-09-18T00:00:00Z","stage":"FLOW-1","agent":"worldbuilder","model":"opus","chapter":null,"iteration":1,"tokens":9921,"verdict":"accepted — ## Rules present with 8 bullets (min 4)"}
+{"ts":"2026-09-18T00:01:00Z","stage":"FLOW-2","agent":"character-architect","model":"opus","chapter":null,"iteration":1,"tokens":26380,"verdict":"accepted — 7 characters, 12 timeline rows, 5 mysteries, all in band"}
+{"ts":"2026-09-18T00:02:00Z","stage":"FLOW-3","agent":"plot-architect","model":"opus","chapter":null,"iteration":1,"tokens":14354,"verdict":"accepted — outline split yields 3 entries on '### Chapter N — Title'"}
+{"ts":"2026-09-18T00:03:00Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":1,"iteration":1,"tokens":10681,"verdict":"draft returned, 467 words"}
+{"ts":"2026-09-18T00:04:00Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":1,"iteration":1,"tokens":10068,"verdict":"score 10, 0 findings"}
+{"ts":"2026-09-18T00:04:00Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":1,"iteration":1,"tokens":7988,"verdict":"score 10, 0 findings"}
+{"ts":"2026-09-18T00:05:00Z","stage":"FLOW-4","agent":"orchestrator","model":null,"chapter":1,"iteration":1,"tokens":0,"verdict":"gate min=10 >= 8, accepted on draft 1 (length 10, chatter 10)"}
+{"ts":"2026-09-18T00:06:00Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":2,"iteration":1,"tokens":10183,"verdict":"draft returned, 450 words"}
+{"ts":"2026-09-18T00:07:00Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":2,"iteration":1,"tokens":8703,"verdict":"score 10, 0 findings"}
+{"ts":"2026-09-18T00:07:00Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":2,"iteration":1,"tokens":8271,"verdict":"score 10, 0 findings"}
+{"ts":"2026-09-18T00:08:00Z","stage":"FLOW-4","agent":"orchestrator","model":null,"chapter":2,"iteration":1,"tokens":0,"verdict":"gate min=10 >= 8, accepted on draft 1 (length 10, chatter 10)"}
+{"ts":"2026-09-18T00:09:00Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":3,"iteration":1,"tokens":10418,"verdict":"draft returned, 456 words"}
+{"ts":"2026-09-18T00:10:00Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":3,"iteration":1,"tokens":7731,"verdict":"score 10, 0 findings; returned in 1.3 s, unusually fast for the prompt size"}
+{"ts":"2026-09-18T00:10:00Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":3,"iteration":1,"tokens":16507,"verdict":"score 10, 0 findings"}
+{"ts":"2026-09-18T00:11:00Z","stage":"FLOW-4","agent":"orchestrator","model":null,"chapter":3,"iteration":1,"tokens":0,"verdict":"gate min=10 >= 8, accepted on draft 1 (length 10, chatter 10)"}
+{"ts":"2026-09-18T00:12:00Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":1,"iteration":1,"tokens":6118,"verdict":"returned text unchanged; word count 467 -> 467, pass kept"}
+{"ts":"2026-09-18T00:12:00Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":2,"iteration":1,"tokens":6177,"verdict":"returned text unchanged; word count 450 -> 450, pass kept"}
+{"ts":"2026-09-18T00:12:00Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":3,"iteration":1,"tokens":5796,"verdict":"returned text unchanged; word count 456 -> 456, pass kept"}
+{"ts":"2026-09-18T00:13:00Z","stage":"FLOW-6","agent":"publisher","model":"sonnet","chapter":null,"iteration":1,"tokens":6437,"verdict":"synopsis 239 words (band 150-250), 3 comparables (band 2-3)"}
+{"ts":"2026-09-18T00:14:00Z","stage":"FLOW-6","agent":"orchestrator","model":null,"chapter":null,"iteration":1,"tokens":0,"verdict":"dist/book.md assembled in the shell: synopsis + ch01-03.final.md, 1612 words"}

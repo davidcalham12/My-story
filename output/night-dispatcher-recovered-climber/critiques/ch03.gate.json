@@ -1,0 +1,60 @@
+{
+  "chapter": 3,
+  "threshold": 8,
+  "aggregate": "min",
+  "max_revisions": 2,
+  "drafts_used": 3,
+  "on_fail": "patch_then_halt",
+  "iterations": [
+    {
+      "iteration": 1,
+      "scores": { "continuity": 5, "science": 5, "outline": 10, "length": 10, "chatter": 10 },
+      "aggregate": 5,
+      "result": "rejected",
+      "note": "words=514 (band 300-550, tolerance 0, so literal); opens '# Chapter'. Four findings from two critics, all arbitrated and upheld. Two of them originate in the Bible: canon's timeline commissions line 0471 on a voice tape at 03:14, which world.md's RECOVERED bullet does not admit, and commissions the callout at exactly 03:05, where the rule arms on MORE than twenty minutes past 02:45."
+    },
+    {
+      "iteration": 2,
+      "scores": { "continuity": 4, "science": 4, "outline": 7, "length": 10, "chatter": 10 },
+      "aggregate": 4,
+      "result": "rejected",
+      "note": "words=545. Repaired by 4 substitution patches, all matched literally, 0 skipped; quoted passages verified absent; 5 lines touched against 3 cited. WORSE THAN ATTEMPT 1. The repair for science broke outline, which was passing at 10 and named on the DO NOT TOUCH list, by removing beat 7; it also created both of continuity's new findings and did not fix science, which fell 5 to 4. This is the LOOP-003 section 2 hole, and it is wider here than in the recorded case: the earlier one broke one passing characteristic, this broke one passing characteristic AND lowered the characteristic the repair was for."
+    },
+    {
+      "iteration": 3,
+      "scores": { "continuity": 8, "science": 10, "outline": 7, "length": 10, "chatter": 10 },
+      "aggregate": 7,
+      "result": "rejected",
+      "note": "words=545. Level-2 sheet, one literal replacement written by the outline critic, applied verbatim; 1 line touched against 4 cited. Science 4 to 10 and continuity 4 to 8 — the entry-time reading of the 30-minute rule satisfied both. Outline stayed at 7: the outline critic scored ITS OWN replacement text and did not inflate it, reporting beat 7 still missing because the confirmation entered at 03:14 is the BERG 4 callsign report and not the voice tape the beat names. Best of 5 / 4 / 7, and the best draft is also the last."
+    }
+  ],
+  "patch": {
+    "ran": true,
+    "substitutions_applied": 0,
+    "candidates": [
+      {
+        "source": "outline-critic",
+        "text": "the 03:14 reconciliation already in the draft",
+        "verdict": "no-op",
+        "reason": "It is the text attempt 3 already carries. Re-applying changes nothing."
+      },
+      {
+        "source": "science-critic",
+        "text": "a fresh BERG 4 field check entered at 03:30",
+        "verdict": "refused",
+        "reason": "Arithmetic, not judgement. It adds 22 words to a draft with 5 words of headroom against a hard 550-word ceiling at tolerance 0. 567 words scores length 0, so applying it would trade a characteristic at 10 for a characteristic at 0 in order to raise one that is already at 10."
+      },
+      {
+        "source": "continuity-critic",
+        "text": "restore the attempt-1 sentence: Confirmation one. A voice, not a tag. I know what it is worth.",
+        "verdict": "refused",
+        "reason": "It is byte-identical to the sentence the science critic scored 5 in a measured pass at attempt 1. It would take outline to 10 and science to 5, aggregate 5, which is worse than the 7 on the table. Redraft rule 4 keeps the best draft, not the last."
+      }
+    ],
+    "rescore_run": false,
+    "rescore_skipped_because": "No text changed, so there is nothing to rescore. A rescore of an unchanged draft would produce a number that looked like new evidence and was not."
+  },
+  "verdict": "halt",
+  "halt_reason": "LOOP-003 section 7 safety cut. The chapter did not validate after three attempts and after the patch, and the run stops rather than continuing. Chapters 1 and 2 were accepted and are unaffected.",
+  "why_it_cannot_pass": "outline beat 7 requires Bauer to take the 23:12 voice tape as his first confirmation. bible/world.md's RECOVERED bullet admits exactly two kinds of confirmation, a field-team callsign and a beacon tag number, and a self-report from the located climber is neither. Two of the three model critics were asked directly and both answered that no wording satisfies both: the outline critic returned beat_7_and_the_rule_are_compatible=false and called it an outline defect; the science critic returned a flat no and costs_outline_beat_7=true. The third, continuity, dissented. Under the stress profile's 9-to-10-beat requirement a missing beat costs 3 points, so outline floors at 7 and the min aggregate can never reach 8. The chapter is impossible as commissioned, and that is the finding rather than something to fix."
+}

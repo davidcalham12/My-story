@@ -1,0 +1,42 @@
+{
+  "_comment": "Written from Claude Code’s own result event. A LOOP-003 stress test on config/profiles/stress.json, not a novel: the chapters were built to be impossible so the patch_then_halt path would finally execute. The run halted at chapter 3 as designed. Do not pool its figures with real runs.",
+  "total_cost_usd": 19.003221049999997,
+  "turns": 138,
+  "wall_clock_ms": 2510937,
+  "subagents": {
+    "spawned": 15,
+    "requested": {
+      "background": 0,
+      "foreground": 15,
+      "unset": 0
+    },
+    "started_in_background": 0,
+    "max_depth": 1,
+    "spawned_by_subagents": 0,
+    "completed": 15,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {
+      "worldbuilder": 1,
+      "character-architect": 1,
+      "plot-architect": 1,
+      "chapter-writer": 3,
+      "continuity-critic": 3,
+      "science-critic": 3,
+      "outline-critic": 3
+    }
+  },
+  "halted": true,
+  "halted_at": "FLOW-4 chapter 3",
+  "source": "claude-code-result-event",
+  "recorded_at": "2026-09-21T15:59:10.541Z"
+}

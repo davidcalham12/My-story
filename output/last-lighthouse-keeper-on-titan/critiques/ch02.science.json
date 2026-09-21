@@ -1,0 +1,12 @@
+{
+  "chapter": 2,
+  "critic": "science",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "verdict": "pass",
+      "findings": []
+    }
+  ]
+}

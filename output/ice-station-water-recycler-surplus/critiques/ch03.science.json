@@ -1,0 +1,33 @@
+{"critic": "science", "chapter": 3, "kind": "model", "agent": "science-critic", "drafts": 3,
+ "iterations": [
+   {"iteration": 1, "score": 5, "findings": [
+     {"kind": "numeric-rule-violation", "severity": "high", "upheld": true,
+      "quote": "That left 167.6. At the unchanged 2.0 kg/day draw it was 83.8 days, and 83.8 days from Day +6 landed on Day +89, not Day +90, which meant the strip on the command module bulkhead was wrong from the moment he cracked the seal and would have to be re-cut.",
+      "claim": "Two airlock cycles vent 0.4 kg of oxygen, two tenths of a day at the 2.0 kg/day draw, but the passage presents them as moving the figure from ninety to eighty-nine, which the rules budget twelve cycles for.",
+      "fix": "Keep the re-cut and show the working that justifies it.",
+      "reference": "bible/world.md, ## Rules — the airlock bullet",
+      "note": "Upheld in substance; the critic's alternative fix of dropping the re-cut was refused in arbitration because the re-cut is outline beat 1."},
+     {"kind": "numeric-rule-violation", "severity": "high", "upheld": true,
+      "quote": "Re-cut the strip. It's eighty-nine.",
+      "claim": "Restates the unshown jump aloud.",
+      "fix": "Correct once, above; this line stands if the arithmetic is shown.",
+      "reference": "bible/world.md, ## Rules — the airlock bullet"}]},
+   {"iteration": 2, "score": 5, "findings": [
+     {"kind": "numeric-rule-violation", "severity": "high", "upheld": true,
+      "quote": "Spend 0.4 kg of oxygen and the remainder came back 83.8 — two tenths of a day, no more than that, but the ninety had no two tenths to give.",
+      "claim": "The repair made the contradiction explicit rather than resolving it: asserting the ninety had zero slack denies the twelve-cycle allowance the rules give it.",
+      "fix": "Concede the allowance and ground the re-cut elsewhere in the rules.",
+      "reference": "bible/world.md, ## Rules — the airlock bullet",
+      "carried_from_iteration": 1},
+     {"kind": "numeric-rule-violation", "severity": "high", "upheld": true,
+      "quote": "Re-cut the strip. It's eighty-nine.",
+      "claim": "Still asserts the jump on its own authority.",
+      "fix": "Tie it to the arithmetic above.",
+      "reference": "bible/world.md, ## Rules — the airlock bullet",
+      "carried_from_iteration": 1}]},
+   {"iteration": 3, "score": 10, "findings": []}],
+ "escalation": {
+   "level_2_sheet": "specs/loops/LOOP-003/sheets/ch03.attempt3.md",
+   "replacements_written_by": "science-critic",
+   "orchestrator_reading_rejected_by_critic": "The orchestrator proposed that the twelve cycles in full are what take ninety to eighty-nine. The critic refused it on the arithmetic: 2.4 kg at 2.0 kg/day is 1.2 days, and ninety less 1.2 truncates to eighty-eight, not eighty-nine. The critic's own replacement grounds the re-cut in the +/-1.5% ultrasonic tank bullet instead — a gauge could call 89.8 ninety and stay inside its error, a hand count could not. Arbitration accepted the critic's text unaltered.",
+   "applied_verbatim": true}}

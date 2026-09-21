@@ -1,0 +1,4 @@
+{"critic": "science", "chapter": 1, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []}]}

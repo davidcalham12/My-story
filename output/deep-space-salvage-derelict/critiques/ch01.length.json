@@ -1,0 +1,4 @@
+{"critic":"length","chapter":1,"drafts":1,"kind":"arithmetic",
+ "band":{"min":225,"max":688,"target":420,"source":"words_per_chapter widened by tolerance_pct 25"},
+ "iterations":[{"iteration":1,"score":10,"measured_words":425,"findings":[]}],
+ "final":{"score":10,"findings":[]}}

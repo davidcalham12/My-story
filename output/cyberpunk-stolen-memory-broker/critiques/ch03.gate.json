@@ -1,0 +1,20 @@
+{
+  "chapter": 3,
+  "threshold": 8,
+  "aggregate": "min",
+  "max_revisions": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "words": 465,
+      "band": { "min": 225, "max": 687 },
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 10 },
+      "unscored": [],
+      "aggregate": 10,
+      "verdict": "accept"
+    }
+  ],
+  "best_aggregate": 10,
+  "accepted_iteration": 1,
+  "final_verdict": "accept"
+}

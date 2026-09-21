@@ -1,0 +1,4 @@
+{"critic":"continuity","chapter":1,"drafts":1,"kind":"model","agent":"continuity-critic",
+ "iterations":[{"iteration":1,"score":10,"findings":[]}],
+ "final":{"score":10,"findings":[]},
+ "notes":["Kessel-4 judged an open detail, not a contradiction: the bible states the 1.6 km/s cost without naming the destination","delta-v arithmetic verified: 2.9 - 1.6 = 1.3","no name drift against bible/characters.md"]}

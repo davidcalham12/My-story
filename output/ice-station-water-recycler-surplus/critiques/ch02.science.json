@@ -1,0 +1,10 @@
+{"critic": "science", "chapter": 2, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 7, "findings": [
+     {"kind": "timeline-arithmetic", "severity": "medium", "upheld": true,
+      "quote": "Eleven days before the loop began coming back rich, a machine at Bittern had told a machine at Cold Harbor something no one aboard had decided to say.",
+      "claim": "Eleven is the length of the surplus run, not the gap from the Day −29 pull to the Day −11 onset, which is eighteen days.",
+      "fix": "State the true gap; the timestamp is canon, so the offset is what changes.",
+      "reference": "bible/world.md, ## Rules, first bullet",
+      "note": "Same defect as the continuity finding, quoted shorter. One repair closed both."}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

@@ -1,0 +1,4 @@
+{"critic":"length","chapter":2,"drafts":2,"kind":"arithmetic","band":{"min":225,"max":688,"target":420},
+ "iterations":[{"iteration":1,"score":10,"measured_words":434,"findings":[]},
+               {"iteration":2,"score":10,"measured_words":465,"findings":[]}],
+ "final":{"score":10,"findings":[]}}

@@ -1,0 +1,9 @@
+{"critic": "continuity", "chapter": 2, "kind": "model", "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 3, "findings": [
+     {"kind": "timeline-arithmetic", "severity": "high", "upheld": true,
+      "quote": "Eleven days before the loop began coming back rich, a machine at Bittern had told a machine at Cold Harbor something no one aboard had decided to say. Twenty-nine days before that.",
+      "claim": "The scene fixes the pull at 0412 Day −29, but 'eleven days before' the surplus onset puts it at Day −22 and 'twenty-nine days before that' puts it at Day −51; three dates for one event.",
+      "fix": "Use the real gap between Day −29 and Day −11, and anchor the second sentence to a datable day rather than to 'that'.",
+      "reference": "bible/timeline.md, Day −29 and Day −11"}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

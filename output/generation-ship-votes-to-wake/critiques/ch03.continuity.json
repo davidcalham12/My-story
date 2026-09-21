@@ -1,0 +1,9 @@
+[
+  {
+    "iteration": 1,
+    "critic": "continuity",
+    "score": 10,
+    "findings": [],
+    "note": "parsed cleanly; counted in the min. Returned in 1.3 s — unusually fast for a prompt this size; the verdict was parseable so it was counted, but it is the thinnest evidence of any critic call in this run."
+  }
+]

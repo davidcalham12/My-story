@@ -1,0 +1,19 @@
+{
+  "chapter": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "words": 490,
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 10 },
+      "aggregate": 10,
+      "aggregate_method": "min",
+      "threshold": 8,
+      "verdict": "accepted",
+      "unscored_critics": [],
+      "note": "490 words, inside the nominal 300-550 band before tolerance. The continuity critic wrapped its JSON in a markdown fence; it parsed cleanly as a score of 10 and was counted, not excluded."
+    }
+  ],
+  "accepted_iteration": 1,
+  "best_iteration": 1,
+  "best_aggregate": 10
+}

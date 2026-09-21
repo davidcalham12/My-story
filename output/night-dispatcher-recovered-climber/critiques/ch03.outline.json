@@ -1,0 +1,52 @@
+{
+  "critic": "outline",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "All ten beats present and in order in 514 words."
+    },
+    {
+      "iteration": 2,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "missing-beat",
+          "severity": "high",
+          "upheld": true,
+          "quote": "and Bauer said, \"That is not a confirmation. A voice is neither a callsign nor a tag. It is enough to reopen the file, and I am reopening it. My callsign limb I already hold: BERG 4, 15:55, one casualty in the couloir. That report was never wrong.\"",
+          "claim": "Beat 7 — Bauer plays the 23:12 voice tape at 03:14 and takes it as his first confirmation, a voice not a tag — does not happen. The patched line has him explicitly reject the tape and substitute his existing BERG 4 report, which is the opposite event.",
+          "fix": "Restore Bauer's line to: Confirmation one. A voice, not a tag. I know what it is worth.",
+          "reference": "outline beat 7"
+        }
+      ],
+      "note": "THE CROSS-CHARACTERISTIC BREAK. Outline was at 10, was named on the DO NOT TOUCH list, and fell to 7 under a repair commissioned by the science critic. The literal replacement this critic proposed is character-for-character the attempt-1 text that science scored 5."
+    },
+    {
+      "iteration": 3,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "missing-beat",
+          "severity": "high",
+          "upheld": true,
+          "quote": "and Bauer said, \"A voice is neither a callsign nor a tag, so the tape itself is not the limb. But it is what reopens the file, and reopening it I enter my first confirmation now: BERG 4, 15:55, one casualty in the couloir. Callsign limb, confirmed 03:14.\"",
+          "claim": "Beat 7 still does not happen. The confirmed evidence entered at 03:14 is the pre-existing BERG 4 field-team callsign report, not the tape, and the line says outright that the tape is not the limb.",
+          "fix": "The durable fix is an outline edit to beat 7, and to the 03:14 half of beat 9's confirmation pairing, not a further draft substitution. No wording change at this seam scores both critics without amending the outline.",
+          "reference": "outline beat 7"
+        }
+      ],
+      "note": "The critic scored ITS OWN reconciliation text, the one arbitration selected and applied verbatim, and returned 7 rather than inflating it. It had told the orchestrator in advance it would score this present-with-caveat, not present, and it did. It then declined to offer a further draft replacement, which is what leaves the patch with nothing admissible to apply.",
+      "arbitration_answers": {
+        "beat_7_and_the_rule_are_compatible": false,
+        "q1": "Load-bearing. Beat 7's only content beyond what beat 3 already gave is that Bauer converts hearing the tape at 03:14 into a confirmation. Beat 9 explicitly anchors on his two confirmations being 03:14 and 03:29, so if 03:14 is not a confirmation, beat 9 breaks with beat 7.",
+        "q3": "This is an outline defect, not a draft defect. No draft can satisfy both the literal beat and the literal rule at once. The fix belongs in outline.md, not in the chapter."
+      }
+    }
+  ]
+}

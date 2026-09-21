@@ -1,0 +1,24 @@
+{
+  "critic": "length",
+  "chapter": 1,
+  "kind": "script",
+  "agent": null,
+  "drafts": 2,
+  "band": { "min": 300, "max": 550, "tolerance_pct": 0 },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 483,
+      "findings": [],
+      "note": "wc -w on chapters/ch01.attempt1.md = 483. Band is 300-550 with tolerance_pct 0, so the band is literal. 67 words of headroom above, 183 below."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "words": 481,
+      "findings": [],
+      "note": "wc -w on chapters/ch01.attempt2.md = 481. The repair removed two tokens (a four-digit number and a slash) and cost nothing on length."
+    }
+  ]
+}

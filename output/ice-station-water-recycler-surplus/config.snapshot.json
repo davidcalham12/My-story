@@ -1,0 +1,78 @@
+{
+  "_snapshot": "Merged at run start: config/novel.config.json overlaid key-by-key with config/profiles/small.json, then novel.tone set by the orchestrator from the premise (and confirmed by the request).",
+  "_run": {
+    "slug": "ice-station-water-recycler-surplus",
+    "started_utc": "2026-09-18T21:28:51Z",
+    "loop": "LOOP-003"
+  },
+  "profile": "small",
+
+  "_tone_decision": "The premise is a mass-balance anomaly in a closed-loop life-support system against a hard consumable deadline: an engineering mystery whose clues are numbers. Hard science fiction, close third person, procedural. The request named the same tone; they agree, and this line is what reaches all eight agents.",
+
+  "novel": {
+    "chapters": 8,
+    "tone": "hard science fiction, close third person, procedural",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": { "min": 900, "target": 1150, "max": 1400 },
+    "tolerance_pct": 20,
+    "_length_band_after_tolerance": { "min": 720, "max": 1680 },
+    "paragraphs_per_chapter": { "min": 8, "max": 44 },
+    "sentences_per_paragraph": { "min": 1, "max": 6 },
+    "lines_per_chapter": { "min": 50, "max": 170 },
+    "chars_per_line": { "max": 84 },
+    "beats_per_chapter": { "min": 3, "max": 5 },
+    "promises": { "min": 3, "max": 5 }
+  },
+
+  "bible": {
+    "world_min_words": 350,
+    "world_max_words": 650,
+    "technology_entries": { "min": 3, "max": 4 },
+    "factions": { "min": 2, "max": 3 },
+    "world_rules": { "min": 4, "max": 6 },
+    "characters": { "min": 4, "max": 5 },
+    "timeline_rows": { "min": 6, "max": 8 },
+    "mysteries": { "min": 3, "max": 4 }
+  },
+
+  "context": {
+    "max_summary_words": 200,
+    "forbid_prior_chapter_prose": true
+  },
+
+  "quality_gate": {
+    "critics": ["continuity", "science", "outline", "length", "chatter"],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "patch_then_halt"
+  },
+
+  "feedback": {
+    "sheet_template": "specs/loops/LOOP-003/sheet_template/v01.md",
+    "validate_before_sending": true,
+    "escalate_to_literal_at_attempt": 3,
+    "keep_attempt_drafts": true,
+    "late_finding_blocks": false
+  },
+
+  "style": { "word_count_tolerance_pct": 0 },
+
+  "budget": { "max_cost_usd": 25.0, "max_calls": 400 },
+
+  "outputs": {
+    "formats": ["markdown"],
+    "synopsis": {
+      "words": { "min": 150, "max": 250 },
+      "comparables": { "min": 2, "max": 3 }
+    },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  }
+}

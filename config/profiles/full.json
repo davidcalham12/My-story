@@ -1,0 +1,63 @@
+{
+  "_comment": "CFG-6: a full-length novel. Thirty-four chapters through a four-critic gate: read the call count in the orchestrator plan before you start it.",
+  "novel": {
+    "chapters": 34,
+    "words_per_chapter": {
+      "min": 2200,
+      "target": 2700,
+      "max": 3200
+    },
+    "tolerance_pct": 18,
+    "paragraphs_per_chapter": {
+      "min": 14,
+      "max": 96
+    },
+    "sentences_per_paragraph": {
+      "min": 1,
+      "max": 6
+    },
+    "lines_per_chapter": {
+      "min": 120,
+      "max": 380
+    },
+    "chars_per_line": {
+      "max": 84
+    }
+  },
+  "context": {
+    "max_summary_words": 300
+  },
+  "budget": {
+    "max_cost_usd": 120.0,
+    "max_calls": 2000
+  },
+  "_comment_bible": "How much canon a book this size can carry. 34 chapters. The base counts are too SMALL here, not too large. Every profile states these now: inheriting one set of counts for every length is how a three-chapter run and a thirty-four-chapter novel ended up with the same Story Bible.",
+  "bible": {
+    "world_min_words": 700,
+    "world_max_words": 1200,
+    "technology_entries": {
+      "min": 6,
+      "max": 9
+    },
+    "factions": {
+      "min": 4,
+      "max": 6
+    },
+    "world_rules": {
+      "min": 6,
+      "max": 10
+    },
+    "characters": {
+      "min": 7,
+      "max": 10
+    },
+    "timeline_rows": {
+      "min": 16,
+      "max": 24
+    },
+    "mysteries": {
+      "min": 5,
+      "max": 7
+    }
+  }
+}

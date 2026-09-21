@@ -1,0 +1,15 @@
+{"critic":"continuity","chapter":2,"kind":"model","agent":"continuity-critic","drafts":2,
+ "iterations":[
+   {"iteration":1,"score":7,"findings":[
+     {"kind":"timeline-math","severity":"medium",
+      "quote":"She checked the timestamp. Drafted 0118 ship time, nine hours out, received 1912. Correct.",
+      "fix":"0118 to 1912 is about eighteen hours, not nine; bible/timeline.md Day 2 says the offer arrives eighteen hours stale",
+      "reference":"bible/timeline.md 2211, Day 2"},
+     {"kind":"rule-shorthand","severity":"low",
+      "quote":"72:00 — expires Day 5, 0400",
+      "fix":"the 72-hour rule is an unoccupied-lapse condition, not a fixed expiry; judged likely crew shorthand",
+      "reference":"bible/world.md Rules"}]},
+   {"iteration":2,"score":9,"findings":[]}
+ ],
+ "final":{"score":9,"findings":[]},
+ "repair":"the writer replaced one sentence: nine hours of flight plus nine queued at the relay, totalling the eighteen the Bible states"}

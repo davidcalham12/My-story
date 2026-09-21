@@ -1,0 +1,8 @@
+{
+  "_comment": "Written by the dev server from Claude Code’s own result event. This is the whole run: the orchestrator’s turns as well as the subagents’. The token totals in logs/agents.jsonl cover the subagents only, so the two do not agree and are not meant to.",
+  "total_cost_usd": 7.448902899999999,
+  "turns": 102,
+  "wall_clock_ms": 1235569,
+  "source": "claude-code-result-event",
+  "recorded_at": "2026-09-18T20:46:23.465Z"
+}

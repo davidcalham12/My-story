@@ -1,0 +1,17 @@
+{
+  "critic": "length",
+  "chapter": 2,
+  "kind": "script",
+  "agent": null,
+  "drafts": 1,
+  "band": { "min": 300, "max": 550, "tolerance_pct": 0 },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 497,
+      "findings": [],
+      "note": "wc -w on chapters/ch02.attempt1.md = 497. 53 words of headroom."
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "chapter": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "words": 581,
+      "scores": {
+        "length": 10,
+        "chatter": 10,
+        "continuity": 10,
+        "science": 10
+      },
+      "aggregate": 10,
+      "aggregate_method": "min",
+      "threshold": 8,
+      "verdict": "accepted",
+      "unscored_critics": [],
+      "note": "581 words is above the nominal max of 550 but inside the band widened by tolerance_pct 25 (225-687), so length scores 10. Both model critics returned parseable JSON with score 10 and no findings; neither was excluded."
+    }
+  ],
+  "accepted_iteration": 1,
+  "best_iteration": 1,
+  "best_aggregate": 10
+}

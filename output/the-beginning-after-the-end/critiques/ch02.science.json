@@ -1,0 +1,4 @@
+{"critic": "science", "chapter": 2, "kind": "model", "agent": "science-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []}],
+ "orchestrator_note": "The prompt told this critic in advance that Tom Leary leaving an unentered row standing is the chapter's subject and an open question in bible/mysteries.md, not a breach of Rules bullet 1. Without that, a rule-shaped critic reading a chapter about a character knowingly breaking a rule would have scored the story's premise as an error."}

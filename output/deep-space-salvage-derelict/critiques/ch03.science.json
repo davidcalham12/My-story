@@ -1,0 +1,4 @@
+{"critic":"science","chapter":3,"kind":"model","agent":"science-critic","drafts":2,
+ "iterations":[{"iteration":1,"score":10,"findings":[]},{"iteration":2,"score":10,"findings":[]}],
+ "final":{"score":10,"findings":[]},
+ "notes":["re-scored on draft 2 rather than carried over, because the shipped text differed from the scored text","open channel at 200 m is local, not across the nine-hour gap","the Miranda answer is shown as extrapolation, satisfying rule 2","delta-v chain verified independently: 2.9 - 1.0 = 1.9, 1.9 - 1.6 = 0.3"]}

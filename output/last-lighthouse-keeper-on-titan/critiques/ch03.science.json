@@ -1,0 +1,13 @@
+{
+  "chapter": 3,
+  "critic": "science",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "verdict": "pass",
+      "findings": [],
+      "note": "Checked specifically on the 7 kW draw against a 5 kW plant, the 79-89 minute Earth-link lag and whether any exchange was written as live, the lift from 180 m of methane-ethane, and preservation at 94 K."
+    }
+  ]
+}

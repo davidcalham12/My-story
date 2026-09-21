@@ -1,0 +1,9 @@
+{"critic": "continuity", "chapter": 1, "kind": "model", "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 6, "findings": [
+     {"kind": "timeline-math", "severity": "high", "upheld": true,
+      "quote": "There were ten in there already. Day −6 through last night, the fold lines soft now from being carried",
+      "claim": "Day −6 through last night is six days and cannot hold ten earlier strips; the chapter's own eleven-day, 25.3 kg accumulation needs ten earlier plus the one just handed over.",
+      "fix": "Open the range on the first surplus day and stop one night short of the strip just handed over, leaving the count of ten and every figure in the paragraph unchanged.",
+      "reference": "bible/timeline.md, Day −11 and Day 0"}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

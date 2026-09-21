@@ -1,0 +1,10 @@
+{
+  "chapter": 2,
+  "critic": "continuity",
+  "agent": "continuity-critic",
+  "model": "sonnet",
+  "iterations": [
+    { "iteration": 1, "score": 10, "findings": [] },
+    { "iteration": 2, "score": 10, "findings": [], "note": "Re-run after the science patch changed the text; continuity was not permitted to coast on the iteration-1 score." }
+  ]
+}

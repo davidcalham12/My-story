@@ -1,0 +1,11 @@
+{"critic":"science","chapter":2,"kind":"model","agent":"science-critic","drafts":2,
+ "iterations":[
+   {"iteration":1,"score":8,"findings":[
+     {"kind":"physics-violation","severity":"low",
+      "quote":"Rook ran the forward inventory in shirtsleeves, free-falling from rack to rack, calling out mass figures in that half-beat-late way of his.",
+      "fix":"name the hull; the crew boarded the Thule Rise in hardsuits and its interior is vacuum",
+      "reference":"bible/world.md Rules; hardsuit technology entry"}]},
+   {"iteration":2,"score":10,"findings":[]}
+ ],
+ "final":{"score":10,"findings":[]},
+ "repair":"the writer added a locating clause: the inventory is in the Bittern's forward hold"}

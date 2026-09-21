@@ -1,0 +1,7 @@
+# The Kraken Mare Light
+
+On Titan's Kraken Mare, where liquid methane barges cross a black sea under a nitrogen sky, Marit Anselm is the last human keeper the Mare Authority still funds — and the decommissioning notice on her station has thirty days left to run. Then a distress bundle arrives speaking in her own voice, reporting a ballast failure she never called in. The custody stamps say it was composed nine years ago, relayed through a buoy the Authority's own records list as dead. She has never filed a false report in her life. She is not about to start believing in ghosts.
+
+What she finds instead is worse: a voiceprint beacon does not lie, and neither does a bundle's timestamped chain of custody — which means somewhere in the tholin-fouled dark, a message that should never have moved has started moving again, and the people who signed off on it staying silent for nine years are the same people about to decide whether her station, and her purpose, still matter. Between a freight guild running illegal shortcuts, a salvage crew that treats silence as ownership, and an auditor whose signature closed the case the first time, Anselm has three days and a failing power budget to find out who is really speaking through that beacon, and what waited nine years to be heard.
+
+For readers of *The Expanse*, *Blindsight*, and *Version Control*, this is hard-vacuum procedural at its most exacting — a mystery where the physics is the alibi.

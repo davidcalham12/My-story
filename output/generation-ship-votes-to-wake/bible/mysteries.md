@@ -1,0 +1,18 @@
+# Mysteries
+
+Each answer below is canon. Later stages may stage these reveals however they like, but may not answer them differently.
+
+- **What do the 1,180 testaments actually say, and why has the Charter Trust only ever quoted from a handful of them?**
+  Answer: 611 of the 1,180 contain some form of a best-available-data clause — the signatories instructed the ship to use the sky it could actually see rather than the 2190s spectra they chose Tau Ceti from. The Trust quoted the other 569 for decades because those read as instructions to honour the original choice, and a guild whose whole claim is fidelity could not be the first to say the founders had already released the ship. Noor Sandoval reads all 1,180 aloud between day 154 and day 203 and ends the selective quotation for good. The reveal changes nothing legally: Article 9 counts votes, not wishes, and a frozen signatory's testament is not a chit.
+
+- **What is wrong with berths 0901 to 0964, and why has Hanne Vollmer never said?**
+  Answer: the flight year 209 power-bus fault rewarmed those sixty-four berths for nine days. Vollmer inherited the log, found the mismatched trickle signatures in flight year 271, and could not test them, because the only test is a 40-day warming that cannot be reversed — opening them to prove they were alive would have been the act that killed them if they were. They are dead. She says nothing until the ballot has already authorised a thaw, then puts all sixty-four at the head of the first cohort, and berths 0901 and 0902 open on day 254 on two people who have been dead for seventy-eight years. The Charter's denominator has counted sixty-four corpses since flight year 209.
+
+- **Why did the launch beam go dark in flight year 96?**
+  Answer: it was switched off, not lost. Ansel Duong's day 203 fragment refers to the beam consortium in the past tense and to the *Vantage* as the first of three, the other two never built. The shutdown was an ordinary institutional death — funding, not catastrophe. This is as far as the answer ever goes: a question to Sol and its reply cannot complete in under 23.8 years, and the book never confirms the fragment. The one thing it does settle is that the Epsilon Eridani spectra everybody is arguing over came from the same silent source.
+
+- **Does Juno Katsaros want the signatories woken?**
+  Answer: yes, and she never says so aloud in the book. Helm officers are struck from the roll while serving, so the one preference she holds is the one preference she is structurally forbidden to spend. She runs the cleanest Tally in the ship's history, certifies a 74-chit margin that goes her way, and refuses even afterwards to confirm it — because a Returning Officer who admits a preference retroactively poisons every count she ever certified, including this one. Falk knows. Nobody else does.
+
+- **Can a diversion to Epsilon Eridani ever actually pass?**
+  Answer: no, and the arithmetic was already closed before the counting hall was cleared. Article 9's 3,527 is 94.1% of the 3,748 chits the roll can produce. The limited thaw adds about 115 living signatories — 190 berths, sixty-four of them already dead, about eleven of the remaining 126 lost to the 9% — which lifts the roll to roughly 3,863 and lowers the requirement only to about 91.3%, while the flight year 292 day 1 commit deadline runs out. Only the full thaw of all 1,180 could have brought the threshold within reach, and the full thaw was the option 301 people voted for. The ship votes on whether to wake the people who chose its course, wakes a fraction of them, and arrives at Tau Ceti in flight year 349 exactly as the 2190s data said it would.

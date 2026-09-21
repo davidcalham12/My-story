@@ -1,0 +1,31 @@
+{
+  "chapter": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "words": 545,
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 6 },
+      "aggregate": 6,
+      "aggregate_method": "min",
+      "threshold": 8,
+      "verdict": "rejected",
+      "unscored_critics": [],
+      "note": "Science critic found a major breach: a six-hour cache depth cannot hold the same packet across a day. Redrafted by substitution (one patch), not by rewriting the chapter."
+    },
+    {
+      "iteration": 2,
+      "words": 671,
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 10 },
+      "aggregate": 10,
+      "aggregate_method": "min",
+      "threshold": 8,
+      "verdict": "accepted",
+      "unscored_critics": [],
+      "note": "1 patch offered, 1 applied literally, 0 skipped; no fallback rewrite was needed. 671 words is inside the band widened by tolerance_pct 25 (225-687). The quoted passage from the iteration-1 finding survives verbatim because the repair was an addition elsewhere (see ch02.science.json) — a deliberate exception to the survival check, recorded rather than hidden."
+    }
+  ],
+  "accepted_iteration": 2,
+  "best_iteration": 2,
+  "best_aggregate": 10,
+  "patches": { "offered": 1, "applied": 1, "skipped": 0, "fallback_full_rewrite": false }
+}

@@ -1,0 +1,19 @@
+{
+  "chapter": 3,
+  "aggregate": "min",
+  "threshold": 8,
+  "iterations": [
+    {
+      "iteration": 1,
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 10 },
+      "words": 456,
+      "band": [225, 688],
+      "aggregate_score": 10,
+      "verdict": "accepted",
+      "note": "all four critics returned a usable verdict; none excluded"
+    }
+  ],
+  "best_iteration": 1,
+  "accepted_iteration": 1,
+  "warning": null
+}

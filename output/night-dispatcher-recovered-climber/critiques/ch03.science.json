@@ -1,0 +1,70 @@
+{
+  "critic": "science",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 5,
+      "findings": [
+        {
+          "kind": "rule-violation",
+          "severity": "high",
+          "upheld": true,
+          "quote": "Confirmation one. A voice, not a tag. I know what it is worth.",
+          "claim": "Line 0471 is validated on a voice transmission from the subject plus a tag reconciliation. The rule names the two admissible confirmations exactly: field-team callsign and beacon tag number. A voice from the climber is neither.",
+          "fix": "Either have a field team radio in a callsign confirmation as the first input, with the voice as corroborating but non-official evidence; or add a line establishing that a first-person voice transmission is an accepted equivalent to a field-team callsign under this post's procedures.",
+          "reference": "bible/world.md, ## Rules, the RECOVERED bullet"
+        },
+        {
+          "kind": "rule-violation",
+          "severity": "medium",
+          "upheld": true,
+          "quote": "At 03:05 the callout tone opened on the valley channel, flat and two-second-cycled, twenty minutes past a post check she had not logged at 02:45.",
+          "claim": "The rule arms on a gap of MORE than 20 minutes. 02:45 to 03:05 is exactly 20.",
+          "fix": "State the overrun rather than the round number.",
+          "reference": "bible/world.md, ## Rules, the post-check bullet"
+        },
+        {
+          "kind": "rule-violation",
+          "severity": "low",
+          "upheld": true,
+          "quote": "Confirmations 03:14 and 03:29, seventeen minutes apart, inside the window, set by the duty controller and by no one else.",
+          "claim": "03:29 minus 03:14 is fifteen minutes, not seventeen.",
+          "fix": "Change seventeen to fifteen.",
+          "reference": "bible/world.md, ## Rules, the RECOVERED bullet"
+        }
+      ],
+      "note": "All three UPHELD. Findings 1 and 2 originate in the Bible, not the draft: canon's timeline commissions line 0471 on a voice tape at 03:14 and commissions the callout at exactly 03:05. THE ORCHESTRATOR'S CHOICE MATTERS HERE and is recorded as a defect in arbitration rather than in the critic: finding 1 offered two branches and the orchestrator wrote branch (a) into the level-1 sheet. Branch (b) was never tried on a draft. When asked afterwards, the critic said branch (b) would not have worked either, but the choice was made before anyone asked."
+    },
+    {
+      "iteration": 2,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "rule-violation",
+          "severity": "high",
+          "upheld": true,
+          "quote": "Confirmations 03:14 and 03:29, fifteen minutes apart, inside the window, set by the duty controller and by no one else.",
+          "claim": "The dialogue above now establishes that 03:14 is not a confirmation and that the real callsign limb is BERG 4 at 15:55, but this summary still credits 03:14. Read correctly the two limbs are about eleven and a half hours apart, breaking the 30-minute requirement outright.",
+          "fix": "Rewrite the summary to name the limbs actually used, and either justify an eleven-hour-old report as timely or restructure so both limbs fall inside 30 minutes.",
+          "reference": "bible/world.md, ## Rules, the RECOVERED bullet"
+        }
+      ],
+      "note": "Science went from 5 to 4 on a draft patched specifically to satisfy science. Closing the first half of the RECOVERED bullet opened the 30-minute half that attempt 1 never engaged."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "note": "Science 4 to 10 on the outline critic's reconciliation. Its stated reading, which is the pivot the whole repair turns on: the bullet says the confirmations must be ENTERED within 30 minutes of each other, not that the events behind them occurred within 30 minutes, and the chapter already uses that distinction in its own text for line 0447, where BERG 4 confirmed at 15:55 and the tag was entered at 16:18, twenty-three minutes apart. On that reading Bauer entering the callsign limb at 03:14 and the tag limb at 03:29 are fifteen minutes apart and the line is validly set.",
+      "arbitration_answers": {
+        "costs_outline_beat_7": true,
+        "q1": "Branch (b) is not available. The bullet names a specific pair as a definition, not a threshold a character can satisfy by asserting equivalence. A climber is not a field team, and I audit against the Bible's stated rule, not a character's in-scene redefinition of it.",
+        "q2": "No, plainly. There is no wording in which the 03:14 voice tape is Bauer's literal first confirmation and the RECOVERED bullet survives."
+      }
+    }
+  ]
+}

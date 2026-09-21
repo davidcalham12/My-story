@@ -1,0 +1,4 @@
+{"critic":"chatter","chapter":1,"drafts":1,"kind":"arithmetic",
+ "rule":"first line must match '# Chapter N'",
+ "iterations":[{"iteration":1,"score":10,"first_line":"# Chapter 1 — Warm Hull","findings":[]}],
+ "final":{"score":10,"findings":[]}}

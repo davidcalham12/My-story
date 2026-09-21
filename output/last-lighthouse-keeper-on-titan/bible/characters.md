@@ -1,0 +1,8 @@
+# Characters: The Kraken Mare Light
+
+- **Marit Anselm** — sole custodian of Station 12, the last crewed light on Kraken Mare, and the registered voice on every beacon she ever signed for; meticulous to the point of cruelty with her own logs, physically reckless about heat and power budgets she would never let anyone else spend
+- **Corvin Ladd** — Mare Authority network auditor at Ligeia Head, writing the decommissioning audit that would close Station 12, and the signature on the 2139 inquest that ruled the lost pod's beacon never transmitted; procedurally immaculate, allergic to any finding that reopens a closed file
+- **Tomas Weir** — skipper of a Mayda Insula salvage cooperative, listening to the open distress band for anything unanswered for seventy-two hours; unsentimental about wrecks and scrupulous about custom, willing to trade a claim for a favour if the arithmetic is honest
+- **Oyuna Brecht** — Kraken Freight Guild barge master of the *Sorrel Draught*, who files weather she knows is false to justify shoal shortcuts; fast, under-crewed and defensive, and the only person who can say what her anchor dragged out of Nicholson Shoal
+- **Delphine Sarr** — Huygens Ring Consortium pass scheduler who meters Station 12's uplink by the kilobit and decides whose bundles ride a congested pass; transactional to the second, quietly precise about what she is and is not permitted to prioritise
+- **Halvard Ness** — survey technician lost with pod Wick-3 in 2138, nine years dead at 94 K on the floor of Nicholson Shoal, still the author of every distress text arriving in Marit Anselm's voice; steady on the record, plainspoken even while sinking

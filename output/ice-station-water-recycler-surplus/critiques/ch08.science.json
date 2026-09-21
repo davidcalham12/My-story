@@ -1,0 +1,15 @@
+{"critic": "science", "chapter": 8, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 4, "findings": [
+     {"kind": "rule-violation", "severity": "high", "upheld": false, "actioned": false,
+      "quote": "Before Day +33 the loop had been enriching at 2.38 ± 0.30 ppm/day for thirteen consecutive days.",
+      "claim": "The critic held that the Rules' 'eleven consecutive days' fixes the duration and that thirteen should become eleven.",
+      "fix": "The critic asked for thirteen to be changed to eleven throughout.",
+      "reference": "bible/world.md, ## Rules — first bullet",
+      "overruled_because": "The Rules' eleven is a Day 0 snapshot of how long the surplus had been running when the book opens; the thirteen is the length of Brede's sampling series, Day +11 through Day +24, which is canon established in chapters 4 and 6 and scored 10 by both model critics on each. Applying the fix would have written an error into the book by hand. Overruled, excluded from the sheet, and the reasoning given to both the writer and the critic; on the rescore the critic accepted it and returned 10 with no findings."},
+     {"kind": "rule-violation", "severity": "medium", "upheld": true,
+      "quote": "627 ± 80 kg — measured.",
+      "claim": "An isotope-derived mass is entered in the loop-inventory field although the station's evidentiary rule admits only totalizer differences accumulated across five days or more as logged findings.",
+      "fix": "Keep the figure and add the custodian's flag that it is not a totalizer accumulation and does not clear the usual bar.",
+      "reference": "bible/world.md, ## Rules — fourth bullet"}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

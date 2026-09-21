@@ -1,0 +1,24 @@
+{"ts":"2026-09-18T10:00:01Z","stage":"FLOW-1","agent":"worldbuilder","model":"opus","chapter":null,"iteration":1,"tokens":10370,"verdict":"accepted: ## Rules present with 8 bullets (min 4)"}
+{"ts":"2026-09-18T10:03:20Z","stage":"FLOW-2","agent":"character-architect","model":"opus","chapter":null,"iteration":1,"tokens":21252,"verdict":"accepted: 6 characters, 12 timeline rows, 5 mysteries"}
+{"ts":"2026-09-18T10:06:10Z","stage":"FLOW-3","agent":"plot-architect","model":"opus","chapter":null,"iteration":1,"tokens":13561,"verdict":"accepted: split on '### Chapter N — Title' yielded 3 entries for 3 chapters"}
+{"ts":"2026-09-18T10:07:35Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":1,"iteration":1,"tokens":12142,"verdict":"draft returned, 581 words"}
+{"ts":"2026-09-18T10:09:10Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":1,"iteration":1,"tokens":15800,"verdict":"score 10, no findings"}
+{"ts":"2026-09-18T10:09:12Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":1,"iteration":1,"tokens":8447,"verdict":"score 10, no findings"}
+{"ts":"2026-09-18T10:09:15Z","stage":"FLOW-4","agent":"orchestrator","model":"n/a","chapter":1,"iteration":1,"tokens":0,"verdict":"gate aggregate 10 (min of 10/10/10/10) >= 8, accepted on draft 1"}
+{"ts":"2026-09-18T10:11:40Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":2,"iteration":1,"tokens":11708,"verdict":"draft returned, 545 words"}
+{"ts":"2026-09-18T10:12:30Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":2,"iteration":1,"tokens":10032,"verdict":"score 10, no findings"}
+{"ts":"2026-09-18T10:14:20Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":2,"iteration":1,"tokens":20034,"verdict":"score 6, 1 major finding: six-hour cache depth cannot hold the packet across a day"}
+{"ts":"2026-09-18T10:14:25Z","stage":"FLOW-4","agent":"orchestrator","model":"n/a","chapter":2,"iteration":1,"tokens":0,"verdict":"gate aggregate 6 (min of 10/10/10/6) < 8, rejected; redrafting by substitution"}
+{"ts":"2026-09-18T10:15:05Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":2,"iteration":2,"tokens":6801,"verdict":"1 patch returned; applied literally, 0 skipped, no fallback rewrite. New chapter-writer instance, so tokens are this attempt only, not a cumulative total."}
+{"ts":"2026-09-18T10:16:00Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":2,"iteration":2,"tokens":8678,"verdict":"score 10, no findings (re-run because the text changed)"}
+{"ts":"2026-09-18T10:16:05Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":2,"iteration":2,"tokens":9557,"verdict":"score 10, finding cleared"}
+{"ts":"2026-09-18T10:16:10Z","stage":"FLOW-4","agent":"orchestrator","model":"n/a","chapter":2,"iteration":2,"tokens":0,"verdict":"gate aggregate 10 >= 8, accepted on draft 2; best draft is also draft 2 (10 > 6)"}
+{"ts":"2026-09-18T10:18:30Z","stage":"FLOW-4","agent":"chapter-writer","model":"opus","chapter":3,"iteration":1,"tokens":10294,"verdict":"draft returned, 490 words"}
+{"ts":"2026-09-18T10:19:20Z","stage":"FLOW-4","agent":"continuity-critic","model":"sonnet","chapter":3,"iteration":1,"tokens":8241,"verdict":"score 10, no findings (JSON was fenced; parsed and counted)"}
+{"ts":"2026-09-18T10:20:40Z","stage":"FLOW-4","agent":"science-critic","model":"sonnet","chapter":3,"iteration":1,"tokens":14424,"verdict":"score 10, no findings"}
+{"ts":"2026-09-18T10:20:45Z","stage":"FLOW-4","agent":"orchestrator","model":"n/a","chapter":3,"iteration":1,"tokens":0,"verdict":"gate aggregate 10 >= 8, accepted on draft 1"}
+{"ts":"2026-09-18T10:22:10Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":1,"iteration":1,"tokens":7263,"verdict":"kept: 581 words in, 581 out"}
+{"ts":"2026-09-18T10:22:12Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":2,"iteration":1,"tokens":8086,"verdict":"kept: 671 words in, 671 out"}
+{"ts":"2026-09-18T10:22:14Z","stage":"FLOW-5","agent":"style-editor","model":"sonnet","chapter":3,"iteration":1,"tokens":7782,"verdict":"kept: 490 words in, 490 out"}
+{"ts":"2026-09-18T10:23:30Z","stage":"FLOW-6","agent":"publisher","model":"sonnet","chapter":null,"iteration":1,"tokens":6069,"verdict":"synopsis accepted, ~235 words, 3 comparables; orchestrator corrected one canon slip ('hard-vacuum procedural' -> 'hard-science procedural': Titan has 1.5 bar of atmosphere)"}
+{"ts":"2026-09-18T10:23:50Z","stage":"FLOW-6","agent":"orchestrator","model":"n/a","chapter":null,"iteration":1,"tokens":0,"verdict":"dist/book.md assembled in the shell by concatenation: synopsis + ch01-03 .final.md, 1992 words"}

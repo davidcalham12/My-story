@@ -1,0 +1,9 @@
+{"critic": "science", "chapter": 1, "kind": "model", "agent": "science-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "rule-contradicted", "severity": "medium",
+      "quote": "Three nights. That's the rule, that's not me. Thursday, Friday, Saturday, and Sunday morning the meeting decides whether you stay.",
+      "claim": "Reads Owen's count as three nights in addition to the arrival night, which would give Ruth four nights before the fourth-morning decision.",
+      "fix": "Have the arrival night count as the first of the three.",
+      "reference": "bible/world.md, ## Rules, bullet 3"}]}],
+ "orchestrator_note": "Scored 8, which clears the threshold on its own, so this finding did not trigger a redraft and no patch was applied. Recorded because it is the run's evidence of what the critic saw. On the orchestrator's reading the draft is already consistent: Ruth arrives on Thursday evening and Owen names Thursday, Friday and Saturday as the three nights, so the arrival night is the first of them and the count is three, not four. The finding is logged as raised and not acted on rather than silently dropped."}

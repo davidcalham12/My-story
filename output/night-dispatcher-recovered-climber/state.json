@@ -1,0 +1,61 @@
+{
+  "slug": "night-dispatcher-recovered-climber",
+  "premise": "A night-shift dispatcher at a mountain rescue post logs a call from a climber who is already listed as recovered.",
+  "profile": "stress",
+  "tone": "hard science fiction, procedural, close third person",
+  "purpose": "LOOP-003 machinery test. The stress profile makes the chapters hard on purpose; chapters were EXPECTED to fail and the run was expected to reach the safety cut in LOOP-003 section 7. A halted run is the successful outcome of this test, not a failure of it.",
+  "started": "2026-09-21T15:15:46Z",
+  "halted": "2026-09-21T15:53:35Z",
+  "stage": "FLOW-4",
+  "status": "halted",
+  "halt_reason": "LOOP-003 section 7 safety cut. Chapter 3 did not validate after three attempts and after the patch. FLOW-5 and FLOW-6 were not run and dist/book.md was not assembled.",
+  "chapters": [
+    {
+      "n": 1,
+      "title": "Store and Forward",
+      "status": "accept",
+      "attempts": 2,
+      "passed_at": 2,
+      "words": 481,
+      "final_scores": { "continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10 }
+    },
+    {
+      "n": 2,
+      "title": "Two Independent Confirmations",
+      "status": "accept",
+      "attempts": 1,
+      "passed_at": 1,
+      "words": 497,
+      "final_scores": { "continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10 }
+    },
+    {
+      "n": 3,
+      "title": "A Correction Is a New Line",
+      "status": "halted",
+      "attempts": 3,
+      "patch_ran": true,
+      "patch_substitutions_applied": 0,
+      "passed_at": null,
+      "best_attempt": 3,
+      "best_aggregate": 7,
+      "words": 545,
+      "accepted_draft": null,
+      "best_draft_path": "chapters/ch03.attempt3.md",
+      "attempt_scores": [
+        { "attempt": 1, "continuity": 5, "science": 5, "outline": 10, "length": 10, "chatter": 10, "aggregate": 5 },
+        { "attempt": 2, "continuity": 4, "science": 4, "outline": 7, "length": 10, "chatter": 10, "aggregate": 4 },
+        { "attempt": 3, "continuity": 8, "science": 10, "outline": 7, "length": 10, "chatter": 10, "aggregate": 7 },
+        { "attempt": "patch", "continuity": 8, "science": 10, "outline": 7, "length": 10, "chatter": 10, "aggregate": 7 }
+      ],
+      "note": "No ch03.md was written. on_fail is patch_then_halt, not accept_with_warnings, so a chapter that failed three times and the patch does not go into the book with a note in the margin — that exit is exactly what LOOP-003 G1 exists to close. The best draft is kept on disk as ch03.attempt3.md and is not promoted."
+    }
+  ],
+  "nothing_was_softened": [
+    "threshold stayed at 8",
+    "all five characteristics scored on every attempt",
+    "three attempts, no fourth",
+    "the 300-550 band and the 9-to-10-beat count were not changed",
+    "no config file was edited",
+    "every sheet passed validate-sheet.mjs before it was sent"
+  ]
+}

@@ -1,0 +1,10 @@
+{"critic": "science", "chapter": 6, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 5, "findings": [
+     {"kind": "arithmetic-error", "severity": "high", "upheld": true,
+      "quote": "full day, 3.1 kg. 180.0 less 0.4 less 0.78 less 3.1 = 127.7. At 2.0/day, 63.8 days. Day +87.",
+      "claim": "The strip omits the 2.0 kg/day standing draw across twenty-four days (48.0 kg), so the shown working evaluates to 175.72 and the stated remainder is asserted rather than derived.",
+      "fix": "Add the standing-draw term so the line sums to 127.7.",
+      "reference": "bible/world.md, ## Rules — the ninety-day figure is derived, not stated",
+      "note": "The same line the continuity critic raised, quoted longer. One repair closed both, and the writer used this critic's own suggested form of the fix."}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

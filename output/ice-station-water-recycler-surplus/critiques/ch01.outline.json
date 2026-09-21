@@ -1,0 +1,16 @@
+{"critic": "outline", "chapter": 1, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 9, "findings": [
+     {"kind": "out-of-order", "severity": "low", "upheld": true, "actioned": false,
+      "quote": "Then declare. Seal the modules, put us in suits, sit the rotation out on the bottles and let somebody come and get us. Nora, we don't know what's crossing into that loop. Stack B's membranes fouled, they didn't age. Stack A is downstream of the same water.",
+      "claim": "Beat 3 bundles Vance naming the discrepancy with his argument to declare; in the draft the declare argument lands after beat 4's burn-down arithmetic.",
+      "fix": "Move the declare argument to immediately after Vance names the discrepancy.",
+      "reference": "outline beat 3",
+      "note": "Upheld as accurate but deliberately not actioned: outline scored 9, above the threshold of 8, and DO NOT TOUCH outranks improving a passing characteristic."}]},
+   {"iteration": 2, "score": 9, "findings": [
+     {"kind": "out-of-order", "severity": "low", "upheld": true, "actioned": false,
+      "quote": "Then declare. Seal the modules, put us in suits, sit the rotation out on the bottles and let somebody come and get us. Nora, we don't know what's crossing into that loop. Stack B's membranes fouled, they didn't age. Stack A is downstream of the same water.",
+      "claim": "Same finding as iteration 1, correctly re-raised: the passage was never sent back for repair.",
+      "fix": "Move the declare argument to immediately after Vance names the discrepancy.",
+      "reference": "outline beat 3",
+      "note": "Carried, not late: raised on the first attempt too. Still above threshold, still not actioned."}]}]}

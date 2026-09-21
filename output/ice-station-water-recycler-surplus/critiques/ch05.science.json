@@ -1,0 +1,9 @@
+{"critic": "science", "chapter": 5, "kind": "model", "agent": "science-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 9, "findings": [
+     {"kind": "arithmetic-inconsistency", "severity": "low", "upheld": true, "actioned": false,
+      "quote": "Day +30 plus twenty-three is Day +53.",
+      "claim": "The chapter derives 23.3 days from 118.8 over 5.1 and then adds twenty-three, so the same quantity is stated two ways in one passage, though the rounded day is unchanged either way.",
+      "fix": "Carry the decimal, or say explicitly that it is being rounded.",
+      "reference": "bible/world.md, ## Rules — the ninety-day derivation bullet",
+      "note": "Upheld as accurate but not actioned: science scored 9, above the threshold of 8, and DO NOT TOUCH outranks improving a passing characteristic. The critic itself notes the final date is the same on either figure."}]}]}

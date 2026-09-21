@@ -1,0 +1,36 @@
+[
+  {
+    "iteration": 1,
+    "critic": "continuity",
+    "chapter": 2,
+    "score": 4,
+    "findings": [
+      {
+        "severity": "high",
+        "quote": "Twenty minutes. Ratri watched the read like a woman watching a kettle.",
+        "problem": "Ratri reads 'the whole lot' (Lot 4417 = 24 recorded hours = 8,640 MB per bible/mysteries.md) across the mastoid port at 4 Mb/s. The Bible's own conversion (one recorded hour = 360 MB = twelve minutes of unbroken cable) makes 24 recorded hours = four hours forty-eight minutes of cable, not twenty minutes. Twenty minutes at 0.5 MB/s moves only ~300 MB, well under one recorded hour of data.",
+        "fix": "Change the read time to roughly four hours forty-eight minutes, or explicitly have Ratri pull only the index/certificate summary rather than 'the whole lot' if a short scene is needed."
+      },
+      {
+        "severity": "medium",
+        "quote": "eleven days ago she had known how to splice such a lead without ever having been taught",
+        "problem": "Juno's borrowed competence originates with the Day -41 transcode of Lot 4417 into her connectome. Chapter 2 is Day +1, so that borrowed knowledge would be about 42 days old, not eleven - and this figure also conflicts with Ratri's own count later in the same scene ('forty-one days in').",
+        "fix": "Anchor it to the Day -41 transcode, roughly six weeks, matching Ratri's count."
+      },
+      {
+        "severity": "low",
+        "quote": "You're forty-one days in.",
+        "problem": "Lot 4417 was transcoded into Juno Halim on Day -41 (bible/timeline.md). Chapter 2 is stated to be Day +1, which is forty-two days after Day -41, not forty-one.",
+        "fix": "Change to 'forty-two days in' to match the Day -41 to Day +1 span."
+      }
+    ]
+  },
+  {
+    "iteration": 2,
+    "critic": "continuity",
+    "chapter": 2,
+    "score": 10,
+    "findings": [],
+    "note": "All three prior findings resolved in the patched draft: the bench now reads a 600 MB sample (600 MB at 0.5 MB/s = 20 minutes, consistent) rather than 'the whole lot' in twenty minutes; 'eleven days ago' became 'six weeks ago', matching the Day -41 to Day +1 span; Ratri's line reads 'forty-two days in'. A fresh read of the full chapter turns up no further name drift, timeline conflicts or duration errors."
+  }
+]

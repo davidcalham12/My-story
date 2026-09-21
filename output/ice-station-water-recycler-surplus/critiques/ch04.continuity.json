@@ -1,0 +1,16 @@
+{"critic": "continuity", "chapter": 4, "kind": "model", "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 3, "findings": [
+     {"kind": "consumable-arithmetic", "severity": "high", "upheld": true,
+      "quote": "Fourteen left.",
+      "claim": "22 less 2 chips, 1 loop sample and 6 for the series leaves thirteen; Vance's recitation never spends the loop vial.",
+      "fix": "Name every vial the chapter spent and land on the total that leaves.",
+      "reference": "bible/characters.md, Brede's fixed attributes — twenty-two vials at the story's open",
+      "note": "Upheld. This finding also convicts the outline entry, which specified 'fourteen left' with the same omission. The chapter's own count governs."},
+     {"kind": "numeric-contradiction", "severity": "high", "upheld": true,
+      "quote": "It's four hundred short of the lens.",
+      "claim": "The lens read 820 and the loop 213, a gap of 607, not four hundred.",
+      "fix": "State the true difference.",
+      "reference": "readings stated in the draft, against bible/world.md ## Means",
+      "note": "Raised independently and identically by the science critic; carried on the sheet as one finding with one repair."}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

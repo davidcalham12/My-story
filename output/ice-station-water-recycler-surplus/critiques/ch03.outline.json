@@ -1,0 +1,6 @@
+{"critic": "outline", "chapter": 3, "kind": "model", "agent": "outline-critic", "drafts": 3,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []},
+   {"iteration": 3, "score": 10, "findings": []}],
+ "note": "Held at 10 through all three attempts. This is the characteristic the two science repairs were constrained to protect: the strip re-cut is beat 1, and the critic's first proposed fix would have deleted it."}

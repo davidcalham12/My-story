@@ -1,0 +1,16 @@
+{"critic": "outline", "chapter": 4, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 9, "findings": [
+     {"kind": "out-of-order", "severity": "low", "upheld": true, "actioned": false,
+      "quote": "So I stop measuring the offset and I measure the slope instead.",
+      "claim": "Beat 4, the slope experiment design, is narrated before beat 3, the six-hour Stack A outage and the swab.",
+      "fix": "Move the outage paragraph ahead of the slope-design paragraph.",
+      "reference": "outline beat 3",
+      "note": "Upheld as accurate but deliberately not actioned: 9 is above the threshold and reordering two paragraphs is far larger than the three arithmetic repairs the chapter was sent back for."}]},
+   {"iteration": 2, "score": 9, "findings": [
+     {"kind": "out-of-order", "severity": "low", "upheld": true, "actioned": false,
+      "quote": "So I stop measuring the offset and I measure the slope instead.",
+      "claim": "Same finding, correctly re-raised: the passage was never sent back for repair.",
+      "fix": "Move the outage paragraph ahead of the slope-design paragraph.",
+      "reference": "outline beat 3",
+      "note": "Carried, not late. The critic confirmed the four numeric substitutions left beat order untouched and that beat 5's tally is now arithmetically consistent at 22 - 2 - 1 - 6 = 13."}]}]}

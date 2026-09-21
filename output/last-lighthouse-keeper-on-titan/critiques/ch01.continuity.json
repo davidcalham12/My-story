@@ -1,0 +1,40 @@
+{
+  "chapter": 1,
+  "critic": "continuity",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "verdict": "pass",
+      "findings": [
+        {
+          "severity": "low",
+          "quote": "Six days back: the *Sorrel Draught*, barge master Oyuna Brecht, cutting a line straight through Nicholson Shoal on a sea state her filing did not justify.",
+          "problem": "Bible timeline places Brecht's shoal run at 'day -6' relative to the first bundle's arrival on 'day 1', a span of seven days, not six.",
+          "fix": "Change 'Six days back' to 'Seven days back'."
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 7,
+      "verdict": "fail",
+      "findings": [
+        {
+          "severity": "medium",
+          "quote": "It had re-transmitted into an empty arc, heard its own unacknowledged call come back, taken custody of the duplicate, and stamped it fresh — a cache renewing itself off its own echo. Nine years of a thing shouting into nothing and stamping the shout.",
+          "problem": "The chapter must leave the explanation of the buoy's nine-year silence open, but this passage supplies a specific, coherent in-universe mechanism (self-renewing echo cache) for why the message looks recent despite being nine years old — resolving a mystery the outline reserves for later chapters rather than merely gesturing at it.",
+          "fix": "Cut or soften to an observation without a mechanism — have Marit note the stamp pattern is impossible and stop there, leaving the 'why' as an open wound rather than a solved puzzle."
+        }
+      ],
+      "note": "This finding was introduced BY the fix for iteration 1's science finding. Science needed the retention mechanically legal; continuity needed it unexplained."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "verdict": "pass",
+      "findings": []
+    }
+  ],
+  "_note": "Every iteration is recorded, not only the last. The rejected drafts' critiques are the evidence the gate did something."
+}

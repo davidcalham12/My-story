@@ -1,0 +1,71 @@
+{
+  "critic": "continuity",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 5,
+      "findings": [
+        {
+          "kind": "clock arithmetic",
+          "severity": "high",
+          "upheld": true,
+          "quote": "Confirmations 03:14 and 03:29, seventeen minutes apart, inside the window, set by the duty controller and by no one else.",
+          "claim": "03:14 to 03:29 is fifteen minutes, not seventeen.",
+          "fix": "Change seventeen minutes apart to fifteen minutes apart.",
+          "reference": "bible/timeline.md, Wed 11 Mar 03:05-03:40 row"
+        }
+      ],
+      "note": "UPHELD. Plain arithmetic. Science raised the same sentence independently at low severity, so one repair closed both."
+    },
+    {
+      "iteration": 2,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "internal-contradiction",
+          "severity": "high",
+          "upheld": true,
+          "quote": "That is not a confirmation. A voice is neither a callsign nor a tag.",
+          "claim": "Bauer denies the 03:14 voice contact is a confirmation, but the line-0471 summary two paragraphs later still calls it one. The repair changed what 03:14 means in the scene and not what the summary claims it means.",
+          "fix": "Rewrite the closing summary to name the limbs Bauer actually used.",
+          "reference": "bible/timeline.md, Wed 11 Mar row"
+        },
+        {
+          "kind": "rule-violation",
+          "severity": "high",
+          "upheld": true,
+          "quote": "My callsign limb I already hold: BERG 4, 15:55, one casualty in the couloir.",
+          "claim": "If the 15:55 report is the callsign limb and 03:29 the tag limb, the two confirmations are about eleven and a half hours apart, not within 30 minutes.",
+          "fix": "Give Bauer a callsign-limb confirmation falling within 30 minutes of the 03:29 tag limb.",
+          "reference": "bible/world.md, ## Rules, the RECOVERED bullet"
+        }
+      ],
+      "note": "BOTH FINDINGS WERE CREATED BY THE REPAIR. Neither was present in attempt 1. Continuity fell 5 to 4 as a direct result of a repair commissioned by the science critic — the same shape as the recorded case in last-lighthouse-keeper-on-titan ch01, except that there it broke one passing characteristic and here it broke two scores at once and failed to fix the third."
+    },
+    {
+      "iteration": 3,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "canon-label-tension",
+          "severity": "low",
+          "upheld": true,
+          "quote": "A voice is neither a callsign nor a tag, so the tape itself is not the limb. But it is what reopens the file, and reopening it I enter my first confirmation now: BERG 4, 15:55, one casualty in the couloir. Callsign limb, confirmed 03:14.",
+          "claim": "bible/timeline.md labels the 03:14 confirmation itself as a voice tape, but this text has Bauer reject the tape as the limb and substitute the BERG 4 callsign report. The timestamp and interval are fully consistent with canon; only the evidentiary type behind the 03:14 confirmation differs from what the timeline row names.",
+          "fix": "Treat the timeline's parenthetical as descriptive of what triggered 03:14 rather than a binding claim about the confirmation's evidentiary type. If a stricter reading is required, reword the timeline row, not the chapter.",
+          "reference": "bible/timeline.md, Wed 11 Mar row"
+        }
+      ],
+      "note": "Continuity 4 to 8. Its stated reading: the closing summary is now internally consistent because Bauer enters the callsign limb at 03:14 and the tag limb at 03:29, both entry timestamps, matching how line 0447's own two limbs were timed by entry rather than by event. Both of its prior findings are closed. Note that this critic's own proposed replacement was REFUSED by arbitration and the draft still rose four points without it — the refusal was correct.",
+      "arbitration_answers": {
+        "solvable_without_a_new_event": true,
+        "q1": "Yes. Read literally against world.md's rule, a voice tape is neither limb, and no field-team callsign reading exists before 03:31. So timeline.md's own statement names a limb the rule's wording does not list. That mismatch is inherited from the Bible, not invented by any draft.",
+        "q2": "Not a flat no — this critic dissented from the other two and proposed restoring the attempt-1 wording. Arbitration refused it because science had already scored that exact text 5."
+      }
+    }
+  ]
+}

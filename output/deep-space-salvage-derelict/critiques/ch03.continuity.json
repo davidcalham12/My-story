@@ -1,0 +1,14 @@
+{"critic":"continuity","chapter":3,"kind":"model","agent":"continuity-critic","drafts":2,
+ "iterations":[
+   {"iteration":1,"score":3,"findings":[
+     {"kind":"character-status","severity":"high","upheld":true,
+      "quote":"Rook's cumulative dose, one long EVA short of the ceiling that ended his career and, some years later, him.",
+      "fix":"past tense reads as Rook already career-ended and dead, while he acts four paragraphs later",
+      "reference":"bible/characters.md"},
+     {"kind":"arithmetic","severity":"high","upheld":false,
+      "quote":"Departure spent 1.6 of the remaining 1.9. Three hundred metres per second in the tanks",
+      "claim":"bible fixes 2.9 - 1.6 = 1.3, so 1.9 is invented",
+      "orchestrator_ruling":"OVERRULED. bible/world.md states rendezvous, station-keeping and departure all spend from the budget. Four days on station spends ~1.0, so 2.9 - 1.0 = 1.9 and 1.9 - 1.6 = 0.3. The science critic reached the same conclusion independently. Not passed to the writer; text left unchanged."}]},
+   {"iteration":2,"score":10,"findings":[]}
+ ],
+ "final":{"score":10,"findings":[]}}

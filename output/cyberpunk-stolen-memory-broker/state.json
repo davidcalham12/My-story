@@ -1,0 +1,22 @@
+{
+  "slug": "cyberpunk-stolen-memory-broker",
+  "premise": "In a flooded megacity, a back-alley neural-implant technician finds her own stolen memories being resold as someone else's.",
+  "profile": "tiny",
+  "stage": "complete",
+  "chapters": [
+    { "n": 1, "title": "Four Days, Itemised", "status": "approved", "words": 482, "drafts": 1, "accepted_iteration": 1, "best_aggregate": 10, "style_pass": "discarded" },
+    { "n": 2, "title": "The Bench Says Two", "status": "approved", "words": 476, "drafts": 2, "accepted_iteration": 2, "best_aggregate": 10, "style_pass": "kept" },
+    { "n": 3, "title": "Seventy-Two Seconds of Cable", "status": "approved", "words": 465, "drafts": 1, "accepted_iteration": 1, "best_aggregate": 10, "style_pass": "kept" }
+  ],
+  "accepted_with_warnings": [],
+  "style_passes_discarded": [
+    { "chapter": 1, "words_sent": 482, "words_returned": 484, "tolerance_pct": 0, "cause": "the editor spaced the em dashes bracketing an interrupted line of dialogue, which splits two whitespace-delimited tokens into four; the gate-approved text was published instead" }
+  ],
+  "outputs": { "markdown": "dist/book.md", "synopsis": "synopsis.md", "formats_written": ["markdown"] },
+  "totals": { "chapter_words": 1423, "book_words": 1672, "subagent_calls": 19, "subagent_tokens": 184436 },
+  "notes": [
+    "bible/world.md is 960 words against the advisory bible.world_max_words of 900; the gated requirement (a ## Rules heading with 4-8 bullets) was satisfied with 8.",
+    "Chapter 2's first draft was prompted with a 125-word rolling summary, 5 words over context.max_summary_words; the summary was trimmed to 120 immediately and every later summary was verified under the cap before use.",
+    "PDF was not produced: outputs.formats is [\"markdown\"] and PDF export is not available on this branch."
+  ]
+}

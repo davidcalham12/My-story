@@ -1,0 +1,16 @@
+{
+  "critic": "science",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    { "iteration": 1, "score": 10, "findings": [] },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "Rescored explicitly on the question LOOP-003 §2 does not cover: did the continuity repair break a characteristic that was already passing. It did not. Science held at 10."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "critic": "science",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "The prompt named the maintenance window explicitly and the critic still returned 10 on a draft that shows queued bursts on the desk before the flush. Recorded against this critic as a miss, not as a pass on the merits."
+    }
+  ]
+}

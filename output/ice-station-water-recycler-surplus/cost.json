@@ -1,0 +1,42 @@
+{
+  "_comment": "Written from Claude Code’s own result event. This is the whole run: the orchestrator’s turns as well as the subagents’. The token totals in logs/agents.jsonl cover the subagents only, so the two do not agree and are not meant to. Recorded by hand rather than by the dev server because this run was launched as a standalone process, so a Vite restart could not kill it.",
+  "total_cost_usd": 49.32665219999998,
+  "turns": 329,
+  "wall_clock_ms": 5932364,
+  "subagents": {
+    "spawned": 44,
+    "requested": {
+      "background": 29,
+      "foreground": 15,
+      "unset": 0
+    },
+    "started_in_background": 29,
+    "max_depth": 1,
+    "spawned_by_subagents": 0,
+    "completed": 44,
+    "failed": 0,
+    "killed": {
+      "parent": 0,
+      "user": 0,
+      "system": 0
+    },
+    "refused": {
+      "depth_limit": 0,
+      "concurrency_limit": 0,
+      "budget": 0
+    },
+    "by_type": {
+      "worldbuilder": 1,
+      "character-architect": 1,
+      "plot-architect": 1,
+      "chapter-writer": 8,
+      "continuity-critic": 8,
+      "science-critic": 8,
+      "outline-critic": 8,
+      "style-editor": 8,
+      "publisher": 1
+    }
+  },
+  "source": "claude-code-result-event",
+  "recorded_at": "2026-09-18T23:08:30.721Z"
+}

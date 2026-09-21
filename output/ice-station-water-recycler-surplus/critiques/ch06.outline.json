@@ -1,0 +1,5 @@
+{"critic": "outline", "chapter": 6, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "note": "The outline entry estimated the loop inventory at 640 ± 80 kg; the writer was authorised to derive it from the chapter's own measured slope instead, giving 627 ± 80, and the critic was told so before scoring both times."}

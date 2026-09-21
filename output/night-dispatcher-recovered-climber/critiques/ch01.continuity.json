@@ -1,0 +1,31 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "timeline/log-arithmetic",
+          "severity": "medium",
+          "upheld": true,
+          "quote": "22:30. 22:45. 23:00. She logged each one on the quarter hour, and between them the channel hissed its flat open hiss, and nothing came down from above the col.",
+          "claim": "The draft invents an INSLOG number, 0459, for the 22:15 post check. Canon fixes the recovered line at 0447 (16:20 Tue) and the voice call at 0463 (02:52 Wed), so fifteen numbered lines separate them; quarter-hour post checks from 22:00 to 02:45 are nineteen lines on their own and overrun the call's number before the call arrives.",
+          "fix": "Strike the invented line number from the post-check entry, keeping the entry, the time and the log formatting.",
+          "reference": "bible/timeline.md, Tue 15:55-16:20 row and Wed 02:52 row; bible/world.md, ## Technology, INSLOG"
+        }
+      ],
+      "note": "Orchestrator arbitration: UPHELD. The critic's own quote is the quarter-hour cadence sentence rather than the sentence carrying 0459, but the arithmetic it states is correct and the defect is real, so the sheet quoted the sentence that actually had to change. Dispatched in one message with science and outline; durations 78.8s / 25.9s / 18.9s from a single reply, so the three ran concurrently."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "Rescored after one literal substitution. The finding is resolved and no new finding was raised, so the repair for continuity cost nothing on continuity's own axis."
+    }
+  ]
+}

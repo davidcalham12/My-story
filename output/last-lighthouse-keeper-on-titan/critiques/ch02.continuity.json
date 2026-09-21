@@ -1,0 +1,20 @@
+{
+  "chapter": 2,
+  "critic": "continuity",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "verdict": "fail",
+      "findings": [
+        {
+          "severity": "high",
+          "quote": "Oyuna Brecht's anchor had fouled the derelict six days ago and dragged it roughly fourteen kilometres east",
+          "problem": "The Bible fixes Oyuna Brecht's shoal run, and the anchor-fouling of Buoy 47, at day -6, and Chapter 1 (as accepted) already read that interval as 'seven days back' from day 1 — consistent with day -6. This chapter is set on days 2-3. Counting 'six days ago' from day 2 lands on day -4, and from day 3 on day -3; neither matches the Bible's day -6 fouling event. The elapsed interval has silently drifted forward by two to three days relative to established canon.",
+          "fix": "Restate the interval relative to the current day so it lands on day -6 — 'eight days back' if this passage occurs on day 2 — matching the fixed calendar day already established in Chapter 1 and the Bible."
+        }
+      ],
+      "note": "This is the clearest catch of the run: a date the writer inherited from its own chapter-1 instincts, wrong by two days against a Bible it was holding in full. Nothing but a critic reading the timeline would have found it."
+    }
+  ]
+}

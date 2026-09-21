@@ -1,0 +1,39 @@
+{
+  "chapter": 2,
+  "threshold": 8,
+  "aggregate": "min",
+  "max_revisions": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "words": 439,
+      "band": { "min": 225, "max": 687 },
+      "scores": { "length": 10, "chatter": 10, "continuity": 4, "science": 3 },
+      "unscored": [],
+      "aggregate": 3,
+      "verdict": "retry",
+      "note": "Both model critics independently caught the same break: the whole of Lot 4417 (8,640 MB) crossing a 4 Mb/s mastoid port in twenty minutes. Continuity added two date errors."
+    },
+    {
+      "iteration": 2,
+      "words": 476,
+      "band": { "min": 225, "max": 687 },
+      "scores": { "length": 10, "chatter": 10, "continuity": 10, "science": 10 },
+      "unscored": [],
+      "aggregate": 10,
+      "verdict": "accept",
+      "repair_method": "patch",
+      "patches_returned": 2,
+      "patches_applied": 2,
+      "patches_failed": 0,
+      "quotes_verified_gone": [
+        "You're forty-one days in.",
+        "eleven days ago she had known how to splice such a lead without ever having been taught",
+        "Twenty minutes. Ratri watched the read like a woman watching a kettle."
+      ]
+    }
+  ],
+  "best_aggregate": 10,
+  "accepted_iteration": 2,
+  "final_verdict": "accept"
+}

@@ -1,0 +1,4 @@
+{"critic": "length", "chapter": 7, "kind": "script", "agent": "orchestrator", "drafts": 1,
+ "band": {"min": 720, "max": 1680, "target": 1150, "derivation": "words_per_chapter 900-1400 widened by tolerance_pct 20"},
+ "iterations": [
+   {"iteration": 1, "score": 10, "words": 1335, "findings": []}]}

@@ -1,0 +1,10 @@
+{"critic": "continuity", "chapter": 6, "kind": "model", "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "consumable-arithmetic", "severity": "medium", "upheld": true,
+      "quote": "180.0 less 0.4 less 0.78 less 3.1 = 127.7",
+      "claim": "The equation omits the 48 kg of standing draw accrued over twenty-four days, so it evaluates to 175.72 rather than the 127.7 it states — though 127.7 is the correct reserve.",
+      "fix": "Show the standing-draw term in the line.",
+      "reference": "bible/timeline.md, Day 0 and Day +24",
+      "note": "Continuity scored 8, which passes on its own. Science scored the same line 5, and min aggregation sent the chapter back, so this finding went on the sheet with it."}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

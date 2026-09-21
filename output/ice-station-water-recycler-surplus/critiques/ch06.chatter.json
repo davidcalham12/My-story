@@ -1,0 +1,5 @@
+{"critic": "chatter", "chapter": 6, "kind": "script", "agent": "orchestrator", "drafts": 2,
+ "rule": "first line must be '# Chapter N' or the draft is not a chapter yet; score 0 otherwise",
+ "iterations": [
+   {"iteration": 1, "score": 10, "first_line": "# Chapter 6 — The Bag", "findings": []},
+   {"iteration": 2, "score": 10, "first_line": "# Chapter 6 — The Bag", "findings": []}]}

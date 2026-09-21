@@ -1,0 +1,11 @@
+{
+  "critic": "continuity",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    { "iteration": 1, "score": 10, "findings": [] }
+  ],
+  "known_defect_not_caught_by_the_gate": "The draft shows Roth reading 7-1150's stacked bursts live on her screen between 02:55 and 03:00, but bible/timeline.md holds those bursts in the Ostgrat queue until the flush at 03:05, which is chapter 3 beat 5. Both the continuity and the science critic were given the maintenance window explicitly and both returned 10. The orchestrator saw it and did not patch it: no finding names it, no attempt was open, and rule 2 of the redraft procedure forbids changing text nothing cited. Recorded here rather than fixed, which is the same disposition as the duplicated sentence in last-lighthouse-keeper-on-titan ch01. None of the five characteristics asks the question that would have caught it."
+}

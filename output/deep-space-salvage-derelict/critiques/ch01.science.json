@@ -1,0 +1,4 @@
+{"critic":"science","chapter":1,"drafts":1,"kind":"model","agent":"science-critic",
+ "iterations":[{"iteration":1,"score":10,"findings":[]}],
+ "final":{"score":10,"findings":[]},
+ "notes":["free-fall rule: no verb implies weight; harness lines, webbed stowage, coffee bulb all zero-g","rule 2: the ship asserts nothing post-dating its 2180 loss; name and cadence are grounded in the carried register","critic flagged a forward risk: a later chapter must not let the wreck reveal post-2180 knowledge without a stated transmission path"]}

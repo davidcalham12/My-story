@@ -1,0 +1,16 @@
+{"critic": "science", "chapter": 4, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 6, "findings": [
+     {"kind": "arithmetic-inconsistency", "severity": "high", "upheld": true,
+      "quote": "It's four hundred short of the lens.",
+      "claim": "820 less 213 is 607, not 400; the chapter printed both readings.",
+      "fix": "State the true gap.",
+      "reference": "bible/world.md, ## Means — benchtop mass spectrometer",
+      "note": "The same defect the continuity critic raised, in the same words."},
+     {"kind": "arithmetic-inconsistency", "severity": "medium", "upheld": true,
+      "quote": "Call it 2.49.",
+      "claim": "2.3 × (820 − 171) / 612 is about 2.44 ppm/day, not 2.49.",
+      "fix": "Put the evaluated figure where 2.49 stands and check the thirteen-day product still rounds to thirty-two.",
+      "reference": "bible/world.md, ## Rules first bullet and ## Means — recycler loop inventory 612 kg",
+      "note": "Upheld, and it convicts the outline entry too, which specified 2.49 ppm/day. The arithmetic governs over the outline."}]},
+   {"iteration": 2, "score": 10, "findings": []}]}

@@ -1,0 +1,33 @@
+{
+  "chapter": 1,
+  "critic": "science",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "verdict": "fail",
+      "findings": [
+        {
+          "severity": "high",
+          "quote": "Every re-transmit stamp after that was Buoy 47 again.",
+          "rule_broken": "Custodial sea buoys run a 30-day bundle cache and bundles 'survive in buoy memory until delivered or expired' — an unacknowledged bundle held and re-transmitted by the same single buoy for nine straight years exceeds the buoy's declared 30-day cache and never expires as the tech spec requires.",
+          "fix": "Either route the bundle through successive buoy/satellite hops over the nine years, or have the buoy's cache reset/re-ingest the bundle, rather than one buoy holding and re-stamping it continuously for nine years past its 30-day cache limit."
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "verdict": "pass",
+      "findings": [],
+      "note": "Re-scored by a FRESH science-critic context, not by resuming the critic that proposed the fix. A critic grading its own suggestion is a weaker gate."
+    },
+    {
+      "iteration": 3,
+      "score": 9,
+      "verdict": "pass",
+      "findings": []
+    }
+  ],
+  "_note": "Score moved 4 -> 10 -> 9 across three drafts of the same chapter. Two of the four critics are models and do not reproduce: 10 and 9 here are two readings of text that differs only in the passage continuity asked to be softened."
+}

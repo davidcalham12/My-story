@@ -1,0 +1,33 @@
+{
+  "chapter": 1,
+  "threshold": 8,
+  "aggregate": "min",
+  "max_revisions": 2,
+  "drafts_used": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "scores": { "continuity": 9, "science": 4, "length": 10, "chatter": 10 },
+      "aggregate": 4,
+      "result": "rejected",
+      "note": "words=500 (band 300-550, widened 225-688); opens '# Chapter'. Science failed on one buoy holding a bundle nine years past its declared 30-day cache."
+    },
+    {
+      "iteration": 2,
+      "scores": { "continuity": 7, "science": 10, "length": 10, "chatter": 10 },
+      "aggregate": 7,
+      "result": "rejected",
+      "note": "words=539. Repaired by 2 substitution patches, both matched literally, 0 skipped. Verified: both quoted passages absent from the patched text. The science fix (scored 4 -> 10 by a fresh critic context) introduced the continuity failure: it explained the buoy's nine-year silence, which the outline reserves for Chapter 2. The two critics pulled opposite ways on the same sentence."
+    },
+    {
+      "iteration": 3,
+      "scores": { "continuity": 10, "science": 9, "length": 10, "chatter": 10 },
+      "aggregate": 9,
+      "result": "accepted",
+      "note": "words=549 (band 300-550). Repaired by 1 substitution patch, matched literally, 0 skipped. Verified: the quoted passage is absent. Best of 4 / 7 / 9, and the accepted draft is also the best draft."
+    }
+  ],
+  "accepted_iteration": 3,
+  "best_iteration": 3,
+  "known_defect_not_caught_by_the_gate": "The iteration-3 patch replaced only the sentence its `find` named, leaving the preceding sentence in place, so paragraph 9 now says 'After that, every stamp was Buoy 47 again, and none of them older than thirty days. After that, Buoy 47 again, and again, and again, ... and not one stamp in it older than thirty days.' — the same fact twice. No critic flagged it: none of the four grades prose quality. It was left in place because rule 2 forbids changing text no finding names, and no drafts remained."
+}

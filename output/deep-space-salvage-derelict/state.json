@@ -1,0 +1,19 @@
+{
+  "slug": "deep-space-salvage-derelict",
+  "premise": "A deep-space salvage crew finds a derelict that remembers them",
+  "profile": "tiny",
+  "config_hash": "5558f78997e9",
+  "stage": "complete",
+  "chapters": [
+    {"n": 1, "status": "approved", "drafts": 1, "words": 425,
+     "scores": {"continuity": 10, "science": 10, "length": 10, "chatter": 10}},
+    {"n": 2, "status": "approved", "drafts": 2, "words": 465,
+     "scores": {"continuity": 9, "science": 10, "length": 10, "chatter": 10}},
+    {"n": 3, "status": "approved", "drafts": 2, "words": 470,
+     "scores": {"continuity": 10, "science": 10, "length": 10, "chatter": 10}}
+  ],
+  "style_passes_discarded": 0,
+  "manuscript_words": 1360,
+  "synopsis_words": 225,
+  "calls": 25
+}

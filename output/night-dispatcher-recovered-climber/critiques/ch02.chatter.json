@@ -1,0 +1,15 @@
+{
+  "critic": "chatter",
+  "chapter": 2,
+  "kind": "script",
+  "agent": null,
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "First line is exactly '# Chapter 2 — Two Independent Confirmations'. No preamble, no trailing notes."
+    }
+  ]
+}

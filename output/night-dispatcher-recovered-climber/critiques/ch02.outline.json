@@ -1,0 +1,15 @@
+{
+  "critic": "outline",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "All ten beats present and in order in 497 words. Second chapter running in which the stress fixture's outline-vs-length tension did not bite."
+    }
+  ]
+}

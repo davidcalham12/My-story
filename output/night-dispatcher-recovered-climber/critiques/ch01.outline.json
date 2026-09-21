@@ -1,0 +1,21 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "All ten beats present and in order. 10 - 0 missing - 0 out of order = 10. The stress profile's ten-beats-in-550-words tension did NOT bite on this chapter: the writer fitted ten beats into 483 words."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "Rescored on whether the continuity repair cost a beat, since the deletion falls inside beat 1. The critic's own reasoning: beat 1 requires taking the desk at 22:00 alone and logging the first post check on the quarter hour, and does not name a line number, so striking 0459 removes no required element. Outline held at 10."
+    }
+  ]
+}

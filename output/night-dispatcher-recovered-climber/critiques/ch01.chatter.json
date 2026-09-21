@@ -1,0 +1,21 @@
+{
+  "critic": "chatter",
+  "chapter": 1,
+  "kind": "script",
+  "agent": null,
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "First line is exactly '# Chapter 1 — Store and Forward'. No preamble before it, no notes after."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "Unchanged by the repair; the first line was never touched."
+    }
+  ]
+}

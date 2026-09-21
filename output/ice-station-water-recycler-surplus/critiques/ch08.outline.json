@@ -1,0 +1,5 @@
+{"critic": "outline", "chapter": 8, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "note": "The outline entry said Brede spends three of her last five vials; the ledger from chapters 4 and 6 leaves four, and the writer was authorised to write four. The critic was told so before scoring. Fourth arithmetic error found in the outline during the run."}

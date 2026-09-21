@@ -1,0 +1,31 @@
+{
+  "critic": "length",
+  "chapter": 3,
+  "kind": "script",
+  "agent": null,
+  "drafts": 3,
+  "band": { "min": 300, "max": 550, "tolerance_pct": 0 },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 514,
+      "findings": [],
+      "note": "wc -w on chapters/ch03.attempt1.md = 514. 36 words of headroom."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "words": 545,
+      "findings": [],
+      "note": "wc -w on chapters/ch03.attempt2.md = 545. The four repairs spent 31 of the 36 words, leaving five."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "words": 545,
+      "findings": [],
+      "note": "wc -w on chapters/ch03.attempt3.md = 545. The applied replacement was word-neutral. THIS IS THE CHARACTERISTIC THAT REFUSED THE SCIENCE CRITIC'S PATCH: its replacement adds 22 words, which is 567 against a hard 550 ceiling at tolerance 0, and would have scored 0. Length never failed in this run and is the reason one of the three candidate patches could be refused on arithmetic rather than on judgement."
+    }
+  ]
+}

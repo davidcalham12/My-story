@@ -1,0 +1,61 @@
+{
+  "premise": "The last lighthouse keeper on Titan starts receiving her own distress calls",
+  "profile": "tiny",
+  "slug": "last-lighthouse-keeper-on-titan",
+  "started": "2026-09-18",
+  "stage": "complete",
+  "canonical_names": ["Marit Anselm", "Corvin Ladd", "Tomas Weir", "Oyuna Brecht", "Delphine Sarr", "Halvard Ness"],
+  "chapters": [
+    {
+      "n": 1,
+      "title": "Custody Stamp 2138",
+      "status": "accepted",
+      "drafts": 3,
+      "aggregate": 9,
+      "best_aggregate": 9,
+      "words": 549,
+      "scores": { "continuity": 10, "science": 9, "length": 10, "chatter": 10 },
+      "style_pass": "discarded",
+      "final": "chapters/ch01.final.md"
+    },
+    {
+      "n": 2,
+      "title": "Dead Node, Live Signature",
+      "status": "accepted",
+      "drafts": 2,
+      "aggregate": 9,
+      "best_aggregate": 9,
+      "words": 475,
+      "scores": { "continuity": 9, "science": 10, "length": 10, "chatter": 10 },
+      "style_pass": "accepted",
+      "final": "chapters/ch02.final.md"
+    },
+    {
+      "n": 3,
+      "title": "Nine Minutes a Pass",
+      "status": "accepted",
+      "drafts": 1,
+      "aggregate": 10,
+      "best_aggregate": 10,
+      "words": 485,
+      "scores": { "continuity": 10, "science": 10, "length": 10, "chatter": 10 },
+      "style_pass": "accepted",
+      "final": "chapters/ch03.final.md"
+    }
+  ],
+  "accepted_with_warnings": [],
+  "totals": {
+    "chapter_words": 1509,
+    "synopsis_words": 247,
+    "book_md_words": 1761,
+    "subagent_calls": 25,
+    "subagent_tokens": 255358,
+    "budget_max_calls": 120
+  },
+  "outputs": {
+    "book": "dist/book.md",
+    "synopsis": "synopsis.md",
+    "formats": ["markdown"],
+    "pdf": "not available in this architecture; outputs.formats is [\"markdown\"]"
+  }
+}

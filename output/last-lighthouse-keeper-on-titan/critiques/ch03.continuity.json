@@ -1,0 +1,13 @@
+{
+  "chapter": 3,
+  "critic": "continuity",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "verdict": "pass",
+      "findings": [],
+      "note": "The writer's prompt for this chapter carried two named traps forward from earlier failures — elapsed intervals, and the fact that Ligeia Head is on Titan so an Earth-link lag needs routing through the Authority's Earth office. Both were avoided in the first draft."
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "_layers": [
+    "config/novel.config.json",
+    "config/profiles/tiny.json"
+  ],
+  "profile": "tiny",
+
+  "novel": {
+    "chapters": 3,
+    "tone": "hard-scifi",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": { "min": 300, "target": 420, "max": 550 },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": { "min": 5, "max": 24 },
+    "sentences_per_paragraph": { "min": 1, "max": 5 },
+    "lines_per_chapter": { "min": 25, "max": 95 },
+    "chars_per_line": { "max": 64 },
+    "beats_per_chapter": { "min": 3, "max": 5 },
+    "promises": { "min": 3, "max": 5 }
+  },
+
+  "bible": {
+    "world_min_words": 400,
+    "world_max_words": 900,
+    "technology_entries": { "min": 3, "max": 6 },
+    "factions": { "min": 2, "max": 4 },
+    "world_rules": { "min": 4, "max": 8 },
+    "characters": { "min": 4, "max": 7 },
+    "timeline_rows": { "min": 6, "max": 12 },
+    "mysteries": { "min": 3, "max": 5 }
+  },
+
+  "context": {
+    "max_summary_words": 120,
+    "forbid_prior_chapter_prose": true
+  },
+
+  "quality_gate": {
+    "critics": ["continuity", "science", "length", "chatter"],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "accept_with_warnings"
+  },
+
+  "style": { "word_count_tolerance_pct": 0 },
+
+  "budget": { "max_cost_usd": 5.0, "max_calls": 120 },
+
+  "outputs": {
+    "formats": ["markdown"],
+    "synopsis": {
+      "words": { "min": 150, "max": 250 },
+      "comparables": { "min": 2, "max": 3 }
+    },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  }
+}

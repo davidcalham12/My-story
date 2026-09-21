@@ -1,0 +1,4 @@
+{"critic": "outline", "chapter": 2, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []}]}

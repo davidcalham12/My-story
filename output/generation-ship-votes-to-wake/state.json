@@ -1,0 +1,30 @@
+{
+  "slug": "generation-ship-votes-to-wake",
+  "profile": "tiny",
+  "premise": "A generation ship votes on whether to wake the people who chose its course",
+  "title": "The Denominator",
+  "started": "2026-09-18",
+  "stage": "complete",
+  "canonical_names": [
+    "Juno Katsaros",
+    "Idris Falk",
+    "Oksana Brill",
+    "Teo Marchetti",
+    "Hanne Vollmer",
+    "Noor Sandoval",
+    "Ansel Duong"
+  ],
+  "chapters": [
+    { "n": 1, "title": "Six Hundred and Eleven", "words": 467, "drafts": 1, "aggregate": 10, "verdict": "approved", "style_pass": "kept", "warning": null },
+    { "n": 2, "title": "Seventy-Four", "words": 450, "drafts": 1, "aggregate": 10, "verdict": "approved", "style_pass": "kept", "warning": null },
+    { "n": 3, "title": "The Denominator", "words": 456, "drafts": 1, "aggregate": 10, "verdict": "approved", "style_pass": "kept", "warning": null }
+  ],
+  "totals": {
+    "chapter_words": 1373,
+    "synopsis_words": 239,
+    "book_words": 1612,
+    "subagent_calls": 16,
+    "subagent_tokens": 165733
+  },
+  "outputs": { "formats_written": ["markdown"], "book": "dist/book.md", "synopsis": "synopsis.md" }
+}

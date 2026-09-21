@@ -1,0 +1,15 @@
+{
+  "slug": "titan-lighthouse-distress-calls",
+  "premise": "A lighthouse keeper on Titan starts receiving her own distress calls",
+  "profile": "tiny",
+  "stage": "complete",
+  "chapters": [
+    { "n": 1, "title": "Forty-One Seconds", "status": "approved", "words": 581, "drafts": 1, "accepted_iteration": 1, "best_aggregate": 10, "style_pass": "kept" },
+    { "n": 2, "title": "Divide by Seventy-Eight", "status": "approved", "words": 671, "drafts": 2, "accepted_iteration": 2, "best_aggregate": 10, "style_pass": "kept" },
+    { "n": 3, "title": "Human-Acknowledged", "status": "approved", "words": 490, "drafts": 1, "accepted_iteration": 1, "best_aggregate": 10, "style_pass": "kept" }
+  ],
+  "accepted_with_warnings": [],
+  "style_passes_discarded": [],
+  "outputs": { "markdown": "dist/book.md", "synopsis": "synopsis.md", "formats_written": ["markdown"] },
+  "totals": { "chapter_words": 1742, "book_words": 1992, "subagent_calls": 19, "subagent_tokens": 210541 }
+}

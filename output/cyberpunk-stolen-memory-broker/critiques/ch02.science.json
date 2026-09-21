@@ -1,0 +1,25 @@
+[
+  {
+    "iteration": 1,
+    "critic": "science",
+    "chapter": 2,
+    "score": 3,
+    "findings": [
+      {
+        "severity": "high",
+        "quote": "Twenty minutes.",
+        "rule_broken": "No wireless deep read. Bulk memory leaves a Lattice only through the mastoid port at 4 Mb/s, and one recorded hour is 360 MB - twelve minutes of unbroken cable.",
+        "problem": "Lot 4417 is twenty-four recorded hours (8,640 MB), which at the port's fixed 4 Mb/s rate requires four hours and forty-eight minutes of unbroken cable (24 hours x 12 minutes/hour). The draft has the entire lot cross the mastoid lead in twenty minutes, roughly fourteen times faster than the port's stated bandwidth allows - effectively a wireless-deep-read-speed transfer over a wired link, and it erases the 'measurable and stateable length of time' the theft/consent rule depends on.",
+        "fix": "Change the duration to four hours and forty-eight minutes, or reduce the amount read in this sitting to match a twenty-minute session (roughly 600 MB, under two recorded hours)."
+      }
+    ]
+  },
+  {
+    "iteration": 2,
+    "critic": "science",
+    "chapter": 2,
+    "score": 10,
+    "findings": [],
+    "note": "Finding addressed. The bench now assays a 600 MB sample in twenty minutes, which is exactly 600 MB at 0.5 MB/s, and the four-hour-forty-eight-minute figure for the full twenty-four recorded hours is stated correctly in dialogue."
+  }
+]

@@ -1,0 +1,20 @@
+# Timeline — The Titan Beacon Chain
+
+Dates before the story are given as offsets from Chapter 1. Dates during the story
+are given as Noor Adeyemi's contract days, the numbering her station log uses.
+Her contract runs 1 to 547; Chapter 1 opens on Contract Day 422.
+
+| When | What |
+| --- | --- |
+| 19 years before | Relay Trust freezes cache firmware at Rev 6.2 across all three store-and-forward satellites: six-hour depth, contents not erased on retransmission, no flag distinguishing a live packet from a replay, and an "Earth-received correction" that adds the season's one-way lag to every surface timestamp it handles — including timestamps it has already corrected. Documentation is sealed as proprietary. |
+| 26 months before | Emlen Pryce is posted to Beacon Eleven and records the Convention voice inventory at commissioning: 312 fixed distress phrases plus a complete numeral set, so the station's dead-man routine can speak any position report in the keeper's own voice. |
+| 16 months before | During a magnetopause blackout in the blind half, Pryce's radar drops for under a minute; the watchdog transmits an automatic distress in his voice. Hours later it returns to him from the relay, stamped ahead of station time, reporting a keeper down on the ice apron. He suits up and walks out to the coordinates. His cryosuit exhausts its heat 1.2 km from the pier. The beacon stays lit; nobody answers it for nine days. |
+| 15 months before | Noor Adeyemi signs an eighteen-month contract at Enceladus Station and records her own Convention voice inventory — 312 phrases and the numeral set — in a commissioning booth, in ninety minutes, and never thinks about it again. |
+| 14 months before | Noor arrives at Beacon Eleven, relights it, and inherits Pryce's logs, his handwriting on the oxidiser tally sheet, and a genset whose electrolysis stack has been failing to keep pace since before he died. |
+| 9 months before | Iver Brekke signs the posthumous abandonment verdict on Pryce. The audited traffic, including both keepers' voice inventories, passes into the Relay Trust's commercial archive. |
+| 6 weeks before | Sorrel Vane buys a bulk archive dump off a decommissioned satellite bus. It contains the beacon chain's keeper voice inventories. She begins testing spliced position reports on lightly trafficked lanes. |
+| Contract Day 419 | The blind half begins: eight days with no direct line of sight to Earth, everything in and out through the Relay Trust cache. Oxidiser stock at Beacon Eleven reads 6%. Noor starts alternating radar and habitat heaters on a forty-minute cycle. |
+| Contract Day 422 | Predicted magnetopause passage; total radio blackout for five hours. At 04:12 local the alternation slips and the radar is unpowered for 41 seconds. The watchdog fires the dead-man template — a distress in Noor's synthesised voice, carrying Beacon Eleven's station hash. She sleeps through it. At 15:40, on the first clear relay pass, the call comes back down to her, stamped 1:18 ahead of station time. **Chapter 1.** |
+| Contract Day 423 | The call returns twice more, at 2:36 and 3:54 ahead — one Earth-lag correction added per cycle. Noor divides by 78 minutes, lands on 04:12 the previous day, and finds the 41 seconds in her own log. She also finds Pryce's last nine entries. **Chapter 2.** |
+| Contract Day 424 | A call arrives in her voice reporting a keeper down at coordinates 40 km offshore, on shoal ice, with no station hash of its own. *Tammuz* is six hours out and altering course toward it. Noor works out the discriminator and puts it on the radar band, direct, twelve seconds each way, while Sorrel Vane listens. **Chapter 3.** |
+| Contract Days 425–427 | Noor breaks the loop by doing the one thing the automation never could: she acknowledges the distress herself, live, at the microphone, setting the human-acknowledged flag Rev 6.2 will not re-forward. *Second Thought* lifts north and stops answering. On Day 427 line of sight to Earth returns and Noor transmits the verbatim log, the 41 seconds included, to an auditor who cannot reply in under 2h36m and will not read it for months. |

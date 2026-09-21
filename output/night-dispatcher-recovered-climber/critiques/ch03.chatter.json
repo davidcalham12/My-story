@@ -1,0 +1,17 @@
+{
+  "critic": "chatter",
+  "chapter": 3,
+  "kind": "script",
+  "agent": null,
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "note": "First line is exactly '# Chapter 3 — A Correction Is a New Line'."
+    },
+    { "iteration": 2, "score": 10, "findings": [], "note": "Unchanged by the four repairs." },
+    { "iteration": 3, "score": 10, "findings": [], "note": "Unchanged by the applied replacement." }
+  ]
+}
