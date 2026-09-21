@@ -302,3 +302,16 @@ different set of characteristics. Evidence, not sample.
 
 **Completeness record** — what an imported run did *not* carry: gate rows,
 durations, a critic. Kept per run so a gap reads as a gap rather than as a zero.
+
+**Token semaphore** — the thing that holds the 100,000-token ceiling. It is
+**concurrent**: the limit is on the sum of all model calls in flight at one
+instant, not on each call. A call reserves prompt tokens + `max_tokens`, waits if
+capacity is short, and releases when it finishes. Waiting is normal; a
+reservation larger than the total capacity is `halted: context`.
+
+**Reservation** — what one call takes from the semaphore. Worst case by
+construction, because `max_tokens` bounds a reply nobody can predict.
+
+**Projection** — what actually enters a prompt: a view of memory, never memory
+itself. The rolling summary is projected from facts, canon is projected by
+retrieval, and it is the *projection* that counts against the semaphore.

@@ -1,5 +1,9 @@
 # NovaForge — for Claude Code
 
+**Read `AGENTS.md` first; this file only adds what is specific to Claude Code.**
+The process — what must be approved before what, and what "done" means — is
+there, not here.
+
 A multi-agent harness that writes novels. Nine agents across six stages, with a
 five-characteristic quality gate between the draft and the book.
 
@@ -62,9 +66,10 @@ gate's arithmetic be tested without a database, a server or a model.
 compose in `runs/` or share through `commons/`. Same rule the frontend's
 Feature-Sliced Design applies to its slices.
 
-`commons/` is not "shared code" — it is **what nobody may skip**. The token
-counter lives in `commons/llm`, which is the only path to a model, so no feature
-can send a prompt without it being counted and charged against the budget.
+`commons/` is not "shared code" — it is **what nobody may skip**. The semaphore
+lives in `commons/context` and the client in `commons/llm`, which is the only
+path to a model, so no feature can send a prompt without it being counted,
+reserved and charged.
 
 Frontend is Feature-Sliced Design v2.1. Layers import downward only; the
 `widgets` layer is not used.
@@ -81,7 +86,7 @@ downloads things, or asks for credentials is not installed — say so instead.
 Installed: `fastapi` · `react` · `sqlite` · `sqlite-vec` ·
 `sentence-transformers` · `feature-sliced-design` · `frontend-design` ·
 `verification` · `grill-me` · `grilling`. Sources and licences are in
-`docs/architecture.md` §5.
+`docs/architecture.md` §7.
 
 ---
 
@@ -91,8 +96,12 @@ Full statements with their class of evidence are in `docs/verification.md`.
 
 1. **The writer never receives prior prose.** Its `ContextPacket` has no field
    that can carry it, and a test fails if the builder gains one.
-2. **100,000 tokens per call**, counted before sending. Over it is an error that
-   fails the run, not a warning.
+2. **100,000 tokens held concurrently**, not per call. A token semaphore in
+   `commons/context` reserves prompt tokens + `max_tokens` before every call and
+   releases after; short capacity means waiting, never failing. Five critics of
+   30,000 satisfy a per-call limit and put 150,000 in the air, which is why the
+   limit is concurrent. A single reservation larger than total capacity is
+   `halted: context`.
 3. **Five characteristics, each 0–10, all ≥ 8, aggregated with `min`.**
    `continuity`, `science`, `outline` (10 − 3 per missing beat − 1 per beat out
    of order), `length` (word count, in band or 0), `chatter` (0 unless it opens
@@ -123,15 +132,17 @@ Full statements with their class of evidence are in `docs/verification.md`.
 ## Not changed without a recorded decision
 
 The threshold of 8 · the five characteristics · the third attempt as the last ·
-the writer's `ContextPacket` · `patch_then_halt` · the 100k ceiling.
+the writer's `ContextPacket` · `patch_then_halt` · the 100k concurrent semaphore ·
+the budget ceiling.
 
-These come from `specs/loops/LOOP-003/README.md` §8.3, which also forbids
-trimming findings from a feedback sheet, sending a sheet that fails its
-validator, quoting a previous chapter's prose in one, and changing the sheet and
-the outline formula in the same chapter.
+Changing one needs **an approved SPEC that names it** — see `AGENTS.md` §6.
 
-Changing one is a decision to write down in `docs/architecture.md` §6, not an
-implementation detail.
+`specs/loops/LOOP-003/README.md` §8.3 adds more: no trimming findings from a
+feedback sheet, no sending a sheet that fails its validator, no quoting a previous
+chapter's prose in one, and no changing the sheet and the outline formula in the
+same chapter.
+
+The decision itself is recorded in `docs/architecture.md` §8.
 
 ---
 

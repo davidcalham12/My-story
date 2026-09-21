@@ -47,20 +47,37 @@ it.
 
 ---
 
-## G2 — No prompt exceeds 100,000 tokens
+## G2 — No more than 100,000 tokens are ever in flight at once
 
 **Class: T** *(planned)*
 
-**Method.** Counted before sending, in `commons/context`. Over the ceiling raises
-and fails the run. `commons/llm` is the only path to a model, so a feature cannot
-send an uncounted prompt.
+**Concurrent, not per call.** Five critics of 30,000 tokens each satisfy a
+per-call limit and put 150,000 in the air. The per-call limit survives only as a
+consequence: no single call can reserve more than the total capacity.
 
-**Evidence.** A unit test that a packet over the ceiling raises; the logged
-prompt size on every call, so the margin is visible rather than assumed.
+**Method.** A token semaphore in `commons/context`, capacity read from config.
+Before each call the reservation is computed as **prompt tokens + `max_tokens`**,
+with the prompt **counted, never estimated** — Anthropic's token-counting API for
+the real engine, the equivalent tokenizer in the mock. The call acquires, waits
+if capacity is short, and releases when done. Waiting is never a failure. A
+reservation larger than total capacity is rejected before waiting: `halted:
+context`.
 
-**Not covered (A, weak).** That `commons/llm` really is the only path. Nothing
-enforces it at import time today — a feature could construct its own client. An
-import-boundary test would make this **A**; until then it rests on review.
+**Evidence.** The test in `architecture.md` §6.3: five critics dispatched in
+parallel at 30,000 each, asserting over every log row that
+`in_flight_at_dispatch + tokens_reserved ≤ 100,000`, and that all five completed.
+Plus `tokens_reserved`, `in_flight_at_dispatch` and `wait_ms` logged per call,
+which turn two assertions into series — *chapter 34 weighs what chapter 1
+weighed*, and *how long the critics waited*.
+
+**Why the reservation is worst case.** `max_tokens` bounds a reply nobody can
+predict. A semaphore sized by an assumed reply is one a single long answer walks
+straight through, and a ceiling that can be exceeded is not a ceiling.
+
+**Not covered (A, weak).** That `commons/llm` really is the only path to a model.
+Nothing enforces it at import time — a feature could construct its own client and
+bypass the semaphore entirely. An import-boundary test would make this **A**;
+until then it rests on review, and it is the weakest link in the guarantee.
 
 ---
 
