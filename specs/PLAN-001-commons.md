@@ -1,9 +1,9 @@
 ---
 id: PLAN-001
 spec: SPEC-001
-status: draft
+status: approved
 created: 2026-09-21
-approved: null
+approved: 2026-09-21 by David Calderon
 ---
 
 # PLAN-001 — implementing `commons`

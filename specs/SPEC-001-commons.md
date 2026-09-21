@@ -1,9 +1,9 @@
 ---
 id: SPEC-001
 title: commons — the machinery nobody may skip
-status: draft
+status: approved
 created: 2026-09-21
-approved: null
+approved: 2026-09-21 by David Calderon
 ---
 
 # SPEC-001 — `commons`
