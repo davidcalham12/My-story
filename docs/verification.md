@@ -13,16 +13,29 @@ Produced with the `verification` skill. Classes are **T**est, **A**nalysis,
 > and where a guarantee splits into a strong half and a weak one, both lines are
 > written.
 
-**Status.** This describes the system v2 is being built to be. Rows marked
-*(planned)* have no evidence yet because the code does not exist; they are here
-so the tests get written rather than discovered missing. Rows without it carry
-evidence from the v1 implementation, named as such.
+**Status, 2026-09-21.** The backend, the panel and the vector layer are built.
+**93 backend tests and 9 frontend tests run on the mock engine, in CI, at $0.**
+Rows still marked *(planned)* are the ones whose code exists but whose test does
+not, and they are named rather than quietly assumed.
+
+The suite that carries these guarantees:
+
+| file | holds |
+|---|---|
+| `test_context.py` | G1 — the writer's packet, read as a type |
+| `test_semaphore.py` | G2 — the ceiling under five parallel reservations |
+| `test_gate.py` | G3, G4, G7, G8 — the gate as arithmetic over values |
+| `test_end_to_end.py` | all of them, in a whole run, including the halt |
+| `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
+| `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
+| `test_vectors.py` | what retrieval may and may not be used for |
+| `test_api.py` | the HTTP edge and the SSE snapshot |
 
 ---
 
 ## G1 — The writer never receives a previous chapter's prose
 
-**Class: T** *(planned)* — **downgraded from A, deliberately.**
+**Class: T** — **downgraded from A, deliberately.** Evidenced.
 
 **Method.** The writer's `ContextPacket` is a type with no field that can carry
 prose: Bible documents, one outline entry, the rolling summary as structured
@@ -49,7 +62,7 @@ it.
 
 ## G2 — No more than 100,000 tokens are ever in flight at once
 
-**Class: T** *(planned)*
+**Class: T**. Evidenced, in isolation and in a whole run.
 
 **Concurrent, not per call.** Five critics of 30,000 tokens each satisfy a
 per-call limit and put 150,000 in the air. The per-call limit survives only as a
@@ -83,7 +96,7 @@ until then it rests on review, and it is the weakest link in the guarantee.
 
 ## G3 — A chapter passes only when all five characteristics reach 8
 
-**Class: T** *(planned)* for the arithmetic, **D** for the whole.
+**Class: T** for the arithmetic, **D** for the whole. Evidenced.
 
 **Method.** `min` over five scores against a threshold read from config, in
 `chapters/domain.py`, which imports only the standard library and is tested

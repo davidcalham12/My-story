@@ -560,6 +560,26 @@ before the code exists.
 
 ---
 
+## 8.3 What is built, 2026-09-21
+
+| phase | state |
+|---|---|
+| 0 — skills | ten installed, each read in full, sources and licences at §7 |
+| 1 — documents | six written; fifteen open decisions closed in a grilling round |
+| 2 — backend on the mock | **done.** A `tiny` novel runs end to end in CI at $0 |
+| 3 — the real engine | written and behind the flag; **not yet run against the API** |
+| 4 — the panel | six pages, FSD, reading one backend; typecheck and build clean |
+| 5 — retrieval | `sqlite-vec` with the dimension pinned and the limits tested |
+| 6 — the outline audit | at FLOW-3, with its own tests |
+
+93 backend tests, 9 frontend tests, one second, no network and no credential.
+
+**What has not happened: a single real model call in v2.** Every figure this
+system has produced so far is graded `estimated`, because the mock counts and
+does not measure. Phase 3's acceptance is a `tiny` run on the real engine with
+its exact cost recorded and compared against v1's $7.45 for the same shape — and
+that needs a credential in the environment, which is the user's to provide.
+
 ## 9. Limits
 
 Stated here and classified in `verification.md`.

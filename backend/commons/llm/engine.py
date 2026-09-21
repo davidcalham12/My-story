@@ -239,7 +239,7 @@ class MockEngine:
     def _facts(self, prompt: str, chapter: int | None = None) -> str:
         import json
 
-        chapter = chapter or 1
+        chapter = 1 if chapter is None else chapter
         terms = self._terms(prompt) or ["premise"]
         return json.dumps({"facts": [
             {"fact": f"chapter {chapter}: the {terms[0]} was measured", "kind": "event"},
@@ -249,7 +249,7 @@ class MockEngine:
         ]})
 
     def _chapter(self, prompt: str, chapter: int | None = None) -> str:
-        chapter = chapter or 1
+        chapter = 1 if chapter is None else chapter
         terms = self._terms(prompt) or ["premise"]
         heading = "" if chapter in self.plan.headingless else f"# Chapter {chapter}\n\n"
         sentences = 4 if chapter in self.plan.out_of_band else 120
@@ -260,8 +260,9 @@ class MockEngine:
                       attempt: int | None = None) -> str:
         import json
 
-        chapter = chapter or 1
-        attempt = attempt or 1
+        # `or 1` would read chapter 0 - the outline audit's slot - as missing.
+        chapter = 1 if chapter is None else chapter
+        attempt = 1 if attempt is None else attempt
         # The agent name is PASSED, not guessed from the text. Guessing it by
         # searching the prompt for "continuity" found the wrong critic every
         # time, because outline-critic's own prompt explains what continuity

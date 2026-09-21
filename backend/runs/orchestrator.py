@@ -199,7 +199,10 @@ class Orchestrator:
             tone=self.tone, draft="\n\n".join(self.entries),
             reference=self.bible["world"], complete=True, chapter=0,
         )
-        raw = self._ask("science-critic", packet, stage="FLOW-3")
+        # chapter=0 on purpose: this call judges the COMMISSION, not a chapter.
+        # Zero is the slot for "before any chapter exists", and it keeps the audit
+        # distinguishable in the log from the same critic's gate calls.
+        raw = self._ask("science-critic", packet, stage="FLOW-3", chapter=0)
         score, findings, _ = parse.critic_reply(raw)
         self._write("critiques/outline.audit.json", raw)
         if score is not None and score < self.threshold:
