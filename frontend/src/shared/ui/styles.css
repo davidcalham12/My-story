@@ -1,0 +1,102 @@
+/* One accent, spent on the one thing that matters: a score that failed.
+   Everything else stays quiet, because a page where everything is emphasised
+   says nothing. */
+
+:root {
+  --ink: #14181d;
+  --muted: #5d6874;
+  --line: #d9dee4;
+  --panel: #ffffff;
+  --page: #f4f6f8;
+  --fail: #a3301f;
+  --pass: #1f6b4a;
+  --halt: #7a4a12;
+}
+
+:root[data-theme='dark'] {
+  --ink: #e6e9ed;
+  --muted: #98a3b0;
+  --line: #2b3239;
+  --panel: #171c21;
+  --page: #0f1317;
+  --fail: #e88372;
+  --pass: #6fc79c;
+  --halt: #d9a860;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 16px/1.55 ui-serif, Georgia, 'Times New Roman', serif;
+}
+
+main { max-width: 74ch; margin: 0 auto; padding: 32px 16px 96px; }
+
+h1, h2, h3 { line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
+h1 { font-size: 1.9rem; margin: 0 0 4px; }
+h2 { font-size: 1.25rem; margin: 32px 0 8px; }
+
+.muted { color: var(--muted); }
+.lede { color: var(--muted); margin-top: 0; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px 18px;
+  margin: 12px 0;
+}
+.panel--bad { border-left: 3px solid var(--fail); }
+.panel--halt { border-left: 3px solid var(--halt); }
+
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--muted); font-size: 0.82rem; }
+td.num { font-variant-numeric: tabular-nums; }
+
+.score { font-variant-numeric: tabular-nums; }
+.score--fail { color: var(--fail); font-weight: 700; }
+.score--none { color: var(--muted); font-style: italic; }
+
+.prov { text-decoration: none; cursor: help; color: var(--muted); margin-left: 4px; }
+
+button {
+  font: inherit;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--ink);
+  cursor: pointer;
+}
+button.primary { background: var(--ink); color: var(--page); border-color: var(--ink); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+input[type='text'], textarea, select {
+  font: inherit;
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.code {
+  font: 0.85rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--page);
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+nav { display: flex; gap: 4px; flex-wrap: wrap; margin: 16px 0 8px; }
+nav button.active { background: var(--ink); color: var(--page); border-color: var(--ink); }
+
+.field { margin: 18px 0; }
+.field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.hint { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
