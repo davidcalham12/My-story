@@ -44,8 +44,7 @@ chapters/
 ├── models.py        Pydantic shapes, at the edge only.
 ├── service.py       The procedure. Imports nothing from FastAPI.
 ├── domain.py        The rules. Imports nothing but the standard library.
-├── repository.py    SQL out, behind a Protocol.
-└── prompts/         The agent prompts for this stage.
+└── repository.py    SQL out, behind a Protocol.
 ```
 
 **Rule 1 — dependencies point inward.** `router → service → domain`, and
@@ -588,7 +587,11 @@ particular. The split falls out of a boundary that already exists: `length` and
 `chatter` are real code and always compute over the text the mock produced — so
 the mock must emit out-of-band and heading-less text on demand — while the three
 model critics have their scores scripted. Scripting the two that reproduce would
-be not testing them.
+be not testing them. *Superseded by Annex C: there is no mock engine, because
+there is no engine in Python. Its place is taken by a recorded stream-json from a
+real run (`USE_RECORDED_STREAM`), which exercises the runner, the parser, the
+persistence, the SSE and both watchers at $0 — and cannot script a critic's
+score, which is why the procedure itself is `verification.md` §3.12.*
 
 **Three halts, each with its mark and its readable artefacts.** See §3.5.
 
@@ -597,7 +600,11 @@ be not testing them.
 **The budget projects worst case** — exact input tokens plus `max_tokens`. A
 ceiling computed from an assumed output is broken by one long reply. Worst case
 stops slightly early, which is the correct direction to be wrong in, and the real
-cost is recorded afterwards so the gap stays visible.
+cost is recorded afterwards so the gap stays visible. *Superseded by Annex C
+(§8.4) and §6.2: Python no longer sees a call before it happens, so the ceiling
+is measured on the stream — tokens priced at the worst rate on file between
+`result` events — and the call that crosses it is the last one. The direction
+of error is the same; the mechanism is not.*
 
 ### 8.2 From Annex B
 
@@ -633,7 +640,7 @@ before the code exists.
 | 5 — retrieval | `sqlite-vec` with the dimension pinned and the limits tested |
 | 6 — the outline audit | at FLOW-3, with its own tests, and it earned its place on the first real run |
 
-**230 backend tests and 18 frontend tests**, one second, no network and no
+**449 backend tests and 19 frontend tests** (2026-09-22), seconds, no network and no
 credential.
 
 **The first real run happened.** `lighthouse-keeper-ledger` — three chapters,
@@ -700,8 +707,9 @@ Stated here and classified in `verification.md`.
 - **One writer at a time**, one user, no authentication. A local tool.
 - **Retrieval is not exhaustive.** Where a check must see everything — every rule,
   every beat — the whole thing is passed and nothing is retrieved.
-- **The writer's isolation is now typed, not structural.** In v1 the chapter
-  writer held a tool list that could not return file contents; the prose was
-  unreachable. In v2 it is a `ContextPacket` with no field for prose, plus a test.
-  A real downgrade in the class of evidence, and `verification.md` says so rather
-  than inheriting v1's language.
+- **The writer's isolation is structural again, and asserted from a file.**
+  `chapter-writer` holds `tools: Glob` (§3.2), so a previous chapter's prose is
+  unreachable, and `test_agents_frontmatter.py` fails if that line changes. What
+  is *not* observed is the subagent's tool calls at runtime — `verification.md`
+  G1 is class A and §3.17 says why. (This bullet used to describe the D2
+  `ContextPacket`, which Annex C deleted.)

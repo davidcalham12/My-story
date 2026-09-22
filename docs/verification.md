@@ -111,7 +111,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **342 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **449 backend tests and 19 frontend tests, on a recorded stream,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -1147,7 +1147,7 @@ planned — and which it does not, with why.
 | static analysis / SAST | no | no `ruff`, no `bandit` configured. The spec-side document said both were in use; neither was |
 | symbolic execution | no | disproportionate |
 | formal verification | no | disproportionate |
-| unit and integration testing | yes | 441 backend tests and 19 frontend, over a recorded stream, at $0, on every push |
+| unit and integration testing | yes | 449 backend tests and 19 frontend (2026-09-22), over a recorded stream, at $0, on every push |
 | property-based testing | **no library** | where the space is small it is enumerated instead: every aggregate at every attempt for `decide` (63 cases), every coefficient combination for the prose formula (64) |
 | mutation testing | no | not yet |
 | contract testing | yes | `test_api_contract.py` (backend payload ↔ panel types), `test_skill_contract.py` (procedure ↔ contract), `test_formulas_agree.py` (formula ↔ code) |
