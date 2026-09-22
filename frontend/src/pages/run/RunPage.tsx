@@ -137,7 +137,8 @@ export function RunPage({ runId }: { runId: string }) {
           {warnings.map((warning, i) => (
             <p key={i} className="panel">
               <strong>{warning.kind}</strong>
-              {warning.chapter ? ` (chapter ${warning.chapter})` : ''} — {warning.detail}
+              {warning.chapter !== null ? ` (chapter ${warning.chapter})` : ''} —{' '}
+              {warning.detail}
             </p>
           ))}
         </>

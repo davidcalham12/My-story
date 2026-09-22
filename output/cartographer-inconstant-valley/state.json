@@ -4,7 +4,15 @@
   "profile": "small",
   "tone": "literary folk-horror mystery — quiet, landscape-haunted, unease over spectacle; the dread is in the measurements, not in monsters",
   "chapters_planned": 8,
-  "stage": "FLOW-1",
+  "stage": "FLOW-4",
   "started_utc": "2026-09-22T17:46:15Z",
-  "chapters": []
+  "bible_complete": true,
+  "outline_complete": true,
+  "outline_audited": true,
+  "canonical_names": ["Edmund Hale", "Silas Brock", "Amos Dent", "Nat Fowler", "Hannah Rigg"],
+  "chapters": [
+    {"n": 1, "title": "The Ford Stone", "verdict": "accept", "attempts": 1, "words": 1331,
+     "scores": {"continuity": 8, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+     "aggregate": 8, "best_aggregate": 8, "prose_check": "clean"}
+  ]
 }

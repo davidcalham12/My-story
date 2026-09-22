@@ -413,3 +413,24 @@ instrument's own first run.
 The pattern behind all three: **an instrument is most wrong in the direction of
 having an opinion.** Each one preferred a confident answer to none, and in each
 case none was correct.
+
+### 7.1 Zero is a value, and this is the family the bugs come in
+
+Four in one day, in four languages and four places, all the same mistake:
+
+| where | what it said | what was true |
+|---|---|---|
+| `COALESCE(SUM(input_tokens),0)` | 0 tokens | **nobody reported any** |
+| `COALESCE(SUM(cost_usd),0)` | $0.00 | nobody reported a cost |
+| the conformance audit | six v1 runs breached the gate | their scores were **absent**, so the question has no answer |
+| `warning.chapter ? … : ''` | this warning is about no chapter | **chapter 0**, which is the outline audit's slot |
+
+The first two turn "unmeasured" into "measured as nothing". The third turns it
+into "measured as wrong". The fourth is the same reflex in a language where `0`
+is falsy. **The rule is not "report absent figures honestly" — it is that zero,
+empty and absent are three different claims, and every language offers a cheap
+way to collapse them.**
+
+Two of the four were found an hour apart, in adjacent fields of the same payload.
+That is why `test_absent_is_not_zero.py` exists: a rule everybody agrees with
+erodes one `COALESCE` at a time.

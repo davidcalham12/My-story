@@ -97,6 +97,9 @@ export interface Conformance {
 }
 
 export interface Warning {
+  /** Null when the warning is about the run, not a chapter. **Zero is a
+   *  chapter** — it is the outline audit's slot — so this is checked against
+   *  null, never for truthiness. A `warning.chapter ? ... : ''` hid it. */
   kind: string
   detail: string
   chapter: number | null
