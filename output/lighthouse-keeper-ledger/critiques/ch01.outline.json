@@ -3,7 +3,7 @@
   "chapter": 1,
   "kind": "model",
   "agent": "outline-critic",
-  "drafts": 1,
+  "drafts": 2,
   "iterations": [
     {
       "iteration": 1,
@@ -14,6 +14,18 @@
         {"beat": 2, "status": "present", "quote": "She wiped the nib on the inside of her left cuff, which was black to the elbow and had been for years, and wrote: 2.41, east by north, Sweet Providence, smack."},
         {"beat": 3, "status": "present", "quote": "He took the last quarter's returns out and went down the unmatched names at half voice"},
         {"beat": 4, "status": "present", "quote": "Enter her a third time and she goes to the Drowned Page, and I will countersign her there myself, and the name is closed."}
+      ],
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "arithmetic": "10 - 0 (all four beats present and in order) = 10",
+      "beats": [
+        {"beat": 1, "status": "present", "quote": "Three petitions on the seventh step. Two weighted with stones, one with a scrap of net float, grey, the twine gone to fur."},
+        {"beat": 2, "status": "present", "quote": "She wiped the nib on the inside of her left cuff, which was black to the elbow and had been for years, and wrote: 2.41, east by north, Sweet Providence, smack."},
+        {"beat": 3, "status": "present", "quote": "\"Spring tide in two days,\" he said. \"Dawn of the sixteenth. I'll audit the book page by page and the oil against the hours.\""},
+        {"beat": 4, "status": "present", "quote": "He went. The flood took the stones behind him a length at a time, and by the time he reached the Ridge there was no causeway, only the Reach, and the seventh step under two feet of it."}
       ],
       "findings": []
     }

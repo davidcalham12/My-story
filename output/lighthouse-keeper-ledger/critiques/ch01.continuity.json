@@ -3,7 +3,7 @@
   "chapter": 1,
   "kind": "model",
   "agent": "continuity-critic",
-  "drafts": 1,
+  "drafts": 2,
   "iterations": [
     {
       "iteration": 1,
@@ -14,10 +14,16 @@
           "severity": "medium",
           "quote": "The *Marigold* stands twice in your hand.",
           "claim": "Creed's line asserts both prior register entries for the Marigold are in Ada's own handwriting, but the Bible timeline states the first entry (page 91, eleven years ago) was written by Walter Byrd, not Ada - only the second entry (nine years ago) is hers.",
-          "fix": "Have Creed say the name stands twice in the book/register rather than 'in your hand,' or otherwise avoid attributing both entries to Ada's handwriting, preserving the Chapter 2 reveal that the first entry is in Walter's distinct hand.",
+          "fix": "Have Creed say the name stands twice in the book rather than 'in your hand', preserving the later reveal that the first entry is in Walter's distinct hand.",
           "reference": "bible/timeline.md, rows 'eleven years ago, 3 a.m.' and 'Nine years ago'; bible/mysteries.md, mystery 2"
         }
       ]
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "One patch applied by literal substitution: 'stands twice in your hand' -> 'stands twice in that book'. Four words for four. The orchestrator confirmed by grep that the quoted text is no longer present, so the repair is arithmetic rather than judgement."
     }
   ]
 }

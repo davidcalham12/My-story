@@ -3,12 +3,36 @@
   "chapter": 1,
   "kind": "model",
   "agent": "science-critic",
-  "drafts": 1,
+  "drafts": 2,
   "iterations": [
     {
       "iteration": 1,
       "score": 10,
       "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "drowned-page-miscount",
+          "severity": "high",
+          "rule": "R5",
+          "clause": "a vessel entered three times in the keeper's own hand",
+          "quote": "The *Marigold* stands twice in that book. Enter her a third time and she goes to the Drowned Page, and I will countersign her there myself, and the name is closed.",
+          "claim": "R5 counted entries 'in the keeper's own hand', which read per-individual-keeper means the previous keeper's entry does not count toward Ada's tally, so a third entry by her would be only her second and Creed's threat is unsupported.",
+          "fix": "Either change the chapter, or establish that 'the keeper's own hand' is read across keepers rather than per individual.",
+          "reference": "bible/world.md, R5"
+        }
+      ],
+      "orchestrator_arbitration": "FINDING UPHELD, FIX RELOCATED. The defect is real but it is in the rule, not the prose. R5's phrase 'in the keeper's own hand' was the orchestrator's own wording from the FLOW-3 amendment and was meant to distinguish a keeper's line from a voided foreign hand, not to reset the tally with each new keeper. bible/timeline.md, bible/characters.md and bible/mysteries.md all assume the across-keepers reading - Creed's two-year-old warning that 'a third Marigold sends the name to the Drowned Page' is canon, and it is arithmetic only under that reading. Four Bible files against one clause, so the clause changed. The draft was NOT altered: continuity 10 and outline 10 were already banked on this exact text and a prose edit would have risked them to fix a defect that was never in the prose. worldbuilder rewrote the clause to 'by the keeper on watch, whether by the present keeper or by any keeper before her', and the critic was re-run on the unchanged draft.",
+      "note": "Partly induced by the orchestrator: this iteration's prompt added a canon note about who made each existing entry and asked the critic pointedly about the count. That is why it surfaced here and not at iteration 1, and it is the reason this is recorded as an ambiguity resolved in canon rather than as a late finding under LOOP-003."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "note": "Rescored against the amended R5 on the identical draft. No prose changed between iteration 2 and iteration 3."
     }
   ]
 }

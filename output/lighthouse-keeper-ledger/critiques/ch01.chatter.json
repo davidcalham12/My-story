@@ -1,0 +1,12 @@
+{
+  "critic": "chatter",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": null,
+  "method": "head -1 of the attempt file; score 0 unless the first line opens with '# Chapter'",
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "first_line": "# Chapter 1 — The Seventh Step", "findings": []},
+    {"iteration": 2, "score": 10, "first_line": "# Chapter 1 — The Seventh Step", "findings": []}
+  ]
+}

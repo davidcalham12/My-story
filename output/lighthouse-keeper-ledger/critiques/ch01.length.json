@@ -1,0 +1,13 @@
+{
+  "critic": "length",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": null,
+  "method": "wc -w on the attempt file, run by the orchestrator in the shell",
+  "band": {"min": 300, "max": 550, "tolerance_pct": 25, "widened_min": 225, "widened_max": 688},
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "measured_words": 526, "findings": []},
+    {"iteration": 2, "score": 10, "measured_words": 526, "findings": [], "note": "The single patch replaced four words with four, so the count did not move."}
+  ]
+}

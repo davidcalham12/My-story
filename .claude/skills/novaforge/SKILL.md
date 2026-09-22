@@ -428,10 +428,16 @@ The shape:
  "aggregate":6,"threshold":8,"verdict":"retry","note":"..."}
 ```
 
-`verdict` is `accept`, `retry` or `accept_with_warnings` — the spec's three
-words, not `accepted`/`rejected`. A draft kept below the threshold because the
-attempts ran out is `accept_with_warnings`, and calling it `accept` hides the
-only thing the row exists to say.
+`verdict` is `accept`, `retry`, `patched` or `halt` — these four words, not
+`accepted`/`rejected`, and the `attempts` table's CHECK admits no others: write
+anything else and the insert fails.
+
+**There is no verdict for "kept below the threshold".** That was
+`accept_with_warnings`, which `patch_then_halt` replaced: a draft still under the
+threshold after the patch does not get a row saying so and go into the book — it
+gets `halt`, and the run stops. `patched` is the row for a draft the patch
+brought up to the threshold: it passed, and it did not pass on its own, and a
+reader is entitled to both facts.
 
 **Timestamp from a clock, not from an estimate.** The same run stamped its
 twenty-four rows across twenty-four minutes and had actually taken seventy-two.
@@ -504,10 +510,16 @@ plainly rather than producing something and calling it a PDF.
 
 ## 7. Report
 
-Tell the user: the workspace path, chapters approved versus accepted with
-warnings, total words, and the path of any chapter whose style pass was
-discarded. Then name the file worth opening first — a `critiques/*.json` from a
-chapter that was rejected once, because that is what shows the gate working.
+Tell the user: the workspace path, **chapters that passed on their own versus
+chapters that needed the patch**, total words, and the path of any chapter whose
+style pass was discarded. Then name the file worth opening first — a
+`critiques/*.json` from a chapter that was rejected once, because that is what
+shows the gate working.
+
+That first figure used to read "approved versus accepted with warnings", which
+was the old exit's vocabulary surviving in the report after it had been removed
+from the gate. Under `patch_then_halt` nothing is accepted with warnings; either
+a chapter reached the threshold or the run halted.
 
 ---
 
