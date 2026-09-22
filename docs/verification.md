@@ -105,6 +105,7 @@ in CI, at $0.** The suite that carries these:
 | `test_rules_resolve.py` | that a cited rule is one the Bible declares |
 | `test_promises.py` | that every promise names a chapter the book actually reaches |
 | `test_checks.py` | that every instrument is reachable from a stage, and the procedure calls it |
+| `test_report.py` | that an unarchived run reads as *unchecked*, never as sound |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |

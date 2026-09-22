@@ -37,6 +37,21 @@ subscription, which is why the tests replay a recording instead.
 | **what is *not* verified, and why that is a decision** | `docs/verification.md` §3 |
 | the quality gate and how it was arrived at | `specs/loops/LOOP-003/README.md` |
 
+## Is a run sound?
+
+```bash
+python -m backend.report output/<slug>
+```
+
+One command, three answers in the order they matter: **did the gate hold**,
+**what did it cost**, and **what is unchecked**. The last section is not
+politeness — a report listing only what it verified reads as a clean bill of
+health, and nothing here reads whether the prose is any good.
+
+It exits non-zero only for a gate breach. A run nobody archived reports
+`unchecked` and exits 0: it has not failed, it has not passed, and an exit code
+cannot say the second without lying.
+
 ## What one real run cost
 
 `lighthouse-keeper-ledger`: three chapters, seven drafts, four feedback sheets,
