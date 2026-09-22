@@ -143,3 +143,48 @@ def test_promoting_a_chapter_that_failed_prose_is_a_breach(db, run_dir):
 
     breaches = conformance.audit(db, RUN)
     assert any(b.rule == "promoted below the threshold" for b in breaches), breaches
+
+
+def test_a_critic_that_ran_and_said_nothing_is_not_a_critic_that_did_not_exist(db, run_dir):
+    """Opposite facts that look identical if you only read the scores.
+
+    A run with a `ch01.prose.json` whose score is null had the critic and it
+    failed to answer — a gate one critic short, which must not pass. A run with
+    no such file never had the critic — a different gate, which may. The file is
+    the discriminator, and it has to be.
+    """
+    build(run_dir, {1: None})
+    (run_dir / "critiques" / "ch01.prose.json").write_text(json.dumps({
+        "critic": "prose", "chapter": 1, "drafts": 1,
+        "iterations": [{"iteration": 1, "score": None, "findings": []}],
+    }), encoding="utf-8")
+    archived(db, run_dir)
+    assert attempts(db)[0]["verdict"] == "retry", "the critic ran and said nothing"
+
+
+def test_a_run_from_before_the_sixth_characteristic_is_judged_by_its_own_gate(db, run_dir):
+    """SPEC-006 landed while an eight-chapter run was in flight.
+
+    Archiving it against today's six marked every attempt unpassed, including
+    chapters that scored 10 on all five the run had. A characteristic that did
+    not exist when a run ran is a different gate, not a critic that failed — the
+    category error `source` exists to prevent between implementations,
+    reappearing between two versions of v2.
+    """
+    (run_dir / "chapters").mkdir(exist_ok=True)
+    (run_dir / "critiques").mkdir(exist_ok=True)
+    (run_dir / "chapters" / "ch01.attempt1.md").write_text("# Chapter 1 — A\n\nx.\n",
+                                                           encoding="utf-8")
+    (run_dir / "chapters" / "ch01.md").write_text("# Chapter 1 — A\n\nx.\n",
+                                                   encoding="utf-8")
+    for critic in [c for c in CHARACTERISTICS if c != "prose"]:
+        (run_dir / "critiques" / f"ch01.{critic}.json").write_text(json.dumps({
+            "critic": critic, "chapter": 1, "drafts": 1,
+            "iterations": [{"iteration": 1, "score": 10, "findings": []}],
+        }), encoding="utf-8")
+
+    report = archived(db, run_dir)
+    row = attempts(db)[0]
+    assert row["verdict"] == "accept", "it passed every characteristic it had"
+    assert row["promoted"] == 1
+    assert any("judged by" in note for note in report.notes), report.notes

@@ -53,7 +53,8 @@ class Verdict:
     note: str
 
 
-def aggregate(scores: dict[str, int | None], threshold: int = THRESHOLD_DEFAULT) -> Verdict:
+def aggregate(scores: dict[str, int | None], threshold: int = THRESHOLD_DEFAULT,
+              expected: tuple[str, ...] | None = None) -> Verdict:
     """`min` over the characteristics that produced a usable verdict.
 
     Two rules meet here, and both were learned the hard way.
@@ -75,16 +76,22 @@ def aggregate(scores: dict[str, int | None], threshold: int = THRESHOLD_DEFAULT)
         return Verdict(None, False, [], unscored,
                        "no characteristic produced a usable verdict")
 
+    # `expected` is the gate the caller is judging against, and it defaults to
+    # today's. The archive passes the set a RUN actually scored: a characteristic
+    # that did not exist when a run ran is a different gate, not a critic that
+    # failed to answer, and SPEC-006 created that situation mid-run.
+    gate = expected or CHARACTERISTICS
+
     lowest = min(scored.values())
     worst = sorted(k for k, v in scored.items() if v == lowest)
-    complete = len(scored) == len(CHARACTERISTICS)
+    complete = len(scored) == len(gate)
     passed = complete and lowest >= threshold
 
     if unscored:
         note = (f"{' and '.join(unscored)} returned no usable verdict and was "
                 f"excluded from the minimum; a gate running on "
                 f"{len(scored)} characteristics is weaker than one running on "
-                f"{len(CHARACTERISTICS)}")
+                f"{len(gate)}")
     else:
         note = f"min {lowest} against threshold {threshold}"
 

@@ -478,7 +478,38 @@ means *the patch brought this to the threshold*, so a `patched` row still under
 it is incoherent and `decide` cannot produce one. The exemption was the widest
 possible hole, under the one label nobody would think to question.
 
-### 7.3 A rule lives in one place, and the count is the tell
+### 7.3 The gate was disobeyed on a live run, and the instrument caught it
+
+**The most important thing this project has measured.**
+
+On the eight-chapter run, chapter 3 scored `continuity` **2**, then **5** on its
+second draft. It was **promoted**. `ch03.md` is byte-identical to
+`ch03.attempt2.md` — no third attempt was made, no patch was applied, and the run
+did not halt. It carried on and wrote chapters 4 and 5.
+
+That is G6 violated: *a chapter that failed the gate does not enter the book*.
+The one outcome the whole system exists to prevent, on a real run, with the
+threshold at 8 and the chapter at 5.
+
+**And it was detected within minutes, by the audit written that morning.**
+Before it existed, §3.1 said the only signal was *reading a book with a bad
+chapter in it* — which would have meant nobody ever noticing, because nobody
+reads a test novel closely. The audit reports it twice, from two independent
+rules: promoted below the threshold, and a verdict the rule would not give.
+
+**What it says about the architecture, which is the uncomfortable part.**
+SPEC-004 moved the decision into code precisely so a model could not reason its
+way past it at the moment a run is about to be thrown away. This run shows the
+remaining half of §3.1 is not theoretical: **the rule being arithmetic does not
+make it obeyed.** Detection is not prevention, and the gap says so.
+
+**What it does not say.** Nothing here shows the orchestrator ignored the script:
+this run began before `SKILL.md` told it to call `decide` at all. The honest
+conclusion is narrower and worse — *the procedure as written when this run
+started was not enough*, and the run is evidence for the change rather than
+against it.
+
+### 7.4 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -499,7 +530,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.4 Zero is a value, and this is the family the bugs come in
+### 7.5 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

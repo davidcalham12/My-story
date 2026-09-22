@@ -114,21 +114,32 @@ def _findings_of(iteration: dict, characteristic: str) -> list[dict]:
 
 
 def _verdict(scores: dict[str, int | None], *, promoted: bool,
-             halted: str | None) -> str:
-    """What the gate decided, asked of the gate.
+             halted: str | None, gate: tuple[str, ...]) -> str:
+    """What the gate decided, asked of the gate **this run actually ran**.
 
     **This used to re-derive it: `aggregate >= THRESHOLD`.** That is the pass
     rule written a second time, and the second copy was wrong — it ignored
-    completeness. A chapter whose `prose` critic returned nothing usable has an
-    aggregate of 10 over the five that answered, and this recorded it as
-    `accept`. The gate had not passed it. **A gate short a critic is a weaker
-    gate, not a passing one**, and that rule returned 10 once already and let a
-    malformed reply ship a draft.
+    completeness. A chapter whose critic returned nothing usable had an aggregate
+    over the ones that answered, and this recorded `accept`. The gate had not
+    passed it. **A gate short a critic is a weaker gate, not a passing one**, and
+    that rule returned 10 once already and let a malformed reply ship a draft. So
+    the verdict comes from `domain.aggregate`.
 
-    So the verdict comes from `domain.aggregate`, which is the one place the rule
-    lives.
+    `gate` is the second half, and it cost a wrong answer to learn. SPEC-006
+    added a sixth characteristic **while an eight-chapter run was in flight**,
+    and archiving that run against today's six marked every attempt of it
+    unpassed — including chapters that scored 10 on all five the run had. A
+    characteristic that did not exist when a run ran is not a critic that failed
+    to answer; it is **a different gate**. That is the category error the
+    `source` column exists to prevent between implementations, reappearing
+    between two versions of v2.
+
+    So completeness is judged against the characteristics **this run ever
+    scored**. A critic that answered elsewhere in the run and not here is still
+    an incomplete gate: that protection is untouched.
     """
-    if aggregate_of(scores).passed:
+    relevant = {k: v for k, v in scores.items() if k in gate}
+    if aggregate_of(relevant, expected=gate).passed:
         return "accept"
     if promoted:
         # It shipped without passing, which under patch_then_halt can only mean
@@ -174,6 +185,25 @@ def archive_run(
 
     critiques = _read_critiques(run_dir, report)
 
+    # The gate this run actually ran: every characteristic that has a critique
+    # FILE, whatever the score in it. Judging a five-characteristic run against
+    # today's six marks chapters unpassed that passed everything that existed.
+    #
+    # The file, not a usable score, is the discriminator — and it has to be. A
+    # critic that ran and returned nothing parseable looks exactly like a critic
+    # that did not exist if you only read the scores, and those are opposite
+    # facts: the first is a gate one critic short, which must not pass, and the
+    # second is a different gate, which may.
+    gate = tuple(c for c in CHARACTERISTICS
+                 if any(c in by_critic for by_critic in critiques.values()))
+    if gate and set(gate) != set(CHARACTERISTICS):
+        report.notes.append(
+            "this run was judged by " + ", ".join(gate)
+            + f" — {len(CHARACTERISTICS) - len(gate)} of today's characteristics "
+              "did not exist for it, and its attempts are judged against its own "
+              "gate rather than against this one"
+        )
+
     drafts: dict[int, list[int]] = {}
     for path in sorted((run_dir / "chapters").glob("ch*.attempt*.md")):
         m = DRAFT.match(path.stem)
@@ -209,7 +239,8 @@ def archive_run(
             usable = [s for s in scores.values() if s is not None]
             aggregate = min(usable) if usable else None
             promoted = accepted and attempt == last
-            verdict = _verdict(scores, promoted=promoted, halted=halted)
+            verdict = _verdict(scores, promoted=promoted, halted=halted,
+                               gate=gate or CHARACTERISTICS)
 
             repository.save_attempt(
                 conn,
