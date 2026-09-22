@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **171 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **191 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -98,6 +98,7 @@ in CI, at $0.** The suite that carries these:
 | `test_runner.py` | G2 layer 2, G13, G14, G17 — the stream, replayed |
 | `test_gate.py` | G3, G4, G5, G7, G8 — the gate as arithmetic over values |
 | `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
+| `test_conformance.py` | G6's obedience, checked after the fact against the archive |
 | `test_end_to_end.py` | all of them, in a whole run, including the halt |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
@@ -256,9 +257,16 @@ away. That is exactly when *it is only just below* gets rationalised, and
 is **no `ch03.md`**, the best draft sits unpromoted at `ch03.attempt3.md`, and
 FLOW-5 and FLOW-6 never ran. That is the whole path exercised end to end, once.
 
-**Why the second half is still D.** The script decides; the orchestrator acts.
-Whether it calls the script, and does what it says, is a procedure — §3.10's
-limit, not a missing test. `test_skill_contract.py` asserts `SKILL.md` instructs
+**Why the second half is still D — and what now backs it.** The script decides;
+the orchestrator acts. Whether it calls the script and does what it says is a
+procedure, §3.10's limit, not a missing test.
+
+**But disobedience is no longer invisible.** `conformance.audit()` recomputes the
+decision at every archived attempt and reports the contradictions: a draft
+promoted below the threshold, a verdict the rule would not give, a fourth
+attempt, a chapter that failed without halting, two promotions for one chapter.
+It ran clean over the first real run — **7 attempts, no breaches** — and that is a
+measurement, not an assurance. `test_skill_contract.py` asserts `SKILL.md` instructs
 the call and names all four answers, which is the strongest thing readable from
 here.
 
@@ -505,11 +513,19 @@ moved into code has been.
 disobeying would take**: a chapter entering the book now needs the orchestrator
 to ignore a script that printed `halt` and its reason, rather than to reason its
 way through a paragraph. That is a sharper thing to do wrong.
-**How we would find out:** by reading a book with a bad chapter in it — still
-**too late**, and still no earlier signal. *This is the line that keeps the row
-critical.*
-**Reviewed by:** every real run, by reading the gate rows against the decisions
-the script would have given. Automating that comparison is the next honest step.
+**How we would find out:** `runs/conformance.py`, which recomputes what
+`decide()` would have answered at every archived attempt and reports where the
+record and the rule disagree. **It runs the moment a run ends**, writes a
+`gate-breach` warning per contradiction, and the run's page leads with the
+answer.
+
+*That line used to read "by reading a book with a bad chapter in it — too late,
+and there is no earlier signal".* There is one now. It does not prevent a
+disobeyed halt; it makes one visible in seconds instead of never, which is the
+difference between an accepted risk and an undetectable one. **The row stays
+critical** because detecting is not preventing.
+**Reviewed by:** every run, automatically, and `test_conformance.py` on every
+commit.
 
 *This row claimed the opposite when first written* — that the mock engine could
 close it in an afternoon. It could not: the decision was not in Python at all.
@@ -697,6 +713,7 @@ step, and that is the sentence worth writing for each one.
 | `test_skill_contract.py` | the procedure and the contract diverging in silence |
 | `archive_run` | a finished run leaving no record anyone can query |
 | `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
+| `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |
 
 **The last row was an aspiration until it was written, and it caught something on
 its first run.** `SKILL.md` told the orchestrator that a verdict is `accept`,

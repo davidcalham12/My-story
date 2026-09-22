@@ -335,3 +335,29 @@ Stated because a document that lists only findings reads as complete.
 - **What the knowledge-state tier is worth.** The ontology calls it the most
   common source of continuity errors. The table exists, empty. Nothing has
   measured what filling it would prevent.
+
+---
+
+## 7. What the checks taught about writing checks
+
+Three defects found by instruments on the day they were written, each in the
+instrument's own first run.
+
+- **A check that answers when the record cannot is inventing its subject.** The
+  gate-conformance audit reported six of the eight v1 runs as having promoted
+  chapters below the threshold. Those runs had recorded no usable scores at all:
+  the aggregate was `NULL`, and the check read absent as failure — **the exact
+  mirror of reading absent as zero**, and no better. An unjudgeable attempt is
+  counted apart now, and `unchecked` is a verdict distinct from `conformant`.
+- **A rule cannot judge what predates it.** The same audit flagged v1 chapters
+  that scored 10 as ones that should not have been retried. They were scored on
+  two or three characteristics with `accept_with_warnings` available — a rule
+  that no longer exists. Applying today's produces a confident answer about
+  nothing, which is the category error the `source` column was added to prevent
+  and which it then failed to prevent because nobody consulted it.
+- **A test that counts files is measuring the filesystem.** `len(reports) == 8`
+  held until v2 wrote its first novel into the same directory.
+
+The pattern behind all three: **an instrument is most wrong in the direction of
+having an opinion.** Each one preferred a confident answer to none, and in each
+case none was correct.

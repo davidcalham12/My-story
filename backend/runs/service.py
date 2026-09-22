@@ -35,6 +35,7 @@ from backend.commons.runner.watch import (
     context_size,
 )
 from backend.runs import repository as read_repo
+from backend.runs import conformance
 from backend.runs.archive import archive_run
 
 
@@ -95,6 +96,10 @@ class RunService:
             "cost": read_repo.cost(self.conn, run_id),
             "warnings": read_repo.warnings(self.conn, run_id),
             "completeness": read_repo.completeness(self.conn, run_id),
+            # Did the run obey its own gate? Computed from the archive rather
+            # than trusted, because the orchestrator writes both the record and
+            # the decisions in it.
+            "conformance": conformance.summary(self.conn, run_id),
         }
 
     # ------------------------------------------------------------ starting
@@ -245,6 +250,14 @@ class RunService:
             write_repo.warn(self.conn, live.run_id, "archive",
                             f"archiving failed, the run's files are intact: {exc!r}")
             return
+
+        # Did it obey its own gate? Asked the moment the run ends, because the
+        # alternative signal — reading a book with a bad chapter in it — arrives
+        # far too late to act on. A breach is a warning, not a crash: the run is
+        # already over and the files are already written.
+        for breach in conformance.audit(self.conn, live.run_id):
+            write_repo.warn(self.conn, live.run_id, "gate-breach", str(breach),
+                            chapter=breach.chapter)
 
         # `result` stays `complete` or `halted: x`. It is the run's outcome, not
         # a place to report bookkeeping, and a reader parsing it should not have

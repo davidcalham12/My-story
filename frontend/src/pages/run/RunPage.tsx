@@ -11,7 +11,7 @@ export function RunPage({ runId }: { runId: string }) {
   if (error) return <p className="panel panel--bad">{error}</p>
   if (!detail) return <p className="muted">Reading the run…</p>
 
-  const { run, cost, warnings, completeness } = detail
+  const { run, cost, warnings, completeness, conformance } = detail
   const halted = haltReason(run)
 
   return (
@@ -37,6 +37,48 @@ export function RunPage({ runId }: { runId: string }) {
             the margin — that exit no longer exists.
           </p>
         </div>
+      )}
+
+      <h2>Did it obey its own gate?</h2>
+      <p className={`panel panel--${conformance.verdict === 'breached' ? 'bad' : 'ok'}`}>
+        {conformance.verdict === 'conformant' && (
+          <>
+            <strong>Yes.</strong> {conformance.attempts_checked} attempts checked
+            against the rule in <code>decide()</code>, recomputed from the archive
+            rather than taken on trust. No draft below the threshold was promoted.
+          </>
+        )}
+        {conformance.verdict === 'breached' && (
+          <>
+            <strong>No — and this is the one thing on this page worth acting on.</strong>{' '}
+            The record contradicts the rule the gate is supposed to follow.
+          </>
+        )}
+        {conformance.verdict === 'unchecked' && (
+          <>
+            <strong>Not checked.</strong> Nothing with a score to judge. That is
+            not the same as obedient — it means the question has no answer here.
+          </>
+        )}
+        {conformance.verdict === 'not_applicable' && (
+          <>
+            <strong>Not applicable.</strong> {conformance.why ?? ''} Judging it by
+            today's rule would produce a confident answer about nothing.
+          </>
+        )}
+      </p>
+      {conformance.breaches.length > 0 && (
+        <ul className="findings">
+          {conformance.breaches.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+      )}
+      {conformance.unjudgeable > 0 && (
+        <p className="hint">
+          {conformance.unjudgeable} attempt(s) had no usable score and could not be
+          judged either way. Unjudgeable is not clean.
+        </p>
       )}
 
       <h2>What it cost</h2>

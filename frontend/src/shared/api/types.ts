@@ -75,6 +75,24 @@ export interface Cost {
   subagent_dispatches: number | null
 }
 
+/**
+ * Four states, not two.
+ *
+ * `unchecked` is not `conformant`: a run with nothing to judge has not been
+ * found obedient, it has not been looked at. `not_applicable` marks a run judged
+ * by a rule that did not exist yet — applying today's to it measures nothing.
+ */
+export type ConformanceVerdict = 'conformant' | 'breached' | 'unchecked' | 'not_applicable'
+
+export interface Conformance {
+  attempts_checked: number
+  /** Attempts with no aggregate. Unjudgeable, which is not the same as clean. */
+  unjudgeable: number
+  breaches: string[]
+  verdict: ConformanceVerdict
+  why?: string
+}
+
 export interface Warning {
   kind: string
   detail: string
@@ -93,6 +111,8 @@ export interface RunDetail {
   attempts: Attempt[]
   cost: Cost
   warnings: Warning[]
+  /** Did the run obey its own gate? Computed from the archive, not trusted. */
+  conformance: Conformance
   /** What an imported run did NOT carry. A gap reads as a gap, never a zero. */
   completeness: Gap[]
 }
