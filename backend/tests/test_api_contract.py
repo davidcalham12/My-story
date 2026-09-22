@@ -169,9 +169,10 @@ def test_no_route_takes_a_path_and_reads_a_file():
     purpose, with its normalisation test beside it."""
     from backend.main import app
 
-    served = {route.path for route in app.routes if hasattr(route, "methods")}
-    framework = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
-    ours = served - framework
+    # The OpenAPI document sees through included routers; `app.routes` no
+    # longer does (FastAPI wraps them), which is how the first version of this
+    # test saw one route and believed it.
+    ours = set(app.openapi()["paths"])
     assert ours == {
         "/api/health",
         "/api/runs",
