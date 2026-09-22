@@ -174,6 +174,13 @@ for PLAN-001 or declared as a gap in §12. Nothing here is left implicit.
 | dependencies | `uv` | `pip` |
 | gate | five characteristics | six (SPEC-006 added `prose`) |
 | agents | nine | ten |
+| FR-RNR-3 `events` table | every raw line persisted before fan-out | **no `events` table**; what is persisted is derived: `runs`, `attempts`, `calls`, `scores`, `gate_decisions`, `findings`, `sheets`, `summary_facts` (`verification.md` G19) — Paso 4 question |
+| FR-BUD-1 `--max-budget-usd` | pass it if the CLI has it | the CLI has it (`claude --help`); the runner **does not pass it** → PLAN-001 |
+| FR-BUD-1 measure between `result` events | running sum of `calls` cost | tokens priced at the most expensive rate on file, `watch.py` — a ceiling that under-estimates is not a ceiling |
+| FR-BUD-2 in-flight sum | `input_tokens + max_tokens` of calls in flight | `input + cache_creation + cache_read` of each `usage` event, measured (`architecture.md` §6.3) |
+| FR-RUN-6 import | `POST /api/runs/import` | `import_all()` in `commons/db/import_v1.py`, exercised by `test_import.py`; **no endpoint, no CLI entry point** — Paso 4 question |
+| FR-HLT-1 health | DB, migrations, `claude`, `sqlite-vec`, model | `{ok, orchestrator, claude_on_path}` only |
+| §6.1 prefix | `/api/v1` | `/api` |
 | tests | fake `claude` binary | the runner replays a recorded stream when `USE_RECORDED_STREAM=true`; same effect, no binary |
 
 The `python -m novaforge.*` names that remain in §4.5–§4.6 and §8 are the
@@ -329,8 +336,9 @@ Prose and Bible stay on disk under `output/<slug>/`; the DB stores paths.
 
 ### 6.1 REST
 
-All under `/api/v1`. JSON. Errors as `{error, detail}`; 404 for unknown run or
-path; 409 for a second concurrent run; 422 for invalid input.
+All under `/api` (the draft said `/api/v1`; the build has no version segment).
+JSON. Errors as FastAPI emits them (`{detail}`); 404 for unknown run; 409 for a
+second concurrent run; 422 for invalid input.
 
 ### 6.2 SSE event schema
 
