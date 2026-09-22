@@ -35,3 +35,18 @@ jobs:
       - run: npx tsc --noEmit
       - run: npx vitest run
       - run: npx vite build
+
+  instruments:
+    # LOOP-003's two instruments ship with --self-test and neither ran in CI.
+    # A check that exists and never runs is documentation, and these are the
+    # ones that decide whether a feedback sheet may be sent at all.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: The sheet validator behaves
+        run: node specs/loops/LOOP-003/validate-sheet.mjs --self-test
+      - name: The measurement instrument reproduces the committed run
+        run: node specs/loops/LOOP-003/measure.mjs --self-test
