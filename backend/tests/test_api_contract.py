@@ -157,3 +157,27 @@ def test_the_panel_names_every_characteristic_it_shows_a_column_for():
     )
     for characteristic in CHARACTERISTICS:
         assert f"{characteristic}:" in quality, characteristic
+
+
+# ------------------------------------------------------- PLAN-007 6.10
+
+
+def test_no_route_takes_a_path_and_reads_a_file():
+    """SPEC-007 FR-RD-2 / AC-10, as decided at Paso 4 (Q2): the backend serves
+    no artefact by file path, so the path-traversal surface does not exist.
+    This test is the day it appears: a new route must be added here on
+    purpose, with its normalisation test beside it."""
+    from backend.main import app
+
+    served = {route.path for route in app.routes if hasattr(route, "methods")}
+    framework = {"/openapi.json", "/docs", "/docs/oauth2-redirect", "/redoc"}
+    ours = served - framework
+    assert ours == {
+        "/api/health",
+        "/api/runs",
+        "/api/runs/{run_id}",
+        "/api/runs/{run_id}/events",
+        "/api/runs/{run_id}/halt",
+    }, sorted(ours)
+    for path in ours:
+        assert "{path" not in path and "{name" not in path and "{section" not in path

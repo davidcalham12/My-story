@@ -490,7 +490,7 @@ beat reaching FLOW-4.
 | `Last-Event-ID` resume is not built | incidental | **closed by PLAN-007 6.4/6.7 (Q3)** — `test_every_stream_line_is_in_events_with_a_dense_seq`, `test_sse_id_field_is_the_persisted_seq`, `test_last_event_id_*` | AC-20 |
 | `SKILL.md` never calls `search` before the continuity critic (§8 point 3) | important | `backend/commons/search.py` and `db/vectors.py` are built and tested and not running (`verification.md` §3.15); the critic gets the full Bible | no `search` call in any run's log |
 | `SKILL.md` does not emit `chNN.facts.json` (§8 point 7) | incidental | the rolling summary is text and `check_summary` holds it to its cap | no `facts.json` under `output/<slug>/chapters/` |
-| `measure.mjs` measures five characteristics; `prose` is outside its self-test | incidental | **closes with PLAN-007 (Q6)**: the instrument learns `prose`; until then `check_prose` covers the mechanical half | AC-14 |
+| `measure.mjs` measures five characteristics; `prose` is outside its self-test | incidental | **closed by PLAN-007 6.9 (Q6)** — `test_the_measurement_instrument_knows_six_characteristics`, `test_the_sheet_validator_requires_all_six_scores`, `test_the_shipped_template_carries_six_slots` | AC-14 |
 | The outline audit is a model (`outline-critic`), not the FR-INS-1 script | important | `verification.md` G11 records it as D; a script would give T and is the next candidate under *code before agent* | the letter stays D until the CLI exists |
 | Subagent-level tool calls may not be visible in the stream; the writer's isolation is asserted from the agent file, not observed at runtime | critical → assumed risk | the `tools:` line is the structural guarantee; AC-8 pins it | any change to the agent file fails CI |
 
