@@ -536,7 +536,29 @@ the same in a single number and are not the same claim.
 written summary to fit is worse than a long one: the cap protects a budget, and a
 dropped sentence loses the only channel between chapters.
 
-### 7.5 A rule lives in one place, and the count is the tell
+### 7.5 The rule identifiers in the arbitration record referred to nothing
+
+The critics and the outline audit cite a world's rules by number — *"R1 says only
+the keeper on watch may write in the Register"*, *"R5 rewritten to name the
+keeper as the writer"*. Those arbitrations are the evidence behind G11, and they
+are quoted in this document.
+
+`bible/world.md` writes its rules as **unnumbered bullets**. The numbers were the
+critic counting the list and inventing an identifier. Across the two v2 runs
+there are **76 such references and not one of them resolves to anything.**
+
+Why it matters beyond tidiness: a positional reference points at a different rule
+the moment one is inserted or reordered, and **two critics can number the same
+list differently** — so `science` and the audit can hold confident, contradictory
+views about which rule is at issue, and nothing would show it. The arbitration
+record decays silently, which is the failure mode this whole document is about.
+
+`worldbuilder` now writes `- **R1.** …`, and `check_rules` resolves the citations.
+**A Bible with no numbers reports `unnumbered`, never `clean`** — saying "no
+dangling references" about a file with no reference system is the same mistake as
+reporting an unmeasured figure as zero.
+
+### 7.6 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -557,7 +579,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.6 Zero is a value, and this is the family the bugs come in
+### 7.7 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

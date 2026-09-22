@@ -109,6 +109,22 @@ count, the canonical names, and `novel.promises` and `novel.beats_per_chapter`.
 
 It returns the outline as text. **You** write it to `output/<slug>/outline.md`.
 
+**Check the rules resolve before anything cites them:**
+
+```bash
+python -m backend.chapters.check_rules output/<slug>
+```
+
+The critics and the audit refer to rules **by number** — *"R5 rewritten to name
+the keeper as the writer"*. If `bible/world.md` writes them as unnumbered
+bullets, those numbers are **the critic counting bullets and inventing an
+identifier**, and two real runs produced 76 such references that resolved to
+nothing. A positional reference points at a different rule the moment one is
+inserted, and the arbitration record decays without anyone noticing.
+
+If it reports `unnumbered`, send `worldbuilder` back to number them. Do not
+renumber them yourself — the Bible has two authors and you are not one of them.
+
 ### Audit the commission before anyone writes it
 
 Dispatch `science-critic` with the outline entries and `bible/world.md`, asking

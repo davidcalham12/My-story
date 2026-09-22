@@ -33,14 +33,24 @@ Produce a Markdown document with these sections, in this order:
   actually depends on, and keep it short when the story is small. (The count
   that governs this section is `bible.technology_entries`, named when this
   pipeline only wrote one genre.)
-- `## Rules` — bulleted, the constraints this story cannot break. They do not
-  have to be physics. "The stall closes at two and the masa is gone by noon" is
-  as enforceable as an exhaust velocity, and for most stories it is the more
-  useful kind.
+- `## Rules` — the constraints this story cannot break. They do not have to be
+  physics. "The stall closes at two and the masa is gone by noon" is as
+  enforceable as an exhaust velocity, and for most stories it is the more useful
+  kind.
+
+  **Number them, and write the number first:** `- **R1.** ...`, `- **R2.** ...`
+
+  This is not decoration. The critics and the outline audit refer to rules by
+  number — *"R5 rewritten to name the keeper as the writer"* — and when the
+  Bible has no numbers, **they count the bullets and invent one**. Two real runs
+  produced 76 such references and not one of them resolved to anything. A
+  positional reference into an unnumbered list points somewhere else the moment
+  a rule is inserted, and the arbitration record decays without anyone
+  noticing.
 - `## Texture` — a short paragraph on what the world feels like from inside
 
-The `## Rules` heading matters: the world critic reads bullets from under it
-and from nowhere else, so a constraint written anywhere else will never be
+The `## Rules` heading matters: the world critic reads the numbered bullets from
+under it and from nowhere else, so a constraint written anywhere else will never be
 enforced. Each rule must be falsifiable by a scene. "Travel is difficult" is
 not a rule; "no faster-than-light travel, so every crossing takes months and
 every message arrives late" is. Neither is "the family is proud"; "nobody eats
