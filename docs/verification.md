@@ -577,7 +577,10 @@ full.
 **How we would find out:** `runs/conformance.py`, which recomputes what
 `decide()` would have answered at every archived attempt and reports where the
 record and the rule disagree. It found that chapter within minutes, twice, from
-two independent rules. **It runs the moment a run ends**, writes a
+two independent rules — **and missed a second breach on the same run**, a chapter
+promoted while `continuity` returned nothing usable, because its aggregate was 10
+over the four critics that answered. Reading the minimum is not reading the
+gate. **It runs the moment a run ends**, writes a
 `gate-breach` warning per contradiction, and the run's page leads with the
 answer.
 

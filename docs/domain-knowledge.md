@@ -503,6 +503,23 @@ way past it at the moment a run is about to be thrown away. This run shows the
 remaining half of §3.1 is not theoretical: **the rule being arithmetic does not
 make it obeyed.** Detection is not prevention, and the gap says so.
 
+**A second violation on the same run, which the audit missed at first.**
+Chapter 7 was promoted with `continuity` returning nothing usable. Its aggregate
+was **10** — a minimum over the four critics that answered — so every rule that
+read the aggregate saw a perfect chapter. *A gate short a critic is a weaker
+gate, not a passing one*: the rule that once returned 10 and let a malformed
+reply ship a draft, shipping one again, **through the audit built to catch
+exactly this.**
+
+Catching it needed the scores, not the minimum — and then needed one more thing.
+A five-characteristic run has `prose` NULL on every attempt because it did not
+exist, so reading NULL as *the critic said nothing* reports every one of those
+chapters as a breach. **"The critic did not exist" and "the critic answered
+nothing" are opposite facts that look identical in a NULL**, and only the archive
+can tell them apart, because only it sees which critique files exist. So the gate
+a run ran is now recorded, and a run archived before that column says *nothing*
+rather than guessing.
+
 **What it does not say.** Nothing here shows the orchestrator ignored the script:
 this run began before `SKILL.md` told it to call `decide` at all. The honest
 conclusion is narrower and worse — *the procedure as written when this run

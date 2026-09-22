@@ -1,0 +1,7 @@
+{"critic": "chatter", "chapter": 8, "kind": "arithmetic",
+ "agent": null, "drafts": 2,
+ "method": "The orchestrator reads the draft's first line. Score 0 unless it begins with '# Chapter'; 10 otherwise. Reproduces exactly.",
+ "iterations": [
+   {"iteration": 1, "score": 10, "first_line": "# Chapter 8 — The Walked Bound", "findings": []},
+   {"iteration": 2, "score": 10, "first_line": "# Chapter 8 — The Walked Bound", "findings": []}],
+ "run_note": "Sixteen drafts across eight chapters and this characteristic scored 10 on every one of them. It never once caught anything, which is the correct outcome for an arithmetic check whose cost is a single line read."}

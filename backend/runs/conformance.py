@@ -22,6 +22,7 @@ rather than as conformant.
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from dataclasses import dataclass
 
@@ -61,14 +62,31 @@ def audit(conn: sqlite3.Connection, run_id: str, *, threshold: int = THRESHOLD_D
       was added to prevent.
     """
     run = conn.execute(
-        "SELECT halted, source FROM runs WHERE id = ?", (run_id,)).fetchone()
+        "SELECT halted, source, gate FROM runs WHERE id = ?", (run_id,)).fetchone()
     if run and run["source"] != "v2":
         return []
     halted = run["halted"] if run else None
 
+    # The gate this run ran, as the archive recorded it. Absent means the run
+    # predates the column: then a NULL score cannot be told from a critic that
+    # did not exist, and this check has to stay silent rather than guess.
+    gate = set(json.loads(run["gate"])) if run and run["gate"] else None
+
     rows = [dict(r) for r in conn.execute(
-        "SELECT chapter, attempt, aggregate, verdict, promoted FROM attempts "
+        "SELECT id, chapter, attempt, aggregate, verdict, promoted FROM attempts "
         "WHERE run_id = ? ORDER BY chapter, attempt", (run_id,))]
+
+    # Which characteristics answered, per attempt. The aggregate alone cannot
+    # show a gate one critic short: a chapter whose `continuity` returned
+    # nothing has an aggregate of 10 over the four that did, and it looks
+    # perfect. One shipped that way and the first version of this audit did not
+    # see it.
+    silent: dict[int, list[str]] = {}
+    if gate:
+        for row in conn.execute(
+                "SELECT attempt_id, characteristic FROM scores WHERE score IS NULL"):
+            if row["characteristic"] in gate:
+                silent.setdefault(row["attempt_id"], []).append(row["characteristic"])
 
     by_chapter: dict[int, list[dict]] = {}
     for row in rows:
@@ -100,6 +118,25 @@ def audit(conn: sqlite3.Connection, run_id: str, *, threshold: int = THRESHOLD_D
                     chapter, row["attempt"], "promoted below the threshold",
                     f"aggregate {aggregate} was put in the book with verdict "
                     f"{row['verdict']!r}",
+                ))
+
+            # 1b. Promoted while a critic said nothing. **The aggregate cannot
+            #     show this**: a chapter whose `continuity` returned nothing
+            #     unparseable has an aggregate of 10 over the four that answered
+            #     and looks perfect. One shipped exactly that way, and this
+            #     audit missed it until the scores were read as well as the
+            #     minimum.
+            #
+            #     A gate short a critic is a weaker gate, not a passing one —
+            #     the rule that once returned 10 and let a malformed reply ship
+            #     a draft.
+            if row["promoted"] and silent.get(row["id"]):
+                missing = ", ".join(sorted(silent[row["id"]]))
+                breaches.append(Breach(
+                    chapter, row["attempt"], "promoted on an incomplete gate",
+                    f"{missing} produced no usable verdict, so the aggregate of "
+                    f"{aggregate} is a minimum over the critics that answered — "
+                    f"not a pass",
                 ))
 
             # 2. The recorded verdict against the rule, at that state.

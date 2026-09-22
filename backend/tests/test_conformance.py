@@ -168,3 +168,77 @@ def test_no_aggregate_below_the_threshold_can_be_promoted_quietly(db, aggregate)
     run = make_run(db, f"r{aggregate}")
     add(db, run, 1, 1, aggregate, "accept", promoted=True)
     assert audit(db, run), f"aggregate {aggregate} promoted and nothing said"
+
+
+def test_a_chapter_promoted_while_a_critic_said_nothing_is_caught(db):
+    """The second violation on the eight-chapter run, which this audit missed.
+
+    Chapter 7 was promoted with `continuity` returning nothing usable. Its
+    aggregate was **10** — a minimum over the four critics that answered — so
+    every rule that reads the aggregate saw a perfect chapter.
+
+    A gate short a critic is a weaker gate, not a passing one. That rule once
+    returned 10 and let a malformed reply ship a draft, and here it shipped one
+    again through the audit built to catch exactly this.
+    """
+    run = make_run(db)
+    # The gate this run ran, as the archive would have recorded it. Without it a
+    # NULL score cannot be told from a critic that did not exist, and the check
+    # correctly stays silent.
+    repository.save_gate_set(db, run, PASS.keys())
+    add(db, run, 7, 1, 4, "retry")
+    repository.save_attempt(
+        db, run_id=run, chapter=7, attempt=2, title=None,
+        draft_path="chapters/ch07.attempt2.md", words=1300,
+        scores={**PASS, "continuity": None},
+        verdict="accept", aggregate=10, findings=[], promoted=True,
+    )
+    breaches = audit(db, run)
+    assert any(b.rule == "promoted on an incomplete gate" for b in breaches), breaches
+    assert any("continuity" in b.detail for b in breaches)
+
+
+def test_a_complete_gate_at_ten_is_not_flagged(db):
+    """The suppression has to be narrow, or every clean chapter reads as a
+    breach and the report stops being read."""
+    run = make_run(db)
+    repository.save_gate_set(db, run, PASS.keys())
+    add(db, run, 1, 1, 10, "accept", promoted=True)
+    assert [b for b in audit(db, run)
+            if b.rule == "promoted on an incomplete gate"] == []
+
+
+def test_a_characteristic_that_did_not_exist_for_the_run_is_not_a_silent_critic(db):
+    """The category error, caught twice in one afternoon.
+
+    A five-characteristic run has `prose` NULL on every attempt because it did
+    not exist. A check reading NULL as "the critic said nothing" reports every
+    one of those chapters as promoted on an incomplete gate — confident nonsense
+    about a rule that was not in force.
+
+    The archive records the gate a run ran; this reads it.
+    """
+    run = make_run(db)
+    repository.save_gate_set(db, run, [c for c in PASS if c != "prose"])
+    repository.save_attempt(
+        db, run_id=run, chapter=1, attempt=1, title=None,
+        draft_path="chapters/ch01.attempt1.md", words=500,
+        scores={**PASS, "prose": None}, verdict="accept", aggregate=10,
+        findings=[], promoted=True,
+    )
+    assert [b for b in audit(db, run)
+            if b.rule == "promoted on an incomplete gate"] == []
+
+
+def test_a_run_with_no_recorded_gate_stays_silent_rather_than_guessing(db):
+    """Archived before the column existed. A NULL score cannot be told from a
+    critic that did not exist, so the check says nothing instead of picking."""
+    run = make_run(db)
+    repository.save_attempt(
+        db, run_id=run, chapter=1, attempt=1, title=None,
+        draft_path="chapters/ch01.attempt1.md", words=500,
+        scores={**PASS, "continuity": None}, verdict="accept", aggregate=10,
+        findings=[], promoted=True,
+    )
+    assert [b for b in audit(db, run)
+            if b.rule == "promoted on an incomplete gate"] == []

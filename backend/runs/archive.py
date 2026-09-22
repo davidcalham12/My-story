@@ -196,6 +196,8 @@ def archive_run(
     # second is a different gate, which may.
     gate = tuple(c for c in CHARACTERISTICS
                  if any(c in by_critic for by_critic in critiques.values()))
+    if gate:
+        repository.save_gate_set(conn, run_id, gate)
     if gate and set(gate) != set(CHARACTERISTICS):
         report.notes.append(
             "this run was judged by " + ", ".join(gate)

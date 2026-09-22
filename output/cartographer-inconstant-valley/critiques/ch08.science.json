@@ -1,0 +1,14 @@
+{"critic": "science", "chapter": 8, "kind": "model",
+ "agent": "science-critic", "drafts": 2,
+ "note": "The world critic under a historical name; audits against the bullets under ## Rules and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 4, "findings": [
+     {"kind": "rule-violation", "severity": "high",
+      "quote": "From the thorn, a quarter of an hour at a woman's pace, to the intake wall that Joseph Dent kept.",
+      "claim": "A clock duration paired with a rate yields a distance, and a dale-born man reads this line aloud to the whole parish. R4 forbids him a distance in his own words or read off a page. It also contradicts the chapter's own narration three sentences later - 'not once in two hours a distance' - and undoes the chapter's best idea, that the book was written this way precisely so it could be read aloud by people who cannot say a distance.",
+      "fix": "A duration tied to an act or a person, with no rate attached.",
+      "reference": "bible/world.md, R4"}]},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "resolution": "Replaced with 'the time it takes a woman to fill a kist with peat' - a duration tied to an act, in the shape of the Creed line beside it, and unconvertible by anybody. Thorn, woman and Joseph Dent's intake wall all kept.",
+ "orchestrator_note": "This is the most consequential single finding of the run, because the chapter's central claim rests on it. The whole point of the last chapter is that a dale-born man can read the parish book aloud to sixty people WITHOUT breaking the rule, because a century and a half of hands wrote it so that he could. One convertible line in the two the draft quotes would have falsified that on the book's own evidence, on its last pages.",
+ "root_cause": "The orchestrator's. The identical construction - a clock paired with a pace - had been caught and removed from the previous chapter, and the rolling summary handed to this chapter's writer said only that the book keeps recitations. It did not carry the warning. The summary chain is the only channel between chapters and this is the second time in the run that what it dropped became a defect."}

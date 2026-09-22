@@ -1,0 +1,17 @@
+{"critic": "continuity", "chapter": 8, "kind": "model",
+ "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 5, "findings": [
+     {"kind": "numeric-contradiction", "severity": "high",
+      "quote": "A hundred and fifty years of hands had kept it so.",
+      "claim": "The parish book's earliest hand is 1703 and the year is 1843, which is a hundred and forty. The figure drifts by a decade on the last page of the book, and it is the measure of the thing the whole story is about.",
+      "fix": "A hundred and forty years.",
+      "reference": "bible/timeline.md, May 1843; the book's earliest hand, 1703"},
+     {"kind": "fact-overclaim", "severity": "medium",
+      "quote": "Four feet two inches and a half above the water: exactly what it had given him on his first day, exactly what it would give anybody.",
+      "claim": "On the first day the stone was not measured. It was eyeballed as 'perhaps four feet out of the water'. There is no first-day figure for four feet two and a half to be exactly equal to.",
+      "fix": "Match the rough first impression rather than a figure never taken.",
+      "reference": "bible/world.md, the rule of the three constants; and the first day's description"}]},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "resolution": "Both findings addressed by literal substitution supplied by the writer, both applied by exact match, neither skipped. The orchestrator checked the century arithmetic itself before sending the sheet: 1843 minus 1703 is 140.",
+ "orchestrator_note": "The ford-stone finding is the better of the two and the kind a gate exists for. The draft was reaching for the book's closing bookend and gave itself a proof it had not earned - an exact match with a number that was never taken. The repair keeps the bookend and makes it honest: the match is with his first rough guess, and the exactness is carried by what the stone gives anybody who ever asks it. The beat critic was asked specifically whether the rewording cost the commissioned ending, and concluded it did not."}

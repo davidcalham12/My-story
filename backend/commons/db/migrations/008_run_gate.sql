@@ -1,0 +1,16 @@
+-- The gate a run actually ran, as JSON.
+--
+-- The archive works this out — every characteristic with a critique file — and
+-- then threw it away. The conformance audit had to guess it back from the
+-- scores, and guessing produced the category error twice in one afternoon:
+-- `prose` is NULL on every attempt of a five-characteristic run because it did
+-- not exist, and a check that reads NULL as "the critic said nothing" reports
+-- every one of those chapters as promoted on an incomplete gate.
+--
+-- "The critic did not exist" and "the critic answered nothing" are opposite
+-- facts. The archive can tell them apart because it sees the files; nothing
+-- downstream can, unless it is written down. This is where it is written down.
+--
+-- NULL means the run was archived before this column existed — absent, not
+-- "all of today's characteristics".
+ALTER TABLE runs ADD COLUMN gate TEXT;

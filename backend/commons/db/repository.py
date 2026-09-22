@@ -95,6 +95,20 @@ def save_cost(conn, run_id: str, *, cost_usd: float, provenance: str = "measured
         )
 
 
+def save_gate_set(conn, run_id: str, characteristics) -> None:
+    """The gate this run actually ran. SPEC-006 made this necessary.
+
+    A characteristic that did not exist when a run ran is not a critic that
+    failed to answer, and the two are indistinguishable from the scores alone:
+    both leave NULL. The archive can tell them apart because it sees which
+    critique files exist. Everything downstream can only know it if it is
+    recorded.
+    """
+    with tx(conn):
+        conn.execute("UPDATE runs SET gate = ? WHERE id = ?",
+                     (json.dumps(list(characteristics)), run_id))
+
+
 def warn(conn, run_id: str, kind: str, detail: str, chapter: int | None = None) -> None:
     with tx(conn):
         conn.execute(
