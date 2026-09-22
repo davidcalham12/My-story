@@ -13,7 +13,7 @@ def test_migrations_created_every_table(db):
         "SELECT name FROM sqlite_master WHERE type='table'")}
     for expected in ("runs", "attempts", "scores", "findings", "gate_decisions",
                      "sheets", "calls", "summary_facts", "character_knowledge",
-                     "chunks", "run_completeness", "run_warnings"):
+                     "chunks", "run_completeness", "run_warnings", "events"):
         assert expected in tables
 
 

@@ -618,11 +618,13 @@ memory. But attempts, scores, findings and sheets reach the database through
 and its calls and none of its gate record.** That is §3.14, and it is the
 difference between this row and the one the spec-side document wrote.
 
-**What the spec asked for and the built system does not have.** An `events` table
-holding every raw stream line under a sequence number, and `Last-Event-ID` resume
-over it. Neither exists. A reconnecting client receives a fresh snapshot from the
-database — a different mitigation with a different guarantee, and it is the one
-that is tested.
+**What the spec asked for, and where it stands.** An `events` table holding every
+raw stream line under a sequence number, and `Last-Event-ID` resume over it.
+**The table exists since PLAN-007 6.2** (`009_events.sql`, `test_events.py`:
+dense `seq`, untouched payload); the runner writes every line into it from 6.4,
+and the resume over it arrives at 6.7. Until then a reconnecting client receives
+a fresh snapshot from the database — a different mitigation with a different
+guarantee, and it is the one that is tested.
 
 ### G20 — A feedback sheet is complete and never quotes a previous chapter
 

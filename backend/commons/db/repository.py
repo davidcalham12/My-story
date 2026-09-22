@@ -109,6 +109,29 @@ def save_gate_set(conn, run_id: str, characteristics) -> None:
                      (json.dumps(list(characteristics)), run_id))
 
 
+def append_event(conn, run_id: str, *, seq: int, type: str, payload: str) -> None:
+    """One raw stream line, before anything is derived from it (FR-RNR-3).
+
+    Its own transaction, and the first write for every line: a crash between
+    this row and the stage it implies loses the derivation, never the evidence.
+    """
+    with tx(conn):
+        conn.execute(
+            "INSERT INTO events (run_id, seq, ts, type, payload) VALUES (?,?,?,?,?)",
+            (run_id, seq, now(), type or "unknown", payload),
+        )
+
+
+def events_after(conn, run_id: str, seq: int) -> list[dict]:
+    """Rows with a `seq` strictly greater than the one given — what a client that
+    sends `Last-Event-ID: seq` has not seen."""
+    rows = conn.execute(
+        "SELECT seq, ts, type, payload FROM events WHERE run_id = ? AND seq > ? "
+        "ORDER BY seq", (run_id, seq),
+    ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def warn(conn, run_id: str, kind: str, detail: str, chapter: int | None = None) -> None:
     with tx(conn):
         conn.execute(

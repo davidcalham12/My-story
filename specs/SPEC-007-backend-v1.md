@@ -334,16 +334,16 @@ files. Every table carries `run_id` (C3 → D6).
 | table | key columns |
 |---|---|
 | `runs` | id, slug, premise, profile, tone, config_hash, status, halt_reason, started_at, finished_at, total_cost_usd, num_turns, duration_ms, source |
-| `events` | run_id, seq, ts, type, payload (JSON) |
+| `events` | run_id, seq, ts, type, payload (the raw line) — **added by PLAN-007 6.2**; written from 6.4 |
 | `calls` | run_id, seq, agent, stage, chapter, attempt, input_tokens, output_tokens, cost_usd, ts, duration_ms, tokens_reserved, in_flight_at_dispatch, source |
 | `gate_decisions` | run_id, chapter, attempt, scores (JSON), aggregate, threshold, verdict |
 | `findings` | run_id, chapter, attempt, critic, kind, severity, upheld, quote, fix, reference, ruling, late |
 | `sheets` | run_id, chapter, attempt, level, path, validated, validator_version |
-| `drafts` | run_id, chapter, attempt, path, words, kept |
-| `facts` | id, run_id, chapter, kind, text (rolling-summary facts, D15) |
+| `drafts` | run_id, chapter, attempt, path, words, kept — **built as `attempts`** (+ aggregate, verdict, promoted) |
+| `facts` | id, run_id, chapter, kind, text (rolling-summary facts, D15) — **built as `summary_facts`**; never written (§12) |
 | `character_knowledge` | run_id, character, fact_id, learned_in_chapter — created, empty in v1 |
-| `embeddings` (vec0) | run_id, source_table, source_id, chunk, embedding |
-| `config_snapshots` | run_id, config_hash, json |
+| `embeddings` (vec0) | run_id, source_table, source_id, chunk, embedding — **built as `chunks`** + a vec0 index; never populated (§12) |
+| `config_snapshots` | run_id, config_hash, json — **built as the `runs.config_snapshot` column**; the hash is computed from it (PLAN-007 6.3) |
 
 Prose and Bible stay on disk under `output/<slug>/`; the DB stores paths.
 
