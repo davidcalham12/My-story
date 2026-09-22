@@ -64,14 +64,24 @@ def test_every_attempt_on_disk_becomes_a_row(archived):
     assert len(rows) == 7, sorted(rows)
 
 
-def test_each_attempt_carries_five_scores(archived):
+def test_each_attempt_carries_a_score_for_every_characteristic(archived):
+    """One row per characteristic, always — including the ones the run never
+    produced, which are stored NULL.
+
+    The run in this fixture predates SPEC-006, so its `prose` row is NULL: the
+    critic did not exist when it ran. That is the honest record, and it is why
+    the archiver writes a row per characteristic rather than a row per verdict.
+    """
+    from backend.chapters.domain import CHARACTERISTICS
+
     db, _ = archived
     for row in db.execute("SELECT id, chapter, attempt FROM attempts WHERE run_id = ?",
                           (RUN_ID,)):
-        n = db.execute(
-            "SELECT COUNT(*) AS n FROM scores WHERE attempt_id = ?", (row["id"],)
-        ).fetchone()["n"]
-        assert n == 5, f"ch{row['chapter']} attempt {row['attempt']} has {n} scores"
+        got = {r["characteristic"] for r in db.execute(
+            "SELECT characteristic FROM scores WHERE attempt_id = ?", (row["id"],))}
+        assert got == set(CHARACTERISTICS), (
+            f"ch{row['chapter']} attempt {row['attempt']}: {sorted(got)}"
+        )
 
 
 def test_a_score_the_run_never_produced_is_null_not_zero(db):

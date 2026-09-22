@@ -195,23 +195,45 @@ on your discipline. Do not add `Read` to that agent to make something easier.
 
 ### Run the gate
 
-The critics are `quality_gate.critics` in the config. **Five now** — LOOP-003
-added the fifth — and every one of them scores from the first attempt:
+The critics are `quality_gate.critics` in the config. **Six now** — LOOP-003
+added the fifth, SPEC-006 the sixth — and every one of them scores from the first
+attempt:
 
 | characteristic | who runs it | how |
 |---|---|---|
 | `continuity` | subagent | dispatch `continuity-critic` with the draft and the Bible |
 | `science` | subagent | dispatch `science-critic` with the draft and `bible/world.md` |
 | `outline` | subagent | dispatch `outline-critic` with the draft and **this chapter's outline entry, beats numbered** |
+| `prose` | subagent | dispatch `prose-critic` with the draft, the genre and the tone |
 | `length` | **you** | count words in the shell; score 10 inside the band, 0 outside |
 | `chatter` | **you** | scan for preamble; score 0 if the draft does not begin with `# Chapter` |
 
-`outline` exists because the other four all ask whether the draft is *correct*
-and none asks whether it is *the chapter the outline commissioned*. A draft that
-is consistent with the Bible, obeys the world, sits in the word band and is
-about something else entirely used to pass this gate cleanly.
+`outline` exists because the others all ask whether the draft is *correct* and
+none asks whether it is *the chapter the outline commissioned*. A draft that is
+consistent with the Bible, obeys the world, sits in the word band and is about
+something else entirely used to pass this gate cleanly.
 
-Dispatch the two critic subagents **in the same message**, as two tool calls in
+**`prose` asks the question none of the other five ask: is it well written?** It
+returns quoted `major` and `minor` findings and **no score** — you compute it:
+
+```bash
+python -m backend.chapters.check_prose output/<slug>/chapters/chNN.attemptK.md   output/<slug>/bible/characters.md          # the mechanical term
+```
+
+```
+prose = 10 − 3·mechanical − 2·major − 1·minor,   floored at 0
+```
+
+`mechanical` is the count of defects **that script** found, never a number the
+critic gives you. A critic asked to count what a script already counted will
+disagree with it, and then the score depends on which of the two you asked. If
+the critic reports a mechanical defect anyway, drop it: it is already charged.
+
+**Check its arithmetic, as you do for `outline`.** The critic's `notes` state its
+own counts; recompute them from the findings it actually quoted. A finding
+without a quote is not a finding — do not count it, and say so in the gate row.
+
+Dispatch the four critic subagents **in the same message**, as four tool calls in
 one reply. Not "one after the other quickly" — in the same reply. They are
 independent, they judge a text that is already fixed, and nothing either returns
 changes what the other is asked.
@@ -418,7 +440,8 @@ python -m backend.chapters.check_prose output/<slug>/chapters/chNN.md
 
 It reports a sentence repeated word for word, a heading glued to the previous
 line, and a paragraph echoing another's opening. **It does not gate.** There are
-five characteristics and this is not a sixth; it never blocks a chapter.
+six characteristics, and this script is not a seventh. It never blocks a
+chapter on its own — its count feeds `prose`, which does.
 
 What it finds, you fix the way you fix anything else: a literal substitution,
 quoted, in the next sheet. A duplicated sentence is exactly the shape redraft
@@ -613,7 +636,7 @@ collapse.
 
 **What costs nothing.** Both critics in one reply. All style passes and the
 publisher in one reply. The bookkeeping for chapter *n* in the same reply as the
-dispatch for chapter *n*+1. Skipping the two model critics on a draft that
+dispatch for chapter *n*+1. Skipping the model critics on a draft that
 failed `chatter`. None of these changes a word that reaches the reader, and
 together they are worth more than any of the trades below.
 

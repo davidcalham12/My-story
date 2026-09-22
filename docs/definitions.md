@@ -98,7 +98,7 @@ ceiling.
 
 **QualityCheck / Rubric** — a named criterion, how it is scored, and at what stage
 it applies.
-→ **built**, as the five characteristics of LOOP-003. See §5.
+→ **built**, as the six characteristics of LOOP-003 and SPEC-006. See §5.
 
 **PipelineStage / Agent** — process metadata: which step produced a given entity,
 so provenance and revision responsibility are traceable.
@@ -181,7 +181,7 @@ boundary, so what an agent was not handed it cannot go and get.
 
 ## 5. Quality dimensions
 
-The ontology names ten. NovaForge's gate scores **five characteristics**, each
+The ontology names ten. NovaForge's gate scores **six characteristics**, each
 0–10, all of which must reach 8, aggregated with `min` — a chapter is worth what
 its worst characteristic is worth.
 

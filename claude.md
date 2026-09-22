@@ -4,8 +4,8 @@
 The process — what must be approved before what, and what "done" means — is
 there, not here.
 
-A multi-agent harness that writes novels. Nine agents across six stages, with a
-five-characteristic quality gate between the draft and the book.
+A multi-agent harness that writes novels. Ten agents across six stages, with a
+six-characteristic quality gate between the draft and the book.
 
 **The central claim:** the writer of a chapter never receives the prose of a
 previous chapter. It receives the Story Bible, its own outline entry, and a

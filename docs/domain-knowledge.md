@@ -234,7 +234,9 @@ evidence; the numbers are an index into it.
 Three visible defects shipped: a sentence duplicated verbatim, a timeline error
 on screen, a paragraph stating the same fact twice. Each was **kept in by rule 2**
 — "change only what was cited" forbids touching what no finding names, and no
-finding named them because none of the five characteristics reads prose quality.
+finding named them because none of the five characteristics read prose quality.
+**SPEC-006 added a sixth that does**, after SPEC-005 took the mechanical part of
+it off the model's plate.
 
 The guardrail and the goal are in tension, and there is a receipt.
 

@@ -1,0 +1,15 @@
+{"critic": "outline", "chapter": 2, "kind": "model",
+ "agent": "outline-critic", "drafts": 1,
+ "formula": "10 minus 3 per missing beat, minus 1 per beat out of order",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [],
+    "beats": [
+      {"beat": 1, "present": true, "draft_position": 1,
+       "notes": "Fowler leading, Coulter following and drawing arrows, the count called, ten arrows into Hale's palm, the line near-verbatim."},
+      {"beat": 2, "present": true, "draft_position": 2,
+       "notes": "Both farmers decline courteously and stay watching; Brock and Coulter sign at the station before Hale leaves it."},
+      {"beat": 3, "present": true, "draft_position": 3,
+       "notes": "Both findings occur. The outline attributes the missing corner to the ESTATE plan; the draft attributes it to the enclosure plan of 1836, which is the document Hale is holding. The critic judged this a naming discrepancy rather than a missing event and did not deduct. The orchestrator agrees: the event the beat commissions — Hale finding no corner where a plan puts one — happens, and the draft's attribution is the more coherent of the two, since the enclosure plan is what he unrolled on the wall."},
+      {"beat": 4, "present": true, "draft_position": 4,
+       "notes": "Dent names no direction for where the 1836 surveyor went. All three elements present."}],
+    "missing": [], "out_of_order": [], "ends_on_honoured": true}]}

@@ -1,0 +1,6 @@
+{"critic": "science", "chapter": 2, "kind": "model",
+ "agent": "science-critic", "drafts": 1,
+ "note": "The world critic under a historical name; audits the draft against the bullets under ## Rules in bible/world.md and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []}],
+ "orchestrator_note": "Clean. R3 was the load-bearing rule of this chapter and the critic was asked to check its three clauses separately — two witnesses, who stood at that station, signing before the surveyor leaves it. It was also asked to rule on two borderline R4 questions: Fowler's 'till noon and not past it', and Dent's 'you'd call it seven weeks', which is a number but a duration rather than a distance. Neither was found to violate a clause."}

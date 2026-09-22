@@ -84,7 +84,8 @@
       "science",
       "outline",
       "length",
-      "chatter"
+      "chatter",
+      "prose"
     ],
     "threshold": 8,
     "max_revisions": 2,

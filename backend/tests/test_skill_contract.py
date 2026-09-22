@@ -97,13 +97,16 @@ def test_three_attempts_and_two_revisions_are_the_same_statement():
     assert CONFIG["quality_gate"]["max_revisions"] == gate["max_iterations"] - 1
 
 
-def test_the_five_characteristics_agree_across_contract_and_code():
+def test_the_characteristics_agree_across_contract_and_code():
     from backend.chapters.domain import CHARACTERISTICS
 
     gate = gate_stage()["gate"]
     assert set(gate["critics"]) == set(CHARACTERISTICS)
     assert set(CONFIG["quality_gate"]["critics"]) == set(CHARACTERISTICS)
-    assert len(CHARACTERISTICS) == 5
+    # Six since SPEC-006. Pinned rather than counted loosely, because
+    # `AGENTS.md` §6 means the next change also needs a spec that names it.
+    assert len(CHARACTERISTICS) == 6, CHARACTERISTICS
+    assert "prose" in CHARACTERISTICS
 
 
 def test_skill_defers_the_decision_to_the_script_instead_of_deciding():

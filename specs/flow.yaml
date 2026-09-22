@@ -141,6 +141,7 @@ stages:
         - outline
         - length
         - chatter
+        - prose
       threshold: 8
       max_iterations: 3
       aggregate: min

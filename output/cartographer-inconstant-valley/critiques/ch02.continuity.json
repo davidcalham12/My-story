@@ -1,0 +1,5 @@
+{"critic": "continuity", "chapter": 2, "kind": "model",
+ "agent": "continuity-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []}],
+ "orchestrator_note": "Clean. The critic was asked to verify three pieces of arithmetic explicitly: the forty-seven-link difference between ten chains fifty-three links and eleven chains on a hundred-link Gunter's chain; Dent's 'back end of April to about hay time — you'd call it seven weeks' for the 1836 survey; and the draft's 'by seven' against Brock having been there 'since six'. It raised no finding on any of them."}

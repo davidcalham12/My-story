@@ -108,3 +108,19 @@ def test_the_run_detail_keys_are_the_ones_the_service_serves():
     required, optional = interface("RunDetail")
     assert required <= served, f"the panel expects and does not get: {required - served}"
     assert served <= required | optional, f"undeclared: {served - required - optional}"
+
+
+def test_the_panel_knows_every_characteristic_the_gate_scores():
+    """A characteristic the panel does not declare renders as nothing.
+
+    `scores` is keyed by `Characteristic`, so a sixth added in Python and not
+    here means the column the chapter actually failed on is the one the reader
+    cannot see.
+    """
+    from backend.chapters.domain import CHARACTERISTICS
+
+    declared = set(re.findall(r"^  \| '(\w+)'$", TYPES, re.M))
+    assert set(CHARACTERISTICS) <= declared, (
+        f"the gate scores and the panel cannot show: "
+        f"{set(CHARACTERISTICS) - declared}"
+    )

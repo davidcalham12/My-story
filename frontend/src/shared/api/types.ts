@@ -19,6 +19,9 @@ export type Characteristic =
   | 'outline'
   | 'length'
   | 'chatter'
+  /** SPEC-006. The only one that judges how a chapter is written rather than
+   *  whether it is correct — and the least reproducible of the six. */
+  | 'prose'
 
 export const CHARACTERISTICS: Characteristic[] = [
   'continuity',
@@ -26,6 +29,7 @@ export const CHARACTERISTICS: Characteristic[] = [
   'outline',
   'length',
   'chatter',
+  'prose',
 ]
 
 export interface Run {

@@ -1,6 +1,6 @@
 """G1, back to being structural.
 
-Under Annex C, Claude Code orchestrates and the nine agents are subagents again.
+Under Annex C, Claude Code orchestrates and the agents are subagents again.
 So the guarantee returns to what it was in v1 and to the strongest form this
 project has ever had:
 
@@ -32,6 +32,9 @@ EXPECTED = {
     "continuity-critic": {"Glob"},
     "science-critic": {"Glob"},
     "outline-critic": {"Glob"},
+    # SPEC-006. It judges the writing, so it needs the draft and nothing else —
+    # the same tool list as the critics it joins.
+    "prose-critic": {"Glob"},
     "style-editor": {"Glob"},
     "publisher": {"Glob"},
 }
@@ -57,9 +60,19 @@ def tools_of(name: str) -> set[str]:
     return {t.strip() for t in raw.split(",") if t.strip()}
 
 
-def test_every_agent_file_exists():
-    for name in EXPECTED:
-        assert (AGENTS / f"{name}.md").exists(), name
+def test_every_agent_file_exists_and_every_file_is_expected():
+    """Both directions, and the second one was missing.
+
+    Every test in this file iterated over EXPECTED, so **a new agent file was
+    invisible to all of them**: one could be added holding `Read` and `Bash` and
+    nothing here would go red. The authority model's own test could not see a
+    new authority. SPEC-006 added the tenth agent and this is what noticed.
+    """
+    on_disk = {p.stem for p in AGENTS.glob("*.md")}
+    assert on_disk == set(EXPECTED), (
+        f"undeclared agent files: {sorted(on_disk - set(EXPECTED))}; "
+        f"declared and missing: {sorted(set(EXPECTED) - on_disk)}"
+    )
 
 
 @pytest.mark.parametrize("name", sorted(EXPECTED))
@@ -80,8 +93,9 @@ def test_no_critic_can_read_a_file():
     """A critic that could fetch its own context would hold exactly the
     capability the writer is denied. Retrieval reaches them because the
     ORCHESTRATOR runs the search and pastes the fragments in."""
-    for name in ("continuity-critic", "science-critic", "outline-critic"):
-        assert tools_of(name) & READERS == set(), name
+    for name in EXPECTED:
+        if name.endswith("-critic"):
+            assert tools_of(name) & READERS == set(), name
 
 
 def test_only_two_agents_can_write():
@@ -90,7 +104,7 @@ def test_only_two_agents_can_write():
 
 
 def test_no_agent_declares_a_genre():
-    """All nine once opened by calling themselves hard science fiction, and a
+    """They once all opened by calling themselves hard science fiction, and a
     premise about a pop star trying quesadillas came back with factions and a
     bandwidth budget."""
     for name in EXPECTED:

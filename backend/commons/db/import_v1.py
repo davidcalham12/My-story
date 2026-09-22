@@ -30,6 +30,9 @@ from typing import Any
 
 from backend.commons.db.connection import tx
 
+#: The five a v1 run could possibly have carried. **Not** `domain.CHARACTERISTICS`,
+#: which gained `prose` in SPEC-006: recording an imported attempt as missing a
+#: critic that did not exist when it ran would file a gap that is not one.
 CHARACTERISTICS = ("continuity", "science", "outline", "length", "chatter")
 
 

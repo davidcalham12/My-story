@@ -1,7 +1,7 @@
 # Architecture
 
 How NovaForge is built: the stack, the rule that governs where code goes, how a
-run is orchestrated, the nine agents, how memory is managed, how the 100,000
+run is orchestrated, the ten agents, how memory is managed, how the 100,000
 concurrent tokens are held, and the limits.
 
 `definitions.md` holds the vocabulary. `domain-knowledge.md` holds what the runs
@@ -153,9 +153,10 @@ return text and the orchestrator writes the file.
 5. **FLOW-4**, per chapter:
    - build the writer's packet — **no prior prose, by type**
    - draft
-   - **five critics, in parallel** — how many at once is the orchestrator's
+   - **six characteristics, four of them critics run in parallel** — how many
+     at once is the orchestrator's
      estimate, not a reservation (§6.1)
-   - `min` of the five scores
+   - `min` of the six scores
    - below 8 → level-1 sheet → attempt 2 → level-2 sheet → attempt 3 →
      `patch_then_halt`
 6. **FLOW-5** style — a pass that may not change a word.
@@ -168,7 +169,7 @@ novel or none.
 
 ### 3.4 Concurrency
 
-- **Within a chapter:** the five critics run in parallel. How many fit at once is
+- **Within a chapter:** the four model critics run in parallel. How many fit at once is
   decided by the orchestrator's `wc -w` estimate before dispatch — an estimate,
   not a reservation, and §6 says why that is the honest word.
 - **Between chapters:** in series. Chapter *n*'s summary feeds chapter *n+1*, and
@@ -201,18 +202,21 @@ events — so a reconnection cannot leave half a state.
 
 ---
 
-## 4. The nine agents and their skills
+## 4. The ten agents and their skills
 
 The catalogue. `AGENTS.md` describes the process the *coding* agent follows;
 these are the agents that write the novel.
 
-**The `ContextPacket` is the boundary.** In v1 each was a Claude Code subagent
-whose tool list decided what it could reach — the chapter writer had `Glob`,
-which returns paths and cannot return contents, so prior prose was *unreachable*.
-In v2 they are prompts plus a typed context, and the boundary is the packet's
-type: **what an agent cannot be handed, it cannot read.** That is a weaker class
-of evidence and `verification.md` G1 says so rather than inheriting the old
-language.
+**The `tools:` line is the boundary.** Each is a Claude Code subagent whose tool
+list decides what it can reach: the chapter writer holds `Glob`, which returns
+paths and cannot return contents, so prior prose is **unreachable** — the
+capability is absent, not merely unused.
+
+*This paragraph described a typed `ContextPacket` until 2026-09-22.* That was the
+D2 design, where Python assembled the context and called an API, and the boundary
+was a type plus a test — class **T**, true only while the test existed. Annex C
+removed the API, and the guarantee went back to being a property of a capability.
+**A test can be deleted; a tool that cannot read cannot be talked into reading.**
 
 Skills are for *building* this system, not for the agents inside it: an agent
 writing a chapter needs a Story Bible, not a SQLite reference. Where that
@@ -320,7 +324,30 @@ obeying the world, in the word band and about something else entirely passes
 cleanly. A beat delivered differently is delivered: penalise absence and
 sequence, never phrasing.
 
-### 4.8 style-editor — FLOW-5, sonnet
+### 4.8 prose-critic — FLOW-4 gate, sonnet
+
+**Receives:** the draft, and the genre and tone this book was decided to have.
+**Returns:** JSON — quoted `major` and `minor` findings, and **no score**.
+**Scoring:** `10 − 3·mechanical − 2·major − 1·minor`, floor 0, computed by the
+orchestrator. `mechanical` comes from `backend/chapters/prose.py`, never from the
+critic.
+
+SPEC-006. It answers the question the other five do not: *is this well written?*
+The five judge whether a chapter is **correct** — against the Bible, the rules,
+its beats, a word band, a heading. A chapter can satisfy all five and be badly
+written, and three visible defects shipped for exactly that reason.
+
+**Every finding carries a quote or it is not a finding.** The writer is handed
+findings and told to change only what was quoted, and a repair is confirmed by
+checking whether the quoted text is still there — so a finding without a quote
+cannot be acted on and cannot be verified. An objection to a whole chapter goes
+in `notes` and raises nothing.
+
+**It is the most subjective judge in the gate, and that is the cost.** Three of
+five characteristics were already model judgements; it is now four of six.
+`verification.md` §3.9 and SPEC-006 both say what that buys and what it prices.
+
+### 4.9 style-editor — FLOW-5, sonnet
 
 **Receives:** one approved chapter, and the word count it must return.
 **Returns:** the chapter with punctuation and spacing normalised. **No word may
@@ -331,7 +358,7 @@ differ. Arithmetic, not judgement — and it has fired on a pass that changed no
 word at all, when closing a space merged two tokens into one. That is the rule
 working, and the discard is recorded.
 
-### 4.9 publisher — FLOW-6, sonnet
+### 4.10 publisher — FLOW-6, sonnet
 
 **Receives:** the Bible, the outline and the chapter summaries — **not the
 chapters**. A synopsis is written from canon.
@@ -651,7 +678,7 @@ both measured over everything that has ever shipped before being believed.
 
 Stated here and classified in `verification.md`.
 
-- **The gate does not reproduce.** Three of its five characteristics are model
+- **The gate does not reproduce.** Four of its six characteristics are model
   judgements. "It passed the gate" is a statement about one run.
 - **No tamper-evident audit.** The log is a record the orchestrator writes.
 - **One writer at a time**, one user, no authentication. A local tool.

@@ -15,7 +15,9 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-CHARACTERISTICS = ("continuity", "science", "outline", "length", "chatter")
+#: SPEC-006 added `prose`. Six, not five — and `AGENTS.md` §6 means this tuple
+#: does not change again without another spec that names it.
+CHARACTERISTICS = ("continuity", "science", "outline", "length", "chatter", "prose")
 THRESHOLD_DEFAULT = 8
 
 # The sheet's field labels. In one place because the builder writes them and the
@@ -28,6 +30,7 @@ LABELS = {
     "outline": "Outline",
     "length": "Length",
     "chatter": "Heading",
+    "prose": "Prose",
 }
 
 
@@ -105,6 +108,26 @@ def score_chatter(draft: str) -> int:
     """
     first = draft.lstrip().split("\n", 1)[0] if draft.strip() else ""
     return 10 if re.match(r"^#\s+Chapter\b", first) else 0
+
+
+def score_prose(*, mechanical: int, major: int, minor: int) -> int:
+    """SPEC-006. `10 − 3·mechanical − 2·major − 1·minor`, floored at 0.
+
+    The shape of `score_outline`, and for the same reason: **a score a model
+    picks freely is a number nobody can check.** The critic finds defects and
+    quotes them; the arithmetic is here, so the orchestrator can recompute the
+    sum against the findings the way it already does for `outline`.
+
+    `mechanical` costs the most because it is the only term that is certain. A
+    repeated sentence is equality — there is no argument to have about it —
+    while a *major* defect is one model's reading of a paragraph. Weighting the
+    judged terms above the counted one would be backwards.
+
+    It comes from `backend/chapters/prose.py`, never from the critic. A critic
+    asked to count what a script already counted will disagree with it, and then
+    the score depends on which of the two was asked.
+    """
+    return max(0, 10 - 3 * mechanical - 2 * major - 1 * minor)
 
 
 def score_outline(missing: int, out_of_order: int) -> int:

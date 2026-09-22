@@ -17,9 +17,14 @@ BAND = (300, 550)
 # ---------------------------------------------------------------- B1, B2
 
 
-def test_a_chapter_passes_only_when_all_five_reach_eight():
-    """`min`, so a chapter is worth what its worst characteristic is worth."""
-    scores = {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10}
+def test_a_chapter_passes_only_when_every_characteristic_reaches_eight():
+    """`min`, so a chapter is worth what its worst characteristic is worth.
+
+    Built over `CHARACTERISTICS` rather than a literal dict: SPEC-006 added a
+    sixth, and a test that hardcodes the five passes a chapter the gate would
+    now stop.
+    """
+    scores = {k: 10 for k in domain.CHARACTERISTICS}
     assert domain.aggregate(scores).passed is True
     scores["science"] = 7
     verdict = domain.aggregate(scores)
@@ -29,8 +34,9 @@ def test_a_chapter_passes_only_when_all_five_reach_eight():
 
 
 def test_an_average_does_not_pass_a_chapter():
-    """Four tens and a four averages 8.8 and must still fail."""
-    scores = {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 4}
+    """Five tens and a four averages 9 and must still fail."""
+    scores = {k: 10 for k in domain.CHARACTERISTICS}
+    scores["chatter"] = 4
     assert domain.aggregate(scores).passed is False
 
 
@@ -38,15 +44,16 @@ def test_an_unusable_verdict_is_excluded_not_counted_as_a_pass():
     """This once returned 10, which meant a malformed reply SILENTLY PASSED a
     draft — the one failure a quality gate must not have. There is no honest
     substitute: 10 invents an approval and 0 invents a rejection."""
-    scores = {"continuity": 10, "science": None, "outline": 10, "length": 10, "chatter": 10}
+    scores = {k: 10 for k in domain.CHARACTERISTICS}
+    scores["science"] = None
     verdict = domain.aggregate(scores)
     assert verdict.unscored == ["science"]
     assert verdict.aggregate == 10
-    assert verdict.passed is False, "four critics is a weaker gate, not a passing one"
+    assert verdict.passed is False, "one critic short is a weaker gate, not a passing one"
     assert "science" in verdict.note
 
 
-def test_all_five_unusable_is_not_a_pass():
+def test_every_characteristic_unusable_is_not_a_pass():
     verdict = domain.aggregate({k: None for k in domain.CHARACTERISTICS})
     assert verdict.passed is False
     assert verdict.aggregate is None
@@ -279,3 +286,52 @@ def test_domain_imports_only_the_standard_library():
         elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
             roots.add(node.module.split(".")[0])
     assert roots <= set(sys.stdlib_module_names), f"non-stdlib import: {roots}"
+
+
+# ---------------------------------------------- SPEC-006, the sixth
+
+def test_prose_scores_by_the_formula_with_a_floor():
+    """10 − 3·mechanical − 2·major − 1·minor. The shape of `outline`, and for
+    the same reason: a score a model picks freely is a number nobody can check."""
+    assert domain.score_prose(mechanical=0, major=0, minor=0) == 10
+    assert domain.score_prose(mechanical=1, major=0, minor=0) == 7
+    assert domain.score_prose(mechanical=0, major=1, minor=0) == 8
+    assert domain.score_prose(mechanical=0, major=0, minor=1) == 9
+    assert domain.score_prose(mechanical=1, major=1, minor=1) == 4
+    assert domain.score_prose(mechanical=9, major=9, minor=9) == 0
+
+
+def test_a_mechanical_defect_costs_more_than_a_judged_one():
+    """It is certain. A major defect is one model's reading; a repeated sentence
+    is equality, and there is no argument to have about it."""
+    assert domain.score_prose(mechanical=1, major=0, minor=0) < \
+           domain.score_prose(mechanical=0, major=1, minor=0)
+
+
+def test_there_are_six_characteristics_and_prose_is_one():
+    assert len(domain.CHARACTERISTICS) == 6
+    assert "prose" in domain.CHARACTERISTICS
+
+
+def test_a_chapter_fails_on_prose_alone():
+    """A4. The whole point: a chapter correct in every other way can be stopped
+    for being badly written."""
+    scores = {k: 10 for k in domain.CHARACTERISTICS}
+    scores["prose"] = 7
+    verdict = domain.aggregate(scores)
+    assert not verdict.passed
+    assert verdict.worst == ["prose"]
+
+
+def test_an_unusable_prose_verdict_is_excluded_not_counted_as_a_pass():
+    """A5. The sixth gets the same rule as the other five, and it is the rule
+    that once returned 10 and passed a draft."""
+    scores = {k: 10 for k in domain.CHARACTERISTICS}
+    scores["prose"] = None
+    verdict = domain.aggregate(scores)
+    assert not verdict.passed
+    assert verdict.unscored == ["prose"]
+
+
+def test_the_sheet_names_prose_like_any_other_characteristic():
+    assert "prose" in domain.LABELS

@@ -55,7 +55,7 @@ with the reason attached — two have, and they say so.
 |---|---|---|---|---|
 | G1 | the writer never receives a previous chapter's prose | **critical** | **A** | yes |
 | G2 | the 100,000-token ceiling | important | **I** + **T** | yes |
-| G3 | five characteristics, all at 8 or above | important | **T** / **D** | yes |
+| G3 | six characteristics, all at 8 or above | important | **T** / **D** | yes |
 | G4 | `outline` scores 10 − 3·missing − 1·out-of-order | important | **T** / **D** | yes |
 | G5 | three attempts, feedback escalating | important | **T** | yes |
 | G6 | a failed chapter does not enter the book | **critical** | **T** for the rule, **D** for obeying it | **partly → §3.1** |
@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **309 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **317 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -125,7 +125,8 @@ in CI, at $0.** The suite that carries these:
 therefore **unreachable** — the capability is absent, not merely unused.
 
 **Evidence.** `backend/tests/test_agents_frontmatter.py` reads the front matter
-of all nine agents and asserts each tool list exactly. It fails if anyone gives
+of **every agent file present** and asserts each tool list exactly — in both
+directions, so a tenth agent cannot appear unnoticed. It fails if anyone gives
 the writer `Read`, `Grep`, `Bash`, `WebFetch` or `Agent`, and it fails if a
 critic gains one, since a critic that could fetch its own context would hold the
 very capability the writer is denied.
@@ -176,7 +177,7 @@ orchestrator's budget: it is about the packets the agents receive.
 **Gaps: §3.4** (no reservation before the call) **and §3.5** (those packets
 report zero, so layer 2 is armed and unexercised on the thing it exists for).
 
-### G3 — A chapter passes only when all five characteristics reach 8
+### G3 — A chapter passes only when all six characteristics reach 8
 
 **Important · Class T** for the arithmetic, **D** for the whole.
 
@@ -191,8 +192,15 @@ decision row per attempt in the run record.
 
 - *`length` and `chatter` reproduce* — **T**. Word count against a band; first
   line against `# Chapter`. Same input, same answer, always.
-- *`continuity`, `science` and `outline` do not* — **D**. They are model
-  judgements. The same draft can score 8 one run and 7 the next. **§3.6.**
+- *`prose`'s mechanical term reproduces* — **T**. It is a script's count, and
+  it is weighted highest for exactly that reason.
+- *`continuity`, `science`, `outline` and the judged half of `prose` do not* —
+  **D**. They are model judgements. The same draft can score 8 one run and 7 the
+  next. **§3.6.**
+
+**SPEC-006 made this row weaker on purpose**, and the spec says so: three of five
+were model judgements, and it is now four of six, the newest being the most
+subjective.
 
 So **"this run's gate produced these scores" is D**, evidenced by the recorded
 decision. **"This text would pass any run" is U.** Those are different claims and
@@ -265,7 +273,7 @@ FLOW-5 and FLOW-6 never ran. That is the whole path exercised end to end, once.
 
 **Why the second half is still D — and what now backs it.** The script decides;
 the orchestrator acts. Whether it calls the script and does what it says is a
-procedure, §3.10's limit, not a missing test.
+procedure, §3.11's limit, not a missing test.
 
 **But disobedience is no longer invisible.** `conformance.audit()` recomputes the
 decision at every archived attempt and reports the contradictions: a draft
@@ -545,7 +553,7 @@ cases behind it. What is left is smaller and still real.
 **What is not verified:** that the orchestrator calls
 `python -m backend.chapters.decide` and obeys the answer, on every chapter of
 every run.
-**Why accepted:** it is §3.10 — the procedure in `SKILL.md` cannot be tested at
+**Why accepted:** it is §3.11 — the procedure in `SKILL.md` cannot be tested at
 $0, and there is no way to make a model's obedience a unit test. What could be
 moved into code has been.
 **Scope of damage:** the project's central safety claim, but **bounded by what
@@ -623,11 +631,13 @@ the exact dishonesty this document is against.
 day those figures populate, and the halt becomes possible.
 **Reviewed by:** every new recorded stream, automatically, by that flag.
 
-### 3.6 Three of the five gate scores are a model's judgement
+### 3.6 Four of the six gate scores are a model's judgement
 
 **What is not verified:** that a passing chapter passes again.
 **Why accepted:** it is the nature of literary judgement. An arithmetic critic
-for continuity would be a worse critic, not a more reliable one.
+for continuity would be a worse critic, not a more reliable one. **SPEC-006 made
+this worse deliberately** — four of six now, up from three of five — in exchange
+for a gate that can stop a chapter for being badly written.
 **Scope of damage:** a chapter accepted today might not be tomorrow. "It passed
 the gate" is a statement about one run, never a property of the text.
 **How we would find out:** the LOOP-003 instruments measure the spread between
@@ -656,10 +666,11 @@ itself. The mitigation is cheaper than the cure.
 
 ### 3.9 Nobody measures the quality of the prose
 
-**Narrowed by SPEC-005, and the narrowing is small and honest.**
+**Narrowed twice — by SPEC-005 with a script, then by SPEC-006 with a critic.**
 
-**What is not verified:** whether the prose is any good. Still **Unverifiable
-with the means available**. None of the five characteristics reads prose.
+**What is not verified:** whether the prose is any good. Still **U** for the
+claim as stated, and the reason is now different: there *is* a judge, and its
+judgement does not reproduce.
 **Why accepted:** there is no instrument for judgement. Inventing a score would
 be worse than the gap, because it would close the question.
 **Scope of damage:** real and observed — a duplicated sentence, a timeline error
@@ -671,16 +682,43 @@ sentence repeated verbatim, a heading glued to the previous line and a paragraph
 echoing another's opening — two of those three shipped defects, at $0, **T**, and
 deterministic. A sixth critic would have cost $0.07 a chapter and been **D**
 forever.
-**What it explicitly does not touch:** the timeline error, voice, pacing,
-dialogue, originality, and whether any sentence earns its place. The report names
-them, so a clean result cannot be read as a verdict on the prose.
+**And SPEC-006 put a judge on the rest.** `prose` is the sixth characteristic:
+`prose-critic` returns quoted `major` and `minor` findings and **no score**, and
+the orchestrator computes `10 − 3·mechanical − 2·major − 1·minor`. A `prose`
+below 8 blocks a chapter through `min`, like any other.
+
+**What that changes, and what it does not.** A chapter can now be stopped for
+being badly written, which was the hole. What it cannot do is establish that a
+chapter scoring 10 *is* well written — a 10 is the absence of named defects, and
+absence of a finding is not a finding of quality. That is why this row stays
+**U** rather than moving to D.
+
+**What it cost, stated where it can be checked:** four of six characteristics are
+now model judgements, up from three of five, and the new one is the most
+subjective. `verification.md` G3 and §3.6 both say so, and SPEC-006's own "what
+this costs" section was written before the code.
 **Reviewed by:** the script, per chapter, before promotion — and its output is
 written to `critiques/chNN.prose.json` and archived as warnings, **clean or
 not**, because a check whose result exists only in a transcript cannot be read
 afterwards and *"we ran it and it was fine"* is not a record. The judgement half
 remains a decision nobody has taken.
 
-### 3.10 The procedure in `SKILL.md` cannot be tested at $0
+### 3.10 A false `prose` finding damages a correct chapter
+
+**What is not verified:** that a `prose` finding describes a real defect.
+**Why accepted:** it is §3.8 with a larger blast radius, and SPEC-006 accepted it
+in writing before the code was written.
+**Scope of damage:** larger than any other critic's. Theirs correct a clause;
+`prose`'s level-2 replacement is **a rewritten sentence**, handed to a writer
+told to integrate it without judging it. Arbitration has already refused two such
+replacements on arithmetic in one run, and one this week that would have written
+an error into six chapters.
+**How we would find out:** the orchestrator's arbitration, `late_findings.jsonl`,
+and the quote rule — a finding that cannot be quoted is not counted, which is the
+cheapest filter available.
+**Reviewed by:** the orchestrator, per finding, with more care than before.
+
+### 3.11 The procedure in `SKILL.md` cannot be tested at $0
 
 **What is not verified:** that a change to the orchestration procedure produces
 the right behaviour, before a real run.
@@ -709,13 +747,13 @@ gate is concerned.
 and a real run.
 **Reviewed by:** whoever changes `SKILL.md`, before merging.
 
-### 3.11 The archive is as complete as the orchestrator's writing was
+### 3.12 The archive is as complete as the orchestrator's writing was
 
 **What is not verified:** that every attempt the run made has a file. The
 archiver reads `output/<slug>/`; it cannot see an attempt whose critique was
 never written.
 **Why accepted:** the alternative is the orchestrator calling Python per
-attempt, which is a change to `SKILL.md` and therefore untestable at $0 (§3.10).
+attempt, which is a change to `SKILL.md` and therefore untestable at $0 (§3.11).
 **Scope of damage:** a chapter whose files are missing is indistinguishable from
 a chapter that was never attempted. **Bounded by being visible:** an attempt with
 no critique on file is stored with `NULL` scores and a `run_warnings` row, never
@@ -724,7 +762,7 @@ as a pass.
 `completeness` block on the run's page.
 **Reviewed by:** whoever reads a run whose warnings list is not empty.
 
-### 3.12 A run that dies mid-flight archives nothing
+### 3.13 A run that dies mid-flight archives nothing
 
 **What is not verified:** anything about a run whose process died before
 `_finish` ran.
@@ -734,7 +772,7 @@ are all still there**, and `archive_run` can be pointed at the directory by hand
 **How we would find out:** a run at `halted: process` with zero attempts.
 **Reviewed by:** nobody routinely. It is a recovery, not a loss.
 
-### 3.13 An interrupted run is not resumed
+### 3.14 An interrupted run is not resumed
 
 **What is not verified:** nothing — this one is absent by decision, and is here
 because absent by decision is not the same as forgotten.
@@ -826,6 +864,15 @@ a validator is: not a check, a thing that makes the reading happen.
   rows in `attempts`, `scores`, `findings`, `gate_decisions` and `sheets`.
   `save_attempt`, `save_gate` and `save_sheet` existed and were called by
   nothing. G13 gains the stored measured total; §3 gains two rows.
+- **SPEC-006.** A sixth characteristic, `prose`, which can stop a chapter for
+  being badly written — the hole three shipped defects went through. It is the
+  first change that makes this document's claims **weaker on purpose**: four of
+  six characteristics are now model judgements, up from three of five. The spec
+  wrote down what that costs before the code existed, and §3.10 is the new gap it
+  opens.
+- **SPEC-005.** The mechanical floor under §3.9, built first, because
+  `AGENTS.md` §5 requires answering why a script will not do before proposing an
+  agent. It answered for two of the three defects; SPEC-006 is what was left.
 - **SPEC-004.** The decision after an attempt moved from a paragraph in
   `SKILL.md` into `decide()`, with an exhaustive test and a script the
   orchestrator runs. **G6, the only critical guarantee below its minimum, is
