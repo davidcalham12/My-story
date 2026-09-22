@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **289 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **291 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -671,7 +671,10 @@ forever.
 **What it explicitly does not touch:** the timeline error, voice, pacing,
 dialogue, originality, and whether any sentence earns its place. The report names
 them, so a clean result cannot be read as a verdict on the prose.
-**Reviewed by:** the script, per chapter, before promotion. The judgement half
+**Reviewed by:** the script, per chapter, before promotion — and its output is
+written to `critiques/chNN.prose.json` and archived as warnings, **clean or
+not**, because a check whose result exists only in a transcript cannot be read
+afterwards and *"we ran it and it was fine"* is not a record. The judgement half
 remains a decision nobody has taken.
 
 ### 3.10 The procedure in `SKILL.md` cannot be tested at $0

@@ -272,3 +272,42 @@ def test_measured_token_figures_are_summed_and_graded_measured(db):
     assert payload["input_tokens"] == 350
     assert payload["output_tokens"] == 175
     assert payload["tokens_provenance"] == "measured"
+
+
+def test_a_prose_report_on_disk_becomes_warnings_not_scores(db, tmp_path):
+    """SPEC-005's findings have to survive the run that produced them.
+
+    A check whose result exists only in the orchestrator's transcript cannot be
+    read afterwards by anyone, and "we ran it and it was fine" is not a record.
+    They land as warnings rather than findings: the gate has five
+    characteristics and SPEC-005 did not add a sixth.
+    """
+    (tmp_path / "chapters").mkdir()
+    (tmp_path / "critiques").mkdir()
+    (tmp_path / "critiques" / "ch02.prose.json").write_text(json.dumps({
+        "verdict": "defects",
+        "defects": [{"kind": "duplicate-sentence", "quote": "The tide came in.",
+                     "claim": "this sentence already appears earlier"}],
+    }), encoding="utf-8")
+
+    repository.create_run(db, run_id="r", slug="s", premise="p", profile="tiny",
+                          tone=None, snapshot="{}")
+    report = archive_run(db, "r", tmp_path)
+    assert report.prose_defects == 1
+
+    rows = [dict(x) for x in db.execute(
+        "SELECT kind, chapter FROM run_warnings WHERE run_id = 'r'")]
+    assert any(r["kind"] == "prose:duplicate-sentence" and r["chapter"] == 2
+               for r in rows), rows
+    assert db.execute("SELECT COUNT(*) AS n FROM scores").fetchone()["n"] == 0
+
+
+def test_a_clean_prose_report_adds_no_warnings(db, tmp_path):
+    (tmp_path / "chapters").mkdir()
+    (tmp_path / "critiques").mkdir()
+    (tmp_path / "critiques" / "ch01.prose.json").write_text(
+        json.dumps({"verdict": "clean", "defects": []}), encoding="utf-8")
+    repository.create_run(db, run_id="r", slug="s", premise="p", profile="tiny",
+                          tone=None, snapshot="{}")
+    report = archive_run(db, "r", tmp_path)
+    assert report.prose_defects == 0

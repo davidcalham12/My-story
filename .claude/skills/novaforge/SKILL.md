@@ -429,6 +429,12 @@ What it **cannot** see is in its own output, under `not_checked`. A clean result
 means three mechanical defects are absent, not that the prose is good. Nothing
 here measures that.
 
+**Write its output to `critiques/chNN.prose.json`, clean or not.** A check whose
+result exists only in this conversation cannot be read afterwards by anyone, and
+"we ran it and it was fine" is not a record. A clean file is the evidence the
+check ran at all — which is exactly why `length` and `chatter` get critique files
+even though you computed them yourself.
+
 ### Record it
 
 Write, for each chapter:

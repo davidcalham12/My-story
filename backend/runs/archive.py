@@ -40,6 +40,7 @@ class ArchiveReport:
     scores: int = 0
     findings: int = 0
     sheets: int = 0
+    prose_defects: int = 0
     cost_usd: float | None = None
     notes: list[str] = field(default_factory=list)
 
@@ -239,6 +240,26 @@ def archive_run(
                 lines_cited=_lines_cited(body),
             )
             report.sheets += 1
+
+    for path in sorted((run_dir / "critiques").glob("ch*.prose.json")):
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            report.notes.append(f"{path.name}: unreadable, skipped")
+            continue
+        chapter = int(path.name[2:4])
+        for defect in raw.get("defects") or []:
+            if not isinstance(defect, dict):
+                continue
+            # A warning, not a finding. The gate has five characteristics and
+            # SPEC-005 did not add a sixth; a mechanical defect is an
+            # observation about a chapter, not a score against it.
+            repository.warn(
+                conn, run_id, f"prose:{defect.get('kind', 'unknown')}",
+                f"{defect.get('claim', '')} — {defect.get('quote', '')[:120]!r}",
+                chapter=chapter,
+            )
+            report.prose_defects += 1
 
     cost_path = run_dir / "cost.json"
     if cost_path.exists():
