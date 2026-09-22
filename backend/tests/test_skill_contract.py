@@ -137,3 +137,44 @@ def test_on_fail_is_patch_then_halt_in_all_three():
 def test_the_aggregate_is_min_not_an_average():
     assert gate_stage()["gate"]["aggregate"] == "min"
     assert CONFIG["quality_gate"]["aggregate"] == "min"
+
+
+# --------------------------------------------- the stages themselves
+
+#: `## 4. FLOW-4 — chapters, with the gate`
+SKILL_STAGE = re.compile(r"^## \d+\. (FLOW-\d) — (\w+)", re.M)
+
+
+def test_the_procedure_runs_the_stages_the_contract_declares_in_that_order():
+    """The first thing that can diverge, and nothing was reading both.
+
+    `flow.yaml` is the contract; `SKILL.md` is the procedure. A stage renamed in
+    one, or reordered, or quietly dropped, would be invisible — the tests check
+    thresholds and verdicts and never looked at the spine.
+    """
+    contract = [(stage["id"], stage["name"]) for stage in FLOW["stages"]]
+    procedure = SKILL_STAGE.findall(SKILL)
+    assert procedure == contract, (
+        f"SKILL.md runs {procedure}; flow.yaml declares {contract}"
+    )
+
+
+def test_each_stage_dispatches_the_agent_the_contract_names():
+    for stage in FLOW["stages"]:
+        agent = stage.get("agent")
+        if not agent:
+            continue
+        assert (ROOT / ".claude/agents" / f"{agent}.md").is_file(), (
+            f"{stage['id']} names {agent}, which has no agent file"
+        )
+        assert agent in SKILL, f"{stage['id']} names {agent}; SKILL.md never does"
+
+
+def test_only_the_gate_stage_may_patch_then_halt():
+    """Every other stage halts outright. A style pass that "patched" would be a
+    model editing text the gate approved, which is what G10 exists to stop."""
+    for stage in FLOW["stages"]:
+        if stage.get("on_fail") == "patch_then_halt":
+            assert stage.get("gate"), f"{stage['id']} patches without a gate"
+        else:
+            assert stage.get("on_fail") == "halt", stage["id"]

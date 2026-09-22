@@ -1,0 +1,55 @@
+{
+  "stage": "FLOW-3",
+  "kind": "commission audit",
+  "agent": "science-critic",
+  "ts": "2026-09-22T18:12:00Z",
+  "what_was_judged": "the eight outline entries against bible/world.md ## Rules. No draft existed; this judges the commission.",
+  "verdict": "defects",
+  "violations": [],
+  "violations_note": "No beat orders an event the rules forbid. Chapter 5 beat 2 — Hale deliberately leaving the theodolite out overnight — was examined and is drama, not a defect: a character breaking a custom on purpose is what the rule exists to be told through.",
+  "ambiguous_rules": [
+    {
+      "rule": "R1",
+      "issue": "whose measurement is it — the hand on the chain or the hand in the book?",
+      "depends_on": [{"chapter": 2, "beat": 1}, {"chapter": 3, "beat": 3}, {"chapter": 4, "beat": 3}],
+      "arbitration": "accepted. Fowler leads the chain on both the Day 2 line and the Day 6 re-run; under the chainman reading those two figures must be identical, which the outline contradicts, and Chapter 3 beat 3 becomes unexplained. The surveyor-of-record reading makes every beat consistent.",
+      "applied": "R1 rewritten to name the surveyor of record — the hand that wrote it in the field book — and to exclude whoever held the chain under their direction."
+    },
+    {
+      "rule": "R1",
+      "issue": "after leaving and returning, do repeats differ once and then stabilise, or never repeat again?",
+      "depends_on": [{"chapter": 4, "beat": 3}, {"chapter": 4, "beat": 4}, {"chapter": 8, "beat": 4}],
+      "arbitration": "ambiguity accepted, the critic's proposed fix OVERRULED. The critic wrote out the one-time-shift reading, which contradicts Chapter 4 beat 4 (three more runs, three more figures) and the Chapter 4 plant ('nothing he re-measures will ever repeat again'). Chapter 8 beat 4 does not need stability to return: the columns sum twice alike there because the triangulation is rebuilt on the three constants of R2, not because Hale's own lines started repeating. A replacement built on the critic's reading would have written the error into six chapters by hand.",
+      "applied": "R1 rewritten to the permanent reading: once the surveyor of record has gone out and come back, that line never repeats for them again and every fresh attempt differs from the last."
+    },
+    {
+      "rule": "R2",
+      "issue": "does R2 guarantee only that each constant measures the same, or that angles between them close?",
+      "depends_on": [{"chapter": 7, "beat": 3}, {"chapter": 8, "beat": 4}],
+      "arbitration": "accepted. Both beats need the stronger reading and the book's resolution rests on it entirely.",
+      "applied": "R2 rewritten to state that the three measure the same singly and in relation to one another, and that angles and distances taken directly among them close identically whatever lies between."
+    },
+    {
+      "rule": "R5",
+      "issue": "is 'no instrument stands after sunset' a physical law or a custom? And is Raven Hause's light the clock everywhere, or only at Raven Hause?",
+      "depends_on": [{"chapter": 5, "beat": 2}, {"chapter": 5, "beat": 4}, {"chapter": 8, "beat": 3}],
+      "arbitration": "accepted on both clauses. As written the first sentence reads as an absolute the dale enforces, which would make Chapter 5 beat 2 impossible rather than transgressive; and Chapter 8 beat 3 takes an entry at the Raven Hause station 'with the light still on the fell', which needs the clock stated.",
+      "applied": "R5 rewritten: leaving an instrument out is a thing no local does, not a thing the dale prevents; the theodolite stands where it was put; the light off Raven Hause is the dale's dusk everywhere in the dale at once, and no local signs at any station between dusk and dawn."
+    },
+    {
+      "rule": "R4",
+      "issue": "does the prohibition cover reading a distance aloud from a page, as against speaking one?",
+      "depends_on": [{"chapter": 8, "beat": 1}],
+      "arbitration": "accepted. Chapter 8 beat 1 has Dent read the perambulation book aloud to the whole dale and the chapter cannot be written without knowing whether that is lawful.",
+      "applied": "R4 rewritten to cover reading off a page as well as speaking, with the structural consequence stated: nothing dale-born hands have written contains a distance to read, which is why the perambulation book keeps the bound in durations and dead men's names."
+    },
+    {
+      "rule": "R3",
+      "issue": "does a correction inherit the original entry's witnesses, or need two of its own?",
+      "depends_on": [{"chapter": 8, "beat": 3}],
+      "arbitration": "accepted, though 'of its own' already favours the second reading. This is the exact rule that deadlocked a previous run of this pipeline, and it is the load-bearing constraint of the whole ending. Making it explicit costs one clause.",
+      "applied": "R3 rewritten: a correction is a new entry in every respect, needing two witnesses who stood at that station for the taking of the correction itself; the original's witnesses count for nothing toward it even if they are the same two people."
+    }
+  ],
+  "outcome": "bible/world.md ## Rules rewritten before FLOW-4. Six rules in, six rules out — none added, none removed, no beat changed. The outline was not re-dispatched because no beat was unlawful."
+}
