@@ -65,6 +65,19 @@ def resolve(profile: str) -> dict[str, Any]:
     return _merge(load_base(), load_profile(profile))
 
 
+def config_hash(snapshot: dict[str, Any]) -> str:
+    """Sixteen hex characters over the canonical JSON of a resolved config.
+
+    Key order is not configuration, so the keys are sorted first. Two runs with
+    the same hash ran the same numbers; a run whose hash differs from today's
+    `resolve(profile)` ran an older one, and says so without a diff (FR-CFG-1).
+    """
+    import hashlib
+
+    canonical = json.dumps(snapshot, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
 def prompt_for(feature: str, agent: str) -> str:
     """An agent's prompt, from disk. Agents do not read disk; this does."""
     path = ROOT / "backend" / feature / "prompts" / f"{agent}.md"

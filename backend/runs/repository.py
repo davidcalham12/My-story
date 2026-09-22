@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import json
 import sqlite3
+
+from backend.commons.config import loader
 
 
 def list_runs(conn: sqlite3.Connection) -> list[dict]:
@@ -15,9 +18,18 @@ def list_runs(conn: sqlite3.Connection) -> list[dict]:
 def get_run(conn: sqlite3.Connection, run_id: str) -> dict | None:
     row = conn.execute(
         "SELECT id, slug, premise, profile, tone, stage, halted, halted_detail, "
-        "source, started_at, finished_at FROM runs WHERE id = ?", (run_id,)
+        "source, started_at, finished_at, config_snapshot FROM runs WHERE id = ?",
+        (run_id,)
     ).fetchone()
-    return dict(row) if row else None
+    if not row:
+        return None
+    run = dict(row)
+    # The hash of what this run ran with, computed from the stored snapshot and
+    # never from today's config (FR-CFG-1). The blob itself stays out of the
+    # payload; the panel reads a fingerprint, not a config file.
+    snapshot = run.pop("config_snapshot")
+    run["config_hash"] = loader.config_hash(json.loads(snapshot)) if snapshot else None
+    return run
 
 
 def attempts_with_scores(conn: sqlite3.Connection, run_id: str) -> list[dict]:
