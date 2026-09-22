@@ -69,19 +69,26 @@ Not "shared code". **What nobody may skip.**
 
 ```
 commons/
-├── llm/       the Anthropic client and its mock; the ONLY path to a model
-├── context/   ContextPacket per agent, its builder, the token semaphore
-├── budget/    the cost ceiling, checked before every call
-├── db/        connection, migrations, sqlite-vec, embeddings
-├── config/    flow.yaml, config, profiles
-└── log/       one row per call: agent, tokens in/out, cost, duration, real timestamp
+├── runner/    launches `claude -p`, reads its stream, watches context and budget
+├── db/        connection, migrations, repository, sqlite-vec, the v1 importer
+├── config/    flow.yaml, config, profiles, pricing
+├── log/       one row per call: agent, tokens in/out, cost, duration, real timestamp
+└── search.py  retrieval over the Bible, the outline and the summaries — never prose
 ```
 
-The semaphore lives in `commons/context` and the client in `commons/llm`, which
-is the only way to reach the API. A feature therefore **cannot** send a prompt
-without it being counted, reserved and charged. v1 held its central guarantee
-structurally, through a subagent's tool list; calling the API directly gives that
-up, and routing every call through one module puts a structural guarantee back
+**This tree was wrong until 2026-09-22**, and wrong in the way that matters: it
+listed `llm/` ("the Anthropic client and its mock; the ONLY path to a model"),
+`context/` (the token semaphore) and `budget/` (a ceiling checked before every
+call). None of the three exists. They were the D2 design, and **Annex C deleted
+the premise all three rested on** — there is no client, because there is no key.
+A map of a codebase that no longer matches it is worse than no map, so
+`test_architecture_doc.py` now fails if this tree names a directory that is not
+there.
+
+What replaced the guarantee that paragraph was making: every model call goes
+through `claude -p`, launched by `commons/runner` with an explicit `--allowedTools`
+list, and the agents' authority is their `tools:` front matter. That is the
+structural guarantee v1 had, back again — see §3.2
 where the strongest one was lost.
 
 ### 2.3 Frontend — Feature-Sliced Design
@@ -146,7 +153,8 @@ return text and the orchestrator writes the file.
 5. **FLOW-4**, per chapter:
    - build the writer's packet — **no prior prose, by type**
    - draft
-   - **five critics, in parallel, under the semaphore**
+   - **five critics, in parallel** — how many at once is the orchestrator's
+     estimate, not a reservation (§6.1)
    - `min` of the five scores
    - below 8 → level-1 sheet → attempt 2 → level-2 sheet → attempt 3 →
      `patch_then_halt`
@@ -160,8 +168,9 @@ novel or none.
 
 ### 3.4 Concurrency
 
-- **Within a chapter:** the five critics run in parallel, bounded by the
-  semaphore.
+- **Within a chapter:** the five critics run in parallel. How many fit at once is
+  decided by the orchestrator's `wc -w` estimate before dispatch — an estimate,
+  not a reservation, and §6 says why that is the honest word.
 - **Between chapters:** in series. Chapter *n*'s summary feeds chapter *n+1*, and
   that chain is the only channel between them.
 - **Between runs:** a queue of one.
@@ -556,8 +565,12 @@ where the brief asked for "the list of agents and their skills, the process".
 
 **The 100,000-token ceiling is concurrent, not per call** (§6). The brief said
 "counted before sending, per call"; the requirement is *concurrent*. Five critics
-of 30,000 satisfy a per-call limit and put 150,000 in the air. The mechanism is a
-semaphore, and the per-call limit survives only as a consequence.
+of 30,000 satisfy a per-call limit and put 150,000 in the air.
+
+*Annex B specified a semaphore for this, and Annex C made it unbuildable.* The
+reading survives — concurrency is what the ceiling is about — but the mechanism
+is now an estimate the orchestrator makes before dispatching and a measured stop
+after the fact. §6 and `verification.md` §3.4 say what that costs.
 
 **Spec → plan → code, with human approval written into the file** (D31). States
 live in the artefact, not in a conversation. TDD, with the test seen failing

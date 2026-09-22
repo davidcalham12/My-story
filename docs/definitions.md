@@ -303,15 +303,44 @@ different set of characteristics. Evidence, not sample.
 **Completeness record** — what an imported run did *not* carry: gate rows,
 durations, a critic. Kept per run so a gap reads as a gap rather than as a zero.
 
-**Token semaphore** — the thing that holds the 100,000-token ceiling. It is
-**concurrent**: the limit is on the sum of all model calls in flight at one
-instant, not on each call. A call reserves prompt tokens + `max_tokens`, waits if
-capacity is short, and releases when it finishes. Waiting is normal; a
-reservation larger than the total capacity is `halted: context`.
-
-**Reservation** — what one call takes from the semaphore. Worst case by
-construction, because `max_tokens` bounds a reply nobody can predict.
+**Token semaphore** — *removed by Annex C, and this entry stays to say so.* It
+was to hold the 100,000-token ceiling by reserving prompt tokens + `max_tokens`
+before each call and making a call wait for capacity. **It is not implementable
+here**: Python no longer assembles the prompts, so there is nothing to count in
+advance. Two layers replaced it — an estimate the orchestrator makes with
+`wc -w`, and a measured stop in `watch.py` after the fact. `architecture.md` §6
+has both. A term for a component that does not exist is worse than no term,
+because the next reader looks for the component.
 
 **Projection** — what actually enters a prompt: a view of memory, never memory
-itself. The rolling summary is projected from facts, canon is projected by
-retrieval, and it is the *projection* that counts against the semaphore.
+itself. The rolling summary is projected from facts and canon is projected by
+retrieval. What it counts against is now an estimate rather than a reservation.
+
+---
+
+## 9. Terms Annex D added
+
+**Criticality level** — `critical`, `important` or `incidental`, carried by every
+guarantee. **It fixes the minimum acceptable letter**: critical needs T or A,
+important needs I, incidental takes anything including U. It is where "how much
+does this deserve" gets written down instead of implied.
+
+**Gap** — a named thing the system does not verify, with five fields: what is not
+verified, why it is accepted, the scope of the damage, how we would find out, and
+who reviews it. **A gap that is listed is an engineering decision. A gap that is
+not listed is a defect.** A critical guarantee below its minimum letter opens one
+automatically.
+
+**Decision** — what follows a scored attempt: `accept`, `retry`, `patch` or
+`halt`. Arithmetic in `chapters/domain.py`, not a judgement, and the orchestrator
+asks for it rather than working it out (SPEC-004).
+
+**Conformance** — whether a run's record agrees with the rule the gate is
+supposed to follow, recomputed from the archive after the fact. Four verdicts,
+and the two extra ones carry the weight: `unchecked` (nothing with a score to
+judge — *not* the same as obedient) and `not_applicable` (a `pre-loop003` run,
+judged by a rule that did not exist).
+
+**Unjudgeable** — an attempt with no aggregate. Not conformant, not breached.
+Reading it as a breach is the mirror of reading an absent figure as zero, and the
+conformance audit did exactly that on its first run.

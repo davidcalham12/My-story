@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **270 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **274 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -105,6 +105,7 @@ in CI, at $0.** The suite that carries these:
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_vectors.py` | what retrieval may and may not be used for |
 | `test_verification_doc.py` | this document — that it still refers to things that exist |
+| `test_architecture_doc.py` | `architecture.md`'s map of `commons/` against the real directories |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
 | `test_archive.py` | SPEC-003 — that a finished run's own record reaches the database |
 | `Provenance.test.tsx`, `figures.test.ts` | G12's other half — the grade reaches the screen |
