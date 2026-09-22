@@ -70,6 +70,7 @@ class Live:
     done: bool = False
     result: str = ""
     process: object | None = None
+    seq: int = 0  # the last stream line persisted to `events`; dense per run
 
 
 class RunService:
@@ -138,7 +139,15 @@ class RunService:
 
         try:
             process.start()
-            for event in process.events():
+            for raw, event in process.lines():
+                # The stream is the record (FR-RNR-3). The raw line lands
+                # before anything is derived from it: a crash between this
+                # row and the stage it implies loses the derivation, never the
+                # evidence.
+                live.seq += 1
+                write_repo.append_event(self.conn, live.run_id, seq=live.seq,
+                                        type=str(event.get("type") or "unknown"),
+                                        payload=raw)
                 state = apply(state, event)
                 self._record(live.run_id, state, event)
                 live.events.put({
@@ -179,6 +188,9 @@ class RunService:
         return RunProcess.for_run(
             premise=premise, profile=profile, tone=tone,
             cwd=Path(self.settings.repo_root),
+            # The same figure the BudgetWatcher holds. 6.5 makes the profile
+            # its source; until then it is the settings ceiling.
+            max_budget_usd=self.settings.budget_ceiling_usd,
         )
 
     def _record(self, run_id: str, state: State, event: dict) -> None:

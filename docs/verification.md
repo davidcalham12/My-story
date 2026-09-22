@@ -943,8 +943,10 @@ as a pass.
 **What is not verified:** anything about a run whose process died before
 `_finish` ran.
 **Why accepted:** archiving at completion is what made SPEC-003 testable at all.
-**Scope of damage:** the database has the run's row and nothing else. **The files
-are all still there**, and `archive_run` can be pointed at the directory by hand.
+**Scope of damage:** the database has the run's row, its stage, its calls and —
+since PLAN-007 6.4 — **every stream line it read** in `events`; what it lacks is
+the archive (attempts, scores, sheets). **The files are all still there**, and
+`archive_run` can be pointed at the directory by hand.
 **How we would find out:** a run at `halted: process` with zero attempts.
 **And a restart makes it worse.** SPEC-001 FR-RUN-7 asks that a run left
 `running` be marked `halted: process` when the server starts. **That is not

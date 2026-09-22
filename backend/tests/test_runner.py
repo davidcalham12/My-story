@@ -224,3 +224,38 @@ def test_a_line_that_is_not_json_is_kept_as_skipped_not_silently_dropped(tmp_pat
     events = list(process.events())
     assert [e["type"] for e in events] == ["system", "result"]
     assert process.skipped == ["this is not json"]
+
+
+# ------------------------------------------------------- PLAN-007 6.4
+
+
+def test_argv_carries_max_budget_usd_from_the_ceiling_it_is_given():
+    """FR-BUD-1 / AC-21: the CLI has `--max-budget-usd`; it is the first line of
+    defence and the watcher is the second. Same figure in both, or the two
+    disagree about what the ceiling is."""
+    run = RunProcess.for_run(premise="p", profile="tiny", tone="", cwd=Path("."),
+                             max_budget_usd=12.5)
+    i = run.command.index("--max-budget-usd")
+    assert run.command[i + 1] == "12.5"
+    assert "p" not in run.command, "the prompt is still on stdin"
+
+
+def test_lines_yield_the_raw_line_beside_the_event():
+    """What goes into `events.payload` is the line as written, not a
+    re-serialisation of what this reader understood of it (AC-20)."""
+    process = ReplayProcess(fixture=FIXTURE)
+    process.start()
+    pairs = list(process.lines())
+    assert pairs, "the fixture has lines"
+    for raw, event in pairs:
+        assert isinstance(raw, str) and isinstance(event, dict)
+        assert json.loads(raw) == event
+    assert [e for _, e in pairs] == list(ReplayProcess(fixture=FIXTURE).events())
+
+
+def test_the_watcher_knows_every_agent_file():
+    """The set said 'the nine'. There are ten, and a dispatch to the tenth was
+    'worth noticing rather than assuming' by a set that had never heard of it."""
+    from backend.commons.runner.watch import AGENTS
+    on_disk = {p.stem for p in (Path(__file__).resolve().parents[2] / ".claude" / "agents").glob("*.md")}
+    assert AGENTS == on_disk, sorted(AGENTS ^ on_disk)

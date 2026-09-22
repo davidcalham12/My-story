@@ -94,7 +94,8 @@ class RunProcess:
 
     @classmethod
     def for_run(cls, *, premise: str, profile: str, tone: str, cwd: Path,
-                executable: str = "claude") -> "RunProcess":
+                executable: str = "claude",
+                max_budget_usd: float | None = None) -> "RunProcess":
         command = [
             executable, "-p",
             # stream-json REQUIRES --verbose. Without it the process exits 1 and
@@ -106,6 +107,10 @@ class RunProcess:
             # boundary, and it is a better one.
             "--allowedTools", *ALLOWED_TOOLS,
         ]
+        if max_budget_usd is not None:
+            # The CLI's own ceiling: the first line of defence. The watcher in
+            # watch.py is the second, on the same figure (FR-BUD-1, AC-21).
+            command += ["--max-budget-usd", str(max_budget_usd)]
         return cls(command=command, prompt=build_prompt(premise, profile, tone), cwd=cwd)
 
     def start(self) -> None:
@@ -134,11 +139,13 @@ class RunProcess:
         self._process.stdin.write(self.prompt)
         self._process.stdin.close()
 
-    def events(self) -> Iterator[dict]:
-        """One parsed event per line, as they arrive.
+    def lines(self) -> Iterator[tuple[str, dict]]:
+        """Each line as written, beside its parsed event, as they arrive.
 
-        A line that will not parse is skipped rather than fatal: the stream
-        belongs to someone else and may grow shapes this reader has never seen.
+        The raw line is what `events.payload` stores (FR-RNR-3): the record is
+        the stream, not this reader's understanding of it. A line that will not
+        parse is kept on `skipped` rather than fatal: the stream belongs to
+        someone else and may grow shapes this reader has never seen.
         """
         if self._process is None or self._process.stdout is None:
             raise RuntimeError("start() first")
@@ -147,10 +154,15 @@ class RunProcess:
             if not line:
                 continue
             try:
-                yield json.loads(line)
+                yield line, json.loads(line)
             except json.JSONDecodeError:
                 self.skipped.append(line[:500])
                 continue
+
+    def events(self) -> Iterator[dict]:
+        """One parsed event per line. `lines()` when the raw text matters."""
+        for _, event in self.lines():
+            yield event
 
     def stop(self) -> None:
         """End the process. Used by the budget and context watchers."""
@@ -195,7 +207,7 @@ class ReplayProcess:
     def start(self) -> None:
         return None
 
-    def events(self) -> Iterator[dict]:
+    def lines(self) -> Iterator[tuple[str, dict]]:
         emitted = 0
         for line in self.fixture.read_text(encoding="utf-8").splitlines():
             if self.stopped:
@@ -208,10 +220,14 @@ class ReplayProcess:
             except json.JSONDecodeError:
                 self.skipped.append(line[:500])
                 continue
-            yield event
+            yield line, event
             emitted += 1
             if self._stop_after is not None and emitted >= self._stop_after:
                 return
+
+    def events(self) -> Iterator[dict]:
+        for _, event in self.lines():
+            yield event
 
     def stop(self) -> None:
         self.stopped = True

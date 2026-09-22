@@ -142,7 +142,8 @@ raw line to `events` before fan-out** (AC-20, table from 6.2).
 | `test_runner.py::test_the_prompt_is_on_stdin_and_absent_from_argv` | AC-1, AC-21 (exists as the argv half of G17 — verify) |
 | `test_api.py::test_every_stream_line_is_in_events_before_the_stage_changes` | AC-20 |
 | `test_api.py::test_events_count_equals_recorded_stream_lines` | AC-20 |
-| `test_api.py::test_cost_json_and_conformance_are_utf8_without_bom` | NFR-7 |
+| `test_utf8_everywhere.py::test_every_text_io_call_outside_tests_names_utf8` | NFR-7 |
+| `test_runner.py::test_the_watcher_knows_every_agent_file` | (a stale set found at 6.4) |
 
 **Code.**
 1. `RunProcess.for_run(..., max_budget_usd: float)` appends
@@ -150,9 +151,12 @@ raw line to `events` before fan-out** (AC-20, table from 6.2).
 2. `RunService._execute`: `append_event` is the **first** statement in the loop
    body, before `apply` and before `_record`; `seq` is a per-run counter held on
    `Live`.
-3. `service.py` lines 342 and 369 call `write_text` **without an encoding**
-   (round 1): on Windows that is cp1252. Both get `encoding="utf-8"`; NFR-7 says
-   explicit everywhere.
+3. Round 1 reported two `write_text` calls without an encoding (`service.py`
+   342, 369). **That was wrong**: the grep missed an `encoding=` on the next
+   line. Both name UTF-8. `test_utf8_everywhere.py` now scans every text I/O
+   call outside tests and pins NFR-7, so the claim is a test rather than a grep.
+4. `watch.AGENTS` said "the nine" and lacked `prose-critic`; pinned to the
+   agent files by a test.
 
 **Docs.** `architecture.md` §3.6 *Observation*: the raw stream is persisted, then
 derived. `claude.md` guarantee 2 unchanged (the watchers are unchanged).
@@ -529,8 +533,9 @@ five rounds. **Stopped at round 2.**
 1. 6.1 named five tests "verify exists; add if not" — the inventory showed two
    exist and three do not; named as such.
 2. 6.3 hedged on `config_hash` — it does not exist; the phase builds it.
-3. NFR-7: two `write_text` calls without an encoding (`service.py` 342, 369) —
-   added to 6.4.
+3. NFR-7: two `write_text` calls reported without an encoding — **a false
+   finding**, corrected at 6.4; the scan test that replaced the grep passed on
+   its first run and stays as the pin.
 4. 6.9 hedged on `validate-sheet.mjs` — it holds five; both instruments change,
    and the sheet template is checked.
 5. NFR-5 structured logs — no step, no logger anywhere: declared P-8.

@@ -196,3 +196,21 @@ def test_a_stream_that_ends_without_result_halts_process(client_for):
         run = client.get(f"/api/runs/{run_id}").json()["run"]
     assert run["halted"] == "process"
     assert "result" in run["halted_detail"]
+
+
+# ------------------------------------------------------- PLAN-007 6.4
+
+
+def test_every_stream_line_is_in_events_with_a_dense_seq(client, db):
+    """FR-RNR-3 / AC-20: the stream is the record. Every parsed line of the
+    recording is a row, in order, with the raw line as its payload."""
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    parsed = [l for l in FIXTURE_LINES if l.strip()]
+    rows = db.execute("SELECT seq, type, payload FROM events WHERE run_id = ? ORDER BY seq",
+                      (run_id,)).fetchall()
+    assert len(rows) == len(parsed)
+    assert [r["seq"] for r in rows] == list(range(1, len(parsed) + 1))
+    for r, line in zip(rows, parsed):
+        assert r["payload"] == line.strip()
+        assert r["type"] == json.loads(line).get("type", "unknown")

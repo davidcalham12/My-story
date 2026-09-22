@@ -197,7 +197,10 @@ arrangement rather than a missing feature.
 poll. On connect it receives a `snapshot` built from the database, then live
 events — so a reconnection cannot leave half a state.
 
-**The stream is a view. The database is the record.**
+**The stream is a view. The database is the record** — and since PLAN-007 6.4
+the database holds the stream itself: every line `claude -p` writes lands in
+`events` under a dense `seq` *before* anything is derived from it, so what the
+run is judged by is what it ran, not a reconstruction (SPEC-007 FR-RNR-3).
 
 ---
 

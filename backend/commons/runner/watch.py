@@ -21,11 +21,13 @@ OUTPUT_PATH = re.compile(r"output[/\\]([^/\\]+)[/\\]")
 CHAPTER_FILE = re.compile(r"ch(\d+)\.attempt(\d+)\.md")
 STAGE_HINT = re.compile(r"\bFLOW-[1-6]\b")
 
-# The nine. Anything else dispatched is worth noticing rather than assuming.
+# The ten, pinned to `.claude/agents/*.md` by `test_the_watcher_knows_every_agent_file`.
+# Anything else dispatched is worth noticing rather than assuming. This set said
+# "the nine" for a day after prose-critic existed.
 AGENTS = {
     "worldbuilder", "character-architect", "plot-architect", "chapter-writer",
-    "continuity-critic", "science-critic", "outline-critic", "style-editor",
-    "publisher",
+    "continuity-critic", "science-critic", "outline-critic", "prose-critic",
+    "style-editor", "publisher",
 }
 
 
