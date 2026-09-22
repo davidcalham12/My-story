@@ -565,25 +565,31 @@ before the code exists.
 
 ---
 
-## 8.3 What is built, 2026-09-21
+## 8.3 What is built, 2026-09-22
 
 | phase | state |
 |---|---|
 | 0 — skills | ten installed, each read in full, sources and licences at §7 |
 | 1 — documents | six written; fifteen open decisions closed in a grilling round |
-| 2 — backend on the mock | **done.** A `tiny` novel runs end to end in CI at $0 |
-| 3 — the real engine | written and behind the flag; **not yet run against the API** |
+| 2 — backend | **done.** A novel runs end to end in CI at $0, on a recorded stream |
+| 3 — the real orchestrator | **done, and run for real.** See below |
 | 4 — the panel | six pages, FSD, reading one backend; typecheck and build clean |
 | 5 — retrieval | `sqlite-vec` with the dimension pinned and the limits tested |
-| 6 — the outline audit | at FLOW-3, with its own tests |
+| 6 — the outline audit | at FLOW-3, with its own tests, and it earned its place on the first real run |
 
-93 backend tests, 9 frontend tests, one second, no network and no credential.
+**230 backend tests and 18 frontend tests**, one second, no network and no
+credential.
 
-**What has not happened: a single real model call in v2.** Every figure this
-system has produced so far is graded `estimated`, because the mock counts and
-does not measure. Phase 3's acceptance is a `tiny` run on the real engine with
-its exact cost recorded and compared against v1's $7.45 for the same shape — and
-that needs a credential in the environment, which is the user's to provide.
+**The first real run happened.** `lighthouse-keeper-ledger` — three chapters,
+seven drafts, four feedback sheets, a book, **$18.82 measured** from Claude
+Code's own `result` event, 136 turns, 56 minutes. Against v1's **$7.45** for a
+run of the same shape, judged by two characteristics instead of five and with no
+outline audit. `domain-knowledge.md` §5 has the comparison and why it is not like
+for like.
+
+That sentence used to read *what has not happened is a single real model call in
+v2*, and said the next step needed a credential in the environment. Annex C
+removed the credential from the question entirely.
 
 ### 8.4 Annex C — Claude Code orchestrates, and there is no API key
 
@@ -611,6 +617,22 @@ to a model is the user's Claude Code session.
   `SKILL.md` is covered by real runs, each of which costs the subscription.
 - **No resume.** A dead `claude -p` halts the run; resuming would be a different
   run.
+
+### 8.5 What the first real run cost to fix, 2026-09-22
+
+A finished run is a better reviewer than any reading of the code. Four defects it
+exposed, each with its own spec or commit:
+
+| what | how it was found |
+|---|---|
+| `SKILL.md` taught a gate verdict the database rejects | writing the `SKILL.md` ↔ contract validator §5 had claimed to have |
+| the run finished with an **empty archive** — every gate fact on disk, none in the database | looking at the database after it finished (SPEC-003) |
+| `.gitignore`'s `dist/` was excluding every generated manuscript | listing what was tracked |
+| the after-attempt decision was a paragraph a model applied | applying Annex D's criticality rule, which said G6 was below its minimum (SPEC-004) |
+
+And two things built because the gap table named them: the mechanical prose check
+(SPEC-005) and the canonical-name check, both **script before agent**, both $0,
+both measured over everything that has ever shipped before being believed.
 
 ## 9. Limits
 

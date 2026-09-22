@@ -34,7 +34,15 @@ subscription, which is why the tests replay a recording instead.
 | the vocabulary, mapped from the ontology | `docs/definitions.md` |
 | what eight runs actually showed, with numbers | `docs/domain-knowledge.md` |
 | every guarantee and the evidence behind it | `docs/verification.md` |
+| **what is *not* verified, and why that is a decision** | `docs/verification.md` §3 |
 | the quality gate and how it was arrived at | `specs/loops/LOOP-003/README.md` |
+
+## What one real run cost
+
+`lighthouse-keeper-ledger`: three chapters, seven drafts, four feedback sheets,
+**$18.82 measured** from Claude Code's own `result` — 136 turns, 56 minutes. The
+same shape under v1 cost $7.45, judged by two characteristics instead of five and
+with nothing auditing the outline first.
 
 ## What it does not give you
 
@@ -44,3 +52,10 @@ subscription, which is why the tests replay a recording instead.
 - **One user, one run at a time.** A local tool.
 - **Retrieval is not exhaustive**, which is why the rules and the outline entry
   are always passed whole.
+- **Nobody measures whether the prose is good.** Three mechanical defects are
+  checked by a script; voice, pacing, dialogue and originality are not checked at
+  all, by anything.
+
+Every one of those is a row in `docs/verification.md` §3 with its scope, its
+signal and who reviews it. **A gap that is listed is a decision. A gap that is
+not listed is a defect.**
