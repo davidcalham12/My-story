@@ -1,7 +1,10 @@
 # PLAN-007 — Backend v1: from the approved spec to a tested branch
 
-status: draft
+status: approved
 date: 2026-09-22
+approved_by: David Calderon (dictated in chat, 2026-09-22 — "aprobado"; written by the building session at his request)
+approved_on: 2026-09-22
+approval_note: P-1 resolved as proposed — `tiny` budget 25.0; coherencia-docs INC-020…025 approved with the plan
 implements: SPEC-007-backend-v1 (approved 2026-09-22, commit `16e493b251e3be0878f498a440676aeaeb430302`)
 branch: `backend-v1`, cut from `main` at `92b0cad`
 
@@ -479,7 +482,7 @@ Architecture decisions, the other direction:
 
 | id | gap | level | why | how we would notice |
 |---|---|---|---|---|
-| P-1 | `tiny.json` budget is $5.0 against a measured $18.82; the plan proposes $25.0 but cannot change a protected value | important | `AGENTS.md` §6; the figure is the user's at Paso 8 | the real tiny run halts on budget at chapter 1 |
+| P-1 | `tiny.json` budget was $5.0 against a measured $18.82 | **resolved at approval**: 25.0, written at 6.5 | `AGENTS.md` §6; the figure is the owner's and was given with the approval | the real tiny run's cost against 25.0 |
 | P-2 | Whether `--max-budget-usd` binds under a subscription is unknown | incidental | no way to learn it at $0; the watcher is the second line either way | the real run's `result` and the flag's behaviour, recorded in Part 6 |
 | P-3 | `search` built and unwired | important | Q5; its own spec | `verification.md` §3.15 |
 | P-4 | The outline audit stays a model, D | important | Q4 | `verification.md` G11 / §3.2 |
