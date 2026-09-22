@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **211 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **230 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -100,6 +100,7 @@ in CI, at $0.** The suite that carries these:
 | `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
+| `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_end_to_end.py` | all of them, in a whole run, including the halt |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
@@ -710,8 +711,13 @@ reliability and cost at the same time, so each one is recorded here.
 | critics' arithmetic findings | believed | recomputed |
 | **mechanical prose defects** | **nothing, and three shipped** | **`check_prose`, before promotion (SPEC-005)** |
 
-**Next candidates:** counting the summary's facts; detecting a `##` at the start
-of a paragraph; checking canonical names.
+| a heading glued to the previous line | nothing, and it is in every v1 book | `check_prose` (SPEC-005) |
+| a name one letter off the Bible's | `continuity`, which reads for contradiction, not for typos | `names.check`, folded into the same script |
+
+**Next candidate:** counting the summary's facts. The other two on this list are
+done — and the name check, **measured over nine books and 32 chapters, has never
+fired.** That is written down rather than quietly deleted: it cost nothing, and
+the alternative was believing the defect was out there because it sounded likely.
 
 **Standing rule, also in `AGENTS.md` §5:** before proposing an agent for a task,
 say why a script will not do. If one will, it is a script.

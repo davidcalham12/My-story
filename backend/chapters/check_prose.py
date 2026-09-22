@@ -1,6 +1,9 @@
 """The mechanical prose check, as a script the orchestrator runs. SPEC-005.
 
-    python -m backend.chapters.check_prose output/<slug>/chapters/ch01.md
+    python -m backend.chapters.check_prose \n      output/<slug>/chapters/ch01.md [output/<slug>/bible/characters.md]
+
+With the Bible's character file as a second argument it also checks canonical
+names — a name one letter from one the Bible declares.
 
 Prints a JSON report and exits 0 whether or not it found anything. **It reports;
 it does not gate.** The five characteristics are fixed by `AGENTS.md` §6 and a
@@ -17,12 +20,13 @@ import json
 import sys
 from pathlib import Path
 
+from backend.chapters.names import check as check_names
 from backend.chapters.prose import report
 
 
 def main(argv: list[str]) -> int:
-    if len(argv) != 2:
-        print(f"usage: {argv[0]} <chapter.md>", file=sys.stderr)
+    if len(argv) not in (2, 3):
+        print(f"usage: {argv[0]} <chapter.md> [characters.md]", file=sys.stderr)
         return 2
     path = Path(argv[1])
     if not path.is_file():
@@ -30,7 +34,28 @@ def main(argv: list[str]) -> int:
         # the absent-read-as-zero mistake in its most expensive form.
         print(f"check_prose: no such file: {path}", file=sys.stderr)
         return 2
-    print(json.dumps(report(path.read_text(encoding="utf-8")), indent=2))
+    draft = path.read_text(encoding="utf-8")
+    result = report(draft)
+
+    if len(argv) == 3:
+        bible = Path(argv[2])
+        if not bible.is_file():
+            print(f"check_prose: no such file: {bible}", file=sys.stderr)
+            return 2
+        suspects = check_names(draft, bible.read_text(encoding="utf-8"))
+        result["defects"].extend({
+            "kind": "name-one-letter-out", "quote": s.written, "claim": str(s),
+        } for s in suspects)
+        result["checked"].append("name-one-letter-out")
+        if suspects:
+            result["verdict"] = "defects"
+    else:
+        # Not checked is not clean. Without the Bible there is nothing to compare
+        # a name against, and the report says so rather than staying quiet.
+        result["not_checked"].append(
+            "canonical names — no characters.md was given to compare against")
+
+    print(json.dumps(result, indent=2))
     return 0
 
 
