@@ -1,3 +1,11 @@
+---
+title: NovaForge — Verification
+version: 2
+status: draft
+last_reviewed: 2026-09-22
+applies_to: SPEC-001 (backend v1), the built backend, and the current orchestrator (SKILL.md, LOOP-003)
+---
+
 # Verification
 
 > **Designing solutions with AI is an exercise in BEST EFFORT. The skill of a
@@ -15,6 +23,13 @@ The brief already said *what cannot be measured is reported as unmeasurable,
 never as zero*. This generalises it: **what is not verified is written down,
 never omitted.** §3 is the most important section here, and it is the one
 documents like this usually leave out.
+
+**Version 2 is a merge.** Two documents existed on 2026-09-22: one written
+against SPEC-001 before the backend was built, and one grown alongside the build
+and two real runs. They are unioned here. Where both classified the same
+guarantee and disagreed, **the lower letter that is true of the built system
+stands** — a merge never raises a letter — and §8 lists every row where the
+spec-side document claimed more than the code can show, so a person can decide.
 
 ---
 
@@ -40,6 +55,9 @@ letter**:
 | **important** | if it breaks, the result visibly worsens | **I** |
 | **incidental** | if it breaks, it is fixed later without damage | anything, **U** included |
 
+*The spec-side document called the third level "accessory". `definitions.md` §9
+says `incidental`, and definitions win on vocabulary; the two mean the same.*
+
 **Not everything deserves the same effort.** Knowing what to care about is half
 the work, and the level column is where that decision gets written down instead
 of implied.
@@ -53,7 +71,7 @@ with the reason attached — two have, and they say so.
 
 | # | promise | level | letter | minimum met? |
 |---|---|---|---|---|
-| G1 | the writer never receives a previous chapter's prose | **critical** | **A** | yes |
+| G1 | the writer never receives a previous chapter's prose | **critical** | **A** + **T** | yes — but see §3.17 |
 | G2 | the 100,000-token ceiling | important | **I** + **T** | yes |
 | G3 | six characteristics, all at 8 or above | important | **T** / **D** | yes |
 | G4 | `outline` scores 10 − 3·missing − 1·out-of-order | important | **T** / **D** | yes |
@@ -61,7 +79,7 @@ with the reason attached — two have, and they say so.
 | G6 | a failed chapter does not enter the book | **critical** | **T** for the rule, **D** for obeying it | **partly → §3.1** |
 | G7 | the writer changes only what was cited | important | **T** / **D** | yes |
 | G8 | a malformed verdict is excluded, never counted as a pass | **critical** | **T** | yes |
-| G9 | only two agents write the Story Bible | **critical** | **A** | yes |
+| G9 | only two agents write the Story Bible | **critical** | **A** + **T** | yes |
 | G10 | the manuscript is assembled in code | important | **A** | yes |
 | G11 | the outline is audited against `## Rules` before FLOW-4 | important | **D** | **no → §3.2** |
 | G12 | every figure carries its provenance | important | **T** + **A** | yes |
@@ -69,7 +87,11 @@ with the reason attached — two have, and they say so.
 | G14 | a run stops when it reaches its budget | **critical** | **T** | yes |
 | G15 | no agent declares a genre | incidental | **A** | yes |
 | G16 | no prompt asks a quantity without saying how to decide it | incidental | **I** | yes |
-| G17 | there is no credential to leak | **critical** | **A** | yes |
+| G17 | there is no credential to leak; nothing reaches a subprocess through argv | **critical** | **A** + **T** | yes |
+| G18 | the pipeline has one implementation, `SKILL.md`; the backend re-implements no stage | important | **A** + **I** | yes |
+| G19 | state is persisted as the stream reveals it, not at the end | important | **T** for stage and calls; **not held** for the gate record | **partly → §3.14** |
+| G20 | a feedback sheet is complete and never quotes a previous chapter | important | **T** for the validator, **I** for its being run | yes |
+| G21 | LOOP-003 §8.3's prohibitions hold: the threshold is 8, the attempts are three, the characteristics are the listed ones | incidental | **T** | yes |
 
 **Three rows failed their own minimum** when the criterion was first applied, and
 that is how they were found — not by a reader. They were neither deleted nor
@@ -150,6 +172,11 @@ into reading.**
 previous chapter's prose. It is a judgement about text and nothing here renders
 it.
 
+**Asserted from the file, not observed at runtime — §3.17.** The stream Claude
+Code emits does not show a subagent's individual tool calls. So the guarantee is
+that the *file* says `Glob`; that Claude Code honours it is a property of the
+CLI, and if it ever stopped, nothing here would see it from the stream.
+
 **Also held here:** retrieval. `commons/search` runs in the *orchestrator*
 through `Bash(python *)`, and only the Bible, the outline and the summaries are
 indexed. Indexing chapter prose would be this guarantee's leak arriving through
@@ -189,7 +216,7 @@ report zero, so layer 2 is armed and unexercised on the thing it exists for).
 
 **Important · Class T** for the arithmetic, **D** for the whole.
 
-**Method.** `min` over five scores against a threshold read from config, in
+**Method.** `min` over six scores against a threshold read from config, in
 `chapters/domain.py`, which imports only the standard library and is tested
 directly with no database, model or HTTP.
 
@@ -546,13 +573,90 @@ pasted into a chat.**
 returns only the comments saying they are absent. `pyproject.toml` has no
 Anthropic dependency.
 
-**What still applies.** Anything reaching a subprocess goes on **stdin**, never
-in argv: in v1 a task was passed as a command-line argument with `shell=True` on
-Windows, which was command injection and shipped for about an hour.
-`test_runner.py` asserts a hostile premise appears in the prompt and in no
-element of the command.
+**What still applies, and is T.** Anything reaching a subprocess goes on
+**stdin**, never in argv: in v1 a task was passed as a command-line argument with
+`shell=True` on Windows, which was command injection and shipped for about an
+hour. `test_runner.py` asserts a hostile premise appears in the prompt and in no
+element of the command, and that `shell` is never true.
+
+**What the spec-side document claimed and the built system has no surface for.**
+SPEC-001 requires every file-backed read endpoint to reject `..`, absolute paths
+and symlinks outside `output/<slug>/`, with a property test. **The built backend
+has no file-backed read endpoints** — four routes, all reading the database — so
+the guarantee is true by absence. That is a conditional invariant of exactly the
+kind §3 warns about: it stops being true the day the first such endpoint is
+added, and it is written here so that day is noticed.
 
 ---
+
+### G18 — The pipeline has one implementation, and the backend re-implements no stage
+
+**Important · Class A + I.**
+
+**Method.** `SKILL.md` is the procedure; Python launches it, watches it and
+archives what it wrote. `backend/` holds no prompt files and no stage logic — the
+stages are read from `flow.yaml` to *validate* the skill, never to execute
+anything. `test_skill_contract.py` asserts the skill runs exactly the stages the
+contract declares, which is the half of this a test can reach.
+
+**Evidence.** The absence of a prompt directory and of any stage code under
+`backend/`, checkable by reading; a reviewer, at each change.
+
+**Why it matters.** Two implementations of one pipeline disagree within a month,
+and the one that runs is not always the one that was reviewed.
+
+### G19 — State is persisted as the stream reveals it, not at the end
+
+**Important · Class T** for the stage, the slug and the `calls` rows, written on
+every event; **not held** for the gate record, which is archived when the run
+ends.
+
+**Method.** `runs/service.py::_record` writes after every stream event, and
+`test_api.py` asserts the SSE snapshot is built from the database, not from
+memory. But attempts, scores, findings and sheets reach the database through
+`archive_run`, at completion — so **a run that dies mid-flight leaves its stage
+and its calls and none of its gate record.** That is §3.14, and it is the
+difference between this row and the one the spec-side document wrote.
+
+**What the spec asked for and the built system does not have.** An `events` table
+holding every raw stream line under a sequence number, and `Last-Event-ID` resume
+over it. Neither exists. A reconnecting client receives a fresh snapshot from the
+database — a different mitigation with a different guarantee, and it is the one
+that is tested.
+
+### G20 — A feedback sheet is complete and never quotes a previous chapter
+
+**Important · Class T** for the validator, **I** for its being run before every
+send.
+
+**Method.** `validate-sheet` refuses a sheet missing a score, missing a finding
+field, carrying an unfilled template slot, quoting a previous chapter, or reaching
+attempt 3 without a literal replacement. Its `--self-test` runs in CI
+(`test_instruments.py`). Whether the orchestrator runs it before every send is a
+procedure in `SKILL.md`, which is §3.12's limit.
+
+**Evidence.** The self-test, in CI; the `sheets.validated` column, which the
+archive fills from the fact that the sheet reached the writer at all.
+
+### G21 — LOOP-003 §8.3's prohibitions hold
+
+**Incidental · Class T.**
+
+**Method.** `test_skill_contract.py` pins the threshold at 8 against the config,
+the attempts at three against the config's two revisions, the characteristic list
+across `flow.yaml`, the config and `domain.py`, and `on_fail` at
+`patch_then_halt` in all three. `test_formulas_agree.py` pins the gate constants
+to one home in Python. Changing any of them without a spec turns CI red.
+
+**Why incidental.** Breaking one of these is caught before anything runs. The
+damage would be a wrong gate, which is visible; the row exists because
+`AGENTS.md` §6 lists them as untouchable, and a rule that is only a rule is a
+reminder.
+
+**Note, SPEC-001 §12.** The pin on the characteristic *list* is Python-side.
+`measure.mjs` — the LOOP-003 instrument CI self-tests — knows five
+characteristics and does not see `prose`; that is a declared gap in SPEC-001,
+not a guarantee this row makes.
 
 ## 3. Known gaps and accepted risks
 
@@ -840,7 +944,12 @@ as a pass.
 **Scope of damage:** the database has the run's row and nothing else. **The files
 are all still there**, and `archive_run` can be pointed at the directory by hand.
 **How we would find out:** a run at `halted: process` with zero attempts.
-**Reviewed by:** nobody routinely. It is a recovery, not a loss.
+**And a restart makes it worse.** SPEC-001 FR-RUN-7 asks that a run left
+`running` be marked `halted: process` when the server starts. **That is not
+built.** A server restarted mid-run leaves the row `running` forever, and the
+panel shows a run that is still going.
+**Reviewed by:** nobody routinely. It is a recovery, not a loss — except the
+restart case, which is a lie the panel tells until someone notices.
 
 ### 3.15 Two memory layers are built, tested, and not running
 
@@ -883,6 +992,38 @@ because absent by decision is not the same as forgotten.
 
 ---
 
+### 3.17 The writer's isolation is asserted from a file, not observed at runtime
+
+**What is not verified:** that Claude Code actually denies `chapter-writer` every
+tool but `Glob` during a run. The stream does not show a subagent's individual
+tool calls, so the guarantee is that the *agent file* says `Glob` — G1 pins that
+file with a test — and that the CLI honours it.
+**Why accepted:** there is no runtime signal to read. `--allowedTools` and the
+`tools:` line are the only structural controls this arrangement offers, and they
+are the strongest thing the project has.
+**Scope of damage:** the project's central claim. If the CLI ever ignored
+`tools:`, prior prose would be reachable and **nothing here would see it from
+the stream**.
+**How we would find out:** any change to an agent file fails CI; a manual read of
+one run's transcript, on every CLI upgrade, is the only check on the runtime.
+**Reviewed by:** whoever upgrades the `claude` CLI, and nobody between upgrades.
+
+### 3.18 Repairing one characteristic can break another
+
+**What is not verified:** that a fix to one characteristic leaves the others
+where they were.
+**Why accepted:** the gate's design — five independent judges over one text —
+makes it possible by construction, and preventing it would need a loop of its own.
+**Scope of damage:** extra attempts, and occasionally `patch_then_halt`.
+**Recorded twice**, in the halted v1 run, where a `science` repair took `outline`
+from 10 to 7 and `science` itself from 5 to 4. A third case on v2's first run
+looked identical in the score column and was not: the critique notes showed a
+rule ambiguity closed in canon, with no prose changed. **A score series is not a
+finding**; only the notes tell the two apart.
+**How we would find out:** `gate_decisions` score deltas between attempts; the
+critiques' `note` fields.
+**Reviewed by:** LOOP-003, per run. A LOOP-004 candidate.
+
 ## 4. Code before agent
 
 **When a check can be done by a script, it is done by a script.** An agent judges
@@ -905,8 +1046,10 @@ reliability and cost at the same time, so each one is recorded here.
 
 | a heading glued to the previous line | nothing, and it is in every v1 book | `check_prose` (SPEC-005) |
 | a name one letter off the Bible's | `continuity`, which reads for contradiction, not for typos | `names.check`, folded into the same script |
+| the run's cost | estimated from the subagents' tokens — $6.21 against $49.33 | read from Claude Code's own `result`; exact |
 
-**Next candidate:** counting the summary's facts. The other two on this list are
+**Next candidate:** counting the summary's facts — the one of the spec-side
+document's three candidates not yet built. The other two on this list are
 done — and the name check, **measured over nine books and 32 chapters, has never
 fired.** That is written down rather than quietly deleted: it cost nothing, and
 the alternative was believing the defect was out there because it sounded likely.
@@ -938,7 +1081,10 @@ step, and that is the sentence worth writing for each one.
 | `test_api_contract.py` | the panel and the backend describing the same JSON differently, each passing its own checks |
 | `test_formulas_agree.py` | a chapter being scored by one copy of a formula and judged by another |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |
-| `check_prose` | a sentence the gate cannot see appearing twice in a chapter that passed |
+| `check_prose` | a sentence the gate cannot see appearing twice in a chapter that passed — and, at FLOW-6, twice in a book |
+| `ContextWatcher` | a subagent packet above 100,000 tokens reaching the next call — **armed and never fired**, because the packets report zero (§3.5) |
+| stdin-only task passing | argv injection reaching the shell — recorded, ~1 h in production, in v1 |
+| the import normaliser | an unknown critique shape becoming a blank screen — recorded in v1; it becomes a `run_completeness` gap instead |
 
 **The last row was an aspiration until it was written, and it caught something on
 its first run.** `SKILL.md` told the orchestrator that a verdict is `accept`,
@@ -955,7 +1101,80 @@ a validator is: not a check, a thing that makes the reading happen.
 
 ---
 
-## 6. What changed since the last version
+## 6. Failure modes
+
+Per component: what fails, its likely cause, how it is detected, what it does,
+what mitigates it — and **the letter the mitigation has actually earned in the
+built system**, which is not always the letter the spec assumed it would.
+
+| # | failure | cause | detection | effect | mitigation | letter |
+|---|---|---|---|---|---|---|
+| F1 | `claude` not on PATH or not signed in | environment | `/health` reports `claude_on_path` | the run never starts | preflight in `/health`; no retry loop | **T** (`test_api.py`) |
+| F2 | a malformed stream line | CLI change, partial write | `JSONDecodeError` | one event lost | logged and skipped in `runner/process.py`; the run continues | **A** — handled in code, no test injects one |
+| F3 | the process ends without a `result` | crash, kill, network | EOF before `result` | no cost, incomplete run | `halted: process`; everything persisted stays readable | **A** — handled in `service.py`, no test drives it |
+| F4 | the slug is never learned | the skill wrote elsewhere | no `output/<slug>/` path in the stream | artefacts unlinked from the run | the fallback slug from the premise, set at creation | **A** — the spec's `output/` scan and `slug_source = inferred` flag are **not built** |
+| F5 | the context watcher trips on healthy runs | orchestrator turns run at 147k–642k tokens | it would have halted every run | wasted runs | halts only on *subagent* packets; calibrated on two recorded streams | **T** (`test_runner.py`) |
+| F6 | the budget is exceeded | a long run, retries | summed cost crosses the ceiling | overspend | `BudgetWatcher` halts; overshoot bounded by one call (§3.4) | **T** |
+| F7 | SQLite is locked | three critics writing at once | `database is locked` | lost rows | one connection, `check_same_thread=False`, a lock | **A** — no test provokes contention |
+| F8 | `sqlite-vec` fails to load | Windows build, path | extension load error | no retrieval | `search` prints *retrieval unavailable* and exits distinctly; the critics receive whole inputs — which they do today regardless (§3.15) | **A** |
+| F9 | the embedding model is unavailable | offline, blocked download | import error | as F8 | as F8 | **A** |
+| F10 | an unknown critique shape on import | a run wrote its own | the normaliser finds no iterations | data loss | recorded as a `run_completeness` gap, never dropped; STRICT tables refused a string `iteration` on the first import | **T** (`test_import.py`) |
+| F11 | path traversal on a read endpoint | crafted path | — | file disclosure | **not applicable: the backend has no file-backed read endpoints.** A conditional invariant (G17); the day one is added, this row needs a test | **A** by absence |
+| F12 | command injection | a task in argv with a shell | `test_runner.py` | arbitrary command | no shell, explicit argv, prompt on stdin | **T** |
+| F13 | BOM or mojibake in an agent file | PowerShell defaults | — | corrupted prompts | **unmitigated.** No check for a BOM exists anywhere | **U** |
+| F14 | `SKILL.md` diverges from `flow.yaml` | an edit in one place | `test_skill_contract.py` | the gate rules differ from the contract | CI fails naming the lines — and it did, on its first run | **T** |
+| F15 | a run orphaned by a server restart | restart | — | a row `running` forever; the panel shows a run still going | **unmitigated.** SPEC-001 FR-RUN-7 is not built (§3.14) | **U** |
+| F16 | the SSE client disconnects | network | connection drop | missed events | a reconnect receives a fresh snapshot from the database | **T** for the snapshot; `Last-Event-ID` resume is **not built** |
+| F17 | an impossible beat reaches FLOW-4 | outline contradicts `## Rules` | recorded: v1 stress ch3 beat 7 | `patch_then_halt`, run dies | the outline audit, a model, before FLOW-4 | **D** (§3.2) |
+| F18 | two critics disagree about one passage | model variance | scores far apart | wrong fix or wrong halt | the orchestrator's arbitration; `late_findings` | **D** (§3.8) |
+| F19 | a self-reported number used in a decision | convenience | code review | wrong gate outcome | no self-declaration enters a decision; `reported` provenance | **A** (§3.7) |
+| F20 | prompt growth across chapters | feedback accumulating | `calls.input_tokens` per chapter not flat | the thesis broken silently | **cannot be detected today**: the per-agent packets report zero (§3.5). The spec's alert waits on the stream | **U** |
+
+Three of twenty are **U** and two of those are unmitigated. They are here because
+the spec-side document marked all twenty **T** before any of it was built, and a
+table of twenty T's is what a reader believes.
+
+## 7. Mapping to the methodology catalogue
+
+Which of the catalogue's methods this project uses — **as built**, not as
+planned — and which it does not, with why.
+
+### 7.1 Artefact level (code)
+
+| method | used? | how, here |
+|---|---|---|
+| type checking | **frontend yes, backend no** | `tsc --strict` in CI; Python is annotated but no `mypy` runs |
+| static analysis / SAST | no | no `ruff`, no `bandit` configured. The spec-side document said both were in use; neither was |
+| symbolic execution | no | disproportionate |
+| formal verification | no | disproportionate |
+| unit and integration testing | yes | 441 backend tests and 19 frontend, over a recorded stream, at $0, on every push |
+| property-based testing | **no library** | where the space is small it is enumerated instead: every aggregate at every attempt for `decide` (63 cases), every coefficient combination for the prose formula (64) |
+| mutation testing | no | not yet |
+| contract testing | yes | `test_api_contract.py` (backend payload ↔ panel types), `test_skill_contract.py` (procedure ↔ contract), `test_formulas_agree.py` (formula ↔ code) |
+
+### 7.2 Process level (agents)
+
+| method | used? | how, here |
+|---|---|---|
+| runtime observability | **partly** | one `calls` row per subagent dispatch; the whole run's cost from `result`, measured. Per-agent token usage is **absent** — the stream reports zero (§3.5). No Langfuse |
+| evals | narrow | LOOP-003's `measure --self-test` over a committed run, in CI |
+| sandboxed execution | partial | `--allowedTools`, no shell, each agent's `tools:` line — **asserted from files, not observed at runtime** (§3.17) |
+| guardrails | yes | the gate, `decide`, `promote`, both watchers, `validate-sheet`, the four `check_*` instruments |
+| human-in-the-loop | yes | spec and plan approval written into file headers; every **I** row |
+| multi-agent verification | yes | four model critics over one draft, and an orchestrator that has overruled them on arithmetic |
+| CI/CD gates | yes | three jobs: backend, frontend, instruments |
+| progressive rollout | no | one user, one machine |
+| red-teaming | small | a hostile premise against argv injection; a stress profile built to force `patch_then_halt` |
+| model checking | no | the run state machine is small enough to enumerate |
+
+## 8. History
+
+| version | date | what changed |
+|---|---|---|
+| 2 | 2026-09-22 | **Merged.** The spec-side v1 (18 guarantees, 10 gaps, 20 failure modes) unioned with the build-side document (17 guarantees, 16 gaps). Added G18–G21, §3.17, §3.18, §6 failure modes, §7 catalogue, this header. **No letter was raised.** Kept lower where the two disagreed: v1 G4 "T" → **D for obedience** (disobeyed twice on a real run); v1 G9 "T" → **A** (the byte-for-byte fixture test does not exist); v1 G10 "T" → **D** (the `outline_audit` CLI was never built; the audit is a model); v1 G18 "T" → **split** (no `events` table; the gate record is archived at the end); v1 G16's path property test → **not applicable** (no file-backed endpoints). §7 rewritten to what runs: no `mypy`, `ruff`, `bandit` or `hypothesis`. **Candidates for a person to raise**, with their evidence: G1 and G9 also have tests (`test_agents_frontmatter.py`); G17's argv half has one (`test_runner.py`). |
+| 1 | 2026-09-22 | the spec-side draft: 18 guarantees, 10 gaps, 20 failure modes, catalogue mapping; and, separately, the build-side document that grew with SPEC-001…006 and two real runs |
+
+### 8.1 What changed on the build side, before the merge
 
 - **Annex D.** The epigraph, the criticality level on every row, §3, §4 and §5.
   The document had the mechanics and not the criterion. Applying the criterion
@@ -998,7 +1217,7 @@ a validator is: not a check, a thing that makes the reading happen.
 
 ---
 
-## 7. What is not verified at all
+## 9. What is not verified at all
 
 Listed apart from §3 because these have no remedy to schedule — they are the edge
 of what this arrangement can know. A document covering only what it verifies
@@ -1008,7 +1227,7 @@ reads as complete.
 |---|---|---|
 | the prose is any good | **U** | §3.9 |
 | voice, pacing, dialogue, originality hold | **U** | four of the ontology's ten dimensions, unchecked |
-| repairing one characteristic does not break another | **U** | confirmed twice. A third case on v2's first run turned out, on reading the critique notes, to be a rule ambiguity surfaced by a sharper prompt and closed in canon — the score column alone could not tell the two apart |
+| repairing one characteristic does not break another | **U** | §3.18 — confirmed twice; a third case looked identical in the score column and was a rule ambiguity closed in canon |
 | the book is worth reading | **U** | the ontology puts a human at this gate and is right to |
 | chapter 34 reads like chapter 1 | **U** | and now for a better reason: **there is data and it does not settle it.** On the eight-chapter run, chapters 3–8 all failed their first attempt on `continuity` and chapters 1–2 did not; the three-chapter run scored its *last* chapter best. `domain-knowledge.md` §3.3b |
 | the feedback sheet's wording matters | **U** | the loop's premise. One chapter has reached attempt 3; there is almost no signal |

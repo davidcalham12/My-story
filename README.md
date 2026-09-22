@@ -10,7 +10,7 @@ That is **structural** — `chapter-writer` holds `tools: Glob`, which returns
 paths and cannot return contents, so prior prose is unreachable rather than
 merely unpassed. **Whether the resulting book holds together over thirty-four
 chapters is not established**: the longest run is eight, and the two runs that
-exist disagree about whether later chapters get harder. `docs/verification.md` §7
+exist disagree about whether later chapters get harder. `docs/verification.md` §9
 and `docs/domain-knowledge.md` §3.3b.
 
 ## Running it

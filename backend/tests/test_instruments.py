@@ -1,7 +1,7 @@
 """LOOP-003's instruments, run rather than trusted.
 
 Both ship with `--self-test` and neither ran anywhere automatic.
-`verification.md` §3.10 named them as a signal we would notice a broken
+`verification.md` §3.12 named them as a signal we would notice a broken
 procedure by — a signal nobody was reading.
 
 `validate-sheet` is the one that matters most: it decides whether a feedback
