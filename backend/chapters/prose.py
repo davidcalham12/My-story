@@ -117,10 +117,22 @@ def find(draft: str) -> list[Defect]:
             "of a sentence",
         ))
 
+    # Every sentence already reported as a duplicate. A paragraph that opens with
+    # one is the SAME fault seen from a second angle, and reporting it twice
+    # charges the chapter six points for one defect — which is exactly what the
+    # critic is told not to do, so the script must not do it either. The
+    # duplicate is the stronger and more specific finding, so it is the one that
+    # stands.
+    duplicated = {_normalise(d.quote) for d in defects
+                  if d.kind == "duplicate-sentence"}
+
     openings: dict[str, str] = {}
     for para in re.split(r"\n\s*\n", text):
         words = _normalise(para).split()
         if len(words) < ECHO_WORDS * 2:
+            continue
+        opening = _sentences(para)
+        if opening and _normalise(opening[0]) in duplicated:
             continue
         key = " ".join(words[:ECHO_WORDS])
         if key in openings:

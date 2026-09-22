@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **325 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **332 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -817,6 +817,7 @@ reliability and cost at the same time, so each one is recorded here.
 | **what happens after an attempt** | **a paragraph the orchestrator applied** | **`decide()`, a script it runs and obeys (SPEC-004)** |
 | critics' arithmetic findings | believed | recomputed |
 | **mechanical prose defects** | **nothing, and three shipped** | **`check_prose`, before promotion (SPEC-005)** |
+| the `prose` score | three numbers copied by hand into a formula | `score_prose`, which runs the mechanical check itself |
 
 | a heading glued to the previous line | nothing, and it is in every v1 book | `check_prose` (SPEC-005) |
 | a name one letter off the Bible's | `continuity`, which reads for contradiction, not for typos | `names.check`, folded into the same script |

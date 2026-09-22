@@ -11,6 +11,7 @@ and the last one is the measurement it produced.
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -76,9 +77,17 @@ def test_a_heading_after_a_blank_line_is_not():
 
 
 def test_two_paragraphs_opening_the_same_way_are_caught():
-    para = ("The tide came in over the causeway again that evening, slow and "
-            "grey and entirely without hurry, as it always had.")
-    assert "echoed-opening" in kinds(f"# Chapter 1 — A\n\n{para}\n\n{para}\n")
+    """They have to *diverge*.
+
+    This fixture used to be the same paragraph twice, which is a duplicated
+    sentence — a different and stronger finding. It passed for the wrong reason
+    until the double-charge rule below made the difference visible.
+    """
+    first = ("The tide came in over the causeway again that evening, slow and "
+             "grey and entirely without hurry.")
+    second = ("The tide came in over the causeway again that morning, and she "
+              "counted the steps on the way down.")
+    assert "echoed-opening" in kinds(f"# Chapter 1 — A\n\n{first}\n\n{second}\n")
 
 
 def test_the_report_says_what_it_did_not_look_for():
@@ -144,3 +153,87 @@ def test_no_chapter_that_passed_the_gate_repeats_a_sentence(slug):
     nothing that has shipped since carries one.
     """
     assert "duplicate-sentence" not in kinds(dict(books())[slug]), slug
+
+
+# --------------------------------------------- scoring, as a script
+
+def score(chapter: Path, payload: str, bible: Path | None = None):
+    import subprocess, sys
+    args = [sys.executable, "-m", "backend.chapters.score_prose", str(chapter)]
+    if bible:
+        args.append(str(bible))
+    return subprocess.run(args, input=payload, capture_output=True, text=True,
+                          cwd=ROOT)
+
+
+def test_the_score_is_computed_by_the_script_not_the_orchestrator(tmp_path):
+    """SPEC-006 left three numbers to be copied by hand into a formula, at the
+    moment a chapter's fate is decided. `AGENTS.md` §5: if a script will do."""
+    chapter = tmp_path / "ch01.md"
+    chapter.write_text(CLEAN, encoding="utf-8")
+    result = score(chapter, '{"major": 2, "minor": 3}')
+    assert result.returncode == 0, result.stderr
+    out = json.loads(result.stdout)
+    assert out["mechanical"] == 0
+    assert out["score"] == 10 - 2 * 2 - 3
+    assert "10 − 3×0 − 2×2 − 1×3 = 3" in out["why"]
+
+
+def test_the_mechanical_count_comes_from_the_script_not_from_the_caller(tmp_path):
+    """The caller cannot inflate or hide it: it is not an input."""
+    chapter = tmp_path / "ch01.md"
+    chapter.write_text(
+        CLEAN + "\nThe water went off the causeway at twenty past two and Ada went down behind it.\n",
+        encoding="utf-8")
+    out = json.loads(score(chapter, '{"major": 0, "minor": 0, "mechanical": 99}').stdout)
+    assert out["mechanical"] == 1
+    assert out["score"] == 7
+    assert out["mechanical_defects"][0]["quote"]
+
+
+def test_the_score_floors_at_zero_and_says_so(tmp_path):
+    chapter = tmp_path / "ch01.md"
+    chapter.write_text(CLEAN, encoding="utf-8")
+    out = json.loads(score(chapter, '{"major": 9, "minor": 9}').stdout)
+    assert out["score"] == 0
+    assert "floored" in out["why"]
+
+
+def test_unreadable_counts_are_refused_rather_than_guessed(tmp_path):
+    """A scoring script that guesses produces a number nothing stands behind,
+    and the orchestrator would use it."""
+    chapter = tmp_path / "ch01.md"
+    chapter.write_text(CLEAN, encoding="utf-8")
+    result = score(chapter, "two majors")
+    assert result.returncode != 0
+    assert "score" not in result.stdout
+
+
+def test_negative_counts_are_refused(tmp_path):
+    chapter = tmp_path / "ch01.md"
+    chapter.write_text(CLEAN, encoding="utf-8")
+    assert score(chapter, '{"major": -1, "minor": 0}').returncode != 0
+
+
+def test_one_fault_is_not_charged_twice(tmp_path):
+    """A repeated paragraph is a duplicate sentence AND an echoed opening.
+
+    Reported as both it costs six points for one fault — exactly what the critic
+    is told not to do, so the script must not do it either. The duplicate is the
+    stronger and more specific finding, so it is the one that stands.
+    """
+    para = "The water went off the causeway at twenty past two and Ada went down behind it."
+    draft = f"# Chapter 1 — A\n\n{para}\n\n{para}\n"
+    found = [d.kind for d in find(draft)]
+    assert found.count("duplicate-sentence") == 1
+    assert "echoed-opening" not in found
+
+
+def test_a_genuine_echo_is_still_caught(tmp_path):
+    """Suppression must be narrow: two paragraphs that open alike and then
+    diverge are a real finding and not a duplicate."""
+    a = ("The tide came in over the causeway again that evening, slow and grey "
+         "and without hurry.")
+    b = ("The tide came in over the causeway again that morning, and she counted "
+         "the steps as she went.")
+    assert "echoed-opening" in kinds(f"# Chapter 1 — A\n\n{a}\n\n{b}\n")

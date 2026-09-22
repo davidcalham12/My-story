@@ -214,24 +214,35 @@ consistent with the Bible, obeys the world, sits in the word band and is about
 something else entirely used to pass this gate cleanly.
 
 **`prose` asks the question none of the other five ask: is it well written?** It
-returns quoted `major` and `minor` findings and **no score** — you compute it:
+returns quoted `major` and `minor` findings and **no score**. You do not compute
+one either — you ask:
 
 ```bash
-python -m backend.chapters.check_prose output/<slug>/chapters/chNN.attemptK.md   output/<slug>/bible/characters.md          # the mechanical term
+echo '{"major": <n>, "minor": <n>}'   | python -m backend.chapters.score_prose       output/<slug>/chapters/chNN.attemptK.md output/<slug>/bible/characters.md
 ```
+
+It runs the mechanical check itself and applies
 
 ```
 prose = 10 − 3·mechanical − 2·major − 1·minor,   floored at 0
 ```
 
-`mechanical` is the count of defects **that script** found, never a number the
-critic gives you. A critic asked to count what a script already counted will
-disagree with it, and then the score depends on which of the two you asked. If
-the critic reports a mechanical defect anyway, drop it: it is already charged.
+returning the score, its arithmetic in `why`, and the mechanical defects quoted
+so you can put them in the sheet.
 
-**Check its arithmetic, as you do for `outline`.** The critic's `notes` state its
-own counts; recompute them from the findings it actually quoted. A finding
-without a quote is not a finding — do not count it, and say so in the gate row.
+**You supply only the two counts, because they are the only part you know.** The
+mechanical term is not an input: a critic asked to count what a script already
+counted will disagree with it, and then the score depends on which of the two you
+asked. If the critic reports a mechanical defect anyway, drop it — it is already
+charged, and one fault charged twice costs the chapter six points instead of
+three.
+
+**Count only findings the critic actually quoted.** A finding without a quote
+cannot be sent to the writer and cannot be verified afterwards, so it is not a
+finding; say so in the gate row rather than letting it lower a score in silence.
+
+**Check the critic's own arithmetic against what it quoted**, as you do for
+`outline`. Its `notes` state its counts; the findings are what it can defend.
 
 Dispatch the four critic subagents **in the same message**, as four tool calls in
 one reply. Not "one after the other quickly" — in the same reply. They are
