@@ -64,10 +64,32 @@ A spec is `specs/SPEC-NNN-short-name.md` and contains:
   while it is being implemented
 - **acceptance criteria that can be verified**, each with its **T/A/I/D/U**
   letter (see `docs/verification.md`)
+- **the gaps it leaves**, each with its level — below
 
 A criterion with no letter is not a criterion. If the honest letter is **U**,
 write U — an unverifiable acceptance criterion is worth knowing about before the
 work starts, not after.
+
+### The gaps a spec leaves
+
+**Every spec lists what it does not verify, and at what level of criticality.**
+Those rows travel from the spec into `docs/verification.md` §3 and live there.
+
+The rule they answer to: **a gap that is written down is an engineering decision;
+a gap that is not written down is a defect.** It costs a paragraph to be the
+first kind.
+
+Two consequences, because they are what makes the section work rather than
+decorate it:
+
+- **A critical guarantee whose letter is only I or D opens a gap row
+  automatically.** Not a discussion — the criticality table in
+  `verification.md` §1 fixes the minimum letter, and anything below it is an
+  accepted risk that has to be named as one. Three rows in the current document
+  exist because of this rule and not because anyone noticed.
+- **A gap row is never removed except by the evidence that closed it.** Deleting
+  one because it reads badly is the exact failure this apparatus exists to
+  prevent.
 
 ---
 
@@ -109,15 +131,28 @@ the procedure in `SKILL.md`** — that needs a real run, and a real run costs th
 subscription every time. Say which half a change is in before claiming it is
 tested.
 
+### Code before agent
+
+**Before proposing an agent for a task, say why a script will not do.** If one
+will, it is a script.
+
+A script gives class **T**; an agent gives **D** at best. Every check that moves
+from agent to code improves reliability and cost at once, which is why
+`verification.md` §4 keeps the list of the ones that have moved — and the ones
+that should next.
+
 ### Definition of done, for any change
 
 - tests green in CI
 - the spec updated if the final behaviour differs from what was approved
 - `docs/` updated
 - `verification.md` updated if a guarantee or its letter changed
+- **`verification.md` §3 updated if the change opened or closed a gap** — a gap
+  closed silently is as bad as one left unwritten, because the next reader cannot
+  tell which rows are still true
 - a skill installed if a technology entered the project
 
-All five. A change missing any of them is not done, it is in progress.
+All six. A change missing any of them is not done, it is in progress.
 
 ---
 

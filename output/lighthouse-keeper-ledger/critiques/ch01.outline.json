@@ -1,0 +1,21 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "arithmetic": "10 - 0 (no beat missing) - 0 (no beat out of order) = 10",
+      "beats": [
+        {"beat": 1, "status": "present", "quote": "Nell Harker stood four steps below with her boots in the standing water and did not come up."},
+        {"beat": 2, "status": "present", "quote": "She wiped the nib on the inside of her left cuff, which was black to the elbow and had been for years, and wrote: 2.41, east by north, Sweet Providence, smack."},
+        {"beat": 3, "status": "present", "quote": "He took the last quarter's returns out and went down the unmatched names at half voice"},
+        {"beat": 4, "status": "present", "quote": "Enter her a third time and she goes to the Drowned Page, and I will countersign her there myself, and the name is closed."}
+      ],
+      "findings": []
+    }
+  ]
+}

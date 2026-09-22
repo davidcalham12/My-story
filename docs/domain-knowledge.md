@@ -247,6 +247,14 @@ makes it five. This applies to every range in every prompt.
   zero.
 - **An unmeasurable field is not zero.** A run that destroyed its evidence and a
   run where nothing changed look identical in a number.
+- **A test that counts what is on disk is measuring the filesystem.** The v1
+  importer's test asserted `len(reports) == 8` and held for weeks — until v2
+  wrote its first novel into the same `output/` directory and it read nine. The
+  count was never the claim; *those eight historical runs, by name* was. Worse
+  than the red test: the importer had quietly filed a live v2 run as
+  `pre-loop003`, contaminating exactly the statistics the `source` column exists
+  to keep clean. **Found by a real run, not by review** — the first defect v2's
+  own first run produced, and it was in the test suite.
 - **Name artefacts by run.** Feedback sheets written to a flat path were silently
   overwritten by the next run. Recoverable from git that time, which is luck.
 - **A contract nobody stated cannot be enforced.** A run wrote its critiques as a

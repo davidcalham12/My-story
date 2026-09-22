@@ -1,0 +1,23 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "fact-contradiction",
+          "severity": "medium",
+          "quote": "The *Marigold* stands twice in your hand.",
+          "claim": "Creed's line asserts both prior register entries for the Marigold are in Ada's own handwriting, but the Bible timeline states the first entry (page 91, eleven years ago) was written by Walter Byrd, not Ada - only the second entry (nine years ago) is hers.",
+          "fix": "Have Creed say the name stands twice in the book/register rather than 'in your hand,' or otherwise avoid attributing both entries to Ada's handwriting, preserving the Chapter 2 reveal that the first entry is in Walter's distinct hand.",
+          "reference": "bible/timeline.md, rows 'eleven years ago, 3 a.m.' and 'Nine years ago'; bible/mysteries.md, mystery 2"
+        }
+      ]
+    }
+  ]
+}

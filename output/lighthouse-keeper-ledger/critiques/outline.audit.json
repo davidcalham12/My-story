@@ -1,0 +1,78 @@
+{
+  "critic": "science",
+  "stage": "FLOW-3",
+  "kind": "model",
+  "agent": "science-critic",
+  "target": "outline.md",
+  "note": "LOOP-003 §10.6 pre-write audit of the commission against bible/world.md ## Rules. No draft exists; this judges the outline.",
+  "verdict": "defects",
+  "violations": [
+    {
+      "chapter": 3,
+      "beat": 4,
+      "rule": "R1",
+      "clause": "who may write in the Register",
+      "severity": "high",
+      "claim": "The beat has Creed write the Marigold's name onto the Drowned Page and sign it himself. The Drowned Page is at the back of that same Register, and R1 says only the keeper on watch may write in the Register. Creed is a Commissioner, not a keeper.",
+      "fix": "Have Ada, as keeper, make the Drowned Page entry herself; Creed's role limited to certifying or countersigning.",
+      "orchestrator_arbitration": "UPHELD. Real, and it exposes that R5 was written in the passive and never named an actor. bible/characters.md independently commissions Creed to 'sign the Drowned Page', so the two Bible files contradicted each other. Fixed in the rule rather than only in the outline: R5 now names the keeper as the writer and admits the Commissioner's countersignature as the single exception to R1."
+    },
+    {
+      "chapter": 3,
+      "beat": 4,
+      "rule": "R1",
+      "clause": "a line in any other hand voids the whole page, and the page must be recopied and signed by two Ridge witnesses before the next high water",
+      "severity": "high",
+      "claim": "Chapter 2 voids page 91 under R1. No beat shows the recopy and witnessing. Chapter 3 then audits that page and writes on it as though it were live.",
+      "fix": "Insert a beat in which page 91 is recopied and signed by two Ridge witnesses before the next high water.",
+      "orchestrator_arbitration": "UPHELD. The outline commissioned a chapter that could not obey its own world. Fixed in both places: R1 now says where the witnesses sign (the seventh step, which R4 permits), and Chapter 2 gains a fifth beat in which the recopy is carried down and witnessed before high water."
+    }
+  ],
+  "ambiguities": [
+    {
+      "rule": "R1",
+      "clause": "within the hour of the sighting",
+      "reading_a": "A sighting is the keeper's own direct observation; an entry from a petition is outside the window entirely.",
+      "reading_b": "A sighting is any report reaching the keeper, including a petition; the hour runs from receipt.",
+      "outline_assumes": "b",
+      "orchestrator_arbitration": "UPHELD, and load-bearing — the whole premise turns on it. R1 now states reading (b) explicitly. Left ambiguous, continuity and science could have held opposite readings of every entry Ada makes and no arbitration could have settled it."
+    },
+    {
+      "rule": "R4",
+      "clause": "answered only by an entry in the Register",
+      "reading_a": "Exclusive means: nothing may substitute, so the keeper may not speak to a petitioner at all.",
+      "reading_b": "Fixes the method of a formal answer only; does not forbid speaking of what already stands written.",
+      "outline_assumes": "b",
+      "orchestrator_arbitration": "UPHELD. Chapter 2 beat 4 and Chapter 3 beat 5 both have Ada speak down the stair, so reading (a) would fail two chapters. R4 now states (b)."
+    },
+    {
+      "rule": "R5",
+      "clause": "a vessel entered three times",
+      "reading_a": "Only valid keeper entries count; a line voided under R1 does not.",
+      "reading_b": "Any physical instance of the name counts regardless of hand.",
+      "outline_assumes": "a",
+      "orchestrator_arbitration": "UPHELD and the most dangerous of the five. Under reading (b), Walter's line in Chapter 2 is the third Marigold entry and the Drowned Page closes before Ada ever lifts the pen, which destroys Chapter 3. R5 now states (a)."
+    },
+    {
+      "rule": "R1 / R4",
+      "clause": "two Ridge witnesses vs nobody past the seventh step",
+      "reading_a": "R4 is absolute; the recopy must be carried down to the step to be signed.",
+      "reading_b": "An unstated exception lets witnesses climb for official business.",
+      "outline_assumes": "neither - the outline never depicts the step at all",
+      "orchestrator_arbitration": "UPHELD. Two rules that could not both be obeyed. R1 now adopts reading (a) explicitly: the recopied page is carried to the seventh step and signed there."
+    },
+    {
+      "rule": "R1",
+      "clause": "the Register",
+      "reading_a": "'Register of Passage' is the full name of the one canonical Register.",
+      "reading_b": "It names a second, separate log not bound by R1-R5.",
+      "outline_assumes": "a",
+      "orchestrator_arbitration": "OVERRULED. bible/world.md ## Instruments names exactly one ledger, 'The Register of Passage', and the Drowned Page is at its back. There is no second book and no reader would infer one. No change made."
+    }
+  ],
+  "actions_taken": [
+    "bible/world.md ## Rules rewritten by worldbuilder (the only agent permitted to write it) with all four upheld ambiguities and the R5 actor closed.",
+    "outline.md chapters 2 and 3 reissued by plot-architect against the amended rules.",
+    "FLOW-4 not started until both landed."
+  ]
+}

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -303,10 +304,47 @@ def _import_calls(conn, slug: str, calls: list[dict]) -> None:
         )
 
 
-def import_all(conn: sqlite3.Connection, output_dir: Path) -> list[ImportReport]:
+def import_all(
+    conn: sqlite3.Connection,
+    output_dir: Path,
+    slugs: Iterable[str] | None = None,
+) -> list[ImportReport]:
+    """Import the v1 runs under `output_dir`.
+
+    **v2 writes its runs into the same directory, on purpose** — the layout is
+    the same one, and a reader should not have to know which implementation
+    produced a novel. So "every directory here is a v1 run" was true exactly
+    until v2 produced its first one, and then it silently marked a live v2 run
+    `pre-loop003` and counted it as history.
+
+    Two ways to say which is which, and both are here:
+
+    - pass `slugs` explicitly — what the tests do, because a test about eight
+      specific historical runs should not change its answer when someone starts
+      a ninth novel;
+    - otherwise skip any slug the database already holds. That is airtight for a
+      live run rather than merely likely: the watcher learns the slug from the
+      first `output/<slug>/` path the run writes, which is the same event that
+      creates the directory this loop could see. It also makes a second import a
+      no-op instead of a duplicate.
+    """
+    if slugs is not None:
+        wanted = set(slugs)
+    else:
+        wanted = None
+        known = {
+            row["slug"]
+            for row in conn.execute("SELECT slug FROM runs WHERE slug IS NOT NULL")
+        }
+
     reports = []
     for run_dir in sorted(p for p in output_dir.iterdir() if p.is_dir()):
         if not (run_dir / "state.json").exists():
+            continue
+        if wanted is not None:
+            if run_dir.name not in wanted:
+                continue
+        elif run_dir.name in known:
             continue
         reports.append(import_run(conn, run_dir))
     return reports

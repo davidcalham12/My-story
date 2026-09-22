@@ -13,15 +13,59 @@ from backend.commons.db.import_v1 import import_all
 
 OUTPUT = Path(__file__).resolve().parents[2] / "output"
 
+#: The eight runs this module is about, by name. It used to say `== 8` and count
+#: what was on disk, which held until v2 wrote its first novel into the same
+#: `output/` directory and the count became nine. The test was measuring the
+#: filesystem, not the import — a real defect in the test, found by a real run.
+V1_RUNS = (
+    "a-night-shift-dispatcher-at-a-mountain",
+    "cyberpunk-stolen-memory-broker",
+    "deep-space-salvage-derelict",
+    "generation-ship-votes-to-wake",
+    "ice-station-water-recycler-surplus",
+    "last-lighthouse-keeper-on-titan",
+    "night-dispatcher-recovered-climber",
+    "the-beginning-after-the-end",
+    "titan-lighthouse-distress-calls",
+)
+
 
 @pytest.fixture
 def imported(db):
-    return db, import_all(db, OUTPUT)
+    return db, import_all(db, OUTPUT, slugs=V1_RUNS)
 
 
-def test_all_eight_runs_import(imported):
+def test_the_named_v1_runs_import(imported):
     _, reports = imported
-    assert len(reports) == 8, [r.slug for r in reports]
+    got = {r.slug for r in reports}
+    on_disk = {s for s in V1_RUNS if (OUTPUT / s / "state.json").exists()}
+    assert got == on_disk, sorted(got ^ on_disk)
+    assert len(got) >= 8
+
+
+def test_a_live_v2_run_is_not_imported_as_history(db):
+    """The importer must not adopt a run v2 is in the middle of producing.
+
+    Marking it `pre-loop003` would file a run judged by five characteristics
+    among the ones judged by three, which is the exact contamination the source
+    column exists to prevent.
+    """
+    live = sorted(
+        p.name
+        for p in OUTPUT.iterdir()
+        if p.is_dir() and (p / "state.json").exists() and p.name not in V1_RUNS
+    )
+    if not live:
+        pytest.skip("no v2 run in output/ yet")
+
+    db.execute(
+        "INSERT INTO runs (id, slug, premise, profile, config_snapshot, stage, "
+        "started_at, source) VALUES (?, ?, ?, ?, ?, ?, ?, 'v2')",
+        ("live", live[0], "a premise", "tiny", "{}", "FLOW-4",
+         "2026-09-22T00:00:00Z"),
+    )
+    reports = import_all(db, OUTPUT)
+    assert live[0] not in {r.slug for r in reports}
 
 
 def test_every_run_is_marked_pre_loop003(imported):
