@@ -5,6 +5,73 @@
   "tone": "literary coastal gothic - a quiet, tide-bound ghost story where the uncanny arrives as a discrepancy in a written record",
   "chapters_planned": 3,
   "started_utc": "2026-09-22T15:53:55Z",
-  "stage": "FLOW-1",
-  "chapters": []
+  "finished_utc": "2026-09-22T16:46:56Z",
+  "stage": "complete",
+  "status": "complete",
+  "canonical_names": ["Ada Rowe", "Thomas Creed", "Nell Harker", "Walter Byrd"],
+  "chapters": [
+    {
+      "n": 1,
+      "title": "The Seventh Step",
+      "status": "accept",
+      "accepted_attempt": 2,
+      "attempts": 2,
+      "words": 526,
+      "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+      "aggregate": 10,
+      "best_aggregate": 10,
+      "file": "chapters/ch01.final.md",
+      "style_pass": "applied - returned byte-identical"
+    },
+    {
+      "n": 2,
+      "title": "A Hand Not Mine",
+      "status": "accept",
+      "accepted_attempt": 3,
+      "attempts": 3,
+      "words": 501,
+      "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+      "aggregate": 10,
+      "best_aggregate": 10,
+      "attempt_aggregates": [3, 7, 10],
+      "file": "chapters/ch02.final.md",
+      "style_pass": "applied - returned byte-identical",
+      "note": "The only chapter that needed the third attempt and its level-2 literal replacement. patch_then_halt was not reached."
+    },
+    {
+      "n": 3,
+      "title": "The Drowned Page",
+      "status": "accept",
+      "accepted_attempt": 2,
+      "attempts": 2,
+      "words": 542,
+      "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+      "aggregate": 10,
+      "best_aggregate": 10,
+      "attempt_aggregates": [4, 10],
+      "file": "chapters/ch03.final.md",
+      "style_pass": "DISCARDED - passed the word-count check but normalised quotation marks the other two chapters did not get; the unedited approved draft was published instead. The returned text is kept at chapters/ch03.style.md."
+    }
+  ],
+  "totals": {
+    "chapters_accepted": 3,
+    "chapters_accepted_with_warnings": 0,
+    "chapters_halted": 0,
+    "prose_words": 1569,
+    "book_words_including_synopsis": 1831,
+    "subagent_calls": 42,
+    "subagent_tokens_measured": 612127,
+    "cost_usd": "unmeasurable",
+    "cost_note": "The Agent tool reports one cumulative token total per call with no input/output split, and config/pricing.json is priced per input and output token. A cost figure cannot be computed from a single total without inventing the split, so it is reported as unmeasurable rather than as zero. Call count 42 against budget.max_calls 120."
+  },
+  "bible_amendments": [
+    {"when": "FLOW-3", "file": "bible/world.md", "what": "## Rules rewritten to close four ambiguities found by the pre-write outline audit: what counts as a sighting, where the two Ridge witnesses sign, what an unanswered petition does, and who writes the Drowned Page line."},
+    {"when": "FLOW-4 ch1", "file": "bible/world.md", "what": "R5 clause 'in the keeper's own hand' -> 'by the keeper on watch, whether by the present keeper or by any keeper before her', because the per-keeper reading contradicted three other Bible files and would have made Creed's threat arithmetically false."}
+  ],
+  "outputs": {
+    "book": "dist/book.md",
+    "synopsis": "synopsis.md",
+    "formats_produced": ["markdown"],
+    "pdf": "not available on this branch; outputs.formats requested markdown only"
+  }
 }

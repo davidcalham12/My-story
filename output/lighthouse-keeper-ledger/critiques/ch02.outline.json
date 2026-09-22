@@ -1,0 +1,34 @@
+{
+  "critic": "outline",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "arithmetic": "10 - 0 (no beat missing) - 0 (no beat out of order) = 10",
+      "beats": [
+        {"beat": 1, "status": "present"}, {"beat": 2, "status": "present"}, {"beat": 3, "status": "present"},
+        {"beat": 4, "status": "present"}, {"beat": 5, "status": "present"}
+      ],
+      "findings": []
+    },
+    {"iteration": 2, "score": 10, "arithmetic": "10 - 0 - 0 = 10", "findings": []},
+    {
+      "iteration": 3,
+      "score": 10,
+      "arithmetic": "10 - 0 - 0 = 10",
+      "beats": [
+        {"beat": 1, "status": "present", "quote": "At sunset Ada Rowe set the character: two flashes and a dark, every half minute, the clockwork wound and the oil topped and the glass wiped free of salt."},
+        {"beat": 2, "status": "present", "quote": "She did not touch it. No entry may be struck out, and a line in a hand not the keeper's voids the whole page."},
+        {"beat": 3, "status": "present", "quote": "Ada went out to the Causeway Bell and rang it, without pause, her arm going and going while the weather came off the water, until the clockwork caught and the two flashes and the dark came back over the drowned street."},
+        {"beat": 4, "status": "present", "quote": "\"If it's written,\" Nell said. And then, into the wind: \"The *Marigold*.\""},
+        {"beat": 5, "status": "present", "quote": "Before high water she carried the fair copy down to the seventh step and no further. Nell Harker signed, and another from the Ridge signed beneath her, the stone wet under the paper."}
+      ],
+      "findings": []
+    }
+  ],
+  "note": "Scored 10 on all three attempts. This is what the patch protocol is for: the two redrafts changed four sentences between them and never touched a beat."
+}

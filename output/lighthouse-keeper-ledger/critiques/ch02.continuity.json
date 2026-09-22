@@ -1,0 +1,55 @@
+{
+  "critic": "continuity",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 3,
+      "findings": [
+        {
+          "kind": "entry-count-contradiction",
+          "severity": "high",
+          "quote": "Beneath Walter Byrd's entry there was a second line.",
+          "claim": "The phrase reads as the Marigold's second entry in the Register; the critic held that the new line should therefore be the third and should send the name to the Drowned Page.",
+          "fix": "Have Ada find the new line beneath both Walter's entry and her own, recognising it as the third.",
+          "reference": "bible/timeline.md, rows 'Nine years ago' and 'Two years ago'",
+          "orchestrator_arbitration": "FINDING UPHELD, FIX OVERRULED. The ambiguity is real - 'a second line' does read as 'the second entry'. But the critic's proposed fix would have destroyed the book: bible/world.md R5 says in terms that a line voided under R1 does not count toward the three, and this line is in a hand that is not the keeper-on-watch's. Making it the third entry closes the Drowned Page a chapter early and leaves chapter 3 with nothing to do. The sheet carried the finding with a rewritten 'how it should read' that named the rule's actual consequence instead."
+        },
+        {
+          "kind": "first-time-handwriting-contradiction",
+          "severity": "high",
+          "quote": "The Marigold stood, for the first time, in her own handwriting, in a line she had not composed.",
+          "claim": "Ada entered the Marigold herself nine years ago, so this cannot be the first time the name stands in her handwriting.",
+          "fix": "Move 'for the first time' onto what is actually new - the line she did not compose.",
+          "reference": "bible/timeline.md, row 'Nine years ago'",
+          "orchestrator_arbitration": "UPHELD in full. A plain factual contradiction."
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "page-attribution-ambiguity",
+          "severity": "medium",
+          "quote": "Then, wanting the date of the second *Marigold* entry, she took the Register down from its shelf and turned back through nine years of her own lines to page 91.",
+          "claim": "The sentence ties the second entry's date to page 91; the second entry is Ada's own and stands on a later page.",
+          "fix": "Give her a different, canon-consistent reason to turn back to page 91.",
+          "reference": "bible/timeline.md, rows 'Nine years ago' and '3 March, eleven years ago'",
+          "orchestrator_arbitration": "UPHELD. Induced in part by this iteration's prompt, which added the canon line that Ada's second entry stands on a page of its own. Not recorded as a late finding under LOOP-003 for that reason - the critic was answering a question it had not previously been asked."
+        }
+      ],
+      "note": "Both of iteration 1's findings resolved by patch. Three patches sent, three matched literally."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "note": "Attempt 3 carried a level-2 sheet: the literal replacement sentence, written by this critic on request rather than described. The writer returned it character for character as its single patch, and the orchestrator applied it by exact substitution. This is the escalation LOOP-003 exists for, working as specified."
+    }
+  ]
+}

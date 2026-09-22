@@ -1,0 +1,14 @@
+{
+  "critic": "length",
+  "chapter": 2,
+  "kind": "arithmetic",
+  "agent": null,
+  "method": "wc -w on the attempt file, run by the orchestrator in the shell",
+  "band": {"min": 300, "max": 550, "tolerance_pct": 25, "widened_min": 225, "widened_max": 688},
+  "drafts": 3,
+  "iterations": [
+    {"iteration": 1, "score": 10, "measured_words": 487, "findings": []},
+    {"iteration": 2, "score": 10, "measured_words": 497, "findings": []},
+    {"iteration": 3, "score": 10, "measured_words": 501, "findings": []}
+  ]
+}

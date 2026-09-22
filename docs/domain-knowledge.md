@@ -173,28 +173,33 @@ characteristic that was already passing. **Open. Not solved by the obvious fix**
 because `outline` *did* review the replacement and reject it. That rejection is
 the 10 → 7.
 
-**A third case, on v2's first real run, and this one was caught and repaired.**
-Chapter 1 of `lighthouse-keeper-ledger`:
+**A third case, on v2's first real run — and reading its own notes cuts it
+down.** Chapter 1 of `lighthouse-keeper-ledger` scored `continuity` 7 then 10,
+and `science` 10, then 4, then 10. It looks like a repair breaking a passing
+characteristic, and the run's own record says it was **not only** that:
 
-| attempt | continuity | science | outcome |
-|---|---|---|---|
-| 1 | **7** | 10 | retry |
-| 2 | 10 | **4** | retry |
-| 3 | 10 | 10 | promoted |
+- the `continuity` repair was a four-word literal substitution, *stands twice in
+  your hand* → *stands twice in that book*, confirmed applied by grep;
+- the `science` 4 arrived on an iteration whose prompt the orchestrator had
+  **enriched** — it added a canon note on who wrote each existing entry and asked
+  the critic pointedly about the count. The critique says so in its `note`;
+- the 10 that followed is a **rescore of the identical draft** against an amended
+  R5. **No prose changed between the 4 and the 10.**
 
-`continuity` found a line putting both prior register entries in Ada's hand when
-the timeline gives the first to Walter Byrd, and asked for "in that book" instead
-of "in your hand". The repair was correct and it landed — and it moved the
-sentence onto a clause of R5 that counts entries *in the keeper's own hand*,
-which `science` then read per-keeper and scored **4**. A precise fix to one
-characteristic walked the text into a rule the other one owns.
+So the honest reading is *an ambiguity in the rules, surfaced by a sharper
+prompt, closed in canon* — not a repair that damaged the text. The two are easy
+to confuse from the score column alone, and only the notes tell them apart.
 
-**Two things this run settles.** The failure is not rare — three for three, once
-per run that has ever needed a repair. And **re-scoring all five every attempt is
-what catches it**: `science` had passed at 10 on attempt 1 and would not have
-been consulted again under any scheme that only re-runs the failing critic. The
-cost of that decision is five critic calls per attempt instead of one; this is
-what it buys.
+**What it does settle**, and this survives the correction: **re-scoring all five
+characteristics every iteration is what made any of this visible.** `science` had
+passed at 10 and would never have been asked again under a scheme that re-runs
+only the failing critic; the ambiguity would have reached chapters 2 and 3
+unnoticed. Five critic calls per iteration instead of one is what that costs.
+
+**And the second lesson is about this document.** The cross-break was written up
+here from the score column before the notes were read, and the notes changed what
+it meant. **A score series is not a finding.** The critique's `note` field is the
+evidence; the numbers are an index into it.
 
 ### 3.5 No critic grades prose, and it shows
 
@@ -270,6 +275,27 @@ makes it five. This applies to every range in every prompt.
   zero.
 - **An unmeasurable field is not zero.** A run that destroyed its evidence and a
   run where nothing changed look identical in a number.
+- **What the gate costs, measured on both sides.** Two three-chapter `tiny` runs
+  on the same profile, each figure from Claude Code's own `result`:
+
+  | | v1, `the-beginning-after-the-end` | v2, `lighthouse-keeper-ledger` |
+  |---|---|---|
+  | characteristics | 2 — `continuity`, `science` | **5** |
+  | critic iterations | 6 | **36** |
+  | rejected drafts kept | **0** | 7 |
+  | outline audit before FLOW-4 | no | yes, with the rules amended |
+  | orchestrator turns | 102 | 136 |
+  | **cost** | **$7.45** | **$18.82** |
+
+  **2.5× the money for 6× the judging**, and it is not the same test: the v1 run
+  was judged by two characteristics, audited nothing before writing, and kept
+  none of its rejected drafts — which is why "the writer changed only what was
+  cited" could not be measured on it at all. That is what `source: pre-loop003`
+  exists to say, and why those runs stay out of LOOP-003's statistics.
+
+  **The cheap thing to notice: the price is sublinear in the judging.** Six times
+  the critic iterations cost two and a half times the money, because the
+  expensive part is the context every call carries, not the call.
 - **A test that counts what is on disk is measuring the filesystem.** The v1
   importer's test asserted `len(reports) == 8` and held for weeks — until v2
   wrote its first novel into the same `output/` directory and it read nine. The

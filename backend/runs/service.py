@@ -35,6 +35,7 @@ from backend.commons.runner.watch import (
     context_size,
 )
 from backend.runs import repository as read_repo
+from backend.runs.archive import archive_run
 
 
 class AlreadyRunning(Exception):
@@ -214,8 +215,47 @@ class RunService:
         if state.total_cost_usd is not None:
             self._write_cost(state)
 
+        self._archive(live, state)
+
         live.done = True
         live.events.put(None)
+
+    def _archive(self, live: Live, state: State) -> None:
+        """Read the run's own record off disk into the database. SPEC-003.
+
+        The orchestrator writes the gate's record to files; nothing read them
+        back, so the first real run finished with `attempts`, `scores`,
+        `findings`, `gate_decisions` and `sheets` empty while every one of those
+        facts sat in `output/<slug>/`.
+
+        **A failure here never fails the run.** The novel is on disk either way,
+        and an archiver that could destroy a finished run would be worse than no
+        archiver. It becomes a warning, which is a row a reader can act on.
+        """
+        if not state.slug:
+            return
+        run_dir = Path(self.settings.output_dir) / state.slug
+        if not run_dir.is_dir():
+            return
+        sheets = Path("specs/loops/LOOP-003/sheets") / state.slug
+        try:
+            report = archive_run(self.conn, live.run_id, run_dir,
+                                 sheets_dir=sheets if sheets.is_dir() else None)
+        except Exception as exc:  # noqa: BLE001 - see the docstring
+            write_repo.warn(self.conn, live.run_id, "archive",
+                            f"archiving failed, the run's files are intact: {exc!r}")
+            return
+
+        # `result` stays `complete` or `halted: x`. It is the run's outcome, not
+        # a place to report bookkeeping, and a reader parsing it should not have
+        # to know about the archive.
+        if not report.attempts and any((run_dir / "chapters").glob("ch*.md")):
+            write_repo.warn(
+                self.conn, live.run_id, "archive",
+                "chapters were written but no attempt drafts were found to "
+                "archive; the gate's record is missing, which is not the same "
+                "as a run that had no attempts",
+            )
 
     def _write_cost(self, state: State) -> None:
         """The whole run's cost, orchestrator included, straight from Claude Code.

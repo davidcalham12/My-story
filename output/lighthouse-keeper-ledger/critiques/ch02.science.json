@@ -1,0 +1,28 @@
+{
+  "critic": "science",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "bell-rung-past-restoration",
+          "severity": "medium",
+          "rule": "R3",
+          "clause": "the Causeway Bell is rung without pause until the character is restored",
+          "quote": "Then she rang until the character had held for the length of a minute more, and stopped.",
+          "claim": "R3 gives the Bell one stopping condition - the character restored - and the draft has Ada ring on for a further minute past it.",
+          "fix": "Stop the ringing at the moment the two flashes and the dark resume.",
+          "reference": "bible/world.md, R3",
+          "orchestrator_arbitration": "UPHELD. Arguably exceeding an obligation rather than breaching one, but the rule names one stopping condition and the sentence was removable without cost. Deleting it outright was the patch."
+        }
+      ]
+    },
+    {"iteration": 2, "score": 10, "findings": [], "note": "The Bell sentence was deleted rather than reworded."},
+    {"iteration": 3, "score": 10, "findings": []}
+  ]
+}

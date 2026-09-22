@@ -60,8 +60,19 @@ export interface Cost {
   calls: number
   input_tokens: number
   output_tokens: number
-  total_usd: number
+  /** The run's own measured total when there is one, else the sum of the calls,
+   *  else null. Never 0 to mean "nothing recorded". */
+  total_usd: number | null
+  /** What the sum over `calls` comes to. A floor when a measured total exists. */
+  summed_from_calls_usd: number | null
+  /** How `total_usd` was obtained. The run total can be measured while the
+   *  per-call split is absent, which is exactly today's situation. */
+  total_provenance: Provenance
+  /** The grade of each individual call. */
   provenance: Provenance[]
+  turns: number | null
+  duration_ms: number | null
+  subagent_dispatches: number | null
 }
 
 export interface Warning {

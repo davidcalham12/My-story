@@ -1,0 +1,12 @@
+{
+  "critic": "continuity",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "findings": []},
+    {"iteration": 2, "score": 10, "findings": [], "note": "Unaffected by the two science patches, which touched no name, date or count."}
+  ],
+  "note": "The only chapter whose continuity passed first time. Its numbers were the most exposed in the book - a tally of three, two hours nineteen apart, and eleven years - and they were all correct on the first draft."
+}

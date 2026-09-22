@@ -1,0 +1,43 @@
+{
+  "critic": "science",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "late-entry",
+          "severity": "high",
+          "rule": "R1",
+          "clause": "only within the hour of the sighting; the hour is counted from the moment the keeper receives it",
+          "quote": "Nell Harker's petition of the fourteenth lay where she had set it two years' worth of refusal ago, the scrap of net float still knotted through it, and she copied it out at last within the hour of taking it up: *Marigold, ketch, sou'-sou'-west.* The third.",
+          "claim": "The petition reached the keeper on the fourteenth, so the hour began then; entering it two days later and calling that moment 'taking it up' does not restart the hour.",
+          "fix": "Move the petition's arrival to within the hour preceding the scene, or have the chapter acknowledge the entry is irregular.",
+          "reference": "bible/world.md, R1",
+          "orchestrator_arbitration": "UPHELD, and the most serious finding of the run. An entry outside the hour is not a valid entry; an invalid entry is not the third; and without a third entry the name never reaches the Drowned Page and the book has no ending. Note where this defect came from: the OUTLINE commissioned it. Chapter 3 beat 4 says in terms 'Nell Harker's petition of 14 March, set aside unwritten, copied out at last'. The pre-write outline audit at FLOW-3 did not catch it, which is worth recording against that audit rather than against the writer. The fix used canon already on the page - bible/characters.md has Nell leaving a petition at EVERY low water - so the petition Ada copies is the one that came up this morning, received within the hour, the same asking as always."
+        },
+        {
+          "kind": "misapplied-rule",
+          "severity": "medium",
+          "rule": "R2",
+          "clause": "a correction is written beneath the original, and both lines are read aloud in the lamp room at the next turn of the tide",
+          "quote": "At the turn of the tide Ada read both aloud in the lamp room as the rule required, the hour on the page and the hour on the return, and the sound of them went out into the salt and did not come back with anything.",
+          "claim": "R2's read-aloud obligation is about a correction written beneath an original Register line; one of the two hours here is on a Commissioners' return, which is not a Register line, so no rule required this.",
+          "fix": "Drop the claim that a rule required it, or have Ada write an actual correction first.",
+          "reference": "bible/world.md, R2",
+          "orchestrator_arbitration": "UPHELD. The draft asserted an obligation the world does not impose. The patch removed the false attribution and left the act standing on habit instead, which is both true and better."
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "note": "Two patches, both matched literally. 514 -> 542 words, still inside the band."
+    }
+  ]
+}

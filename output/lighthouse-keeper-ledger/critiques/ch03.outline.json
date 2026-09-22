@@ -1,0 +1,33 @@
+{
+  "critic": "outline",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "arithmetic": "10 - 0 (no beat missing) - 0 (no beat out of order) = 10",
+      "beats": [
+        {"beat": 1, "status": "present"}, {"beat": 2, "status": "present"}, {"beat": 3, "status": "present"},
+        {"beat": 4, "status": "present", "note": "All three sub-actions present: the third entry, the Drowned Page line in Ada's hand, Creed's countersignature beneath it."},
+        {"beat": 5, "status": "present"}
+      ],
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "arithmetic": "10 - 0 - 0 = 10",
+      "beats": [
+        {"beat": 1, "status": "present", "quote": "Ada stood with her left cuff black to the elbow and let him count."},
+        {"beat": 2, "status": "present", "quote": "\"Off the seventh step,\" Ada said. \"The petitions. I copy the name and enter it within the hour, in my hand, at a bearing I choose.\""},
+        {"beat": 3, "status": "present", "quote": "Creed did not offer a reason. Neither did she."},
+        {"beat": 4, "status": "present", "quote": "Creed took the pen from her and countersigned beneath the line."},
+        {"beat": 5, "status": "present", "quote": "\"*Marigold*,\" Nell said, once, aloud, over the water."}
+      ],
+      "findings": []
+    }
+  ]
+}

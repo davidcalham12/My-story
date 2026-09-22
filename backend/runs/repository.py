@@ -43,6 +43,15 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
     Imported runs carry one total with no split, graded `reconstructed`; v2 runs
     carry both halves. Mixing them into one number without saying so is how
     $6.21 came to stand in for $49.33.
+
+    **The run's own measured total wins over the sum of the calls** (SPEC-003 A7).
+    Both are here and they answer different questions: the `result` event knows
+    what the whole run cost including the orchestrator's turns, and the `calls`
+    rows know how it split. When the first exists, the second is a floor. Showing
+    the floor as the total is a reconstructed figure standing where a measured one
+    exists, and that is the failure the grades are for.
+
+    `total_usd` is None, never 0, when nothing measured and nothing summed.
     """
     row = conn.execute(
         "SELECT COUNT(*) AS calls, COALESCE(SUM(input_tokens),0) AS input_tokens, "
@@ -52,7 +61,31 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
     ).fetchone()
     kinds = [r["provenance"] for r in conn.execute(
         "SELECT DISTINCT provenance FROM calls WHERE run_id = ?", (run_id,))]
-    return {**dict(row), "provenance": sorted(kinds)}
+
+    run = conn.execute(
+        "SELECT cost_usd, cost_provenance, turns, duration_ms, subagent_dispatches "
+        "FROM runs WHERE id = ?", (run_id,)
+    ).fetchone()
+
+    summed = row["total_usd"] if row["calls"] else None
+    measured = run["cost_usd"] if run else None
+    if measured is not None:
+        total, grade = measured, (run["cost_provenance"] or "measured")
+    elif summed:
+        total, grade = summed, "reconstructed"
+    else:
+        total, grade = None, "absent"
+
+    return {
+        **dict(row),
+        "total_usd": total,
+        "summed_from_calls_usd": summed,
+        "total_provenance": grade,
+        "provenance": sorted(kinds),
+        "turns": run["turns"] if run else None,
+        "duration_ms": run["duration_ms"] if run else None,
+        "subagent_dispatches": run["subagent_dispatches"] if run else None,
+    }
 
 
 def warnings(conn: sqlite3.Connection, run_id: str) -> list[dict]:

@@ -57,6 +57,24 @@ def finish(conn, run_id: str) -> None:
         )
 
 
+def save_cost(conn, run_id: str, *, cost_usd: float, provenance: str = "measured",
+              turns=None, duration_ms=None, subagent_dispatches=None) -> None:
+    """The whole run's cost, from Claude Code's `result` event. SPEC-003 A7.
+
+    It lived only in `output/<slug>/cost.json`, so the panel showed the sum over
+    `calls` instead - a reconstructed figure standing where a measured one
+    existed, which is the rule G12 holds, inverted. Nullable on purpose: a run
+    with no `result` has no cost, and that is absent, not zero.
+    """
+    with tx(conn):
+        conn.execute(
+            "UPDATE runs SET cost_usd = ?, cost_provenance = ?, turns = ?, "
+            "duration_ms = ?, subagent_dispatches = ? WHERE id = ?",
+            (float(cost_usd), provenance, turns, duration_ms, subagent_dispatches,
+             run_id),
+        )
+
+
 def warn(conn, run_id: str, kind: str, detail: str, chapter: int | None = None) -> None:
     with tx(conn):
         conn.execute(
@@ -89,11 +107,16 @@ def save_attempt(conn, *, run_id, chapter, attempt, title, draft_path, words,
         for f in findings:
             conn.execute(
                 "INSERT INTO findings (attempt_id, characteristic, severity, kind, "
-                "quote, claim, fix, reference, upheld, late) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                "quote, claim, fix, reference, upheld, ruling, late) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (attempt_id, f.get("characteristic", "?"), f.get("severity", "medium"),
                  f.get("kind"), f.get("quote"), f.get("claim") or f.get("problem"),
                  f.get("fix"), f.get("reference"),
                  0 if f.get("upheld") is False else 1,
+                 # The arbitration itself, not just its outcome. "Overruled and
+                 # right" and "overruled and wrong" are different events, and
+                 # only the wording tells them apart.
+                 f.get("ruling") or f.get("orchestrator_arbitration"),
                  1 if f.get("late") else 0),
             )
     return attempt_id

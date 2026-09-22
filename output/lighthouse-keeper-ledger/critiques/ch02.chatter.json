@@ -1,0 +1,13 @@
+{
+  "critic": "chatter",
+  "chapter": 2,
+  "kind": "arithmetic",
+  "agent": null,
+  "method": "head -1 of the attempt file; score 0 unless the first line opens with '# Chapter'",
+  "drafts": 3,
+  "iterations": [
+    {"iteration": 1, "score": 10, "first_line": "# Chapter 2 — A Hand Not Mine", "findings": []},
+    {"iteration": 2, "score": 10, "first_line": "# Chapter 2 — A Hand Not Mine", "findings": []},
+    {"iteration": 3, "score": 10, "first_line": "# Chapter 2 — A Hand Not Mine", "findings": []}
+  ]
+}

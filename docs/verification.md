@@ -84,7 +84,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **91 backend tests and 9 frontend tests, on the mock engine,
+Status, 2026-09-22: **106 backend tests and 11 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -97,6 +97,7 @@ in CI, at $0.** The suite that carries these:
 | `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
 | `test_vectors.py` | what retrieval may and may not be used for |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
+| `test_archive.py` | SPEC-003 — that a finished run's own record reaches the database |
 | `test_api.py` | the HTTP edge and the SSE snapshot |
 
 ---
@@ -348,7 +349,17 @@ nothing changed are identical in a number and must not be identical in a report.
 
 **Evidence.** `test_runner.py` asserts the figure is read from a real recorded
 `result` ($19.00 on the run in the fixture). Three v1 runs carry their own
-`cost.json` from the same source.
+`cost.json` from the same source. **v2's first real run measured $18.82** —
+136 turns, 41 subagent dispatches, 56 minutes — against **$7.45** for v1's
+three-chapter `tiny` run, which judged by two characteristics instead of five and
+audited nothing before writing. `domain-knowledge.md` §5 has the comparison and
+why it is not like for like.
+
+**It is now stored, not only written to disk** (SPEC-003). It sat in
+`cost.json` while the API reported the sum over nine `calls` rows — a
+reconstructed figure standing where a measured one existed, which is this row's
+own rule inverted. `runs.cost_usd` carries it with its grade, and
+`test_archive.py` asserts the reader prefers it.
 
 **Why this is the row Annex C improves most.** v1 priced the subagents' tokens
 and knew nothing of the orchestrator's turns: **$6.21 estimated against $49.33
@@ -568,7 +579,32 @@ covered by a recorded stream; what Claude Code does is not.
 **How we would find out:** the instruments' `--self-test`, and a real `tiny` run.
 **Reviewed by:** whoever changes `SKILL.md`, before merging.
 
-### 3.11 An interrupted run is not resumed
+### 3.11 The archive is as complete as the orchestrator's writing was
+
+**What is not verified:** that every attempt the run made has a file. The
+archiver reads `output/<slug>/`; it cannot see an attempt whose critique was
+never written.
+**Why accepted:** the alternative is the orchestrator calling Python per
+attempt, which is a change to `SKILL.md` and therefore untestable at $0 (§3.10).
+**Scope of damage:** a chapter whose files are missing is indistinguishable from
+a chapter that was never attempted. **Bounded by being visible:** an attempt with
+no critique on file is stored with `NULL` scores and a `run_warnings` row, never
+as a pass.
+**How we would find out:** `run_warnings` with `kind = 'archive'`, and the
+`completeness` block on the run's page.
+**Reviewed by:** whoever reads a run whose warnings list is not empty.
+
+### 3.12 A run that dies mid-flight archives nothing
+
+**What is not verified:** anything about a run whose process died before
+`_finish` ran.
+**Why accepted:** archiving at completion is what made SPEC-003 testable at all.
+**Scope of damage:** the database has the run's row and nothing else. **The files
+are all still there**, and `archive_run` can be pointed at the directory by hand.
+**How we would find out:** a run at `halted: process` with zero attempts.
+**Reviewed by:** nobody routinely. It is a recovery, not a loss.
+
+### 3.13 An interrupted run is not resumed
 
 **What is not verified:** nothing — this one is absent by decision, and is here
 because absent by decision is not the same as forgotten.
@@ -616,6 +652,7 @@ step, and that is the sentence worth writing for each one.
 | the front-matter test | a change of tools reaching a run |
 | `BudgetWatcher` | a run reaching $49 without anyone deciding it |
 | `test_skill_contract.py` | the procedure and the contract diverging in silence |
+| `archive_run` | a finished run leaving no record anyone can query |
 
 **The last row was an aspiration until it was written, and it caught something on
 its first run.** `SKILL.md` told the orchestrator that a verdict is `accept`,
@@ -643,6 +680,11 @@ a validator is: not a check, a thing that makes the reading happen.
   capability again, not a type plus a test. G17 becomes **A by subtraction** —
   there is no credential to leak. G2 is rewritten as two layers, neither a
   reservation. G13 improves, because the whole run's cost now arrives measured.
+- **SPEC-003.** v2's first real run finished with a complete novel and an
+  **empty archive** — three chapters, seven drafts, four sheets on disk and zero
+  rows in `attempts`, `scores`, `findings`, `gate_decisions` and `sheets`.
+  `save_attempt`, `save_gate` and `save_sheet` existed and were called by
+  nothing. G13 gains the stored measured total; §3 gains two rows.
 - **§5 stopped being a list of intentions.** Writing the `SKILL.md` ↔ contract
   validator as a test found a live divergence in the verdict vocabulary the same
   hour — see §5. §3.1 was also corrected: it had claimed the halt was testable
@@ -662,7 +704,7 @@ reads as complete.
 |---|---|---|
 | the prose is any good | **U** | §3.9 |
 | voice, pacing, dialogue, originality hold | **U** | four of the ontology's ten dimensions, unchecked |
-| repairing one characteristic does not break another | **U** | confirmed **three** times, most recently on v2's first run: a correct `continuity` fix took `science` from 10 to 4. Re-scoring all five every attempt catches it; nothing prevents it |
+| repairing one characteristic does not break another | **U** | confirmed twice. A third case on v2's first run turned out, on reading the critique notes, to be a rule ambiguity surfaced by a sharper prompt and closed in canon — the score column alone could not tell the two apart |
 | the book is worth reading | **U** | the ontology puts a human at this gate and is right to |
 | chapter 34 reads like chapter 1 | **U** | architecture, not evidence. The longest run is eight chapters |
 | the feedback sheet's wording matters | **U** | the loop's premise. One chapter has reached attempt 3; there is almost no signal |

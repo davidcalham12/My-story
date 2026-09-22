@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Attempt, Cost, Run } from '@/shared/api/types'
 import { acceptedAttempt, bestAttempt, chapters, haltReason, unscored, worst } from './lib'
-import { gradeOf, money } from '@/shared/lib/provenance'
+import { gradeOf, money, weakestCall } from '@/shared/lib/provenance'
 
 const attempt = (over: Partial<Attempt>): Attempt => ({
   chapter: 1,
@@ -58,18 +58,35 @@ describe('scores', () => {
 describe('provenance', () => {
   const cost = (over: Partial<Cost>): Cost => ({
     calls: 10, input_tokens: 1, output_tokens: 1, total_usd: 1,
-    provenance: ['measured'], ...over,
+    summed_from_calls_usd: 1, total_provenance: 'measured',
+    provenance: ['measured'], turns: null, duration_ms: null,
+    subagent_dispatches: null, ...over,
   })
 
-  it('takes the weakest grade present, because a total is only as good as its worst part', () => {
-    expect(gradeOf(cost({ provenance: ['measured', 'reconstructed'] }))).toBe('reconstructed')
-    expect(gradeOf(cost({ provenance: ['measured'] }))).toBe('measured')
+  it('grades the total by how the total was obtained', () => {
+    expect(gradeOf(cost({ total_provenance: 'reconstructed' }))).toBe('reconstructed')
+    expect(gradeOf(cost({ total_provenance: 'absent' }))).toBe('absent')
+  })
+
+  it('keeps a measured total measured when the per-call split is absent', () => {
+    // Today's situation exactly: Claude Code's result event gives the whole
+    // run's cost, and the per-agent packets report nothing. Grading the total
+    // by its weakest call would file $18.82 of measured money as unrecorded.
+    const c = cost({ total_provenance: 'measured', provenance: ['absent'] })
+    expect(gradeOf(c)).toBe('measured')
+    expect(weakestCall(c)).toBe('absent')
+  })
+
+  it('takes the weakest grade across the calls, because a series is only as good as its worst part', () => {
+    expect(weakestCall(cost({ provenance: ['measured', 'reconstructed'] }))).toBe('reconstructed')
+    expect(weakestCall(cost({ provenance: ['measured'] }))).toBe('measured')
   })
 
   it('says "not recorded" rather than zero', () => {
     // A run that destroyed its evidence and a run where nothing happened are
     // identical in a number and must not be identical on screen.
     expect(money(cost({ calls: 0, total_usd: 0 }))).toBe('not recorded')
+    expect(money(cost({ total_usd: null }))).toBe('not recorded')
     expect(money(undefined)).toBe('not recorded')
     expect(money(cost({ total_usd: 49.33 }))).toBe('$49.33')
   })

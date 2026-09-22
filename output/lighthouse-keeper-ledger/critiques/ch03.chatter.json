@@ -1,0 +1,13 @@
+{
+  "critic": "chatter",
+  "chapter": 3,
+  "kind": "arithmetic",
+  "agent": null,
+  "method": "head -1 of the attempt file; score 0 unless the first line opens with '# Chapter'",
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "first_line": "# Chapter 3 — The Drowned Page", "findings": []},
+    {"iteration": 2, "score": 10, "first_line": "# Chapter 3 — The Drowned Page", "findings": []}
+  ],
+  "note": "chatter scored 10 on all seven drafts in this run. It never sent a chapter back, which is what a cheap arithmetic guard looks like when the writer is behaving."
+}
