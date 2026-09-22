@@ -662,7 +662,7 @@ reads as complete.
 |---|---|---|
 | the prose is any good | **U** | §3.9 |
 | voice, pacing, dialogue, originality hold | **U** | four of the ontology's ten dimensions, unchecked |
-| repairing one characteristic does not break another | **U** | confirmed to happen twice; the obvious fix is known not to have saved the case on record |
+| repairing one characteristic does not break another | **U** | confirmed **three** times, most recently on v2's first run: a correct `continuity` fix took `science` from 10 to 4. Re-scoring all five every attempt catches it; nothing prevents it |
 | the book is worth reading | **U** | the ontology puts a human at this gate and is right to |
 | chapter 34 reads like chapter 1 | **U** | architecture, not evidence. The longest run is eight chapters |
 | the feedback sheet's wording matters | **U** | the loop's premise. One chapter has reached attempt 3; there is almost no signal |

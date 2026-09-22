@@ -173,6 +173,29 @@ characteristic that was already passing. **Open. Not solved by the obvious fix**
 because `outline` *did* review the replacement and reject it. That rejection is
 the 10 → 7.
 
+**A third case, on v2's first real run, and this one was caught and repaired.**
+Chapter 1 of `lighthouse-keeper-ledger`:
+
+| attempt | continuity | science | outcome |
+|---|---|---|---|
+| 1 | **7** | 10 | retry |
+| 2 | 10 | **4** | retry |
+| 3 | 10 | 10 | promoted |
+
+`continuity` found a line putting both prior register entries in Ada's hand when
+the timeline gives the first to Walter Byrd, and asked for "in that book" instead
+of "in your hand". The repair was correct and it landed — and it moved the
+sentence onto a clause of R5 that counts entries *in the keeper's own hand*,
+which `science` then read per-keeper and scored **4**. A precise fix to one
+characteristic walked the text into a rule the other one owns.
+
+**Two things this run settles.** The failure is not rare — three for three, once
+per run that has ever needed a repair. And **re-scoring all five every attempt is
+what catches it**: `science` had passed at 10 on attempt 1 and would not have
+been consulted again under any scheme that only re-runs the failing critic. The
+cost of that decision is five critic calls per attempt instead of one; this is
+what it buys.
+
 ### 3.5 No critic grades prose, and it shows
 
 Three visible defects shipped: a sentence duplicated verbatim, a timeline error
