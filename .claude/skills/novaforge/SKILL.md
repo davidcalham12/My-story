@@ -1,16 +1,16 @@
 ---
 name: novaforge
-description: Write a novel from a premise by orchestrating the eight NovaForge subagents through the six stages of specs/flow.yaml, with a per-chapter quality gate. Use when asked to draft, generate or continue a NovaForge novel, or when asked to run a stage of the pipeline.
+description: Write a novel from a premise by orchestrating the ten NovaForge subagents through the six stages of specs/flow.yaml, with a per-chapter quality gate. Use when asked to draft, generate or continue a NovaForge novel, or when asked to run a stage of the pipeline.
 ---
 
 # NovaForge — the orchestration procedure
 
-You are the orchestrator. The eight agents in `.claude/agents/` are subagents
+You are the orchestrator. The ten agents in `.claude/agents/` are subagents
 you dispatch with the Agent tool. This file is the procedure; `specs/flow.yaml`
 is the contract it implements.
 
 **The premise decides what kind of book this is.** Not this file, not the agent
-files and not the config. All eight agents used to open by declaring themselves
+files and not the config. All the agents used to open by declaring themselves
 hard science fiction; none does now, and `novel.tone` is null until you set it.
 Read the genre off the premise and carry it into every prompt.
 
@@ -40,7 +40,7 @@ Then:
    before anything else runs.
 
    This is the single most consequential line in the run. It reaches every one
-   of the eight agents, none of which has a genre of its own any more. It used
+   of the agents, none of which has a genre of its own any more. It used
    to say `hard-scifi` permanently, and the results were exactly what you would
    expect: a cyberpunk premise came back as an engineering document with a
    bandwidth budget, and a premise about a pop star trying quesadillas came back
@@ -424,7 +424,7 @@ which is the state attempt 1 was already in.
 
 Five rules the sheet obeys, each of which is in the validator:
 
-1. **All five scores, including the passing ones.** The writer has to know what
+1. **All six scores, including the passing ones.** The writer has to know what
    is already right in order to leave it alone.
 2. **An explicit DO NOT TOUCH list.** In the saved run the writer changed two
    lines and then one. That restraint is the thing to protect: a writer that

@@ -131,7 +131,7 @@ Full statements with their class of evidence are in `docs/verification.md`.
    `input + cache_creation + cache_read`. And the orchestrator's own turns run at
    a median of 147,000 tokens: **halting on those would halt every run**, because
    the ceiling was never the orchestrator's budget.
-3. **Five characteristics, each 0–10, all ≥ 8, aggregated with `min`.**
+3. **Six characteristics, each 0–10, all ≥ 8, aggregated with `min`** (SPEC-006 added `prose`).
    `continuity`, `science`, `outline` (10 − 3 per missing beat − 1 per beat out
    of order), `length` (word count, in band or 0), `chatter` (0 unless it opens
    `# Chapter`). Two are arithmetic and reproduce; three are model judgement and
@@ -160,7 +160,7 @@ Full statements with their class of evidence are in `docs/verification.md`.
 
 ## Not changed without a recorded decision
 
-The threshold of 8 · the five characteristics · the third attempt as the last ·
+The threshold of 8 · the six characteristics · the third attempt as the last ·
 the `tools:` line of every agent · `patch_then_halt` · the 100k ceiling ·
 the budget ceiling.
 

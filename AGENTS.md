@@ -159,7 +159,7 @@ All six. A change missing any of them is not done, it is in progress.
 ## 6. Never touched without an approved SPEC that names it
 
 - the threshold of **8**
-- the **five characteristics**
+- the **six characteristics**
 - the **third attempt** as the last
 - the **`tools:` line of any agent** — that line IS the authority model, and
   `chapter-writer`'s `Glob` is why prior prose is unreachable rather than merely

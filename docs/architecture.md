@@ -621,7 +621,7 @@ before the code exists.
 
 ---
 
-## 8.3 What is built, 2026-09-22
+### 8.3 What is built, 2026-09-22
 
 | phase | state |
 |---|---|
