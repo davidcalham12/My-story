@@ -478,7 +478,28 @@ means *the patch brought this to the threshold*, so a `patched` row still under
 it is incoherent and `decide` cannot produce one. The exemption was the widest
 possible hole, under the one label nobody would think to question.
 
-### 7.3 Zero is a value, and this is the family the bugs come in
+### 7.3 A rule lives in one place, and the count is the tell
+
+Finding the pass rule written twice was worth searching for the others. The
+threshold — 8 — turned out to be written in **four**:
+
+| where | now |
+|---|---|
+| `config/novel.config.json` | the source |
+| `chapters/domain.py` | the default, from the config |
+| `runs/archive.py` | **a literal `8`**, four lines from the module that owns it — and `commons/config/loader.py` opens by saying exactly why that is wrong |
+| `frontend/.../lib.ts` | a literal, in a language that cannot import it — so a test compares it |
+
+The panel also said *"All five must reach 8"* after the gate had six, and its
+column-label map was `Record<string, string>`, so the missing `prose` entry
+returned `undefined` and **the column would have shipped with no name**. Typed
+against `Characteristic`, the compiler refuses an incomplete map — which is the
+difference between a rule and a reminder.
+
+**The pattern worth keeping:** when a defect turns out to be two copies of one
+fact, the next move is not to fix that pair. It is to count the copies.
+
+### 7.4 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

@@ -1,12 +1,21 @@
-import { CHARACTERISTICS, type Attempt, type RunDetail } from '@/shared/api/types'
+import { CHARACTERISTICS, type Attempt, type Characteristic, type RunDetail } from '@/shared/api/types'
 import { THRESHOLD, bestAttempt, chapters, unscored, worst } from '@/entities/run/lib'
 
-const LABEL: Record<string, string> = {
+/**
+ * Typed against `Characteristic`, not `string`.
+ *
+ * As `Record<string, string>` a missing entry returned `undefined` and the
+ * column header rendered empty — which is how SPEC-006's `prose` column would
+ * have shipped nameless. The compiler refuses an incomplete map now, so the next
+ * characteristic cannot be added without naming it here.
+ */
+const LABEL: Record<Characteristic, string> = {
   continuity: 'Continuity',
   science: 'Science',
   outline: 'Outline',
   length: 'Length',
   chatter: 'Heading',
+  prose: 'Prose',
 }
 
 function Score({ attempt, which }: { attempt: Attempt; which: string }) {
@@ -53,10 +62,11 @@ export function Quality({ detail }: { detail: RunDetail }) {
     <>
       <h2>The gate</h2>
       <p className="hint">
-        All five must reach {THRESHOLD}; they aggregate with <code>min</code>.
+        All {CHARACTERISTICS.length} must reach {THRESHOLD}; they aggregate with{' '}
+        <code>min</code>.
         {run.source === 'pre-loop003' && (
           <>
-            {' '}This run predates the five-characteristic gate, so missing columns
+            {' '}This run predates this gate, so missing columns
             mean the characteristic did not exist — not that it scored nothing.
           </>
         )}

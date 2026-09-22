@@ -1,0 +1,13 @@
+{"critic": "science", "chapter": 4, "kind": "model",
+ "agent": "science-critic", "drafts": 2,
+ "note": "The world critic under a historical name; audits against the bullets under ## Rules and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "rule-scope-overclaim", "severity": "medium",
+      "quote": "He had measured to it and from it eleven times in five days. It was the one thing in Scarrowdale he no longer had to think about.",
+      "claim": "R2 guarantees the three constants singly and in relation to one another. A chain distance run from ordinary ground to the ford stone is not covered, and falls under R2's second sentence - everything else measures differently each time. The passage promises a reliability the rule does not extend to it.",
+      "fix": "Make it the stone taken against the church tower, one constant to another.",
+      "reference": "bible/world.md, R2"}]},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "resolution": "Upheld and patched. The sentence became 'He had taken it against the church tower eleven times in five days, one fixed thing sighted to another, and it had closed the same every time.' The beat is unchanged - he still rides past without looking down - and the claim is now exactly what R2 grants.",
+ "orchestrator_note": "This finding is worth more than its severity suggests. The book's resolution rebuilds the whole triangulation on the three constants, and that only works if R2's scope has been stated correctly from the first time the reader meets it. The critic caught a promise the book would have had to break in Chapter 8."}

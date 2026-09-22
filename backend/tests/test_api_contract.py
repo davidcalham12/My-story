@@ -124,3 +124,36 @@ def test_the_panel_knows_every_characteristic_the_gate_scores():
         f"the gate scores and the panel cannot show: "
         f"{set(CHARACTERISTICS) - declared}"
     )
+
+
+def test_the_panel_and_the_config_agree_on_the_threshold():
+    """A fourth copy of the number, in a language that cannot import it.
+
+    `commons/config/loader.py` opens by saying a threshold written into Python is
+    a second source of truth and the two disagree within a month. It is written
+    into TypeScript too, where the argument is the same and the import is not
+    available — so the check is.
+    """
+    import json
+
+    config = json.loads((ROOT / "config/novel.config.json").read_text(encoding="utf-8"))
+    lib = (ROOT / "frontend/src/entities/run/lib.ts").read_text(encoding="utf-8")
+    match = re.search(r"export const THRESHOLD = (\d+)", lib)
+    assert match, "the panel no longer states a threshold"
+    assert int(match.group(1)) == config["quality_gate"]["threshold"]
+
+
+def test_the_panel_names_every_characteristic_it_shows_a_column_for():
+    """`Record<string, string>` returned undefined for a missing entry and the
+    column header rendered empty — which is how `prose` would have shipped
+    nameless. It is typed against `Characteristic` now; this says so out loud so
+    the type cannot be loosened back without a red test."""
+    from backend.chapters.domain import CHARACTERISTICS
+
+    quality = (ROOT / "frontend/src/pages/quality/Quality.tsx").read_text(encoding="utf-8")
+    assert "Record<Characteristic, string>" in quality, (
+        "LABEL is no longer typed against Characteristic; a missing column name "
+        "would render empty again"
+    )
+    for characteristic in CHARACTERISTICS:
+        assert f"{characteristic}:" in quality, characteristic

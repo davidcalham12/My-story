@@ -25,11 +25,15 @@ import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from backend.chapters.domain import CHARACTERISTICS
+from backend.chapters.domain import CHARACTERISTICS, THRESHOLD_DEFAULT
 from backend.chapters.domain import aggregate as aggregate_of
 from backend.commons.db import repository
 
-THRESHOLD = 8
+#: Imported, not written again. `commons/config/loader.py` opens by saying a
+#: threshold written into Python is a second source of truth and the two
+#: disagree within a month — and this file had one, four lines from the module
+#: that owns it.
+THRESHOLD = THRESHOLD_DEFAULT
 
 #: `chNN.attemptK.md`
 DRAFT = re.compile(r"^ch(\d+)\.attempt(\d+)$")

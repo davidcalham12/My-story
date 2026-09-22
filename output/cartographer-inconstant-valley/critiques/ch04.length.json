@@ -1,0 +1,9 @@
+{"critic": "length", "chapter": 4, "kind": "arithmetic",
+ "agent": null, "drafts": 2,
+ "method": "wc -w on the draft file, run by the orchestrator in the shell. Reproduces exactly.",
+ "band": {"min": 720, "max": 1680,
+          "derivation": "novel.words_per_chapter.min 900 and .max 1400 from config/profiles/small.json, widened by novel.tolerance_pct 20"},
+ "iterations": [
+   {"iteration": 1, "score": 10, "words": 1296, "findings": []},
+   {"iteration": 2, "score": 10, "words": 1330, "findings": [],
+    "note": "Up 34 words: two of the four substitutions replaced a short clause with a longer one. Still comfortably in band."}]}
