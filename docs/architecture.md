@@ -52,7 +52,7 @@ chapters/
 `service → repository` through a Protocol. `domain.py` imports only the standard
 library.
 
-This is not tidiness. It is what makes the gate testable: the `min` of five
+This is not tidiness. It is what makes the gate testable: the `min` of six
 scores, `10 − 3` per missing beat, the word band, a sheet's completeness — all
 arithmetic over values, testable in `domain.py` with no database, no HTTP and no
 model. In v1 those rules were entangled with network calls, so the only way to

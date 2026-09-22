@@ -131,30 +131,25 @@ Full statements with their class of evidence are in `docs/verification.md`.
    `input + cache_creation + cache_read`. And the orchestrator's own turns run at
    a median of 147,000 tokens: **halting on those would halt every run**, because
    the ceiling was never the orchestrator's budget.
-3. **Six characteristics, each 0–10, all ≥ 8, aggregated with `min`** (SPEC-006 added `prose`).
-   `continuity`, `science`, `outline` (10 − 3 per missing beat − 1 per beat out
-   of order), `length` (word count, in band or 0), `chatter` (0 unless it opens
-   `# Chapter`). Two are arithmetic and reproduce; three are model judgement and
-   do not.
-4. **Three attempts, escalating.** Attempt 2 gets the correction described;
-   attempt 3 gets the critic's literal replacement sentence.
-5. **`patch_then_halt`.** If three attempts fail, the orchestrator applies the
-   replacements itself — arbitrating each first — and rescores. If it still
-   fails, **the run stops**. Never `accept_with_warnings`.
-6. **Only `worldbuilder` and `character-architect` write the Story Bible.** Every
+3. **The gate: six characteristics, `min`, threshold 8, three escalating
+   attempts, then `patch_then_halt`.** The sequence and the numbers are in
+   `docs/architecture.md` §3.3, which scores are arithmetic and which are
+   model judgement in `docs/verification.md` G3, and what may not change
+   without a spec in `AGENTS.md` §6. This file does not restate them.
+4. **Only `worldbuilder` and `character-architect` write the Story Bible.** Every
    other agent returns text; the orchestrator writes the file.
-7. **The book is assembled in code**, never by an agent. A model asked to
+5. **The book is assembled in code**, never by an agent. A model asked to
    concatenate paraphrases a sentence in the middle.
-8. **The outline is audited against `## Rules` before FLOW-4.** A beat that
+6. **The outline is audited against `## Rules` before FLOW-4.** A beat that
    commissions what the world forbids produces a chapter that cannot pass, and no
    redrafting saves it.
-9. **Provenance on every figure**: `measured` · `reported` · `reconstructed` ·
+7. **Provenance on every figure**: `measured` · `reported` · `reconstructed` ·
    `estimated` · `absent`. **What cannot be measured is said to be unmeasurable,
    never reported as zero.**
-10. **Budget ceiling measured on the stream.** The call that crosses it finishes
+8. **Budget ceiling measured on the stream.** The call that crosses it finishes
     and the next does not start — the overshoot is bounded by one call, not by
     zero. What the run produced is left readable.
-11. **No agent declares a genre.** The genre is read off the premise and recorded
+9. **No agent declares a genre.** The genre is read off the premise and recorded
     in the run's config snapshot.
 
 ---
