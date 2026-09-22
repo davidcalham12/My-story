@@ -1,0 +1,22 @@
+{"critic": "outline", "chapter": 3, "kind": "model",
+ "agent": "outline-critic", "drafts": 2,
+ "formula": "10 minus 3 per missing beat, minus 1 per beat out of order",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [],
+    "beats": [{"beat": 1, "present": true, "draft_position": 1},
+              {"beat": 2, "present": true, "draft_position": 2},
+              {"beat": 3, "present": true, "draft_position": 3},
+              {"beat": 4, "present": true, "draft_position": 4}],
+    "missing": [], "out_of_order": [], "ends_on_honoured": true},
+   {"iteration": 2, "score": 10, "findings": [],
+    "beats": [
+      {"beat": 1, "present": true, "draft_position": 1,
+       "notes": "Sermon content and the congregation following it perfectly both shown."},
+      {"beat": 2, "present": true, "draft_position": 2,
+       "notes": "All four named elements: both poles on the named hills, angles in clear weather, both witnesses signing at the station before Hale leaves it, tea at three farms in turn."},
+      {"beat": 3, "present": true, "draft_position": 3,
+       "notes": "Solo re-measurement, exact agreement, second walk from the far end."},
+      {"beat": 4, "present": true, "draft_position": 4,
+       "notes": "Margin note in ink in his own hand; Fowler watches and is silent."}],
+    "missing": [], "out_of_order": [], "ends_on_honoured": true}],
+ "orchestrator_note": "Scored 10 on both attempts. On iteration 1 the critic was told explicitly that whether the chapter's figure agreed with an earlier chapter's was a continuity question and not its own, and that it should not let that change the score. It did not, and it noted the concern in its beat-3 notes both times - which is the behaviour wanted: the beat critic judges the commission, the continuity critic judges the canon, and neither borrows the other's job."}

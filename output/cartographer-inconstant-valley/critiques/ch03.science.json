@@ -1,0 +1,15 @@
+{"critic": "science", "chapter": 3, "kind": "model",
+ "agent": "science-critic", "drafts": 2,
+ "note": "The world critic under a historical name; audits against the bullets under ## Rules and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 8, "findings": [
+     {"kind": "rule-violation", "severity": "medium", "late": true,
+      "quote": "Then there's a stretch that is about as long again, and at the end of that stretch is the place my father put his hand on when I was a lad of nine",
+      "claim": "Amos Dent is dale-born and 'about as long again' is a relative spatial comparison said aloud, inside a sermon the narration then describes as having no distance in it.",
+      "fix": "Make it a duration rather than a length.",
+      "reference": "bible/world.md, R4"}]}],
+ "arbitration_of_the_late_finding": "UPHELD on the substance, with one correction to the critic's reasoning: it cited 'not so much as a good step' as R4's own wording, but that phrase is in the DRAFT's narration, not in the rule. The finding stands regardless - a spatial comparison in a dale-born mouth contradicts the narration two paragraphs later. Patched by literal substitution: 'is about as long again' became 'takes about as long again'. One word.",
+ "blocking_score_iteration_2": 10,
+ "blocking_score_note": "feedback.late_finding_blocks is false, and the finding was patched besides. The raw score the critic returned was 8 and is recorded above unaltered. The same critic read the same sentence on iteration 1 and scored it 10 with no findings, which is what 'late' means here: the critic did not read the same way twice.",
+ "gap": "This is the reproducibility limit the architecture states plainly. Two reads of the same sentence by the same critic gave 10 and 8. That is a property of a model critic, not of the text."}

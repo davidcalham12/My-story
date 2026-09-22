@@ -416,7 +416,29 @@ The pattern behind all three: **an instrument is most wrong in the direction of
 having an opinion.** Each one preferred a confident answer to none, and in each
 case none was correct.
 
-### 7.1 Zero is a value, and this is the family the bugs come in
+### 7.1 The procedure is a file, and a file can change under a run
+
+`SKILL.md` **is** the pipeline — Annex C left exactly one implementation of it —
+and it is a file anyone can edit while a run is in flight. **That happened.** A
+sixth characteristic was added during an eight-chapter run: chapters 1 and 2 were
+judged by five, and everything after could be judged by six.
+
+Nothing noticed. The config has been snapshotted per run since the first
+migration, for precisely this reason; **the procedure was not**, and the
+procedure is the larger half of what a run does.
+
+The result is not a broken run — it is worse in a quieter way. It is **a run that
+is not a clean sample of either gate**, whose cost cannot be compared with a
+five-characteristic run's and whose pass rate cannot be compared with a
+six's. That is the same contamination `source: pre-loop003` exists to prevent
+between implementations, appearing inside one run.
+
+Runs now carry a SHA of `SKILL.md` at start and at end, and a mismatch writes a
+`procedure-changed` warning. **A missing fingerprint is absent, not "unchanged"** —
+runs that finished before this existed say nothing rather than claiming the
+procedure held.
+
+### 7.2 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

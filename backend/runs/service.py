@@ -10,6 +10,7 @@ The only access to a model is the user's Claude Code session on this machine.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import queue
 import re
@@ -117,6 +118,7 @@ class RunService:
                 # records what it decided. A default here would weld it shut.
                 tone=tone.strip() or None, snapshot=cfg,
             )
+            write_repo.save_skill_sha(self.conn, run_id, at_start=self._skill_sha())
             live = Live(run_id=run_id)
             self._live = live
 
@@ -220,10 +222,45 @@ class RunService:
         if state.total_cost_usd is not None:
             self._write_cost(state)
 
+        self._check_procedure_held(live)
         self._archive(live, state)
 
         live.done = True
         live.events.put(None)
+
+    def _skill_sha(self) -> str | None:
+        """A fingerprint of the procedure, taken at the start and at the end.
+
+        `SKILL.md` **is** the pipeline — Annex C left one implementation of it —
+        and it is a file anyone can edit while a run is in flight. That happened:
+        a sixth characteristic was added during an eight-chapter run, so its
+        first chapters were judged by five and the rest by six. Nothing noticed,
+        because the config was snapshotted per run and the procedure was not.
+        """
+        path = (Path(self.settings.repo_root)
+                / ".claude/skills/novaforge/SKILL.md")
+        try:
+            return hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+        except OSError:
+            # Absent, not "unchanged". A missing fingerprint must not read as a
+            # matching one.
+            return None
+
+    def _check_procedure_held(self, live: Live) -> None:
+        after = self._skill_sha()
+        write_repo.save_skill_sha(self.conn, live.run_id, at_end=after)
+        row = self.conn.execute(
+            "SELECT skill_sha_at_start FROM runs WHERE id = ?", (live.run_id,)
+        ).fetchone()
+        before = row["skill_sha_at_start"] if row else None
+        if before and after and before != after:
+            write_repo.warn(
+                self.conn, live.run_id, "procedure-changed",
+                f"SKILL.md changed while this run was in flight "
+                f"({before} → {after}). Its early chapters and its late ones were "
+                f"not necessarily produced by the same procedure, so this run is "
+                f"not a clean sample of either.",
+            )
 
     def _archive(self, live: Live, state: State) -> None:
         """Read the run's own record off disk into the database. SPEC-003.

@@ -321,3 +321,33 @@ def test_a_clean_prose_report_adds_no_warnings(db, tmp_path):
                           tone=None, snapshot="{}")
     report = archive_run(db, "r", tmp_path)
     assert report.prose_defects == 0
+
+
+def test_a_procedure_that_changed_mid_run_is_recorded(db):
+    """SKILL.md is the pipeline, and it is a file anyone can edit mid-run.
+
+    It happened: a sixth characteristic was added during an eight-chapter run,
+    so its first chapters were judged by five and the rest could be judged by
+    six. The config is snapshotted per run for exactly this reason; the
+    procedure was not, and nothing noticed.
+    """
+    repository.create_run(db, run_id="r", slug="s", premise="p", profile="tiny",
+                          tone=None, snapshot="{}")
+    repository.save_skill_sha(db, "r", at_start="aaaa")
+    repository.save_skill_sha(db, "r", at_end="bbbb")
+    row = db.execute(
+        "SELECT skill_sha_at_start, skill_sha_at_end FROM runs WHERE id = 'r'"
+    ).fetchone()
+    assert row["skill_sha_at_start"] != row["skill_sha_at_end"]
+
+
+def test_a_missing_fingerprint_is_absent_not_unchanged(db):
+    """A run that finished before this existed has no fingerprint. That is not
+    the same claim as "the procedure held"."""
+    repository.create_run(db, run_id="r", slug="s", premise="p", profile="tiny",
+                          tone=None, snapshot="{}")
+    row = db.execute(
+        "SELECT skill_sha_at_start, skill_sha_at_end FROM runs WHERE id = 'r'"
+    ).fetchone()
+    assert row["skill_sha_at_start"] is None
+    assert row["skill_sha_at_end"] is None

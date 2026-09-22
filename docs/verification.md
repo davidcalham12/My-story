@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **317 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **319 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -273,7 +273,7 @@ FLOW-5 and FLOW-6 never ran. That is the whole path exercised end to end, once.
 
 **Why the second half is still D — and what now backs it.** The script decides;
 the orchestrator acts. Whether it calls the script and does what it says is a
-procedure, §3.11's limit, not a missing test.
+procedure, §3.12's limit, not a missing test.
 
 **But disobedience is no longer invisible.** `conformance.audit()` recomputes the
 decision at every archived attempt and reports the contradictions: a draft
@@ -553,7 +553,7 @@ cases behind it. What is left is smaller and still real.
 **What is not verified:** that the orchestrator calls
 `python -m backend.chapters.decide` and obeys the answer, on every chapter of
 every run.
-**Why accepted:** it is §3.11 — the procedure in `SKILL.md` cannot be tested at
+**Why accepted:** it is §3.12 — the procedure in `SKILL.md` cannot be tested at
 $0, and there is no way to make a model's obedience a unit test. What could be
 moved into code has been.
 **Scope of damage:** the project's central safety claim, but **bounded by what
@@ -718,7 +718,23 @@ and the quote rule — a finding that cannot be quoted is not counted, which is 
 cheapest filter available.
 **Reviewed by:** the orchestrator, per finding, with more care than before.
 
-### 3.11 The procedure in `SKILL.md` cannot be tested at $0
+### 3.11 A run's procedure can change while it is running
+
+**What is not verified:** that the `SKILL.md` a run finished under is the one it
+started under.
+**Why accepted:** it cannot be prevented without locking a file someone may
+legitimately need to fix mid-run, and a lock that stops a repair is worse than a
+warning that names a contamination.
+**Scope of damage:** **it has already happened.** SPEC-006 added a sixth
+characteristic during an eight-chapter run, so chapters 1–2 were judged by five
+and the rest could be judged by six. Not a broken run — a run that is **not a
+clean sample of either gate**, whose cost and pass rate compare to neither.
+**How we would find out:** a SHA of `SKILL.md` is recorded at start and at end,
+and a mismatch writes a `procedure-changed` warning on the run. A missing
+fingerprint reads as absent, never as "unchanged".
+**Reviewed by:** whoever reads the run, on the run's own page.
+
+### 3.12 The procedure in `SKILL.md` cannot be tested at $0
 
 **What is not verified:** that a change to the orchestration procedure produces
 the right behaviour, before a real run.
@@ -747,13 +763,13 @@ gate is concerned.
 and a real run.
 **Reviewed by:** whoever changes `SKILL.md`, before merging.
 
-### 3.12 The archive is as complete as the orchestrator's writing was
+### 3.13 The archive is as complete as the orchestrator's writing was
 
 **What is not verified:** that every attempt the run made has a file. The
 archiver reads `output/<slug>/`; it cannot see an attempt whose critique was
 never written.
 **Why accepted:** the alternative is the orchestrator calling Python per
-attempt, which is a change to `SKILL.md` and therefore untestable at $0 (§3.11).
+attempt, which is a change to `SKILL.md` and therefore untestable at $0 (§3.12).
 **Scope of damage:** a chapter whose files are missing is indistinguishable from
 a chapter that was never attempted. **Bounded by being visible:** an attempt with
 no critique on file is stored with `NULL` scores and a `run_warnings` row, never
@@ -762,7 +778,7 @@ as a pass.
 `completeness` block on the run's page.
 **Reviewed by:** whoever reads a run whose warnings list is not empty.
 
-### 3.13 A run that dies mid-flight archives nothing
+### 3.14 A run that dies mid-flight archives nothing
 
 **What is not verified:** anything about a run whose process died before
 `_finish` ran.
@@ -772,7 +788,7 @@ are all still there**, and `archive_run` can be pointed at the directory by hand
 **How we would find out:** a run at `halted: process` with zero attempts.
 **Reviewed by:** nobody routinely. It is a recovery, not a loss.
 
-### 3.14 An interrupted run is not resumed
+### 3.15 An interrupted run is not resumed
 
 **What is not verified:** nothing — this one is absent by decision, and is here
 because absent by decision is not the same as forgotten.

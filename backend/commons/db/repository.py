@@ -57,6 +57,26 @@ def finish(conn, run_id: str) -> None:
         )
 
 
+def save_skill_sha(conn, run_id: str, *, at_start: str | None = None,
+                   at_end: str | None = None) -> None:
+    """Fingerprint the procedure a run ran under.
+
+    `SKILL.md` is the pipeline, and it is a file anyone can edit mid-run. That
+    happened: a sixth characteristic was added during an eight-chapter run, so
+    its first chapters were judged by five and the rest could be judged by six.
+    A run whose procedure changed underneath it is not a clean sample, and that
+    has to be a recorded fact rather than something someone remembers.
+    """
+    if at_start is not None:
+        with tx(conn):
+            conn.execute("UPDATE runs SET skill_sha_at_start = ? WHERE id = ?",
+                         (at_start, run_id))
+    if at_end is not None:
+        with tx(conn):
+            conn.execute("UPDATE runs SET skill_sha_at_end = ? WHERE id = ?",
+                         (at_end, run_id))
+
+
 def save_cost(conn, run_id: str, *, cost_usd: float, provenance: str = "measured",
               turns=None, duration_ms=None, subagent_dispatches=None) -> None:
     """The whole run's cost, from Claude Code's `result` event. SPEC-003 A7.
