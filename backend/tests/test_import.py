@@ -172,3 +172,36 @@ def test_unkept_drafts_are_recorded_as_unkept(imported):
         "SELECT COUNT(*) AS n FROM attempts WHERE draft_path = '(not kept)'"
     ).fetchone()["n"]
     assert unkept > 0
+
+
+# ------------------------------------------------- PLAN-007 6.1: the switches
+
+
+def test_an_unknown_critique_shape_is_a_parse_error_row_not_a_drop(db, tmp_path):
+    """AC-7: three shapes are known. A fourth must leave a trace, because a
+    silently dropped critique reads later as 'this critic was never run'."""
+    import json
+    from backend.commons.db.import_v1 import import_run
+
+    run_dir = tmp_path / "fourth-shape"
+    (run_dir / "critiques").mkdir(parents=True)
+    (run_dir / "state.json").write_text(json.dumps({
+        "premise": "A premise.", "profile": "tiny", "stage": "FLOW-6",
+        "chapters": [{"n": 1, "drafts": 1}],
+    }), encoding="utf-8")
+    # A known shape beside the unknown one: the run still imports.
+    (run_dir / "critiques" / "ch01.science.json").write_text(
+        json.dumps([{"iteration": 1, "score": 9, "findings": []}]), encoding="utf-8")
+    (run_dir / "critiques" / "ch01.continuity.json").write_text(
+        json.dumps({"verdict": "looks fine", "remarks": ["nothing numeric"]}), encoding="utf-8")
+
+    import_run(db, run_dir)
+
+    scores = db.execute(
+        "SELECT characteristic, score FROM scores s JOIN attempts a ON a.id = s.attempt_id "
+        "WHERE a.run_id = 'fourth-shape'").fetchall()
+    assert [(r["characteristic"], r["score"]) for r in scores] == [("science", 9)]
+    warnings = db.execute(
+        "SELECT kind, detail, chapter FROM run_warnings WHERE run_id = 'fourth-shape'").fetchall()
+    assert [(w["kind"], w["chapter"]) for w in warnings] == [("parse_error", 1)]
+    assert "ch01.continuity.json" in warnings[0]["detail"]

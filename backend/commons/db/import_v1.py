@@ -46,7 +46,7 @@ class ImportReport:
     missing: dict[str, str]
 
 
-def _iterations(raw: Any) -> list[dict]:
+def _iterations(raw: Any) -> list[dict] | None:
     """A critique file, in whichever of three shapes its run happened to write.
 
     The shape was never specified, so each run chose one. Being strict about a
@@ -60,7 +60,9 @@ def _iterations(raw: Any) -> list[dict]:
             return [it for it in raw["iterations"] if isinstance(it, dict)]
         if isinstance(raw.get("score"), (int, float)):
             return [raw]
-    return []
+    # A fourth shape. None, not []: the caller records it, because a critique
+    # silently dropped reads later as "this critic was never run" (AC-7).
+    return None
 
 
 def _int(value: Any, default: int | None = None) -> int | None:
@@ -254,7 +256,17 @@ def _import_scores(conn, attempt_id: int, run_dir: Path, chapter: int, attempt: 
         path = run_dir / "critiques" / f"ch{chapter:02d}.{characteristic}.json"
         if not path.exists():
             continue
-        for it in _iterations(_read_json(path)):
+        iterations = _iterations(_read_json(path))
+        if iterations is None:
+            conn.execute(
+                "INSERT INTO run_warnings (run_id, kind, detail, chapter, ts) "
+                "VALUES (?,?,?,?,?)",
+                (run_dir.name, "parse_error",
+                 f"{path.name}: unrecognised critique shape, not imported",
+                 chapter, datetime.now(timezone.utc).isoformat()),
+            )
+            continue
+        for it in iterations:
             if (it.get("iteration") or 1) != attempt:
                 continue
             score = it.get("score")

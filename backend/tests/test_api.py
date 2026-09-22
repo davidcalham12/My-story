@@ -143,3 +143,56 @@ def test_a_failure_in_the_post_run_bookkeeping_still_ends_the_stream(client, mon
             if kinds and kinds[-1] == "done":
                 break
     assert kinds[-1] == "done", "the stream must end even when bookkeeping fails"
+
+
+# ------------------------------------------------- PLAN-007 6.1: the switches
+
+
+@pytest.fixture
+def client_for(db, tmp_path):
+    """A client whose recorded stream is a *modified* copy of the fixture: the
+    switch is a different recording, never a change to the replay double."""
+    def make(lines: list[str]):
+        fixture = tmp_path / "switched.stream.jsonl"
+        fixture.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path,
+                            use_recorded_stream=True, recorded_stream=fixture,
+                            budget_ceiling_usd=1000.0)
+        service = RunService(db, settings)
+        app.dependency_overrides[runs_router.get_service] = lambda: service
+        return TestClient(app)
+    yield make
+    app.dependency_overrides.pop(runs_router.get_service, None)
+
+
+FIXTURE_LINES = (Path(__file__).resolve().parent / "fixtures" / "recorded-run.stream.jsonl") \
+    .read_text(encoding="utf-8").splitlines()
+
+
+def test_a_malformed_line_becomes_a_run_warning(client_for):
+    """AC-2: logged, not lost. The log here is the database — `run_warnings` —
+    because the backend writes no other (PLAN-007 P-8)."""
+    lines = list(FIXTURE_LINES)
+    lines.insert(5, "garbage that is not json")
+    with client_for(lines) as client:
+        run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+        events = _wait(client, run_id)
+        assert events[-1][1]["result"] == "complete"
+        warnings = client.get(f"/api/runs/{run_id}").json()["warnings"]
+    kinds = [w["kind"] for w in warnings]
+    assert "malformed_line" in kinds
+    assert any("garbage" in w["detail"] for w in warnings)
+
+
+def test_a_stream_that_ends_without_result_halts_process(client_for):
+    """FR-RNR-7: the orchestrator died. Everything written stays readable; the
+    run is marked, not resumed."""
+    lines = [l for l in FIXTURE_LINES if '"type": "result"' not in l]
+    assert len(lines) == len(FIXTURE_LINES) - 1, "the fixture has exactly one result line"
+    with client_for(lines) as client:
+        run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+        events = _wait(client, run_id)
+        assert events[-1][1]["result"] == "halted: process"
+        run = client.get(f"/api/runs/{run_id}").json()["run"]
+    assert run["halted"] == "process"
+    assert "result" in run["halted_detail"]

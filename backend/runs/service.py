@@ -236,6 +236,11 @@ class RunService:
             if state.total_cost_usd is not None:
                 self._write_cost(state)
 
+            # The parser skips a line it cannot read; the record says so. The
+            # backend writes no log file, so the database is the log (P-8).
+            for raw in getattr(live.process, "skipped", None) or []:
+                write_repo.warn(self.conn, live.run_id, "malformed_line", raw)
+
             self._check_procedure_held(live)
             self._archive(live, state)
         except Exception as exc:  # noqa: BLE001 - see the docstring

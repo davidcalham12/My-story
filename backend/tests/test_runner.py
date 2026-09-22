@@ -203,3 +203,24 @@ def test_stopping_the_replay_ends_the_stream():
         if seen == 3:
             process.stop()
     assert seen <= 4
+
+
+# ------------------------------------------------- PLAN-007 6.1: the switches
+
+
+def test_a_line_that_is_not_json_is_kept_as_skipped_not_silently_dropped(tmp_path):
+    """SPEC-007 FR-RNR-2 / AC-2: a malformed line is *logged* and skipped. The
+    parser used to `continue` and forget; a stream that quietly loses lines is
+    indistinguishable from one that never had them."""
+    fixture = tmp_path / "stream.jsonl"
+    fixture.write_text(
+        '{"type": "system", "subtype": "init"}\n'
+        'this is not json\n'
+        '{"type": "result", "total_cost_usd": 0.01, "num_turns": 1}\n',
+        encoding="utf-8",
+    )
+    process = ReplayProcess(fixture=fixture)
+    process.start()
+    events = list(process.events())
+    assert [e["type"] for e in events] == ["system", "result"]
+    assert process.skipped == ["this is not json"]

@@ -86,6 +86,9 @@ class RunProcess:
     command: list[str]
     prompt: str
     cwd: Path
+    #: Lines that would not parse, kept verbatim. A stream that quietly loses
+    #: lines is indistinguishable from one that never had them (SPEC-007 AC-2).
+    skipped: list[str] = field(default_factory=list)
     _process: subprocess.Popen | None = field(default=None, repr=False)
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
@@ -146,6 +149,7 @@ class RunProcess:
             try:
                 yield json.loads(line)
             except json.JSONDecodeError:
+                self.skipped.append(line[:500])
                 continue
 
     def stop(self) -> None:
@@ -185,6 +189,7 @@ class ReplayProcess:
     fixture: Path
     prompt: str = ""
     stopped: bool = False
+    skipped: list[str] = field(default_factory=list)
     _stop_after: int | None = None
 
     def start(self) -> None:
@@ -201,6 +206,7 @@ class ReplayProcess:
             try:
                 event = json.loads(line)
             except json.JSONDecodeError:
+                self.skipped.append(line[:500])
                 continue
             yield event
             emitted += 1
