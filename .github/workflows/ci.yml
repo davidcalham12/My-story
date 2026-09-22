@@ -18,7 +18,7 @@ jobs:
       - run: pip install fastapi uvicorn pydantic pyyaml pytest httpx sqlite-vec
       - name: Tests
         env:
-          USE_MOCK_ENGINE: 'true'
+          USE_RECORDED_STREAM: 'true'
         run: python -m pytest backend/tests -q
 
   frontend:

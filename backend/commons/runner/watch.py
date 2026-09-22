@@ -1,0 +1,317 @@
+"""Reading the stream: what happened, what it cost, and when to stop it.
+
+Three jobs, all from the same line of JSON:
+
+1. **Progress** — which stage, chapter, attempt and agent, inferred from the tool
+   calls and the paths being written. Inferred, not counted: this is reading
+   someone else's work over their shoulder, so what it reports is the last thing
+   it recognised rather than a position in a plan it owns.
+2. **Accounting** — real token usage per message, and the whole run's cost from
+   the final `result`. Measured, not estimated.
+3. **The two watchers** — budget and context. Both act *after* a call rather than
+   before it, which is the honest cost of Claude Code assembling the prompts.
+"""
+
+from __future__ import annotations
+
+import re
+from dataclasses import dataclass, field
+
+OUTPUT_PATH = re.compile(r"output[/\\]([^/\\]+)[/\\]")
+CHAPTER_FILE = re.compile(r"ch(\d+)\.attempt(\d+)\.md")
+STAGE_HINT = re.compile(r"\bFLOW-[1-6]\b")
+
+# The nine. Anything else dispatched is worth noticing rather than assuming.
+AGENTS = {
+    "worldbuilder", "character-architect", "plot-architect", "chapter-writer",
+    "continuity-critic", "science-critic", "outline-critic", "style-editor",
+    "publisher",
+}
+
+
+@dataclass
+class State:
+    """What the run is doing, as far as the stream lets anyone tell."""
+
+    slug: str | None = None
+    stage: str | None = None
+    chapter: int | None = None
+    attempt: int | None = None
+    agent: str | None = None
+    headline: str = "starting"
+    dispatched: list[str] = field(default_factory=list)
+    written: list[str] = field(default_factory=list)
+
+    # Accounting, from `usage` on assistant messages. These are REAL numbers the
+    # model reported, not a rule of thumb — the provenance is `measured`.
+    input_tokens: int = 0
+    output_tokens: int = 0
+    calls: int = 0
+
+    # From the final `result`, which covers the WHOLE run including the
+    # orchestrator's own turns. This is the figure v1 could not see, and its
+    # absence is why a $6.21 estimate stood in for $49.33.
+    total_cost_usd: float | None = None
+    turns: int | None = None
+    duration_ms: int | None = None
+    finished: bool = False
+    error: str | None = None
+
+
+def _message(event: dict) -> dict:
+    """The message object, or an empty one.
+
+    Some events carry `message` as a plain string. The stream belongs to someone
+    else and may grow shapes this reader has never seen, so every access to it
+    goes through here rather than assuming a dict and raising in the middle of a
+    run that was going fine.
+    """
+    message = event.get("message")
+    return message if isinstance(message, dict) else {}
+
+
+def _usage(event: dict) -> dict:
+    """The usage object, wherever this event keeps it.
+
+    Two places, and they mean different things:
+
+    - on an `assistant` message: the ORCHESTRATOR's own turn;
+    - on a `system/task_progress` event: a SUBAGENT's packet, with
+      `subagent_type` naming which.
+
+    Conflating them is the mistake this function exists to prevent.
+    """
+    if event.get("type") == "system" and event.get("subtype") == "task_progress":
+        usage = event.get("usage")
+    else:
+        usage = _message(event).get("usage")
+    return usage if isinstance(usage, dict) else {}
+
+
+def context_size(usage: dict) -> int:
+    """How large a turn's context actually was.
+
+    **`input_tokens` alone is nearly always 2.** Almost the entire context
+    arrives cached, so the real figure is
+    `input_tokens + cache_creation_input_tokens + cache_read_input_tokens`.
+
+    Reading only `input_tokens` gives a watcher that reports two-token calls and
+    never trips - a ceiling that cannot be exceeded because it is measuring the
+    wrong thing. This was found by replaying a real run, not by reading the docs.
+    """
+    return (
+        int(usage.get("input_tokens") or 0)
+        + int(usage.get("cache_creation_input_tokens") or 0)
+        + int(usage.get("cache_read_input_tokens") or 0)
+    )
+
+
+def _blocks(event: dict) -> list[dict]:
+    content = _message(event).get("content")
+    return [b for b in content if isinstance(b, dict)] if isinstance(content, list) else []
+
+
+def _text(event: dict) -> str:
+    return " ".join(b.get("text", "") for b in _blocks(event) if b.get("type") == "text")
+
+
+def apply(state: State, event: dict) -> State:
+    """Fold one event into the state. Never raises on an unfamiliar shape."""
+    kind = event.get("type")
+
+    if kind == "system" and event.get("subtype") == "init":
+        state.headline = "Claude Code started and loaded the skill"
+        return state
+
+    if kind == "result":
+        state.finished = True
+        state.total_cost_usd = event.get("total_cost_usd")
+        state.turns = event.get("num_turns")
+        state.duration_ms = event.get("duration_ms")
+        if event.get("is_error"):
+            state.error = str(event.get("result") or "the run reported an error")
+        state.headline = "finished" if not state.error else "the run reported an error"
+        return state
+
+    if kind in ("assistant", "user"):
+        usage = _usage(event)
+        if usage:
+            state.input_tokens += int(usage.get("input_tokens") or 0)
+            state.output_tokens += int(usage.get("output_tokens") or 0)
+
+        narration = _text(event).strip()
+        if narration:
+            line = next((l for l in narration.split("\n") if len(l.strip()) > 12), "")
+            if line:
+                state.headline = line.strip()[:160]
+            stage = STAGE_HINT.search(narration)
+            if stage:
+                state.stage = stage.group(0)
+
+        for block in _blocks(event):
+            if block.get("type") != "tool_use":
+                continue
+            name = block.get("name")
+            data = block.get("input") or {}
+
+            if name in ("Agent", "Task"):
+                agent = str(data.get("subagent_type") or data.get("description") or "?")
+                state.agent = agent
+                state.dispatched.append(agent)
+                state.calls += 1
+                state.headline = f"dispatched {agent}"
+
+            elif name in ("Write", "Edit"):
+                path = str(data.get("file_path") or "")
+                # The slug is LEARNED from the paths the run writes. Claude Code
+                # derives it from the premise itself, so the launcher cannot know
+                # it in advance and must not guess: a guessed slug reads the
+                # wrong novel, or none.
+                found = OUTPUT_PATH.search(path)
+                if found:
+                    state.slug = found.group(1)
+                chapter = CHAPTER_FILE.search(path)
+                if chapter:
+                    state.chapter = int(chapter.group(1))
+                    state.attempt = int(chapter.group(2))
+                short = "/".join(path.replace("\\", "/").split("/")[-2:])
+                if short:
+                    state.written.append(short)
+                    state.headline = f"wrote {short}"
+
+    return state
+
+
+# --------------------------------------------------------------- the watchers
+
+
+class WatchTripped(Exception):
+    """A watcher stopped the run. Carries the halt kind it should be marked with."""
+
+    def __init__(self, kind: str, detail: str):
+        super().__init__(f"{kind}: {detail}")
+        self.kind, self.detail = kind, detail
+
+
+@dataclass
+class BudgetWatcher:
+    """The cost ceiling, enforced after the fact.
+
+    Python no longer assembles the prompts, so it cannot project a call's cost
+    before the call happens. What it can do is add up the `usage` the stream
+    reports and stop the process the moment the total crosses the ceiling.
+
+    **This is weaker than the projection it replaces and the difference has a
+    name.** A projection refuses the call that would exceed; this lets that call
+    happen and stops the next. The overshoot is bounded by one call rather than
+    by zero, and `verification.md` records it as a stop rather than a guarantee.
+    """
+
+    ceiling_usd: float
+    pricing: dict
+    # The models the nine agents run on. Read from their files rather than
+    # assumed, so a change there cannot silently mis-price a run.
+    rate_per_token: float = 0.0
+    spent_usd: float = 0.0
+
+    def observe(self, state: State) -> None:
+        if state.total_cost_usd is not None:
+            self.spent_usd = state.total_cost_usd
+        else:
+            # Between `result` events the only figure available is the token
+            # count. Priced at the most expensive rate on file, because a
+            # ceiling that under-estimates is not a ceiling.
+            # Tokens here are the orchestrator's, which is the right basis:
+            # the run's bill includes them and v1's estimate did not.
+            worst = max(
+                (m["output_per_mtok"] for m in self.pricing.get("models", {}).values()),
+                default=0.0,
+            ) / 1_000_000
+            self.spent_usd = (state.input_tokens + state.output_tokens) * worst
+
+        if self.spent_usd > self.ceiling_usd:
+            raise WatchTripped(
+                "budget",
+                f"spent ${self.spent_usd:.2f} against a ceiling of "
+                f"${self.ceiling_usd:.2f}",
+            )
+
+
+@dataclass
+class ContextWatcher:
+    """The 100,000-token ceiling, and an honest account of what it can watch.
+
+    Layer 2 of two. Layer 1 is in `SKILL.md`: the orchestrator measures each
+    packet with `wc -w` before dispatching and does not send one that is too
+    large. That is a **procedure**, classified Inspection, and it is also where
+    the flat-context series is recorded.
+
+    **What replaying two real runs showed, and it changes this class.**
+
+    The ceiling is about the PACKETS THE AGENTS RECEIVE - the quantity the
+    architecture claims stays flat as a book grows. It was never the
+    orchestrator's own budget.
+
+    - The orchestrator's turns run at a **median of 147,000 and a peak of
+      642,000** tokens across two real runs. That is not a defect: an
+      orchestrator accumulates, carrying the Bible and the drafts and the
+      findings turn after turn. It is the same fact that made a $6.21 estimate
+      stand in for $49.33, now visible in tokens. **Halting on it would halt
+      every run inside a minute**, which is what a naive reading of this layer
+      would do.
+    - The subagents' packets DO have a slot in the stream - `task_progress`
+      carries `subagent_type` and `usage` - but in both recordings that `usage`
+      reads **zero**. So the one quantity the ceiling is actually about is, from
+      the stream, **not measurable today**.
+
+    Therefore this class does two things and claims only them:
+
+    1. **Halts** when a subagent packet is reported above the ceiling. That is a
+       real check that will fire the day those figures populate, and it costs
+       nothing to have waiting.
+    2. **Observes** the orchestrator's context as its own series, recorded and
+       never used to halt.
+
+    What it does NOT do is report zero as if it were a measurement. When no
+    subagent usage arrives, `packets_measured` stays at 0 and the provenance of
+    that series is `absent` - which is not the same as "every packet was small".
+    """
+
+    ceiling: int
+    largest_packet: int = 0
+    packets_measured: int = 0
+    largest_orchestrator_turn: int = 0
+    orchestrator_turns: int = 0
+    # Per agent, so "chapter 34 weighs what chapter 1 weighed" can be drawn the
+    # day the figures arrive.
+    by_agent: dict[str, int] = field(default_factory=dict)
+
+    def observe_event(self, event: dict) -> None:
+        usage = _usage(event)
+        if not usage:
+            return
+        size = context_size(usage)
+
+        if event.get("type") == "system" and event.get("subtype") == "task_progress":
+            agent = str(event.get("subagent_type") or "?")
+            if size <= 0:
+                return  # reported but empty: absent, not zero
+            self.packets_measured += 1
+            self.largest_packet = max(self.largest_packet, size)
+            self.by_agent[agent] = max(self.by_agent.get(agent, 0), size)
+            if size > self.ceiling:
+                raise WatchTripped(
+                    "context",
+                    f"{agent} was handed {size:,} tokens against a ceiling of "
+                    f"{self.ceiling:,}",
+                )
+            return
+
+        # The orchestrator's own turn. Recorded, never fatal.
+        self.orchestrator_turns += 1
+        self.largest_orchestrator_turn = max(self.largest_orchestrator_turn, size)
+
+    @property
+    def packet_series_provenance(self) -> str:
+        """`measured` when packets were reported, `absent` when they were not."""
+        return "measured" if self.packets_measured else "absent"

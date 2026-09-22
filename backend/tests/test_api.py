@@ -16,8 +16,10 @@ PREMISE = "A lighthouse keeper on Titan starts receiving her own distress calls.
 
 @pytest.fixture
 def client(db, tmp_path):
+    # The recorded stream stands in for `claude`. It covers the runner, the
+    # parser, the persistence, the SSE and both watchers at $0.
     settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path,
-                        use_mock_engine=True, budget_ceiling_usd=100.0)
+                        use_recorded_stream=True, budget_ceiling_usd=1000.0)
     service = RunService(db, settings)
     # The dependency override is the cleanest seam FastAPI gives you: the test
     # swaps the database and the engine without the code under test knowing.
@@ -43,19 +45,19 @@ def _wait(client, run_id: str, timeout: float = 30.0):
     return events
 
 
-def test_health_says_which_engine_is_running():
-    """A panel showing costs from a mock run would be lying about money."""
+def test_health_says_whether_it_is_replaying_or_orchestrating():
+    """A panel showing costs from a replayed stream would be lying about money."""
     with TestClient(app) as c:
         body = c.get("/api/health").json()
     assert body["ok"] is True
-    assert body["engine"] in ("mock", "anthropic")
+    assert body["orchestrator"] in ("recorded-stream", "claude-code")
 
 
 def test_start_a_run_and_follow_it_to_completion(client):
     created = client.post("/api/runs", json={"premise": PREMISE, "profile": "tiny"})
     assert created.status_code == 201
     run_id = created.json()["id"]
-    assert created.json()["slug"].startswith("a-lighthouse-keeper")
+    assert created.json()["slug"].startswith("a-lighthouse-keeper")  # the fallback
 
     events = _wait(client, run_id)
     kinds = [kind for kind, _ in events]
@@ -64,8 +66,8 @@ def test_start_a_run_and_follow_it_to_completion(client):
     assert "progress" in kinds
 
     final = events[-1][1]
+    # The recording ends with a real `result`, so the run completes.
     assert final["result"] == "complete"
-    assert final["run"]["stage"] == "complete"
 
 
 def test_the_snapshot_is_built_from_the_database_not_from_memory(client):
@@ -76,9 +78,9 @@ def test_the_snapshot_is_built_from_the_database_not_from_memory(client):
 
     body = client.get(f"/api/runs/{run_id}").json()
     assert body["run"]["stage"] == "complete"
-    assert len(body["attempts"]) >= 3
-    assert body["cost"]["calls"] > 10
-    assert body["cost"]["provenance"] == ["estimated"]
+    # The slug was LEARNED from the paths the recorded run wrote, not guessed
+    # from the premise this test sent.
+    assert body["run"]["slug"] == "night-dispatcher-recovered-climber"
 
 
 def test_a_premise_that_is_too_short_is_refused_at_the_edge(client):

@@ -36,10 +36,15 @@ app.include_router(runs_router.router, prefix="/api/runs", tags=["runs"])
 
 @app.get("/api/health")
 def health() -> dict:
+    from backend.commons.runner.process import available
+
     settings = load_settings()
     return {
         "ok": True,
-        # Said plainly, because a panel showing costs from a mock run would be
-        # lying about money.
-        "engine": "mock" if settings.use_mock_engine else "anthropic",
+        # Said plainly, because a panel showing costs from a replayed stream
+        # would be lying about money.
+        "orchestrator": "recorded-stream" if settings.use_recorded_stream else "claude-code",
+        # Whether this machine could orchestrate at all. There is no API
+        # fallback: Claude Code is the only route to a model.
+        "claude_on_path": available(),
     }

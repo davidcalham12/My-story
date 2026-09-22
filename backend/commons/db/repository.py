@@ -11,7 +11,18 @@ import json
 import sqlite3
 
 from backend.commons.db.connection import tx
-from backend.commons.llm.dispatch import now
+
+
+def now() -> str:
+    """A real clock reading.
+
+    v1 estimated its timestamps and a log claimed 24 minutes for a run that took
+    72. A plausible number and a measured one look identical once written down,
+    which is why this is a function and not a habit.
+    """
+    from datetime import datetime, timezone
+
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def create_run(conn, *, run_id, slug, premise, profile, tone, snapshot) -> None:

@@ -31,11 +31,17 @@ cd frontend && npm install && npm run dev
 uv run python -m backend.commons.db.migrate
 ```
 
-**Tests run on the mock engine and cost nothing.** A suite that needs a
-credential does not run in CI, and a suite that does not run in CI is
-documentation. The real engine is opt-in through `USE_MOCK_ENGINE=false` and
-reads `ANTHROPIC_API_KEY` **from the environment only** — never from a file,
-never from a chat message, never from a command line argument.
+**Claude Code is the orchestrator. There is no API key and no SDK.** The backend
+launches `claude -p --output-format stream-json --verbose` as a subprocess with
+the prompt on **stdin**, reads the stream line by line, forwards it over SSE,
+persists state in SQLite and writes `cost.json` from the `result` event. That is
+what the four Vite plugins do in v1, in Python.
+
+**Tests run against a recorded stream and cost nothing.** A real run costs the
+subscription, every time. The recording covers the runner, the parser, the
+persistence, the SSE and both watchers; what it cannot cover is the procedure in
+`SKILL.md`, and that is said plainly rather than blurred. Set
+`USE_RECORDED_STREAM=false` to orchestrate for real.
 
 ---
 
@@ -56,6 +62,11 @@ the two will disagree. Read them from the spec and the config.
 
 ## The architecture, in two rules
 
+**Claude Code orchestrates; Python launches, watches and archives.** The
+pipeline has exactly one implementation and it is `SKILL.md`. Python does not
+execute the stages; it validates that `SKILL.md` does not contradict `flow.yaml`
+or `config/`.
+
 **Backend — vertical slices, dependencies inward.**
 Inside a feature: `router → service → domain`, and `service → repository` through
 a Protocol. `domain.py` imports only the standard library, which is what lets the
@@ -66,10 +77,9 @@ gate's arithmetic be tested without a database, a server or a model.
 compose in `runs/` or share through `commons/`. Same rule the frontend's
 Feature-Sliced Design applies to its slices.
 
-`commons/` is not "shared code" — it is **what nobody may skip**. The semaphore
-lives in `commons/context` and the client in `commons/llm`, which is the only
-path to a model, so no feature can send a prompt without it being counted,
-reserved and charged.
+`commons/` is not "shared code" — it is **what nobody may skip**.
+`commons/runner` is the only thing that launches a model, and both watchers read
+its stream.
 
 Frontend is Feature-Sliced Design v2.1. Layers import downward only; the
 `widgets` layer is not used.
@@ -94,14 +104,22 @@ Installed: `fastapi` · `react` · `sqlite` · `sqlite-vec` ·
 
 Full statements with their class of evidence are in `docs/verification.md`.
 
-1. **The writer never receives prior prose.** Its `ContextPacket` has no field
-   that can carry it, and a test fails if the builder gains one.
-2. **100,000 tokens held concurrently**, not per call. A token semaphore in
-   `commons/context` reserves prompt tokens + `max_tokens` before every call and
-   releases after; short capacity means waiting, never failing. Five critics of
-   30,000 satisfy a per-call limit and put 150,000 in the air, which is why the
-   limit is concurrent. A single reservation larger than total capacity is
-   `halted: context`.
+1. **The writer never receives prior prose**, and this is once again
+   **structural**: `chapter-writer` holds `tools: Glob`, which returns paths and
+   cannot return contents, so the prose is *unreachable* rather than merely not
+   passed. `test_agents_frontmatter.py` fails if that line changes.
+2. **100,000 tokens, in two layers.** Python no longer assembles the prompts, so
+   it cannot reserve before a call. Layer 1 is in `SKILL.md`: the orchestrator
+   measures each packet with `wc -w` before dispatching. Layer 2 is
+   `commons/runner/watch.py`, measuring the stream's own `usage` and stopping the
+   run. **Neither is a reservation taken in advance**, and `verification.md` G2
+   says so.
+
+   Two things replaying real runs showed. `input_tokens` alone is nearly always
+   2 — almost the whole context arrives cached, so the real size is
+   `input + cache_creation + cache_read`. And the orchestrator's own turns run at
+   a median of 147,000 tokens: **halting on those would halt every run**, because
+   the ceiling was never the orchestrator's budget.
 3. **Five characteristics, each 0–10, all ≥ 8, aggregated with `min`.**
    `continuity`, `science`, `outline` (10 − 3 per missing beat − 1 per beat out
    of order), `length` (word count, in band or 0), `chatter` (0 unless it opens
@@ -132,7 +150,7 @@ Full statements with their class of evidence are in `docs/verification.md`.
 ## Not changed without a recorded decision
 
 The threshold of 8 · the five characteristics · the third attempt as the last ·
-the writer's `ContextPacket` · `patch_then_halt` · the 100k concurrent semaphore ·
+the `tools:` line of every agent · `patch_then_halt` · the 100k ceiling ·
 the budget ceiling.
 
 Changing one needs **an approved SPEC that names it** — see `AGENTS.md` §6.

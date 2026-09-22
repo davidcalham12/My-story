@@ -12,9 +12,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# The real engine and the embedder are optional on purpose: the whole test
-# suite runs without them, on the mock, at no cost.
-real = ["anthropic>=0.40"]
+# There is NO Anthropic SDK here. Claude Code is the orchestrator and the only
+# access to a model is the user's own session; an API client would be a second
+# route to the model, which is exactly what this architecture no longer has.
+#
+# The embedder is optional: the whole suite runs without it, against a recorded
+# stream, at no cost.
 vector = ["sqlite-vec>=0.1.6", "sentence-transformers>=3.0"]
 dev = ["pytest>=8.3", "pytest-asyncio>=0.24", "httpx>=0.27"]
 

@@ -1,19 +1,7 @@
 import pytest
 
 from backend.commons.config.loader import resolve
-from backend.commons.context.tokens import DeterministicCounter
 from backend.commons.db.migrate import migrate
-
-
-def test_counting_is_deterministic():
-    counter = DeterministicCounter()
-    assert counter.count("hello world") == counter.count("hello world")
-
-
-def test_counting_never_returns_zero():
-    """A zero-token reservation would let unbounded calls through a full pool."""
-    assert DeterministicCounter().count("") == 1
-    assert DeterministicCounter().count("x") == 1
 
 
 def test_migrations_run_once(db):
@@ -71,4 +59,6 @@ def test_tone_is_not_decided_by_the_config():
 
 
 def test_the_ceiling_is_config_not_a_literal():
+    """Still config, still 100,000 — but under Annex C it is enforced in two
+    layers rather than reserved in advance. See docs/verification.md G2."""
     assert resolve("tiny")["context"]["max_concurrent_tokens"] == 100_000
