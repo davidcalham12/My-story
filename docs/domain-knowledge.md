@@ -329,6 +329,28 @@ makes it five. This applies to every range in every prompt.
   zero.
 - **An unmeasurable field is not zero.** A run that destroyed its evidence and a
   run where nothing changed look identical in a number.
+- **The eight-chapter comparison, both sides measured — and it inverts the
+  three-chapter one.**
+
+  | | v1 `ice-station` | v2 `cartographer` |
+  |---|---|---|
+  | chapters | 8 | 8 |
+  | words in the book | 10,723 | **11,133** |
+  | characteristics | 2–3 | **5** |
+  | rejected drafts kept | 0 | **6** |
+  | outline audited first | no | **yes** |
+  | orchestrator turns | 329 | **275** |
+  | **cost** | **$49.33** | **$54.87** |
+
+  **Eleven per cent more money, for roughly twice the judging and fewer turns.**
+  At three chapters the same comparison was 2.5× ($7.45 → $18.82). The overhead
+  does not scale with the book: it is mostly fixed — the Bible, the outline, the
+  audit — and a longer book amortises it. Per thousand words the two runs are
+  $4.60 and $4.93.
+
+  That is the single most useful number this project has, because it is the one a
+  person deciding whether to run it would ask for.
+
 - **What the gate costs, measured on both sides.** Two three-chapter `tiny` runs
   on the same profile, each figure from Claude Code's own `result`:
 
@@ -503,7 +525,8 @@ way past it at the moment a run is about to be thrown away. This run shows the
 remaining half of §3.1 is not theoretical: **the rule being arithmetic does not
 make it obeyed.** Detection is not prevention, and the gap says so.
 
-**A second violation on the same run, which the audit missed at first.**
+**And it was not one chapter. A second violation on the same run, which the audit
+missed at first.**
 Chapter 7 was promoted with `continuity` returning nothing usable. Its aggregate
 was **10** — a minimum over the four critics that answered — so every rule that
 read the aggregate saw a perfect chapter. *A gate short a critic is a weaker
