@@ -104,6 +104,7 @@ in CI, at $0.** The suite that carries these:
 | `test_summary_cap.py` | the rolling summary against its cap — the flat cost curve, measured |
 | `test_rules_resolve.py` | that a cited rule is one the Bible declares |
 | `test_promises.py` | that every promise names a chapter the book actually reaches |
+| `test_checks.py` | that every instrument is reachable from a stage, and the procedure calls it |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
@@ -764,7 +765,15 @@ the right behaviour, before a real run.
 **Why accepted:** it is the price of having no API key. Everything Python does is
 covered by a recorded stream; what a model does with a paragraph is not.
 
-**Narrower than it was, and worth saying how.** `test_skill_contract.py` now
+**Smaller than it was, which is the only honest way to narrow it.** Seven
+instruments now stand between a run and a defect, and remembering which at what
+moment is exactly what failed: a chapter promoted at 5, a summary cap exceeded
+five times, a verdict in a vocabulary the database rejects. `backend/checks.py`
+maps stage → checks, so the procedure holds **one command per stage instead of
+seven**, and `test_checks.py` fails if an instrument exists that no stage calls
+or a stage the procedure never invokes.
+
+**Narrower too, and worth saying how.** `test_skill_contract.py` now
 checks statically that `SKILL.md`:
 
 - runs exactly the stages `flow.yaml` declares, in that order;

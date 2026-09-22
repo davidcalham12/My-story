@@ -102,6 +102,16 @@ who cannot keep the cast straight has already stopped reading.
 It returns the canonical character names. **Keep that list.** Every later prompt
 carries it, and it is what the continuity critic checks spelling against.
 
+**Before leaving FLOW-2, run its checks:**
+
+```bash
+python -m backend.checks FLOW-2 output/<slug>
+```
+
+The Bible is now written and nothing has cited it yet. This is the cheapest
+moment to find a rule with no number and a promise with no chapter, because every
+later stage quotes both.
+
 ## 3. FLOW-3 — outline
 
 Dispatch `plot-architect` with all four Bible files quoted in full, the chapter
@@ -109,13 +119,25 @@ count, the canonical names, and `novel.promises` and `novel.beats_per_chapter`.
 
 It returns the outline as text. **You** write it to `output/<slug>/outline.md`.
 
-**Check the promises are answerable before FLOW-4 writes anything:**
+**Run the stage's checks — one command, not a list you remember:**
 
 ```bash
-python -m backend.chapters.check_promises output/<slug>
+python -m backend.checks FLOW-3 output/<slug>
 ```
 
-`bible/mysteries.md` is the only part of the Bible that commits to *when*: each
+It runs everything FLOW-3 owes and names whatever failed. Seven instruments now
+stand between a run and a defect, and **remembering which at what moment is
+exactly what has failed here**: a chapter promoted at 5, a summary cap exceeded
+five times, a verdict written in a vocabulary the database rejects. None of those
+was forgotten on purpose.
+
+It reports; it does not gate. `decide` and `promote` are the only things that
+refuse.
+
+What it checks at this stage, and why each matters.
+
+**`promises are reachable`.** `bible/mysteries.md` is the only part of the Bible
+that commits to *when*: each
 question names the chapter that plants it and the chapter that lands it. A
 promise planted and never paid is the foreshadowing failure the ontology names,
 and it is **the one literary defect a script can reach** — but only because the
@@ -129,13 +151,7 @@ the book will not reach, and that is cheaper to fix now than at chapter eight.
 **It reads the commitment, not the chapter.** A chapter that says nothing about
 the mystery it was supposed to land passes this and fails a reader.
 
-**Check the rules resolve before anything cites them:**
-
-```bash
-python -m backend.chapters.check_rules output/<slug>
-```
-
-The critics and the audit refer to rules **by number** — *"R5 rewritten to name
+**`rules resolve`.** The critics and the audit refer to rules **by number** — *"R5 rewritten to name
 the keeper as the writer"*. If `bible/world.md` writes them as unnumbered
 bullets, those numbers are **the critic counting bullets and inventing an
 identifier**, and two real runs produced 76 such references that resolved to
@@ -532,11 +548,13 @@ Write, for each chapter:
   chapter cannot be written without: what changed, who now knows what, and what
   is still open.
 
-  **Then measure it, because the cap is the flat cost curve:**
+  **Then run the chapter's checks, which include it:**
 
-  ```bash
-  python -m backend.chapters.check_summary output/<slug> <N>
-  ```
+```bash
+  python -m backend.checks FLOW-4 output/<slug> <N>
+```
+
+  The cap is the flat cost curve.
 
   The Bible is fixed and the outline entry is one chapter's. **The summary is the
   only part of a chapter's packet that can grow with the book**, so
@@ -678,6 +696,15 @@ the chapters; a synopsis is written from canon. Give it
 `outputs.synopsis.words.min/max` and `comparables`. Write the result to
 `synopsis.md`. Dispatch it alongside the style passes, as FLOW-5 says: it reads
 nothing they write.
+
+**Before assembling, run the book's checks:**
+
+```bash
+python -m backend.checks FLOW-6 output/<slug>
+```
+
+This is the last moment a promise landing in a chapter that was never written can
+be found before a reader finds it.
 
 Then **assemble `dist/book.md` yourself**, in the shell, by concatenating the
 `.final.md` files in order with the synopsis in front if
