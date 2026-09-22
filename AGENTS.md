@@ -103,9 +103,11 @@ expensive.
 2. Write the smallest code that passes it.
 3. Refactor with the tests green.
 
-**Tests run on the mock engine and cost $0.** A test that needs the real engine
-is marked as such and does not run in CI. A suite that needs a credential is a
-suite that does not run, and a suite that does not run is documentation.
+**Tests replay a recorded stream and cost $0.** That recording covers the
+runner, the parser, the persistence, the SSE and both watchers. **It cannot cover
+the procedure in `SKILL.md`** — that needs a real run, and a real run costs the
+subscription every time. Say which half a change is in before claiming it is
+tested.
 
 ### Definition of done, for any change
 
@@ -124,8 +126,10 @@ All five. A change missing any of them is not done, it is in progress.
 - the threshold of **8**
 - the **five characteristics**
 - the **third attempt** as the last
-- the writer's **`ContextPacket`**
-- the **100,000-token concurrent semaphore**
+- the **`tools:` line of any agent** — that line IS the authority model, and
+  `chapter-writer`'s `Glob` is why prior prose is unreachable rather than merely
+  unpassed
+- the **100,000-token ceiling**, in either of its two layers
 - the **budget ceiling**
 
 These are not configuration in the sense of "tune freely". Each was arrived at

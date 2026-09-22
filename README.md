@@ -10,7 +10,7 @@ one's, and the cost curve is flat.
 ## Running it
 
 ```bash
-# backend — the tests use a mock engine and cost nothing
+# backend — the tests replay a recorded run and cost nothing
 pip install fastapi uvicorn pydantic pyyaml pytest httpx sqlite-vec
 python -m pytest backend/tests -q
 python -m uvicorn backend.main:app --port 8000
@@ -19,8 +19,11 @@ python -m uvicorn backend.main:app --port 8000
 cd frontend && npm install && npm run dev
 ```
 
-The real engine is opt-in: `USE_MOCK_ENGINE=false` plus `ANTHROPIC_API_KEY` in
-the environment. It is never read from a file or an argument.
+**Claude Code is the orchestrator. There is no API key and no SDK.** The backend
+launches `claude -p` as a subprocess, reads its event stream and archives it. So
+`claude` must be on PATH and signed in on this machine. Set
+`USE_RECORDED_STREAM=false` to orchestrate for real — every real run costs the
+subscription, which is why the tests replay a recording instead.
 
 ## Where to start reading
 

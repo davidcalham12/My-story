@@ -35,64 +35,68 @@ The suite that carries these guarantees:
 
 ## G1 — The writer never receives a previous chapter's prose
 
-**Class: T** — **downgraded from A, deliberately.** Evidenced.
+**Class: A.** Evidenced. **Upgraded back from T** by Annex C.
 
-**Method.** The writer's `ContextPacket` is a type with no field that can carry
-prose: Bible documents, one outline entry, the rolling summary as structured
-facts, canonical names, chapter number and target. A test constructs a packet and
-fails if any field can hold another chapter's text; a second test fails if the
-builder gains one.
+**Method.** `chapter-writer` is a Claude Code subagent whose front matter reads
+`tools: Glob`. `Glob` returns paths and cannot return contents. The prose is
+therefore **unreachable** — the capability is absent, not merely unused.
 
-**Evidence.** `backend/tests/test_context.py`, in CI on every commit. Plus the
-prompt size logged per chapter, which must stay flat as the book grows — a rising
-curve is prose leaking in by some route the type did not anticipate.
+**Evidence.** `backend/tests/test_agents_frontmatter.py` reads the front matter
+of all nine agents and asserts each tool list exactly. It fails if anyone gives
+the writer `Read`, `Grep`, `Bash`, `WebFetch` or `Agent`, and it fails if a
+critic gains one, since a critic that could fetch its own context would hold the
+very capability the writer is denied.
 
-**The downgrade, stated plainly.** In v1 this was **A**: the chapter writer was a
-subagent whose tool list held `Glob`, which returns paths and cannot return
-contents. The prose was *unreachable* — the capability was absent, not merely
-unused. In v2 the orchestrator calls the API directly, so the guarantee becomes
-"the code does not pass it, and a test says so". That is weaker, it is true only
-while the test exists, and inheriting v1's language would be a lie.
+**Why this row moved twice, and why it matters.** Under D2 the orchestrator was
+Python calling an API, so the guarantee became "the `ContextPacket` has no field
+for it, and a test says so" — class **T**, true only while the test exists.
+Annex C removed the API, and the guarantee went back to being a property of a
+capability. **A test can be deleted; a tool that cannot read cannot be talked
+into reading.**
 
 **Not covered (U).** That the rolling summary contains no paraphrase of a
 previous chapter's prose. It is a judgement about text and nothing here renders
 it.
 
----
+**Also held here:** retrieval. `commons/search` runs in the *orchestrator*
+through `Bash(python *)`, and only the Bible, the outline and the summaries are
+indexed. Indexing chapter prose would be this guarantee's leak arriving through
+the back door, so the indexable list is a constant with a test around it.
 
-## G2 — No more than 100,000 tokens are ever in flight at once
+## G2 — The 100,000-token ceiling
 
-**Class: T**. Evidenced, in isolation and in a whole run.
+**Class: I for layer 1, T for layer 2.** Neither is a reservation taken in
+advance, and that is the honest consequence of Claude Code assembling the
+prompts.
 
-**Concurrent, not per call.** Five critics of 30,000 tokens each satisfy a
-per-call limit and put 150,000 in the air. The per-call limit survives only as a
-consequence: no single call can reserve more than the total capacity.
+**Layer 1 — a procedure (I).** `SKILL.md` has the orchestrator measure each
+packet with `wc -w` before dispatching, convert at ~1.35 tokens per word, trim if
+it is over, and decide how many critics can run at once. Evidence: the text of
+`SKILL.md`, and a reviewer. It is a procedure a model follows, so it is
+Inspection and nothing stronger.
 
-**Method.** A token semaphore in `commons/context`, capacity read from config.
-Before each call the reservation is computed as **prompt tokens + `max_tokens`**,
-with the prompt **counted, never estimated** — Anthropic's token-counting API for
-the real engine, the equivalent tokenizer in the mock. The call acquires, waits
-if capacity is short, and releases when done. Waiting is never a failure. A
-reservation larger than total capacity is rejected before waiting: `halted:
-context`.
+**Layer 2 — a measurement (T).** `commons/runner/watch.py` reads the `usage` on
+every stream event and stops the run when a subagent packet exceeds the ceiling.
+Evidence: `test_runner.py`, against a real recorded stream.
 
-**Evidence.** The test in `architecture.md` §6.3: five critics dispatched in
-parallel at 30,000 each, asserting over every log row that
-`in_flight_at_dispatch + tokens_reserved ≤ 100,000`, and that all five completed.
-Plus `tokens_reserved`, `in_flight_at_dispatch` and `wait_ms` logged per call,
-which turn two assertions into series — *chapter 34 weighs what chapter 1
-weighed*, and *how long the critics waited*.
+**What replaying two real runs showed, and it changed this row.**
 
-**Why the reservation is worst case.** `max_tokens` bounds a reply nobody can
-predict. A semaphore sized by an assumed reply is one a single long answer walks
-straight through, and a ceiling that can be exceeded is not a ceiling.
+`input_tokens` alone is nearly always **2** — almost the whole context arrives
+cached — so the true size is `input + cache_creation + cache_read`. A watcher
+reading the first field only would report two-token calls and never trip. That
+was found by replay, not by reading a document, and `test_runner.py` pins it.
 
-**Not covered (A, weak).** That `commons/llm` really is the only path to a model.
-Nothing enforces it at import time — a feature could construct its own client and
-bypass the semaphore entirely. An import-boundary test would make this **A**;
-until then it rests on review, and it is the weakest link in the guarantee.
+The orchestrator's own turns run at a **median of 147,000 and a peak of 642,000**
+tokens. **Halting on those would halt every run**, and the ceiling was never the
+orchestrator's budget: it is about the packets the agents receive.
 
----
+**Not covered, and this is the important line.** Those packets have a slot in the
+stream — `task_progress.usage` — and in both recordings it reads **zero**. So the
+quantity this guarantee is about is **not measurable from the stream today**. The
+watcher reports `packet_series_provenance: absent` rather than treating zero as a
+measurement. The check is in place and will fire the day those figures populate;
+until then **layer 2 is armed and unexercised on the thing it is for**, which is
+a weaker claim than it looks and is written down as such.
 
 ## G3 — A chapter passes only when all five characteristics reach 8
 
@@ -133,8 +137,8 @@ findings count on every scored attempt.
 
 ## G5 — Three attempts, with feedback that escalates
 
-**Class: T** *(planned)* for the count and the escalation; **U** for the claim it
-rests on.
+**Class: T** for the count and the escalation, evidenced in `test_gate.py`;
+**U** for the claim it rests on.
 
 **Method.** The attempt counter and the sheet level are code. Attempt 2 receives
 the correction described; attempt 3 receives the critic's literal replacement.
@@ -179,7 +183,7 @@ refused two on arithmetic, which is the encouraging case and not a general one.
 
 ## G7 — The writer changes only what was cited
 
-**Class: T** *(planned)* for the mechanism, **D** for the outcome.
+**Class: T** for the mechanism, evidenced; **D** for the outcome.
 
 **Method.** Redrafts return substitutions `{find, replace, why}` applied by
 literal match. Anything no finding names is not touched, because the orchestrator
@@ -200,7 +204,7 @@ is now true and FLOW-4 writes `chNN.attemptK.md`.
 
 ## G8 — A malformed critic verdict is excluded, never counted as a pass
 
-**Class: T** *(planned)*
+**Class: T.** Evidenced in `test_gate.py`.
 
 **Method.** An unparseable reply yields no score. It is excluded from the `min`,
 recorded as unscored, and named in the gate row's note.
@@ -213,16 +217,18 @@ is why it has its own row rather than living inside G3.
 
 ## G9 — The Story Bible is written by two agents only
 
-**Class: I**, and honestly so.
+**Class: A.** Restored by Annex C, for the same reason as G1.
 
-**Method.** `worldbuilder` and `character-architect` produce Bible files; every
-other agent returns text the orchestrator writes.
+**Method.** Only `worldbuilder` and `character-architect` hold `Write` in their
+front matter. The other seven cannot write a file at all — the capability is
+absent, not merely unexercised.
 
-**Evidence.** Review of the service layer. In v1 this was **A** — the other seven
-agents had no `Write` tool. In v2 nothing structural prevents a service writing
-to `bible/`, so the class drops to Inspection until something enforces it. A
-repository that refuses Bible paths outside the two features would make it **T**;
-it is not built, and saying so is the point of this row.
+**Evidence.** `test_agents_frontmatter.py::test_only_two_agents_can_write`
+asserts exactly that set.
+
+**It had dropped to I under D2**, when a Python service could have written to
+`bible/` and nothing structural stopped it. Getting it back was not the point of
+Annex C, but it is a second thing the reversal bought.
 
 ---
 
@@ -278,29 +284,42 @@ nothing changed are identical in a number and must not be identical in a report.
 
 ## G13 — Cost is not invented
 
-**Class: T** for direct-API runs, **A** for imported ones.
+**Class: D**, and better than it was.
 
-**Method.** The API returns input and output tokens per call; cost is computed
-from `pricing.json` and is exact. Runs imported from v1 have one total with no
-split, so they stay bounded — `low / estimate / high` — and carry
-`reconstructed`.
+**Method.** Claude Code's final `result` event carries `total_cost_usd` for the
+**whole run, orchestrator turns included**. It is written to
+`output/<slug>/cost.json` and graded `measured`.
 
-**Evidence.** Per-call cost rows; the pricing file with its source and date; the
-grade on every imported figure.
+**Evidence.** `test_runner.py` asserts the figure is read from a real recorded
+`result` ($19.00 on the run in the fixture). Three v1 runs carry their own
+`cost.json` from the same source.
 
-**What the numbers must not be read as.** v1's token-derived estimate priced the
-subagents and knew nothing of the orchestrator's turns: **$6.21 estimated against
-$49.33 actual** on the same run. Any bounded figure of that shape is a **floor,
-not a range**, and the interface says so where it shows one.
+**Why this is the row Annex C improves most.** v1 priced the subagents' tokens
+and knew nothing of the orchestrator's turns: **$6.21 estimated against $49.33
+actual** on the same run. The difference was never a modelling error — it was a
+quantity nobody could see. Now it arrives measured, from the only party that
+knows it.
 
----
+**Per-agent breakdown is weaker.** It comes from `task_progress.usage`, which
+reads zero in both recordings, so those rows are graded `absent` rather than
+zero. The run total is solid; the split by agent is not yet.
+
+**Imported runs stay bounded**, `low / estimate / high`, graded `reconstructed`.
+Any bounded figure of that shape is a **floor, not a range**, and the interface
+says so where it shows one.
 
 ## G14 — A run stops when it reaches its budget
 
-**Class: T** *(planned)*
+**Class: T.** Evidenced in `test_runner.py`.
 
-**Method.** `commons/budget` checks the projected cost before every call.
-Exceeding it halts with `halted: budget`, and what was produced stays readable.
+**Method.** `BudgetWatcher` adds up what the stream reports and stops the
+process when the total crosses the ceiling. Tokens between `result` events are
+priced at the **worst rate on file**, because a ceiling that under-estimates is
+not a ceiling.
+
+**Weaker than what it replaces, and the difference has a name.** A projection
+refuses the call that would exceed; this lets that call finish and stops the
+next. **The overshoot is bounded by one call rather than by zero.**
 
 **Evidence.** A test that a run with a low ceiling halts and that its artefacts
 remain queryable.
@@ -337,22 +356,24 @@ would be the exact failure this document is written to avoid.
 
 ---
 
-## G17 — Credentials never leave the environment
+## G17 — There is no credential to leak
 
-**Class: T** and **A**
+**Class: A.** The strongest form this row has ever had, and by subtraction.
 
-**Method.** The key is read from the environment only. Never a default in code,
-never a file, never an argument, never logged. `.env` is git-ignored before it
-exists.
+**Method.** There is no Anthropic SDK in this project and nothing reads
+`ANTHROPIC_API_KEY`. The only access to a model is the user's Claude Code session
+on this machine. **A key that does not exist cannot be committed, logged or
+pasted into a chat.**
 
-**Evidence.** A test that the settings object has no credential default; a grep
-in CI for key-shaped literals; `.gitignore` under version control.
+**Evidence.** A grep over the tree for `anthropic` and `ANTHROPIC_API_KEY`
+returns only the comments saying they are absent. `pyproject.toml` has no
+Anthropic dependency.
 
-**Carried from v1, where it was got wrong once.** A task was passed as a command
-argument with `shell: true` on Windows, which was command injection and shipped
-for about an hour. Anything reaching a subprocess goes on **stdin**.
-
----
+**What still applies.** Anything reaching a subprocess goes on **stdin**, never
+in argv: in v1 a task was passed as a command-line argument with `shell=True` on
+Windows, which was command injection and shipped for about an hour.
+`test_runner.py` asserts a hostile premise appears in the prompt and in no
+element of the command.
 
 ## What is not verified at all
 

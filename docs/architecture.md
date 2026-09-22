@@ -14,7 +14,8 @@ it. `AGENTS.md` at the root holds the process the coding agent follows.
 
 | layer | choice | why |
 |---|---|---|
-| backend | Python 3.12, FastAPI | the orchestrator itself, not a wrapper around one |
+| model access | **Claude Code, the user's own session** | there is no API key and no SDK anywhere in this project |
+| backend | Python 3.12, FastAPI | launches Claude Code, watches its stream, archives what it says |
 | database | SQLite via the stdlib `sqlite3`, no ORM | small stable schema; `sqlite-vec` is a virtual table and ORMs model those badly |
 | vector search | `sqlite-vec` | same file, same transaction, no second service |
 | embeddings | `sentence-transformers`, local, `all-MiniLM-L6-v2` (384) | no per-call cost, no network, runs in CI |
@@ -22,7 +23,8 @@ it. `AGENTS.md` at the root holds the process the coding agent follows.
 | frontend structure | Feature-Sliced Design v2.1 | — |
 | tooling | uv + pytest; npm + vitest; GitHub Actions | CI runs on the mock engine and costs nothing |
 
-**Context ceiling: 100,000 tokens held concurrently.** Not per call — see §6.
+**Context ceiling: 100,000 tokens**, held in two layers rather than reserved in
+advance — see §6.
 
 ---
 
@@ -105,21 +107,33 @@ the part that took longest to learn. The visual layer is rebuilt.
 
 ### 3.1 Who orchestrates
 
-**A Python service inside FastAPI. Not a model.** The orchestrator does not
-reason: it executes `specs/flow.yaml` stage by stage and applies the gate's
-rules. Every turn that Claude Code spent orchestrating in v1 disappears from the
-bill — and that was most of it: a measured run priced its agents at $6.21 and
-actually cost $49.33.
+**Claude Code, running `.claude/skills/novaforge/SKILL.md`.** Not a Python
+service. There is no Anthropic API key and no way to obtain one, so the only
+access to a model is the user's own Claude Code session on this machine.
+
+FastAPI is the **launcher, the observer and the archive**. It starts
+`claude -p --output-format stream-json --verbose` as a subprocess with the prompt
+on stdin, reads the stream line by line, forwards it over SSE, persists state in
+SQLite, and writes `cost.json` from the final `result`. That is exactly what v1's
+four Vite plugins did, moved to Python with a database behind it.
+
+**This was reversed deliberately**, and §8.4 says what it gains and costs. The
+short version: it gains back the strongest guarantee the project has, and it
+loses the ability to reserve tokens before a call.
 
 ### 3.2 What an agent is
 
-A Python function. It receives a typed `ContextPacket`, loads its prompt from
-`backend/<feature>/prompts/<agent>.md`, calls the engine (real or mock) with its
-assigned model, and returns text plus token usage.
+A subagent, dispatched by Claude Code with the `Agent` tool, defined by
+`.claude/agents/<name>.md`. **Its `tools:` line is the authority model.**
 
-**Nothing else. An agent does not read disk and does not write disk** — the
-orchestrator does both on its behalf. That is what makes the writer's isolation a
-property of a type rather than of anyone's discipline.
+`chapter-writer` holds `tools: Glob`. `Glob` returns paths and cannot return
+contents, so a previous chapter's prose is **unreachable** — not merely not
+passed. That is the difference between a capability being absent and a code path
+being polite, and it is why `verification.md` G1 is class **A** rather than
+**T**.
+
+Only `worldbuilder` and `character-architect` hold `Write`. The other seven
+return text and the orchestrator writes the file.
 
 ### 3.3 The sequence of a run
 
@@ -139,7 +153,10 @@ property of a type rather than of anyone's discipline.
 6. **FLOW-5** style — a pass that may not change a word.
 7. **FLOW-6** publish — synopsis by an agent, **manuscript assembled in code**.
 
-**State is persisted to SQLite after every stage and every attempt.**
+**State is persisted after every event the stream reveals**, not at the end. The
+run's slug is *learned* from the `output/<slug>/` paths the run writes, because
+Claude Code derives it from the premise itself and a guessed slug opens the wrong
+novel or none.
 
 ### 3.4 Concurrency
 
@@ -156,11 +173,14 @@ Three reasons a run halts, each leaving it readable up to where it reached:
 | mark | cause |
 |---|---|
 | `halted: budget` | the cost ceiling was reached; the attempt in flight is kept, unpromoted |
-| `halted: context` | a single reservation exceeded the semaphore's total capacity |
+| `halted: context` | a subagent packet was reported above the ceiling |
 | `halted: gate` | `patch_then_halt` exhausted; no chapter file is promoted |
+| `halted: process` | the orchestrator ended without a `result` event |
+| `halted: interrupted` | the launcher itself failed |
 
-A fourth, `halted: interrupted`, marks a run whose process died. Resume is not
-implemented in v1; the persisted state is sufficient to add it without migration.
+**A `claude -p` process that dies is not resumed.** The run halts, stays readable,
+and resuming would be a different run. That is an honest limit of this
+arrangement rather than a missing feature.
 
 ### 3.6 Observation
 
@@ -351,73 +371,58 @@ and it is the half that cannot go wrong.
 
 ---
 
-## 6. Managing the 100,000 concurrent tokens
+## 6. Managing the 100,000 tokens
 
-**The ceiling applies to the sum of all model calls in flight at the same
-instant**, not to each call separately. The distinction is not pedantic: the five
-critics run in parallel, and five calls of 30,000 tokens each satisfy a per-call
-limit while putting 150,000 in the air. A per-call limit is a *consequence* — no
-single call can reserve more than the total capacity.
+**Python no longer assembles the prompts**, so it cannot reserve tokens before a
+call. The semaphore Annex B specified is not implementable here, and saying so is
+better than shipping something that looks like one. Two layers replace it, and
+neither is a reservation taken in advance.
 
-### 6.1 The mechanism: a token semaphore in `commons/context/`
+### 6.1 Layer 1 — a procedure, inside `SKILL.md`
 
-- **Capacity: 100,000, read from config.** Never a literal in the code.
-- Before each call the orchestrator computes the **reservation**: prompt tokens +
-  `max_tokens` for the reply.
-- **Prompt tokens are counted, never estimated** — with Anthropic's token-counting
-  API for the real engine, and the equivalent tokenizer in the mock.
-- The call **acquires** that amount. If capacity is short it **waits**; waiting is
-  never a failure. When the call finishes it **releases**.
-- **A reservation larger than total capacity is rejected before waiting** — that
-  is `halted: context`, an error of the run, not an infinite wait.
+Before dispatching an agent, the orchestrator measures the packet with `wc -w`
+and converts at roughly **1.35 tokens per word**, marked `estimated`. Over the
+limit, it trims — the summary, the number of retrieved fragments — and measures
+again. For concurrency it decides how many critics can go at once from those
+estimates: if five do not fit, they go in two rounds.
 
-Note the shape: the reservation is worst case, since `max_tokens` bounds a reply
-nobody can predict. A semaphore sized by an *assumed* reply is one a single long
-answer walks through, and a ceiling that can be exceeded is not a ceiling.
+**This is a procedure, not a guarantee.** `verification.md` classifies it
+**Inspection**.
 
-### 6.2 What the log records, per call
+### 6.2 Layer 2 — a measurement, in Python
 
-| field | why |
-|---|---|
-| `tokens_reserved` | what this call held |
-| `in_flight_at_dispatch` | what everything else held when it started |
-| `wait_ms` | how long it waited for room |
+Every message in the stream carries `usage`. `commons/runner/watch.py` reads it
+and stops the process when a subagent packet exceeds the ceiling. It is a real
+check on real figures — **and it arrives after the call, not before it.**
 
-With those three, two series can be drawn that were previously assertions:
-**"chapter 34 weighs what chapter 1 weighed"**, and **"how long the critics spent
-waiting"** — which is the cost of the ceiling, made visible rather than argued
-about.
+### 6.3 Two things replaying real runs showed, and they shaped this
 
-### 6.3 The test
+**`input_tokens` alone is nearly always 2.** Almost the whole context arrives
+cached, so the real size is
+`input_tokens + cache_creation_input_tokens + cache_read_input_tokens`. A watcher
+reading only the first field reports two-token calls and never trips: a ceiling
+that cannot be exceeded because it is measuring the wrong thing.
 
-Five critics dispatched in parallel, 30,000 tokens each. The test asserts, over
-every row in the log, that `in_flight_at_dispatch + tokens_reserved ≤ 100,000`,
-and that all five completed. It is a **Test**-class guarantee in
-`verification.md`.
+**The orchestrator's own turns are far above 100,000 and always will be.**
 
-### 6.4 What a `tiny` run reserves
+| run | median | p90 | peak |
+|---|---|---|---|
+| a 3-chapter stress run | 147,086 | 263,285 | 299,678 |
+| an 8-chapter run | 254,448 | 554,937 | 642,667 |
 
-Estimated from the current runs and **marked estimated until Phase 3 measures
-it**.
+That is not a defect. An orchestrator accumulates — it carries the Bible, the
+drafts, the findings and the sheets turn after turn, which is the same fact that
+made a $6.21 estimate stand in for $49.33. **Halting on those figures would halt
+every run inside a minute.** The ceiling was never the orchestrator's budget: it
+is about the packets the *agents* receive, the quantity the architecture claims
+stays flat as a book grows.
 
-| call | reservation, estimated |
-|---|---|
-| worldbuilder | ~6,000 |
-| character-architect | ~8,000 |
-| plot-architect | ~12,000 |
-| chapter-writer | ~14,000 |
-| continuity-critic | ~15,000 |
-| science-critic | ~9,000 |
-| outline-critic | ~8,000 |
-| style-editor | ~7,000 |
-| publisher | ~7,000 |
-
-The three model critics together come to roughly 32,000, which fits — so on
-`tiny` the semaphore should rarely block, and a `wait_ms` that is consistently
-non-zero there means one of these estimates is wrong. That is the point of
-recording it.
-
----
+Those packets have a slot in the stream — `task_progress` carries `subagent_type`
+and `usage` — and **in both recordings that `usage` reads zero**. So the one
+quantity the ceiling is actually about is, from the stream, **not measurable
+today**. The watcher therefore reports `packet_series_provenance: absent` rather
+than claiming every packet was small. Zero and unmeasured are different
+statements, and this one says which.
 
 ## 7. Skills installed for building this
 
@@ -579,6 +584,33 @@ system has produced so far is graded `estimated`, because the mock counts and
 does not measure. Phase 3's acceptance is a `tiny` run on the real engine with
 its exact cost recorded and compared against v1's $7.45 for the same shape — and
 that needs a credential in the environment, which is the user's to provide.
+
+### 8.4 Annex C — Claude Code orchestrates, and there is no API key
+
+D2 reversed. There is no Anthropic key and no way to get one, so the only access
+to a model is the user's Claude Code session.
+
+**What it gains.**
+
+- It works, with the session that already exists.
+- **The writer's isolation goes back to being structural** — `tools: Glob`, which
+  cannot return contents. That is the strongest thing the project has and it was
+  about to be traded for a type and a test.
+- **The real cost of the whole run, orchestrator included, arrives measured** in
+  the `result` event. v1's factor of eight stops being a hole and becomes a
+  number.
+- **One implementation of the pipeline**, `SKILL.md`. Python validates that it
+  does not contradict `flow.yaml` or `config/`; it does not duplicate it.
+
+**What it costs, plainly.**
+
+- **No reservation before a call.** The ceiling is a procedure plus a measured
+  stop; §6 has the detail.
+- **The procedure cannot be tested at $0.** The runner, the parser, the
+  persistence, the SSE and both watchers are covered by a recorded stream.
+  `SKILL.md` is covered by real runs, each of which costs the subscription.
+- **No resume.** A dead `claude -p` halts the run; resuming would be a different
+  run.
 
 ## 9. Limits
 
