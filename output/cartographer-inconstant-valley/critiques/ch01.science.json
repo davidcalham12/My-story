@@ -1,0 +1,6 @@
+{"critic": "science", "chapter": 1, "kind": "model",
+ "agent": "science-critic", "drafts": 1,
+ "note": "The world critic under a historical name. This is not science fiction; it audits the draft against the bullets under ## Rules in bible/world.md and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []}],
+ "orchestrator_note": "Clean. The critic was asked specifically to test the dale-born speech rule (R4) against the milk-woman's four answers, against Amos Dent's 'up from the thorn', and against the two passages quoted from the perambulation book; and to test R2 against the draft's claim that the ford stone agrees with all four plans in relation to the church tower. It found no clause violated."}

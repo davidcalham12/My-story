@@ -1,0 +1,11 @@
+{"critic": "continuity", "chapter": 1, "kind": "model",
+ "agent": "continuity-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "field-book-procedure", "severity": "medium",
+      "quote": "He took out the field book and mixed nothing, the iron-gall being already made up, and wrote in a hand he was proud of:",
+      "claim": "Hale enters the ford-stone measurement in the inn parlour that evening, hours after leaving the ford, where world.md's Means says of the field book that entries are made at the station and signed there.",
+      "fix": "Make the ford entry at the ford, or mark the parlour writing as a private copy rather than the standing entry.",
+      "reference": "bible/world.md, ## Means — the field book and the iron-gall ink"}]}],
+ "orchestrator_note": "Recorded, not acted on. The aggregate was 8 and the gate answered accept, so no redraft was commissioned. The finding is also weak on its own terms: it cites ## Means, not ## Rules, and R3 says only what makes an entry OFFICIAL — two witnesses who stood at the station, signing before the surveyor leaves it. The draft never claims official standing for the Day 1 entry, and the science critic, which reads the Rules and nothing else, scored this draft 10 with no findings. Left in the record rather than argued away.",
+ "arithmetic_checked": "The critic was asked to verify the draft's 'forty-four days' from 11 May to Midsummer Day, 24 June. It is correct: 20 days remaining in May plus 24 in June. No finding was raised and none was due."}

@@ -1,0 +1,17 @@
+{"critic": "outline", "chapter": 1, "kind": "model",
+ "agent": "outline-critic", "drafts": 1,
+ "formula": "10 minus 3 per missing beat, minus 1 per beat out of order",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [],
+    "beats": [
+      {"beat": 1, "present": true, "draft_position": 1,
+       "notes": "Arrival, ford-stone check and unanimous agreement all present. The two beacon poles are never named in the draft and the theodolite appears only in the Midsummer reckoning rather than as cargo — a partial element, not a missing beat, and not deducted twice."},
+      {"beat": 2, "present": true, "draft_position": 2,
+       "notes": "Duration and last-walker given; three further phrasings before he stops."},
+      {"beat": 3, "present": true, "draft_position": 3,
+       "notes": "Chest unlocked, book handed over, refusal to read, Creed-length and last walker given instead."},
+      {"beat": 4, "present": true, "draft_position": 4,
+       "notes": "Four-course Sile, first field-book entry, Midsummer day-count."},
+      {"beat": 5, "present": true, "draft_position": 5,
+       "notes": "Arrival after dark with the lantern, supper, standing-witness offer, Raven Hause remark. The draft does not say Brock rode; nothing contradicts it."}],
+    "missing": [], "out_of_order": [], "ends_on_honoured": true}]}
