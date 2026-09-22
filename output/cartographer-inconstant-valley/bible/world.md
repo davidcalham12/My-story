@@ -1,19 +1,19 @@
 # Scarrowdale — World Bible
 
-In the autumn of 1843, the Tithe Commutation surveys are working their slow way north, parish by parish, turning every field in England into a number on a plan and a shilling in an apportionment. Scarrowdale is the last unapportioned parish in its hundred: a narrow dale in the northern fells, a half-day's cart from the market town of Ingleford, with the hamlet of Nether Scarrow at its lower end, the beck called the Sile running its length, Sile Ford at the mouth and the pass at Raven Hause at the head. Four plans of the dale exist already — an estate survey, an enclosure award, a turnpike engineer's sketch and an old county map — and no two of them agree on the course of the beck, the number of fields, or where the parish stops. The Commission has decided this is carelessness. It has sent a surveyor with a chain, a theodolite and a printed commission to settle the matter for good, and it will not pay until the plan is sealed.
+In 1843 the Tithe Commutation surveys reach the northern fells. Scarrowdale is the last unapportioned parish in the hundred: a narrow dale a half-day's cart from Ingleford, with Nether Scarrow at its foot, the beck called the Sile running its length, Sile Ford at the mouth and Raven Hause at the head. Four plans exist — estate, enclosure, turnpike, county — and no two agree on the beck's course, the number of fields, or where the parish stops. The Commission calls that carelessness and has sent a surveyor with chain, theodolite and commission; it will not pay his fee until the plan is sealed.
 
 ## Factions
 
-- **The Tithe Commission at Somerset House** — wants a first-class plan of every numbered field in the parish, confirmed under seal, so the dale can be charged rent-charge like anywhere else; gets it by contract, by withholding the surveyor's fee until confirmation, and by threatening to apportion the dale by estimate if no plan arrives.
-- **The Hollins Hall estate** — owns most of the dale's grazing and is paying the survey's costs; wants the upper pastures shown as waste and the boundary drawn at Raven Hause rather than beyond it, which lowers what it owes and enlarges what it holds; gets it by hospitality, by producing old deeds at useful moments, and by lending men who are slow in the places it prefers unmeasured.
-- **The dale's own people** — the families of Nether Scarrow and the upper farms; want the valley left unnumbered, because what is written down can be taken; get it by silence, by declining to witness, and by keeping the Rogation walk to a line no instrument has ever confirmed.
+- **The Tithe Commission at Somerset House** — wants a first-class plan of every numbered field, confirmed under seal; withholds the surveyor's fee until confirmation, and will apportion by estimate if no plan comes.
+- **The Hollins Hall estate** — owns the grazing and pays for the survey; wants the upper pastures shown as waste and the bound drawn at Raven Hause, which lowers its charge and enlarges its holding; gets it by hospitality and by men who work slowly where it prefers nothing measured.
+- **The dale's people** — families of Nether Scarrow and the upper farms; want the valley left unnumbered, since what is written can be taken; keep it so by silence, by refusing to witness, and by walking the Rogation bound on a line no instrument has confirmed.
 
 ## Means
 
-- **The Gunter's chain and its ten arrows** — the trade's instrument of truth, carried by two chainmen; what the survey means by a fact.
-- **The theodolite and the two beacon poles** — one raised on Raven Hause, one on Sile Head; the whole plan hangs on the angles read between them.
-- **The field book and the iron-gall ink** — entries made in ink at the station, witnessed and signed; nothing in pencil has any standing.
-- **The parish perambulation book** — the record of the Rogationtide walk, kept in the church chest at Nether Scarrow, the only account of the dale that the dale itself accepts.
+- **The Gunter's chain and its ten arrows** — the trade's instrument of truth, worked by two chainmen; what the survey calls a fact.
+- **The theodolite and the two beacon poles** — one on Raven Hause, one on Sile Head; the plan hangs on the angles between them.
+- **The field book and the iron-gall ink** — entries made at the station and signed there; nothing in pencil has standing.
+- **The parish perambulation book** — the record of the Rogationtide walk, kept in the church chest; the only account of the dale the dale accepts.
 
 ## Rules
 
@@ -26,4 +26,4 @@ In the autumn of 1843, the Tithe Commutation surveys are working their slow way 
 
 ## Texture
 
-Wet bracken, low cloud on the fell shoulders, sheep standing in walls that have been rebuilt more often than they need to be. The dale is not menacing; it is courteous. Doors open, tea is poured, questions are answered with something adjacent to an answer. The wrongness arrives as paperwork — a column of figures that will not sum the same way twice, a wall that was on the left yesterday, a signature that nobody remembers giving. People here are calm about it in the way of those who have lived a long time beside something they have agreed not to name, and the horror is in their calm rather than in anything that happens.
+Wet bracken, low cloud on the fell shoulders. The dale is not menacing; it is courteous. Doors open, tea is poured, questions are answered with something adjacent to an answer. The wrongness arrives as paperwork: a column that will not sum twice alike, a signature nobody remembers giving. The calm is the horror.
