@@ -1,10 +1,10 @@
 ---
 id: SPEC-007
 title: NovaForge backend v1 — launcher, observer and archive for the Claude Code orchestrator
-status: draft
-owner: <human>
-approved_by: —
-approved_on: —
+status: approved
+owner: David Calderon
+approved_by: David Calderon (dictated in chat, 2026-09-22; written by the building session at his request)
+approved_on: 2026-09-22
 supersedes: —
 renamed_from: SPEC-001-backend-v1 (2026-09-22; the number collided with SPEC-001-commons)
 depends_on: docs/architecture.md, docs/verification.md, specs/flow.yaml, specs/loops/LOOP-003/README.md
