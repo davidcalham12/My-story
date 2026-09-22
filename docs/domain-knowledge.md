@@ -229,6 +229,44 @@ here from the score column before the notes were read, and the notes changed wha
 it meant. **A score series is not a finding.** The critique's `note` field is the
 evidence; the numbers are an index into it.
 
+### 3.3a What actually blocks a chapter, measured over two v2 runs
+
+Eleven chapters, 22 scored attempts, **12 below the threshold**. What was worst
+each time:
+
+| characteristic | times it was the minimum on a failing attempt |
+|---|---|
+| `continuity` | **9** |
+| `science` | 3 |
+| `outline`, `length`, `chatter` | **0** |
+
+**The gate is, in practice, a continuity gate.** Three of its five
+characteristics have never once been the thing that stopped a chapter. That is
+not an argument for removing them — `outline` exists because a beautifully
+consistent chapter about something else used to pass cleanly, and `chatter`
+catches a failure mode no rubric anticipates. It is an argument for knowing where
+the work is: **the writer's isolation is paid for in continuity, and that is the
+bill arriving.**
+
+### 3.3b Does a later chapter get harder? The data says yes and no
+
+The eight-chapter run looks like a clean answer. Chapters 1 and 2 passed on the
+first attempt; **chapters 3 through 8 all failed it, every one on `continuity`,
+and every one needed exactly two attempts.** A step, not a slope, and it lands
+exactly where the rolling summary first has to compress rather than restate.
+
+**The three-chapter run does not reproduce it.** Its first-attempt `continuity`
+went 7, 3, **10** — the last chapter was its best.
+
+So the honest statement is the one this document has always made about chapter
+thirty-four, now for a better reason: **there is data and the data does not settle
+it.** One run of eight is one run. What the two agree on is §3.3a — where the
+failures are — and not that they worsen with position.
+
+Two things worth doing before believing either shape: a second eight-chapter run,
+and per-chapter packet sizes, which the stream does not currently report
+(`verification.md` §3.5).
+
 ### 3.4a A sentence repeated across chapters, and why it had to happen
 
 The eight-chapter book repeats a line word for word in **chapters 2 and 7**:

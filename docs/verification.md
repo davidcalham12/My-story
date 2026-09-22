@@ -997,7 +997,7 @@ reads as complete.
 | voice, pacing, dialogue, originality hold | **U** | four of the ontology's ten dimensions, unchecked |
 | repairing one characteristic does not break another | **U** | confirmed twice. A third case on v2's first run turned out, on reading the critique notes, to be a rule ambiguity surfaced by a sharper prompt and closed in canon — the score column alone could not tell the two apart |
 | the book is worth reading | **U** | the ontology puts a human at this gate and is right to |
-| chapter 34 reads like chapter 1 | **U** | architecture, not evidence. Two eight-chapter runs exist and nothing has read them end to end for drift |
+| chapter 34 reads like chapter 1 | **U** | and now for a better reason: **there is data and it does not settle it.** On the eight-chapter run, chapters 3–8 all failed their first attempt on `continuity` and chapters 1–2 did not; the three-chapter run scored its *last* chapter best. `domain-knowledge.md` §3.3b |
 | the feedback sheet's wording matters | **U** | the loop's premise. One chapter has reached attempt 3; there is almost no signal |
 | the log resists tampering | **U** | a record the orchestrator writes, not a hash chain |
 | it runs unattended | **U** | one user, one run, a subprocess on this machine |
