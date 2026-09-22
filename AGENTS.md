@@ -5,7 +5,7 @@ else.
 
 This file is about **process**: what has to be approved before what, and what
 "done" means. It is not about the novel-writing agents — the catalogue of those
-nine lives in [`docs/architecture.md`](docs/architecture.md) §4.
+ten lives in [`docs/architecture.md`](docs/architecture.md) §4.
 
 Three processes, with gates between them: **docs → specs → code**. Nothing
 advances without the stage before it approved.
@@ -178,7 +178,7 @@ implementation detail.
 
 | what | where |
 |---|---|
-| the nine novel-writing agents, with skills | `docs/architecture.md` §4 |
+| the ten novel-writing agents, with skills | `docs/architecture.md` §4 |
 | the guarantees and their T/A/I/D/U letters | `docs/verification.md` |
 | the vocabulary | `docs/definitions.md` |
 | what the runs taught | `docs/domain-knowledge.md` |

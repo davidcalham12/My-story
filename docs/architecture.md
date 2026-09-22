@@ -178,7 +178,7 @@ novel or none.
 
 ### 3.5 Failure and stopping
 
-Three reasons a run halts, each leaving it readable up to where it reached:
+The reasons a run halts, each leaving it readable up to where it reached:
 
 | mark | cause |
 |---|---|
