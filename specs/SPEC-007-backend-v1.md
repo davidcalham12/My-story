@@ -1,15 +1,16 @@
 ---
-id: SPEC-001
+id: SPEC-007
 title: NovaForge backend v1 — launcher, observer and archive for the Claude Code orchestrator
 status: draft
 owner: <human>
 approved_by: —
 approved_on: —
 supersedes: —
+renamed_from: SPEC-001-backend-v1 (2026-09-22; the number collided with SPEC-001-commons)
 depends_on: docs/architecture.md, docs/verification.md, specs/flow.yaml, specs/loops/LOOP-003/README.md
 ---
 
-# SPEC-001 — NovaForge backend v1
+# SPEC-007 — NovaForge backend v1
 
 A Software Requirements Specification, in one document, for the first functional
 backend. Written against `docs/` (definitions, domain knowledge, architecture,
@@ -18,7 +19,7 @@ verification) and the four start-up addenda (B, C, D). Where this spec and
 between the two must tend to zero (see §12).
 
 Per `AGENTS.md`: no implementation plan until this spec is approved; no code until
-PLAN-001 is approved; tests first.
+PLAN-007 is approved; tests first.
 
 ## 1. Introduction
 
@@ -153,7 +154,7 @@ backend writes when its own reading of the stream raised — distinct from
 This spec was drafted before the backend existed and is being approved after most
 of it does. Where the two differ, **the build is what this table says and the
 spec text above is amended to match**; what the build lacks is either scheduled
-for PLAN-001 or declared as a gap in §12. Nothing here is left implicit.
+for PLAN-007 or declared as a gap in §12. Nothing here is left implicit.
 
 | item | the draft said | built |
 |---|---|---|
@@ -161,8 +162,8 @@ for PLAN-001 or declared as a gap in §12. Nothing here is left implicit.
 | create response | `202 {run_id}` | `201 {id, slug}` |
 | lifecycle | `queued → running → …` | `running → complete \| halted`; no queue — 409 is the queue |
 | halt reasons | `budget, context, gate, process, user` | `budget, context, gate, process, interrupted`; `user` pending FR-RUN-5 |
-| FR-RUN-5 halt endpoint | required | **not built** → PLAN-001; gap in §12 |
-| FR-RUN-7 startup sweep | required | **not built** → PLAN-001 |
+| FR-RUN-5 halt endpoint | required | **not built** → PLAN-007; gap in §12 |
+| FR-RUN-7 startup sweep | required | **not built** → PLAN-007 |
 | FR-RUN-4 `Last-Event-ID` | required | **not built**; stream opens with `snapshot` → gap in §12 |
 | FR-RD-1/2 file-backed read endpoints | per artefact | **not built**; artefacts are archived to SQLite at run end (`runs/archive.py`) and read from there; the path-normalisation property is N/A (`verification.md` G17) |
 | FR-INS-1 `outline_audit` CLI | a script | a model, `outline-critic` — class D (`verification.md` §8, v2 entry); gap in §12 |
@@ -175,7 +176,7 @@ for PLAN-001 or declared as a gap in §12. Nothing here is left implicit.
 | gate | five characteristics | six (SPEC-006 added `prose`) |
 | agents | nine | ten |
 | FR-RNR-3 `events` table | every raw line persisted before fan-out | **no `events` table**; what is persisted is derived: `runs`, `attempts`, `calls`, `scores`, `gate_decisions`, `findings`, `sheets`, `summary_facts` (`verification.md` G19) — Paso 4 question |
-| FR-BUD-1 `--max-budget-usd` | pass it if the CLI has it | the CLI has it (`claude --help`); the runner **does not pass it** → PLAN-001 |
+| FR-BUD-1 `--max-budget-usd` | pass it if the CLI has it | the CLI has it (`claude --help`); the runner **does not pass it** → PLAN-007 |
 | FR-BUD-1 measure between `result` events | running sum of `calls` cost | tokens priced at the most expensive rate on file, `watch.py` — a ceiling that under-estimates is not a ceiling |
 | FR-BUD-2 in-flight sum | `input_tokens + max_tokens` of calls in flight | `input + cache_creation + cache_read` of each `usage` event, measured (`architecture.md` §6.3) |
 | FR-RUN-6 import | `POST /api/runs/import` | `import_all()` in `commons/db/import_v1.py`, exercised by `test_import.py`; **no endpoint, no CLI entry point** — Paso 4 question |
@@ -183,9 +184,8 @@ for PLAN-001 or declared as a gap in §12. Nothing here is left implicit.
 | §6.1 prefix | `/api/v1` | `/api` |
 | tests | fake `claude` binary | the runner replays a recorded stream when `USE_RECORDED_STREAM=true`; same effect, no binary |
 
-The `python -m novaforge.*` names that remain in §4.5–§4.6 and §8 are the
-draft's; the plan maps each to its `backend.*` home or to the gap row that
-replaces it.
+The draft's `python -m novaforge.*` names are gone from §4; where §8 keeps one
+it is marked with the Paso 4 decision that retired it.
 
 ## 4. Functional requirements
 
@@ -204,17 +204,19 @@ Numbering: `FR-<feature>-<n>`. Each FR is testable; its verification letter is i
   attempt, active agent(s), totals, halt reason.
 - **FR-RUN-4** `GET /api/runs/{id}/events` is an SSE stream of run events (§6.2).
   It opens with a `snapshot` of the run's persisted state and then relays live
-  events. `Last-Event-ID` resume is **not built**; §12.
+  events. With `Last-Event-ID: <seq>` it replays from the `events` table
+  (FR-RNR-3) before going live. *Not built at 2026-09-22; PLAN-007 (Paso 4, Q3).*
 - **FR-RUN-5** `POST /api/runs/{id}/halt` terminates the subprocess and marks
-  `halted: user`. **Not built at 2026-09-22** (§3.2); PLAN-001 schedules it and
+  `halted: user`. **Not built at 2026-09-22** (§3.2); PLAN-007 schedules it and
   §12 carries the gap until then.
-- **FR-RUN-6** `POST /api/runs/import` scans `output/*/`, imports every run found
+- **FR-RUN-6** `python -m backend.commons.db.import_v1` (a CLI entry point over
+  the existing `import_all()`; no HTTP endpoint — *Paso 4, Q7*) scans `output/*/`, imports every run found
   (state, log, critiques, sheets, cost.json) into SQLite with
   `source = reconstructed`, normalising the three known critique shapes; an
   unrecognised shape becomes a row with `parse_error` and is never dropped
   silently.
 - **FR-RUN-7** On startup, any run left in `running` is marked `halted: process`.
-  **Not built at 2026-09-22** (§3.2); PLAN-001 schedules it.
+  **Not built at 2026-09-22** (§3.2); PLAN-007 schedules it.
 
 ### 4.2 Runner
 
@@ -226,7 +228,9 @@ Numbering: `FR-<feature>-<n>`. Each FR is testable; its verification letter is i
   malformed line is logged with its raw text and skipped; the parser never
   crashes the run.
 - **FR-RNR-3** Persists every event to `events(run_id, seq, ts, type, payload)`
-  before fanning out.
+  before fanning out. *Not built at 2026-09-22 — the build persists derived
+  state only; PLAN-007 adds the table by migration (Paso 4, Q3): a run is judged
+  by the stream it ran, and that needs the stream, not a reconstruction.*
 - **FR-RNR-4** Derives run state from events: stage and agent from `Agent` tool
   calls (subagent name), chapter/attempt from `output/<slug>/chapters/chNN*` and
   `critiques/chNN.*.attemptK*` paths in tool inputs, slug from the first write
@@ -244,8 +248,10 @@ Numbering: `FR-<feature>-<n>`. Each FR is testable; its verification letter is i
 
 - **FR-BUD-1** Maintains running `cost_usd` from `calls`; when it exceeds
   `config.budget.max_cost_usd` for the profile, terminates the process and marks
-  `halted: budget`. Checks whether the CLI offers a max-budget flag for `-p`; if
-  it does, passes it as the first line of defence (documented either way).
+  `halted: budget`. The CLI offers `--max-budget-usd`; the runner passes the
+  profile's ceiling as the first line of defence and the watcher stays the
+  second — whether the flag binds under a subscription is learned from the real
+  run (AC-15) and written down either way.
 - **FR-BUD-2** Maintains the sum of `input_tokens + max_tokens` of calls
   currently in flight (a call is in flight from its dispatch event until its
   `usage` event). When the sum exceeds `config.context.max_concurrent_tokens`
@@ -271,37 +277,46 @@ Numbering: `FR-<feature>-<n>`. Each FR is testable; its verification letter is i
 - **FR-SRC-1** Embeds `bible/*.md` sections and rolling-summary facts per run
   with a local `sentence-transformers` model into a `vec0` table keyed to the
   source row. Never embeds chapter prose.
-- **FR-SRC-2** CLI `python -m novaforge.search <slug> "<text>" --k <n> --scope bible,summary`
-  prints the top-k fragments as JSON. This is what the orchestrator runs (via
-  `Bash(python *)`) before dispatching the continuity critic.
+- **FR-SRC-2** `backend/commons/search.py` indexes and queries Bible sections
+  and summary facts (built, tested). **The orchestrator does not call it in v1**
+  — wiring it into `SKILL.md` before the continuity critic changes the procedure,
+  which only a real run verifies, and the one real run of this spec (§10, AC-15)
+  validates the backend. Declared in §12; a SPEC of its own. *Paso 4, Q5.*
 - **FR-SRC-3** If `sqlite-vec` or the model is unavailable, the CLI exits with a
   distinct code and JSON `{"available": false}`; `SKILL.md` then falls back to
   passing the full Bible. The degradation is logged, never silent.
 
 ### 4.6 Instruments (CLI, invoked by the orchestrator)
 
-- **FR-INS-1** `python -m novaforge.outline_audit <slug>` checks every numbered
-  beat in `outline.md` against the bullets under `## Rules` in `bible/world.md`
-  and prints `{ok, violations:[{chapter, beat, rule, why}]}`. A violation blocks
-  FLOW-4 for that chapter until the outline is revised.
-- **FR-INS-2** `python -m novaforge.validate_sheet <path>` ports
-  `validate-sheet.mjs`: rejects a sheet missing any of the six scores, any of
-  the four finding fields, with a template gap, quoting a previous chapter, or
-  reaching attempt 3 without literal replacements. Exit code non-zero on reject.
-- **FR-INS-3** `python -m novaforge.measure <slug> [--self-test]` ports
-  `measure.mjs`; `--self-test` must reproduce the recorded assertions on the
-  fixture run (`deep-space-salvage-derelict`), reporting SKIP where the fixture
-  lacks data, never hiding it.
+- **FR-INS-1** The outline is audited against the bullets under `## Rules` in
+  `bible/world.md` before FLOW-4, and a violation blocks FLOW-4 for that chapter
+  until the outline is revised. **The auditor is a model** (`science-critic` in
+  its FLOW-3 role, `architecture.md` §4.6) — class D, `verification.md` G11.
+  The draft's `outline_audit` script is **not built by this spec**: matching
+  free-text beats against free-text rules in code would be a T in name only.
+  A script is its own SPEC, with its own evidence. *Paso 4, Q4.*
+- **FR-INS-2** `node specs/loops/LOOP-003/validate-sheet.mjs <path>` — the
+  validator the skill already runs — rejects a sheet missing any of the six
+  scores, any of the four finding fields, with a template gap, quoting a previous
+  chapter, or reaching attempt 3 without literal replacements. Exit code non-zero
+  on reject. **Stays in Node**; no Python port. *Paso 4, Q6.*
+- **FR-INS-3** `node specs/loops/LOOP-003/measure.mjs <slug> [--self-test]`
+  stays in Node and **learns the sixth characteristic, `prose`**, in PLAN-007;
+  `--self-test` reproduces the recorded assertions on the fixture run
+  (`deep-space-salvage-derelict`), reporting SKIP where the fixture lacks data,
+  never hiding it. *Paso 4, Q6.*
 - **FR-INS-4** All instruments read files and SQLite only; none calls a model.
 
 ### 4.7 Read endpoints (per feature)
 
-- **FR-RD-1** `GET /api/runs/{id}/bible/{section}` · `/outline` · `/chapters` ·
-  `/chapters/{n}` (drafts by attempt, `kept` flag) · `/chapters/{n}/critiques` ·
-  `/chapters/{n}/sheets` · `/chapters/{n}/gate` · `/style` · `/book` ·
-  `/synopsis` · `/cost` · `/calls` · `/facts`.
-- **FR-RD-2** File-backed endpoints resolve paths after normalisation and only
-  under `output/<slug>/`; anything else is 404, never 500.
+- **FR-RD-1** What a run produced is read **from the archive in SQLite**, not
+  from `output/<slug>/`: `GET /api/runs/{id}` returns the run with its stages,
+  attempts, scores, gate decisions, calls and cost as archived at run end
+  (`runs/archive.py`). Per-artefact endpoints (`/bible/{section}`, `/chapters/{n}`
+  …) are **not in v1**: no client consumes one. *Paso 4, Q2.*
+- **FR-RD-2** The backend serves no file by path. The path-normalisation
+  property of the draft is therefore not applicable (`verification.md` G17);
+  it returns the day an endpoint reads a file.
 - **FR-RD-3** Every numeric field carries
   `source ∈ {measured, reported, reconstructed, estimated, absent}`.
 
@@ -348,8 +363,9 @@ second concurrent run; 422 for invalid input.
 
 Types: `state` (stage/chapter/attempt/agent), `call` (a subagent usage row),
 `gate` (a decision), `finding`, `sheet`, `halt`, `complete`, `raw` (optional, the
-untouched stream line). The built stream opens with `snapshot` and closes with
-`done`; `Last-Event-ID` resume is a declared gap (§12).
+untouched stream line). The stream opens with `snapshot` and closes with
+`done`; `id` is the persisted `seq` once FR-RNR-3 lands, and `Last-Event-ID`
+resumes from it.
 
 ### 6.3 Subprocess contract with `claude -p`
 
@@ -389,11 +405,14 @@ The backend cannot work unless `SKILL.md`:
 
 1. Writes rejected drafts as `chapters/chNN.attemptK.md`.
 2. Records real `ts` (`date -u`) and, where possible, `duration_ms` per call.
-3. Calls `python -m novaforge.search` before the continuity critic and pastes the
-   fragments; falls back to full Bible on `{"available": false}`.
-4. Calls `python -m novaforge.outline_audit` after FLOW-3 and revises the outline
-   on violations before FLOW-4.
-5. Calls `python -m novaforge.validate_sheet` before sending any sheet.
+3. ~~Calls `search` before the continuity critic~~ — **not in v1** (Q5); the
+   critic receives the full Bible, and this line returns with the spec that wires
+   the search.
+4. Audits the outline against `## Rules` after FLOW-3 and revises it on
+   violations before FLOW-4 — **done today by a model** (Q4), and the skill
+   already does it.
+5. Runs `node specs/loops/LOOP-003/validate-sheet.mjs` before sending any sheet
+   — **the skill already does** (Q6).
 6. Estimates packet size (`wc -w × 1.35`, marked `estimated`) before each dispatch
    and staggers parallel critics to stay under 100,000.
 7. Emits the rolling summary as structured facts (D15) into
@@ -430,15 +449,20 @@ to Python, and each is a separate SPEC item if the team prefers.
 | AC-4 | `cost.json` and `runs.total_cost_usd` equal the `result` event's values | T |
 | AC-5 | Cost overshoot in the fake stream → process terminated → `halted: budget` | T |
 | AC-6 | Concurrent tokens > 100,000 in the fake stream → `halted: context`; all `calls` rows carry `in_flight_at_dispatch` | T |
-| AC-7 | Import of the eight existing runs succeeds; three critique shapes normalised; an unknown shape yields a `parse_error` row and no silent drop | T |
+| AC-7 | `python -m backend.commons.db.import_v1` imports the eight v1 runs; three critique shapes normalised; an unknown shape yields a `parse_error` row and no silent drop | T |
 | AC-8 | `chapter-writer` front matter `tools:` equals `Glob`; only the two Bible writers include `Write`; CI fails otherwise | T |
 | AC-9 | `SKILL.md` agrees with `flow.yaml` and `config/` on stage order, critics, threshold, attempts, `on_fail` | T |
-| AC-10 | Every file-backed read endpoint rejects `..`, absolute paths and symlinks outside `output/<slug>/` (property-based) | T |
-| AC-11 | `search` returns top-k fragments from Bible and facts only; never from chapter prose; degrades to `{"available": false}` when the extension or model is missing | T |
-| AC-12 | `outline_audit` flags the recorded impossible beat (stress fixture, chapter 3, beat 7) | T |
-| AC-13 | `validate_sheet` rejects each of the five defect classes; `--self-test` passes | T |
-| AC-14 | `measure --self-test` reproduces the fixture's recorded assertions, reporting SKIP where data is absent | T |
-| AC-15 | A real `tiny` run completes end to end via the backend with exact cost recorded; difference vs the current project's $7.45 run is explained in `docs/domain-knowledge.md` | D |
+| AC-10 | No endpoint reads a file by path (Q2); a test asserts the router has no path-taking file route, so the property returns with the first such endpoint | T |
+| AC-11 | `backend.commons.search` returns top-k fragments from Bible and facts only, never from chapter prose, and degrades to `{"available": false}` when the extension or model is missing — at module level; the skill does not call it (Q5, §12) | T |
+| AC-12 | The FLOW-3 audit (a model, Q4) flags the impossible beat the `stress` profile commissions; evidenced from the run's critique file, not reproducible | D |
+| AC-13 | `validate-sheet.mjs` rejects each of the five defect classes; its self-test passes in CI | T |
+| AC-14 | `measure.mjs --self-test` reproduces the fixture's recorded assertions over **six** characteristics, reporting SKIP where data is absent | T |
+| AC-18 | `POST /api/runs/{id}/halt` stops the process, marks `halted: user`, keeps the attempt in flight unpromoted and readable | T |
+| AC-19 | On startup a run left `running` is marked `halted: process` | T |
+| AC-20 | Every stream line lands in `events` before fan-out; `Last-Event-ID: n` replays from `n+1` then goes live | T |
+| AC-21 | The spawned argv carries `--max-budget-usd <profile ceiling>`; the prompt is not in argv | T |
+| AC-15 | A real `tiny` run completes end to end via the backend with exact cost recorded (last v2 tiny: $18.82); difference vs v1's $7.45 is explained in `docs/domain-knowledge.md` | D |
+| AC-15b | A real `stress` run via the backend reaches `patch_then_halt` or explains why it did not; both runs carry `--max-budget-usd` and the profile ceiling; the pair is authorised at Paso 4, Q8 | D |
 | AC-16 | The 100k pre-dispatch estimate in `SKILL.md` is present and applied (read the skill; inspect one run's log) | I |
 | AC-17 | No dependency on the Anthropic SDK; grep for `anthropic` and `ANTHROPIC_API_KEY` returns nothing outside docs | A |
 
@@ -460,22 +484,40 @@ beat reaching FLOW-4.
 | The procedure in `SKILL.md` is not testable at $0 | important | only the runner is; the skill needs real runs | `measure` on each real run; LOOP-003 instruments |
 | Interrupted runs cannot resume | incidental | v1 scope | `halted: process` count |
 | `character_knowledge` is created but never written | incidental | v1 scope; ontology says it matters | table row count stays 0 |
-| `POST /api/runs/{id}/halt` (`halted: user`) is not built | important | v1 launched without it; the process is stopped from the terminal; PLAN-001 schedules it | no `halted: user` row can exist; the AC table in §10 says so |
-| The startup sweep (FR-RUN-7) is not built | important | one run at a time on one machine; a stale `running` row is visible in `GET /api/runs` | a `running` row with no live process |
-| `Last-Event-ID` resume is not built | incidental | one local client; a reconnect gets a fresh `snapshot`, and `GET /api/runs/{id}` holds the persisted state | a client that needs the sequence number |
+| `POST /api/runs/{id}/halt` (`halted: user`) is not built | important | **closes with PLAN-007**; until then the process is stopped from the terminal | AC-18 |
+| The startup sweep (FR-RUN-7) is not built | important | **closes with PLAN-007**; until then a stale `running` row is visible in `GET /api/runs` | AC-19 |
+| No endpoint serves an artefact by path (FR-RD-1, Q2) | incidental | no client asks for one; the archive answers through `GET /api/runs/{id}` | a frontend feature that needs a file the archive lacks |
+| `Last-Event-ID` resume is not built | incidental | **closes with PLAN-007 (Q3)**: the `events` table gives it; until that phase lands a reconnect gets a fresh `snapshot` | AC-20 |
 | `SKILL.md` never calls `search` before the continuity critic (§8 point 3) | important | `backend/commons/search.py` and `db/vectors.py` are built and tested and not running (`verification.md` §3.15); the critic gets the full Bible | no `search` call in any run's log |
 | `SKILL.md` does not emit `chNN.facts.json` (§8 point 7) | incidental | the rolling summary is text and `check_summary` holds it to its cap | no `facts.json` under `output/<slug>/chapters/` |
-| `measure.mjs` measures five characteristics; `prose` is outside its self-test | incidental | the instrument predates SPEC-006; `check_prose` covers the mechanical half of `prose` | its self-test names five; noted at `verification.md` G21 |
+| `measure.mjs` measures five characteristics; `prose` is outside its self-test | incidental | **closes with PLAN-007 (Q6)**: the instrument learns `prose`; until then `check_prose` covers the mechanical half | AC-14 |
 | The outline audit is a model (`outline-critic`), not the FR-INS-1 script | important | `verification.md` G11 records it as D; a script would give T and is the next candidate under *code before agent* | the letter stays D until the CLI exists |
 | Subagent-level tool calls may not be visible in the stream; the writer's isolation is asserted from the agent file, not observed at runtime | critical → assumed risk | the `tools:` line is the structural guarantee; AC-8 pins it | any change to the agent file fails CI |
+
+## 12a. Decisions taken at Paso 4 (grill, 2026-09-22)
+
+Eight questions, all answered with the recommendation. Each is cited where it
+changed a requirement; the list is here so the plan and the report can point at
+one place.
+
+| q | decision |
+|---|---|
+| Q1 | renamed SPEC-007 / PLAN-007: the number collided with SPEC-001-commons |
+| Q2 | reads come from the SQLite archive; no file-by-path endpoints in v1 |
+| Q3 | an `events` table is added; `Last-Event-ID` replays from it |
+| Q4 | the outline audit stays a model (D); a script would be its own spec |
+| Q5 | `search` stays built-and-unwired; a declared gap, its own spec |
+| Q6 | `validate-sheet.mjs` and `measure.mjs` stay in Node; `measure.mjs` learns `prose` |
+| Q7 | import is a CLI, `python -m backend.commons.db.import_v1`; no endpoint |
+| Q8 | one real `tiny` run and one real `stress` run, each under `--max-budget-usd` and the profile ceiling |
 
 ## 13. How this spec is executed
 
 1. Human sets `status: approved` in the header after review.
-2. The building session writes `specs/PLAN-001-backend-v1.md`: tests first, then
+2. The building session writes `specs/PLAN-007-backend-v1.md`: tests first, then
    code by feature in `flow.yaml` order (commons before features), then docs
    updates; loop the plan against `docs/architecture.md` and this spec until no
    gap remains.
-3. Human sets PLAN-001 to `approved`.
+3. Human sets PLAN-007 to `approved`.
 4. Work happens on a new branch cut from the current one; TDD; every merge
    updates this spec if behaviour differs, and `docs/verification.md`.

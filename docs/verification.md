@@ -653,7 +653,7 @@ damage would be a wrong gate, which is visible; the row exists because
 `AGENTS.md` §6 lists them as untouchable, and a rule that is only a rule is a
 reminder.
 
-**Note, SPEC-001 §12.** The pin on the characteristic *list* is Python-side.
+**Note, SPEC-007 §12.** The pin on the characteristic *list* is Python-side.
 `measure.mjs` — the LOOP-003 instrument CI self-tests — knows five
 characteristics and does not see `prose`; that is a declared gap in SPEC-001,
 not a guarantee this row makes.

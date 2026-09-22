@@ -22,4 +22,4 @@ Two consequences worth stating:
   fact, `verification.md` is what gets corrected.
 - **A spec is derived.** Where `SPEC-*.md` and `architecture.md` disagree, the
   work stops and the two are reconciled before a plan is written — the spec says
-  so itself (SPEC-001 §12).
+  so itself (SPEC-007 §12).
