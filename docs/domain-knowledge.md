@@ -438,6 +438,22 @@ Runs now carry a SHA of `SKILL.md` at start and at end, and a mismatch writes a
 runs that finished before this existed say nothing rather than claiming the
 procedure held.
 
+**And then the run itself corrected the alarm.** Chapters 1, 2 **and 3** all came
+back with five critiques, after the edit. The orchestrator appears to hold the
+procedure it read when its session began rather than re-reading the file each
+turn — so the file changing mid-run is a smaller hazard than it looked, for that
+run.
+
+That does not retire the warning; it calibrates it. The warning says the early
+and late chapters were *not necessarily* produced by the same procedure, which is
+exactly the claim the evidence supports: **we can detect that the file moved, and
+we cannot detect what the orchestrator was still holding.** A warning hedged that
+way is useful; one that asserted contamination would have been wrong here.
+
+The unhedged consequence stands and is the more important one: **the next run
+picks up the change**, and a run's own config snapshot will say five while its
+procedure says six unless the snapshot is taken from the same place.
+
 ### 7.2 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
