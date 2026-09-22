@@ -1,0 +1,12 @@
+{"critic": "continuity", "chapter": 6, "kind": "model",
+ "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 4, "findings": [
+     {"kind": "timeline-contradiction", "severity": "high",
+      "quote": "He saw Mr Brock pass. Then he saw him pass again. Before the light, both times, and he had a lantern with him going, and he had it still lit coming back, which is a queer thing, because by then he'd no use for it.",
+      "claim": "Two things that will not both stand: both sightings before the light, and no use for the lantern on the second - the only reason offered for a lantern being useless is that it has got light. It also collides with the established fact that Brock reached Hale out of the dark with the flame already killed.",
+      "fix": "Let the sky grey between the two passes without the light yet being on Raven Hause.",
+      "reference": "bible/timeline.md, the ninth day"}]},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "arbitration": "The finding was UPHELD IN PART. Its core is right: the lantern's logic did not hold and the son's sighting is the single piece of evidence the next two chapters reconstruct from, so it had to fit. But the critic also argued that ANY gradual greying of the sky before the light reaches Raven Hause is forbidden, because the dale's dawn arrives everywhere at once. That was OVERRULED. What R5 says arrives everywhere at once is the dale's DAWN - the moment that decides who may sign an entry - not the ordinary lightening of a northern sky, and the previous chapter already has 'a sky that had begun to be a sky' before the light lands, a passage the world critic has now passed three times. The sheet carried the overruled half explicitly, marked as overruled, so that nothing was trimmed and the writer would not act on it.",
+ "resolution": "One literal substitution, applied by exact match, not skipped. Iteration 2 scored 10 with no findings and none marked late."}

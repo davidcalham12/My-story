@@ -509,7 +509,34 @@ conclusion is narrower and worse — *the procedure as written when this run
 started was not enough*, and the run is evidence for the change rather than
 against it.
 
-### 7.4 A rule lives in one place, and the count is the tell
+### 7.4 The one number the flat cost curve rests on was not being checked
+
+The project's central architectural claim is that **chapter thirty-four's prompt
+is the same size as chapter one's**. The Bible is fixed; the outline entry is one
+chapter's. **The rolling summary is the only part that can grow with the book**,
+and `context.max_summary_words` is the only thing stopping it.
+
+Nothing measured it. Measured now:
+
+| profile | cap | summaries, in order |
+|---|---|---|
+| `tiny` | 120 | 108, 116, **122** |
+| `small` | 200 | 192, **204**, **211**, **246**, **220**, **222** |
+
+Five of six over on the longer run, by 2% to 23%. **A number nobody measures
+becomes a target rather than a limit.**
+
+**What it is not.** It is not a runaway. The figures plateau around 220 instead of
+climbing with the chapter count, and the cap scales by profile — 120, 200, 260,
+300 — so the flat curve holds with roughly a tenth of one component's slack. The
+distinction is the whole finding: *bounded overshoot* and *unbounded growth* look
+the same in a single number and are not the same claim.
+
+**And the check reports rather than truncates**, deliberately. Truncating a
+written summary to fit is worse than a long one: the cap protects a budget, and a
+dropped sentence loses the only channel between chapters.
+
+### 7.5 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -530,7 +557,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.5 Zero is a value, and this is the family the bugs come in
+### 7.6 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

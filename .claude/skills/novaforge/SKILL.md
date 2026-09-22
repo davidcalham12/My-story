@@ -495,6 +495,25 @@ Write, for each chapter:
   summary. This is the only channel between chapters, so it carries what a later
   chapter cannot be written without: what changed, who now knows what, and what
   is still open.
+
+  **Then measure it, because the cap is the flat cost curve:**
+
+  ```bash
+  python -m backend.chapters.check_summary output/<slug> <N>
+  ```
+
+  The Bible is fixed and the outline entry is one chapter's. **The summary is the
+  only part of a chapter's packet that can grow with the book**, so
+  `max_summary_words` is the whole of the claim that chapter thirty-four's prompt
+  is the size of chapter one's.
+
+  It was being exceeded: on a real `small` run, five of six summaries were over
+  the 200-word cap, the worst by 23%. A number nobody measures becomes a target
+  rather than a limit.
+
+  **If it reports over, trim the NEXT one. Do not truncate a summary already
+  written** — the cap protects a budget, and a dropped sentence loses the only
+  channel between chapters, which costs more than the words saved.
 - `critiques/ch0N.<critic>.json` — **one per characteristic, all five**,
   every iteration's score and findings, not just the last. `length` and
   `chatter` get files too even though you computed them yourself: recent runs

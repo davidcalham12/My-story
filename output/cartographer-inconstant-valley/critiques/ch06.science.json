@@ -1,0 +1,7 @@
+{"critic": "science", "chapter": 6, "kind": "model",
+ "agent": "science-critic", "drafts": 2,
+ "note": "The world critic under a historical name; audits against the bullets under ## Rules and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": []},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "orchestrator_note": "The hardest R4 audit in the book, and the reason is structural: this is the only chapter told from inside a dale-born head, so every line of dialogue in it is under the speech rule and the narration is her own. The critic was asked to keep two halves separate and did. Half one, what she SAYS: her three answers about the extent of her ground, all durations and dead men as R4 requires; the naming of the three intakes at the gate, where 'beyond', 'yon' and 'under the scar' were tested as possible directions and ruled deictic pointers rather than bearings; and the whole of the Lady Day speech, where 'the oak' names a place and 'waste of the manor' is a legal term. Half two, what she THINKS: the acreage she holds silently and the wish to say it that goes nowhere. The critic ruled that R4 governs speech only - 'say... aloud', 'in their own words or read off a page' - so those passages are the rule being obeyed under pressure, which is the chapter's whole subject, rather than broken. Both reads clean."}

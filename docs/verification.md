@@ -101,6 +101,7 @@ in CI, at $0.** The suite that carries these:
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
 | `test_six_end_to_end.py` | a chapter stopped by `prose` alone, through the real archive path |
 | `test_promote.py` | that a failing chapter cannot be promoted by the script that promotes |
+| `test_summary_cap.py` | the rolling summary against its cap — the flat cost curve, measured |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
@@ -868,6 +869,7 @@ step, and that is the sentence worth writing for each one.
 | `archive_run` | a finished run leaving no record anyone can query |
 | `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
 | `promote` | a failing draft reaching `chNN.md` by a one-line copy, which is how one did |
+| `check_summary` | the one component that can grow with the book growing unwatched |
 | `test_api_contract.py` | the panel and the backend describing the same JSON differently, each passing its own checks |
 | `test_formulas_agree.py` | a chapter being scored by one copy of a formula and judged by another |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |
