@@ -210,6 +210,30 @@ finding named them because none of the five characteristics reads prose quality.
 
 The guardrail and the goal are in tension, and there is a receipt.
 
+**Two of those three are arithmetic, and nobody had tried.** A sentence repeated
+word for word is equality; a paragraph echoing another's opening is a prefix.
+Only the timeline error needs judgement. `check_prose` finds the first two at $0
+and deterministically, where a sixth critic would have cost ~$0.07 a chapter and
+never reproduced.
+
+Run over the nine assembled books it found **23 defects in six of them**, and the
+distribution is the interesting part:
+
+| | v1 books | v2 book |
+|---|---|---|
+| heading with no blank line before it | **20**, across six books | **0** |
+| paragraph echoing another's opening | 3, all in one degenerate early run | 0 |
+| sentence repeated verbatim | 0 | 0 |
+
+Every v1 book glues each chapter's heading to the previous chapter's last
+sentence — the shell concatenated with a single newline. v2 assembles in
+`publish/domain.py`, which joins with a blank line.
+
+**So "assemble in code" bought a second thing nobody claimed.** It was adopted
+because a model asked to concatenate paraphrased a sentence. It also happens to
+concatenate correctly, and the difference sat in nine published files for weeks
+with nothing looking at it.
+
 ### 3.6 Arithmetic cannot tell presentation from editing
 
 Two style passes were discarded because the editor closed the space in `± 0.30`

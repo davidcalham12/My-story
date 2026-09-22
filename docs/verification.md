@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **191 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **211 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -99,6 +99,7 @@ in CI, at $0.** The suite that carries these:
 | `test_gate.py` | G3, G4, G5, G7, G8 — the gate as arithmetic over values |
 | `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
+| `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_end_to_end.py` | all of them, in a whole run, including the halt |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
@@ -331,6 +332,13 @@ and by a test that the publish path makes exactly one model call — the synopsi
 **Why it matters.** A model asked to concatenate approved chapters rewrote a
 sentence in the middle of text the gate had already passed. It is the founding
 case of §4.
+
+**A second reason, measured afterwards and never anticipated.** `check_prose`
+over the nine assembled books found **20 headings glued to the previous
+chapter's last sentence — in six v1 books, and none in v2's.** v1 concatenated in
+the shell with a single newline; `publish/domain.py` joins with a blank line.
+Assembling in code was adopted because a model paraphrased. It also happens to
+concatenate *correctly*, which nobody had claimed and nothing had checked.
 
 ### G11 — The outline is audited against `## Rules` before FLOW-4
 
@@ -617,15 +625,26 @@ itself. The mitigation is cheaper than the cure.
 
 ### 3.9 Nobody measures the quality of the prose
 
-**What is not verified:** whether the prose is any good. **Unverifiable with the
-means available.** None of the five characteristics reads prose.
-**Why accepted:** there is no instrument. Inventing a score would be worse than
-the gap, because it would close the question.
+**Narrowed by SPEC-005, and the narrowing is small and honest.**
+
+**What is not verified:** whether the prose is any good. Still **Unverifiable
+with the means available**. None of the five characteristics reads prose.
+**Why accepted:** there is no instrument for judgement. Inventing a score would
+be worse than the gap, because it would close the question.
 **Scope of damage:** real and observed — a duplicated sentence, a timeline error
 on screen, a paragraph stating the same fact twice. Three shipped defects, and
 rule 2 is what kept them in, because no finding named them.
-**How we would find out:** **no automatic signal. A reader, or nothing.**
-**Reviewed by:** deferred to v2 as a possible sixth characteristic.
+**How we would find out:** **for the judgement, still a reader or nothing.** For
+the mechanical part there is now a signal: `backend/chapters/prose.py` finds a
+sentence repeated verbatim, a heading glued to the previous line and a paragraph
+echoing another's opening — two of those three shipped defects, at $0, **T**, and
+deterministic. A sixth critic would have cost $0.07 a chapter and been **D**
+forever.
+**What it explicitly does not touch:** the timeline error, voice, pacing,
+dialogue, originality, and whether any sentence earns its place. The report names
+them, so a clean result cannot be read as a verdict on the prose.
+**Reviewed by:** the script, per chapter, before promotion. The judgement half
+remains a decision nobody has taken.
 
 ### 3.10 The procedure in `SKILL.md` cannot be tested at $0
 
@@ -689,6 +708,7 @@ reliability and cost at the same time, so each one is recorded here.
 | beats against the world's rules | nothing | a script audit before FLOW-4 (D25) |
 | **what happens after an attempt** | **a paragraph the orchestrator applied** | **`decide()`, a script it runs and obeys (SPEC-004)** |
 | critics' arithmetic findings | believed | recomputed |
+| **mechanical prose defects** | **nothing, and three shipped** | **`check_prose`, before promotion (SPEC-005)** |
 
 **Next candidates:** counting the summary's facts; detecting a `##` at the start
 of a paragraph; checking canonical names.
@@ -714,6 +734,7 @@ step, and that is the sentence worth writing for each one.
 | `archive_run` | a finished run leaving no record anyone can query |
 | `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |
+| `check_prose` | a sentence the gate cannot see appearing twice in a chapter that passed |
 
 **The last row was an aspiration until it was written, and it caught something on
 its first run.** `SKILL.md` told the orchestrator that a verdict is `accept`,

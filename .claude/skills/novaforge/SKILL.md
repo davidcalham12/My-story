@@ -381,6 +381,27 @@ findings rather than on flourishes. And after a redraft, check whether the
 quoted passages are still present verbatim — if one survived, the repair did not
 happen, and that is arithmetic rather than judgement.
 
+### Check the prose for what a script can see
+
+Before promoting a draft, run:
+
+```bash
+python -m backend.chapters.check_prose output/<slug>/chapters/chNN.md
+```
+
+It reports a sentence repeated word for word, a heading glued to the previous
+line, and a paragraph echoing another's opening. **It does not gate.** There are
+five characteristics and this is not a sixth; it never blocks a chapter.
+
+What it finds, you fix the way you fix anything else: a literal substitution,
+quoted, in the next sheet. A duplicated sentence is exactly the shape redraft
+rule 2 wants — the quote is the identity, and removing it changes nothing the
+findings did not name.
+
+What it **cannot** see is in its own output, under `not_checked`. A clean result
+means three mechanical defects are absent, not that the prose is good. Nothing
+here measures that.
+
 ### Record it
 
 Write, for each chapter:
