@@ -20,6 +20,13 @@ from dataclasses import dataclass, field
 CHARACTERISTICS = ("continuity", "science", "outline", "length", "chatter", "prose")
 THRESHOLD_DEFAULT = 8
 
+#: Three attempts, and the third is the last. `AGENTS.md` §6 lists it among the
+#: things no change may touch without a spec that names it — which is an argument
+#: for it having exactly one home. It was a bare `3` in three function
+#: signatures, the same shape as the threshold that turned out to be written in
+#: four places.
+MAX_ATTEMPTS_DEFAULT = 3
+
 # The sheet's field labels. In one place because the builder writes them and the
 # validator looks for them, and two copies of a format drift.
 FIELDS = ("Quote:", "What is wrong:", "Against what:", "How it should read:")
@@ -226,7 +233,8 @@ class Decision:
     why: str
 
 
-def decide(*, aggregate: int | None, attempt: int, max_attempts: int = 3,
+def decide(*, aggregate: int | None, attempt: int,
+           max_attempts: int = MAX_ATTEMPTS_DEFAULT,
            patched: bool = False, threshold: int = THRESHOLD_DEFAULT) -> Decision:
     """What follows an attempt. SPEC-004.
 

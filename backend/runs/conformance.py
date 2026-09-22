@@ -25,7 +25,8 @@ from __future__ import annotations
 import sqlite3
 from dataclasses import dataclass
 
-from backend.chapters.domain import THRESHOLD_DEFAULT, decide
+from backend.chapters.domain import (MAX_ATTEMPTS_DEFAULT, THRESHOLD_DEFAULT,
+                                     decide)
 
 
 @dataclass(frozen=True)
@@ -42,7 +43,7 @@ class Breach:
 
 
 def audit(conn: sqlite3.Connection, run_id: str, *, threshold: int = THRESHOLD_DEFAULT,
-          max_attempts: int = 3) -> list[Breach]:
+          max_attempts: int = MAX_ATTEMPTS_DEFAULT) -> list[Breach]:
     """Every way the record can contradict the rule. Empty means it obeyed.
 
     **Two things this deliberately refuses to call a breach**, both learned by

@@ -22,7 +22,8 @@ import json
 import sys
 from dataclasses import asdict
 
-from backend.chapters.domain import THRESHOLD_DEFAULT, decide
+from backend.chapters.domain import (MAX_ATTEMPTS_DEFAULT, THRESHOLD_DEFAULT,
+                                     decide)
 
 
 def main(argv: list[str]) -> int:
@@ -46,7 +47,7 @@ def main(argv: list[str]) -> int:
     decision = decide(
         aggregate=aggregate,
         attempt=attempt,
-        max_attempts=int(payload.get("max_attempts") or 3),
+        max_attempts=int(payload.get("max_attempts") or MAX_ATTEMPTS_DEFAULT),
         patched=bool(payload.get("patched")),
         threshold=int(payload.get("threshold") or THRESHOLD_DEFAULT),
     )

@@ -92,3 +92,39 @@ def test_the_outline_formula_in_the_skill_matches_the_code():
     assert score_outline(missing=1, out_of_order=0) == 7
     assert score_outline(missing=0, out_of_order=1) == 9
     assert score_outline(missing=4, out_of_order=0) == 0, "floored at 0"
+
+
+# ------------------------------------------- one home per constant
+
+def test_the_gate_constants_are_written_once_in_python():
+    """The threshold was in four places and the attempt limit in three.
+
+    Both are on `AGENTS.md` §6's never-touched-without-a-spec list, which is an
+    argument for each having exactly one home. A bare literal in a second module
+    is how a spec-protected number gets changed by an edit nobody reviews.
+    """
+    offenders = []
+    for path in sorted((ROOT / "backend").rglob("*.py")):
+        if path.name.startswith("test_") or "__pycache__" in path.parts:
+            continue
+        if path == ROOT / "backend/chapters/domain.py":
+            continue  # the one home
+        for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if re.search(r"^\s*(THRESHOLD|MAX_ATTEMPTS)\w*\s*=\s*\d+\s*$", line):
+                offenders.append(f"{path.relative_to(ROOT)}:{i}: {line.strip()}")
+            if re.search(r"max_attempts(: int)?\s*=\s*\d+", line):
+                offenders.append(f"{path.relative_to(ROOT)}:{i}: {line.strip()}")
+    assert not offenders, offenders
+
+
+def test_the_constants_the_config_owns_match_it():
+    import json
+
+    from backend.chapters.domain import MAX_ATTEMPTS_DEFAULT, THRESHOLD_DEFAULT
+
+    config = json.loads((ROOT / "config/novel.config.json").read_text(encoding="utf-8"))
+    gate = config["quality_gate"]
+    assert THRESHOLD_DEFAULT == gate["threshold"]
+    # Three attempts is one draft plus two revisions, and the config counts
+    # revisions. The arithmetic is the only thing tying the two numbers together.
+    assert MAX_ATTEMPTS_DEFAULT == gate["max_revisions"] + 1

@@ -1,0 +1,22 @@
+{"critic": "continuity", "chapter": 5, "kind": "model",
+ "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 3, "findings": [
+     {"kind": "date-error", "severity": "high",
+      "quote": "wrote *17 May, cont.* at the head of a clean leaf",
+      "claim": "The parlour scene is the evening of the eighth day, which is Thursday 18 May; 17 May is the seventh day, already used. A surveyor misdating his own leaf, in the chapter where his book turns out to hold an entry he cannot remember making.",
+      "fix": "18 May, and drop 'cont.' from a clean leaf.",
+      "reference": "bible/timeline.md — the first day is Thursday 11 May 1843"},
+     {"kind": "quantity-drift", "severity": "low",
+      "quote": "He had lost four days to arguing with errors",
+      "claim": "Counting back, the days spent fighting his own figures are three, not four; the solo re-measurement was his best day.",
+      "fix": "Three, or name today's unclosed sight as the fourth.",
+      "reference": "bible/timeline.md, days 5 to 8"}]},
+   {"iteration": 2, "score": 9, "findings": [
+     {"kind": "unreconstructable-count", "severity": "low", "late": false,
+      "quote": "He had lost three days to arguing with errors, and this unclosed sight would make a fourth.",
+      "claim": "The critic held that even three is more than the established facts support, since the ride to Ingleford was travel rather than on-site error-arguing.",
+      "fix": "Name the three, or soften to two plus the unclosed sight.",
+      "reference": "the timeline, days 5 to 7"}]}],
+ "resolution": "Both iteration-1 findings addressed by two literal substitutions supplied by the writer; both applied by exact match, neither skipped, neither quoted string surviving.",
+ "orchestrator_note": "Iteration 2's remaining finding is low severity and the chapter scored 9, above the threshold, so the gate answered accept and nothing was commissioned. Recorded rather than argued away. It is a narrower reading than iteration 1's: the same critic accepted 'three' as the fix on one read and then questioned it on the next. The orchestrator's own view is that the ride to Ingleford was a day spent on the errors even though it was spent travelling - the whole errand was to have the chain certified because the figures would not agree - but the gate had already passed the chapter and the finding did not need arbitrating."}
