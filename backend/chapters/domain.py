@@ -191,6 +191,79 @@ def accepted_of(attempts: list[AttemptResult]) -> AttemptResult | None:
     return None
 
 
+# ------------------------------------------------------- what happens next
+
+
+@dataclass(frozen=True)
+class Decision:
+    #: accept | retry | patch | halt
+    action: str
+    #: what the `attempts` row should record, when the action is `accept`
+    verdict: str
+    why: str
+
+
+def decide(*, aggregate: int | None, attempt: int, max_attempts: int = 3,
+           patched: bool = False, threshold: int = THRESHOLD_DEFAULT) -> Decision:
+    """What follows an attempt. SPEC-004.
+
+    **This was a paragraph in `SKILL.md`** and is now arithmetic, for the reason
+    every other check moved: a rule a model reads is a rule a model can reason
+    around, and this one is read at the worst possible moment — when a run has
+    spent an hour and is about to be thrown away. `accept_with_warnings`, the
+    exit `patch_then_halt` replaced, is what reasoning around it looks like when
+    it wins.
+
+    The order is the whole rule, and `patch_then_halt` is two words in that
+    order:
+
+    1. **At or above the threshold: accept.** Whatever the attempt number, and
+       recorded as `patched` when the patch is what got it there — it passed, and
+       it did not pass on its own, and a reader is entitled to both facts.
+    2. **Below, with attempts left: retry**, with the escalated sheet.
+    3. **Below, on the last attempt: patch.** Never accept. The critics' own
+       literal replacements, arbitrated, then a rescore.
+    4. **Below, after the patch: halt.** By construction the only way to arrive
+       here is a replacement that was itself wrong and that arbitration did not
+       catch, and that is worth a person before another chapter is written.
+
+    `aggregate is None` means no characteristic produced a usable verdict. It is
+    **not a low score**, it is the absence of one, and it can never accept: this
+    returned 10 once and a malformed reply silently passed a draft.
+    """
+    if aggregate is not None and aggregate >= threshold:
+        return Decision(
+            "accept",
+            "patched" if patched else "accept",
+            f"aggregate {aggregate} at or above threshold {threshold}"
+            + (", reached with the patch applied" if patched else ""),
+        )
+
+    shown = "no usable verdict" if aggregate is None else f"aggregate {aggregate}"
+
+    if patched:
+        return Decision(
+            "halt", "halt",
+            f"{shown} after the patch was applied: a critic's replacement was "
+            f"itself wrong and arbitration did not catch it, so the run stops "
+            f"rather than putting the chapter in the book",
+        )
+
+    if attempt >= max_attempts:
+        return Decision(
+            "patch", "retry",
+            f"{shown} on attempt {attempt} of {max_attempts}: apply the critics' "
+            f"literal replacements, arbitrate each first, then rescore",
+        )
+
+    return Decision(
+        "retry", "retry",
+        f"{shown} below threshold {threshold} on attempt {attempt} of "
+        f"{max_attempts}: redraft against a level-"
+        f"{2 if attempt + 1 >= max_attempts else 1} sheet",
+    )
+
+
 def mark_late(findings: list[dict], first_draft: str, seen_quotes: set[str]) -> list[dict]:
     """Flag findings that were available on the first draft and went unmentioned.
 

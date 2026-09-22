@@ -58,7 +58,7 @@ with the reason attached — two have, and they say so.
 | G3 | five characteristics, all at 8 or above | important | **T** / **D** | yes |
 | G4 | `outline` scores 10 − 3·missing − 1·out-of-order | important | **T** / **D** | yes |
 | G5 | three attempts, feedback escalating | important | **T** | yes |
-| G6 | a failed chapter does not enter the book | **critical** | **D** | **no → §3.1** |
+| G6 | a failed chapter does not enter the book | **critical** | **T** for the rule, **D** for obeying it | **partly → §3.1** |
 | G7 | the writer changes only what was cited | important | **T** / **D** | yes |
 | G8 | a malformed verdict is excluded, never counted as a pass | **critical** | **T** | yes |
 | G9 | only two agents write the Story Bible | **critical** | **A** | yes |
@@ -71,9 +71,14 @@ with the reason attached — two have, and they say so.
 | G16 | no prompt asks a quantity without saying how to decide it | incidental | **I** | yes |
 | G17 | there is no credential to leak | **critical** | **A** | yes |
 
-**Three rows fail their own minimum**, and applying the criterion is what
-exposed them. They are not deleted and they are not promoted — they become §3.1,
-§3.2 and §3.3. That is the mechanism working as intended on its first use.
+**Three rows failed their own minimum** when the criterion was first applied, and
+that is how they were found — not by a reader. They were neither deleted nor
+promoted: they became §3.1, §3.2 and §3.3.
+
+**One of the three has since been half repaired.** G6's *rule* is now code with an
+exhaustive test (SPEC-004); obeying it is still a procedure. That is what a gap
+row is for — it named the work, the work happened, and the row shrank to what is
+actually left instead of disappearing.
 
 Two levels were moved from Annex D's assignment, in writing:
 
@@ -84,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **106 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **171 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -92,6 +97,7 @@ in CI, at $0.** The suite that carries these:
 | `test_agents_frontmatter.py` | G1, G9, G15 — the authority model, read off the front matter |
 | `test_runner.py` | G2 layer 2, G13, G14, G17 — the stream, replayed |
 | `test_gate.py` | G3, G4, G5, G7, G8 — the gate as arithmetic over values |
+| `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
 | `test_end_to_end.py` | all of them, in a whole run, including the halt |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
@@ -223,21 +229,42 @@ decidable in advance. Two honest claims where there was one false one.
 
 ### G6 — A failed chapter does not enter the book
 
-**Critical · Class D** — demonstrated once, on real data. **Below its minimum:
-§3.1.**
+**Critical · Class T for the rule, D for obeying it.** Split by SPEC-004, and
+the split is the honest form of this row.
 
 **Method.** `patch_then_halt`. Three failed attempts trigger the orchestrator
 applying the critics' own replacements, arbitrating each first, then a rescore. A
 chapter that still fails halts the run; no `chapters/chNN.md` is promoted.
 
+**What changed, and why it is the most important thing in this document.** The
+decision used to be a paragraph in `SKILL.md` that a model read and applied.
+`chapters/domain.py::decide()` now answers `accept | retry | patch | halt` as
+arithmetic, and `python -m backend.chapters.decide` makes it a script the
+orchestrator runs. **The rule is no longer a judgement.**
+
+`test_decision.py` asserts it **exhaustively**: every aggregate 0–9 at every
+attempt number, patched and unpatched, never decides `accept` — 63 cases, because
+at this size exhaustive is cheaper than clever. `None` — no usable verdict — never
+accepts either; it is the absence of a score, not a low one, and it returned 10
+once.
+
+It was read at the worst possible moment: an hour spent, a run about to be thrown
+away. That is exactly when *it is only just below* gets rationalised, and
+`accept_with_warnings` is what rationalising looked like when it won.
+
 **Evidence.** `output/night-dispatcher-recovered-climber/`: the run halted, there
 is **no `ch03.md`**, the best draft sits unpromoted at `ch03.attempt3.md`, and
 FLOW-5 and FLOW-6 never ran. That is the whole path exercised end to end, once.
 
-**Why D and not T.** A test can prove the halt fires, and one should exist — that
-is §3.1's remedy. Whether the arbitration refuses a *bad* replacement is a
-judgement: in that run it refused two on arithmetic, which is the encouraging
-case and not a general one.
+**Why the second half is still D.** The script decides; the orchestrator acts.
+Whether it calls the script, and does what it says, is a procedure — §3.10's
+limit, not a missing test. `test_skill_contract.py` asserts `SKILL.md` instructs
+the call and names all four answers, which is the strongest thing readable from
+here.
+
+And whether the arbitration refuses a *bad* replacement remains judgement: in the
+halted run it refused two on arithmetic, which is the encouraging case and not a
+general one.
 
 ### G7 — The writer changes only what was cited
 
@@ -464,25 +491,29 @@ demands. **They were generated by the rule, not noticed by a person.**
 
 ### 3.1 `patch_then_halt` is demonstrated, not tested — and G6 is critical
 
-**What is not verified:** that the halt fires on every exhausted chapter, rather
-than on the one where it was watched.
-**Why accepted:** because **the decision is not in Python.** `patch_then_halt`
-is a paragraph in `SKILL.md`; `chapters/domain.py` scores and aggregates but
-never decides what happens after the third attempt. So this is §3.10 wearing a
-different name, and it cannot be closed by writing a test — only by moving the
-decision into code, which is a spec, not an afternoon.
+**Narrowed by SPEC-004, not closed.** It used to read *the whole decision is a
+paragraph a model applies*. The decision is now arithmetic with 63 exhaustive
+cases behind it. What is left is smaller and still real.
 
-*This row said the opposite when it was first written* — that the mock engine
-could drive a chapter to three failures and close it. That was wrong: there is
-no such loop in v2's Python, and checking before claiming is the point of the
-document.
-**Scope of damage:** the project's central safety claim. A chapter that failed
-the gate entering the book is the one outcome the system exists to prevent.
-**How we would find out:** by reading a book with a bad chapter in it — that is,
-**too late**. There is no earlier signal.
-**Reviewed by:** the next spec that touches `chapters/`, which should ask whether
-the after-third-attempt decision belongs in `domain.py`. Until then this row
-stands.
+**What is not verified:** that the orchestrator calls
+`python -m backend.chapters.decide` and obeys the answer, on every chapter of
+every run.
+**Why accepted:** it is §3.10 — the procedure in `SKILL.md` cannot be tested at
+$0, and there is no way to make a model's obedience a unit test. What could be
+moved into code has been.
+**Scope of damage:** the project's central safety claim, but **bounded by what
+disobeying would take**: a chapter entering the book now needs the orchestrator
+to ignore a script that printed `halt` and its reason, rather than to reason its
+way through a paragraph. That is a sharper thing to do wrong.
+**How we would find out:** by reading a book with a bad chapter in it — still
+**too late**, and still no earlier signal. *This is the line that keeps the row
+critical.*
+**Reviewed by:** every real run, by reading the gate rows against the decisions
+the script would have given. Automating that comparison is the next honest step.
+
+*This row claimed the opposite when first written* — that the mock engine could
+close it in an afternoon. It could not: the decision was not in Python at all.
+Checking before claiming is the point of the document.
 
 ### 3.2 The outline audit is a judgement, and G11 is important
 
@@ -640,6 +671,7 @@ reliability and cost at the same time, so each one is recorded here.
 | assembling the book | an agent, which paraphrased | concatenation in the shell |
 | applying corrections | the writer rewrote | literal `{find, replace}` substitutions |
 | beats against the world's rules | nothing | a script audit before FLOW-4 (D25) |
+| **what happens after an attempt** | **a paragraph the orchestrator applied** | **`decide()`, a script it runs and obeys (SPEC-004)** |
 | critics' arithmetic findings | believed | recomputed |
 
 **Next candidates:** counting the summary's facts; detecting a `##` at the start
@@ -664,6 +696,7 @@ step, and that is the sentence worth writing for each one.
 | `BudgetWatcher` | a run reaching $49 without anyone deciding it |
 | `test_skill_contract.py` | the procedure and the contract diverging in silence |
 | `archive_run` | a finished run leaving no record anyone can query |
+| `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
 
 **The last row was an aspiration until it was written, and it caught something on
 its first run.** `SKILL.md` told the orchestrator that a verdict is `accept`,
@@ -696,6 +729,11 @@ a validator is: not a check, a thing that makes the reading happen.
   rows in `attempts`, `scores`, `findings`, `gate_decisions` and `sheets`.
   `save_attempt`, `save_gate` and `save_sheet` existed and were called by
   nothing. G13 gains the stored measured total; §3 gains two rows.
+- **SPEC-004.** The decision after an attempt moved from a paragraph in
+  `SKILL.md` into `decide()`, with an exhaustive test and a script the
+  orchestrator runs. **G6, the only critical guarantee below its minimum, is
+  now T for the rule** — and honestly still D for obeying it, which is what §3.1
+  has been narrowed to say.
 - **§5 stopped being a list of intentions.** Writing the `SKILL.md` ↔ contract
   validator as a test found a live divergence in the verdict vocabulary the same
   hour — see §5. §3.1 was also corrected: it had claimed the halt was testable

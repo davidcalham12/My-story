@@ -106,6 +106,28 @@ def test_the_five_characteristics_agree_across_contract_and_code():
     assert len(CHARACTERISTICS) == 5
 
 
+def test_skill_defers_the_decision_to_the_script_instead_of_deciding():
+    """SPEC-004 A9. The procedure must call the rule, not restate it.
+
+    A restated rule is a second copy, and two copies of a rule drift. This one
+    drifting means a chapter the gate rejected going into a book.
+    """
+    assert "python -m backend.chapters.decide" in SKILL, (
+        "SKILL.md no longer tells the orchestrator to ask the decision script"
+    )
+    # The four answers it has to know how to obey.
+    for action in ("accept", "retry", "patch", "halt"):
+        assert f"`{action}`" in SKILL, f"SKILL.md does not say what to do on {action}"
+
+
+def test_the_decision_script_is_runnable_with_the_tools_the_run_is_given():
+    """A rule the orchestrator is not permitted to invoke is a rule it must
+    remember, which is what SPEC-004 exists to stop."""
+    from backend.commons.runner.process import ALLOWED_TOOLS
+
+    assert any(t.startswith("Bash(python") for t in ALLOWED_TOOLS), ALLOWED_TOOLS
+
+
 def test_on_fail_is_patch_then_halt_in_all_three():
     assert gate_stage()["on_fail"] == "patch_then_halt"
     assert CONFIG["quality_gate"]["on_fail"] == "patch_then_halt"

@@ -244,19 +244,41 @@ there is nothing left to interpret:
 On the second attempt the writer interprets a description. On the third it does
 not interpret at all — it integrates a given text. And if even that fails:
 
-**`on_fail` is `patch_then_halt`, not `accept_with_warnings`.** The old exit put
-a chapter that had failed three times into the book with a note in the margin.
-Now you apply the critics' own replacement sentences yourself, by literal
-substitution, and rescore. For `length` and `chatter` the patch is trivial —
-trim words, fix the first line. For the three model characteristics it is the
-sentence the critic proposed, which you **arbitrate before applying**: you have
-overruled a false finding before, and a replacement built on one would write the
-error into the book by hand.
+**You do not work out what happens next. You ask, and you obey.** After every
+scored attempt, run:
 
-If the chapter still does not pass after the patch, **stop the run**. By
-construction the only way to arrive there is a critic's replacement that was
-itself wrong and that arbitration did not catch, and that is worth a person
-looking at before another chapter is written.
+```bash
+echo '{"aggregate": <min>, "attempt": <n>, "patched": <true|false>}' \
+  | python -m backend.chapters.decide
+```
+
+It answers `accept`, `retry`, `patch` or `halt`, with its reason. **Do what it
+says, including when you disagree with it.** If you think it is wrong, say so to
+the user in the report — do not act on the disagreement.
+
+This used to be a paragraph you read and applied yourself, and it was moved into
+code deliberately (SPEC-004). You read it at the worst possible moment: a run has
+been going for an hour and is about to be thrown away. That is exactly when "it
+is only just below" gets rationalised, and `accept_with_warnings` — the exit this
+replaced, which put a chapter that had failed three times into the book with a
+note in the margin — is what rationalising looks like when it wins.
+
+What each answer asks of you:
+
+- **`accept`** — promote the draft to `chapters/chNN.md`. If the answer's
+  `verdict` is `patched`, record `patched`, not `accept`: it passed, and it did
+  not pass on its own.
+- **`retry`** — redraft against the sheet at the level the reason names.
+- **`patch`** — apply the critics' own replacement sentences by literal
+  substitution, then rescore. For `length` and `chatter` this is trivial — trim
+  words, fix the first line. For the three model characteristics it is the
+  sentence the critic proposed, which you **arbitrate before applying**: you have
+  overruled a false finding before, and a replacement built on one would write
+  the error into the book by hand. Then ask again with `"patched": true`.
+- **`halt`** — **stop the run.** Do not promote the chapter, do not run FLOW-5 or
+  FLOW-6. By construction the only way to arrive here is a critic's replacement
+  that was itself wrong and that arbitration did not catch, and that is worth a
+  person looking at before another chapter is written.
 
 **Where this guarantee is weakest, said plainly:** `outline` is the hardest to
 patch, because a missing beat is not a sentence but a paragraph. Its level-2
