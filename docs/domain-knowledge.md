@@ -229,6 +229,32 @@ here from the score column before the notes were read, and the notes changed wha
 it meant. **A score series is not a finding.** The critique's `note` field is the
 evidence; the numbers are an index into it.
 
+### 3.4a A sentence repeated across chapters, and why it had to happen
+
+The eight-chapter book repeats a line word for word in **chapters 2 and 7**:
+
+> "That's what's in your hand, sir," Fowler said. "I'll not say it for you."
+
+**It is not the writer copying itself — it cannot be.** The writer never receives
+a previous chapter's prose; that is the architecture. The line is in
+`bible/characters.md`, verbatim, as Nat Fowler's `Speaks.` example. Two chapters
+five apart were each handed the Bible, each wanted that character's voice, and
+each used the sentence they were given.
+
+**So the isolation that prevents drift is exactly what prevents noticing.** The
+Bible is the only shared channel, which means *a quoted line in canon is a line
+the book will repeat*, and no chapter can see that another already did.
+
+**Nothing caught it, including the checks written to catch it.** The gate reads
+one chapter at a time. So did `check_prose` — it found nothing in all eight
+chapters. The repeat is only visible in the assembled book, and it took pointing
+the same script at `dist/book.md` to see it. *A per-chapter check cannot find a
+between-chapter defect*, which sounds obvious written down and was not.
+
+Two fixes, at the two ends: `character-architect` is told that a quoted line is a
+sample of register rather than a line to use — describe the voice, let each
+chapter find its own words — and `backend.checks FLOW-6` reads the book.
+
 ### 3.5 No critic grades prose, and it shows
 
 Three visible defects shipped: a sentence duplicated verbatim, a timeline error

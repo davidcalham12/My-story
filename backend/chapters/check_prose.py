@@ -5,8 +5,14 @@
 With the Bible's character file as a second argument it also checks canonical
 names — a name one letter from one the Bible declares.
 
-Prints a JSON report and exits 0 whether or not it found anything. **It reports;
-it does not gate.** The five characteristics are fixed by `AGENTS.md` §6 and a
+Prints a JSON report and **exits 1 when it finds something**, like every other
+check here. That is not gating: nothing in the pipeline stops on it, and the
+combined `backend.checks` run reports which checks failed by name. An exit code
+that is always 0 makes a finding invisible to anything that aggregates — which is
+how a duplicated sentence reached an assembled book while the check that could
+see it reported success.
+
+**It reports; it does not gate.** The five characteristics are fixed by `AGENTS.md` §6 and a
 sixth is not added by a script quietly acquiring a veto.
 
 What the orchestrator does with a defect is FLOW-4's business: a duplicated
@@ -56,6 +62,10 @@ def main(argv: list[str]) -> int:
             "canonical names — no characters.md was given to compare against")
 
     print(json.dumps(result, indent=2))
+    if result["defects"]:
+        print(f"check_prose: {len(result['defects'])} defect(s) in {path.name}. "
+              f"Each is quoted; put them in the sheet.", file=sys.stderr)
+        return 1
     return 0
 
 

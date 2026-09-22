@@ -49,7 +49,13 @@ BY_STAGE: dict[str, list[tuple[str, list[str]]]] = {
         ("promises still reachable", ["backend.chapters.check_promises", "{run}"]),
     ],
     # The book is about to be assembled.
+    # The book, not a chapter. Everything above reads one chapter at a time, and
+    # a sentence repeated in chapters 2 and 7 is invisible to every one of them.
+    # One shipped: the Bible quoted a character's line verbatim as a sample of
+    # how he speaks, and two chapters five apart used it word for word.
     "FLOW-6": [
+        ("the assembled book repeats nothing",
+         ["backend.chapters.check_prose", "{run}/dist/book.md"]),
         ("every promise landed in a chapter that exists",
          ["backend.chapters.check_promises", "{run}"]),
         ("summaries within their cap", ["backend.chapters.check_summary", "{run}"]),

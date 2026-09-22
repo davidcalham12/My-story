@@ -704,7 +704,11 @@ judgement does not reproduce.
 be worse than the gap, because it would close the question.
 **Scope of damage:** real and observed — a duplicated sentence, a timeline error
 on screen, a paragraph stating the same fact twice. Three shipped defects, and
-rule 2 is what kept them in, because no finding named them.
+rule 2 is what kept them in, because no finding named them. **A fourth shipped on
+2026-09-22**: a line quoted verbatim in the Bible, used word for word in chapters
+2 and 7. Not the writer copying itself — it cannot see its own earlier prose — but
+the Bible handing the same sentence to both. The isolation that prevents drift is
+what prevents noticing.
 **How we would find out:** **for the judgement, still a reader or nothing.** For
 the mechanical part there is now a signal: `backend/chapters/prose.py` finds a
 sentence repeated verbatim, a heading glued to the previous line and a paragraph

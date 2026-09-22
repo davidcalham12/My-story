@@ -55,6 +55,29 @@ run, and the report will be correct.
 A two-column Markdown table of when-and-what, ordered, with the events that
 happened before the story starts included.
 
+### A quoted line is a sample of register, not a line to use
+
+If you give a character a sentence in quotation marks — under **Speaks**, or as a
+tag — **every chapter that wants that character's voice will use it verbatim, and
+no chapter can see that another already did.** The writer is handed the Bible and
+never a previous chapter's prose; the Bible is the only shared channel, so a
+quoted line in it is a line the book will repeat.
+
+It happened. A chainman's `Speaks.` line went into the Bible word for word, and
+chapters 2 and 7 both used it exactly:
+
+> "That's what's in your hand, sir. I'll not say it for you."
+
+Nothing caught it: the gate reads one chapter at a time, and so did every prose
+check, until one of them was pointed at the assembled book.
+
+**So describe the register and let each chapter find its own words.** *"Speaks
+little, and never in figures — he sets the arrows in your palm and lets you read
+the count off your own hand"* gives a writer the same character and no sentence
+to copy. Where an exact phrase is genuinely canon — a formula, an oath, something
+the plot turns on being repeated — say so in the entry, because then the
+repetition is the point and a reader will feel it as one.
+
 ## bible/mysteries.md
 
 Bullets, each a question the reader will want answered. Each is a promise the

@@ -75,6 +75,11 @@ def test_every_run_cost_quoted_in_the_docs_matches_a_file():
         49.00: "the budget ceiling, a setting and not a measurement",
         8.24: "a v1 run whose cost.json was never written; reconstructed, and "
               "labelled as such where it appears",
+        # Derived per thousand words from two totals that ARE in files. The
+        # check is about run totals; a derived rate is a different kind of
+        # figure and saying so beats widening the rule until it catches nothing.
+        4.60: "$49.33 / 10,723 words, per thousand",
+        4.93: "$54.87 / 11,133 words, per thousand",
     }
 
     offenders = []
