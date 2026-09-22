@@ -45,10 +45,9 @@ def _wait(client, run_id: str, timeout: float = 30.0):
     return events
 
 
-def test_health_says_whether_it_is_replaying_or_orchestrating():
+def test_health_says_whether_it_is_replaying_or_orchestrating(client):
     """A panel showing costs from a replayed stream would be lying about money."""
-    with TestClient(app) as c:
-        body = c.get("/api/health").json()
+    body = client.get("/api/health").json()
     assert body["ok"] is True
     assert body["orchestrator"] in ("recorded-stream", "claude-code")
 
@@ -390,3 +389,26 @@ def test_last_event_id_beyond_the_end_yields_only_done(client, db):
     _wait(client, run_id)
     frames = _frames(client, run_id, last_event_id="999999")
     assert [e for _, e, _ in frames] == ["snapshot", "done"]
+
+
+# ------------------------------------------------------- PLAN-007 6.11
+
+
+def test_health_reports_db_and_the_number_of_migrations_applied(client, db):
+    """FR-HLT-1: DB reachable and migrations applied — as counted in the same
+    database the service uses, not asserted."""
+    body = client.get("/api/health").json()
+    assert body["db"] is True
+    applied = db.execute("SELECT COUNT(*) AS n FROM schema_migrations").fetchone()["n"]
+    assert body["migrations"] == applied >= 9
+
+
+def test_health_reports_sqlite_vec_and_model_availability_without_loading_the_model(client):
+    """FR-HLT-1: `sqlite-vec` loadable, embeddings model present — and 'never
+    probes the model': the answer for the model comes from its cache directory
+    on disk, so health stays cheap and offline."""
+    import sys
+    body = client.get("/api/health").json()
+    assert isinstance(body["sqlite_vec"], bool)
+    assert body["embeddings_model"] in ("present", "absent", "unchecked")
+    assert "sentence_transformers" not in sys.modules, "health must not import the model library"

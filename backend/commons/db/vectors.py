@@ -75,6 +75,29 @@ class HashEmbedder:
         return out
 
 
+def model_cached(model_name: str = MODEL) -> str:
+    """Whether the embeddings model is on disk — without importing the library.
+
+    `present` / `absent` from the Hugging Face hub cache that
+    `sentence-transformers` uses; `unchecked` if that location cannot be
+    determined. Health asks this, and health must not load a model to answer.
+    """
+    import os
+    from pathlib import Path
+
+    try:
+        root = Path(os.environ.get("HF_HUB_CACHE")
+                    or os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface"))
+        if not os.environ.get("HF_HUB_CACHE"):
+            root = root / "hub"
+        candidates = [root / f"models--sentence-transformers--{model_name}",
+                      Path.home() / ".cache" / "torch" / "sentence_transformers"
+                      / f"sentence-transformers_{model_name}"]
+        return "present" if any(c.is_dir() for c in candidates) else "absent"
+    except OSError:
+        return "unchecked"
+
+
 def available(conn: sqlite3.Connection) -> bool:
     """Whether this process can load the extension.
 
