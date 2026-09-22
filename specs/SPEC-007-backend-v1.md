@@ -484,10 +484,10 @@ beat reaching FLOW-4.
 | The procedure in `SKILL.md` is not testable at $0 | important | only the runner is; the skill needs real runs | `measure` on each real run; LOOP-003 instruments |
 | Interrupted runs cannot resume | incidental | v1 scope | `halted: process` count |
 | `character_knowledge` is created but never written | incidental | v1 scope; ontology says it matters | table row count stays 0 |
-| `POST /api/runs/{id}/halt` (`halted: user`) is not built | important | **closes with PLAN-007**; until then the process is stopped from the terminal | AC-18 |
-| The startup sweep (FR-RUN-7) is not built | important | **closes with PLAN-007**; until then a stale `running` row is visible in `GET /api/runs` | AC-19 |
+| `POST /api/runs/{id}/halt` (`halted: user`) is not built | important | **closed by PLAN-007 6.7** — `test_halt_stops_the_process_and_marks_halted_user`, `test_halt_keeps_what_was_persisted_readable`, `test_halt_on_an_unknown_or_finished_run_is_404_or_409` | AC-18 |
+| The startup sweep (FR-RUN-7) is not built | important | **closed by PLAN-007 6.7** — `test_a_run_left_running_is_marked_halted_process_on_startup` | AC-19 |
 | No endpoint serves an artefact by path (FR-RD-1, Q2) | incidental | no client asks for one; the archive answers through `GET /api/runs/{id}` | a frontend feature that needs a file the archive lacks |
-| `Last-Event-ID` resume is not built | incidental | **closes with PLAN-007 (Q3)**: the `events` table gives it; until that phase lands a reconnect gets a fresh `snapshot` | AC-20 |
+| `Last-Event-ID` resume is not built | incidental | **closed by PLAN-007 6.4/6.7 (Q3)** — `test_every_stream_line_is_in_events_with_a_dense_seq`, `test_sse_id_field_is_the_persisted_seq`, `test_last_event_id_*` | AC-20 |
 | `SKILL.md` never calls `search` before the continuity critic (§8 point 3) | important | `backend/commons/search.py` and `db/vectors.py` are built and tested and not running (`verification.md` §3.15); the critic gets the full Bible | no `search` call in any run's log |
 | `SKILL.md` does not emit `chNN.facts.json` (§8 point 7) | incidental | the rolling summary is text and `check_summary` holds it to its cap | no `facts.json` under `output/<slug>/chapters/` |
 | `measure.mjs` measures five characteristics; `prose` is outside its self-test | incidental | **closes with PLAN-007 (Q6)**: the instrument learns `prose`; until then `check_prose` covers the mechanical half | AC-14 |

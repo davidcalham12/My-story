@@ -620,11 +620,12 @@ difference between this row and the one the spec-side document wrote.
 
 **What the spec asked for, and where it stands.** An `events` table holding every
 raw stream line under a sequence number, and `Last-Event-ID` resume over it.
-**The table exists since PLAN-007 6.2** (`009_events.sql`, `test_events.py`:
-dense `seq`, untouched payload); the runner writes every line into it from 6.4,
-and the resume over it arrives at 6.7. Until then a reconnecting client receives
-a fresh snapshot from the database — a different mitigation with a different
-guarantee, and it is the one that is tested.
+**Built, PLAN-007 6.2–6.7 — T.** `009_events.sql`; every parsed line lands in
+`events` before anything is derived from it (`test_every_stream_line_is_in_events_with_a_dense_seq`);
+every live SSE frame carries its `seq` as `id:` and `Last-Event-ID` replays the
+rows after it, then goes live or ends (`test_last_event_id_replays_from_the_next_seq_then_goes_live`,
+`test_last_event_id_beyond_the_end_yields_only_done`). The snapshot on connect
+stays, so a client that sends no id still gets the whole state.
 
 ### G20 — A feedback sheet is complete and never quotes a previous chapter
 
@@ -948,12 +949,13 @@ since PLAN-007 6.4 — **every stream line it read** in `events`; what it lacks 
 the archive (attempts, scores, sheets). **The files are all still there**, and
 `archive_run` can be pointed at the directory by hand.
 **How we would find out:** a run at `halted: process` with zero attempts.
-**And a restart makes it worse.** SPEC-001 FR-RUN-7 asks that a run left
-`running` be marked `halted: process` when the server starts. **That is not
-built.** A server restarted mid-run leaves the row `running` forever, and the
-panel shows a run that is still going.
-**Reviewed by:** nobody routinely. It is a recovery, not a loss — except the
-restart case, which is a lie the panel tells until someone notices.
+**A restart used to make it worse.** SPEC-007 FR-RUN-7 asks that a run left
+`running` be marked `halted: process` when the server starts. **Built at
+PLAN-007 6.7** (`sweep_orphans`, called from `build_service`;
+`test_a_run_left_running_is_marked_halted_process_on_startup`). Before it, a
+server restarted mid-run left the row `running` forever.
+**Reviewed by:** nobody routinely. It is a recovery, not a loss, and the
+restart case no longer lies.
 
 ### 3.15 Two memory layers are built, tested, and not running
 

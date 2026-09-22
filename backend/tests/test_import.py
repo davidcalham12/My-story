@@ -205,3 +205,32 @@ def test_an_unknown_critique_shape_is_a_parse_error_row_not_a_drop(db, tmp_path)
         "SELECT kind, detail, chapter FROM run_warnings WHERE run_id = 'fourth-shape'").fetchall()
     assert [(w["kind"], w["chapter"]) for w in warnings] == [("parse_error", 1)]
     assert "ch01.continuity.json" in warnings[0]["detail"]
+
+
+# ------------------------------------------------------- PLAN-007 6.7: the CLI
+
+
+def test_the_cli_entry_point_imports_the_eight_v1_runs(tmp_path):
+    """AC-7 / FR-RUN-6 as decided at Paso 4 (Q7): a command, not an endpoint."""
+    from backend.commons.db.connection import connect
+    from backend.commons.db.import_v1 import main
+
+    db_path = tmp_path / "imported.db"
+    code = main(["--output", str(OUTPUT), "--db", str(db_path), *V1_RUNS])
+    assert code == 0
+    conn = connect(db_path)
+    got = {r["slug"] for r in conn.execute("SELECT slug FROM runs WHERE source = 'pre-loop003'")}
+    on_disk = {s for s in V1_RUNS if (OUTPUT / s / "state.json").exists()}
+    assert got == on_disk
+
+
+def test_the_cli_skips_runs_already_in_the_database(tmp_path):
+    from backend.commons.db.connection import connect
+    from backend.commons.db.import_v1 import main
+
+    db_path = tmp_path / "imported.db"
+    assert main(["--output", str(OUTPUT), "--db", str(db_path), *V1_RUNS]) == 0
+    before = connect(db_path).execute("SELECT COUNT(*) AS n FROM runs").fetchone()["n"]
+    assert main(["--output", str(OUTPUT), "--db", str(db_path), *V1_RUNS]) == 0
+    after = connect(db_path).execute("SELECT COUNT(*) AS n FROM runs").fetchone()["n"]
+    assert after == before, "importing twice does not duplicate"

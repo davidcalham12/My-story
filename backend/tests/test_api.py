@@ -214,3 +214,179 @@ def test_every_stream_line_is_in_events_with_a_dense_seq(client, db):
     for r, line in zip(rows, parsed):
         assert r["payload"] == line.strip()
         assert r["type"] == json.loads(line).get("type", "unknown")
+
+
+# ------------------------------------------------------- PLAN-007 6.7
+
+
+def _frames(client, run_id: str, last_event_id: str | None = None):
+    """Every SSE frame with its `id:`, `event:` and parsed `data:`."""
+    headers = {"Last-Event-ID": last_event_id} if last_event_id is not None else {}
+    frames, current = [], {"id": None, "event": None}
+    with client.stream("GET", f"/api/runs/{run_id}/events", headers=headers) as response:
+        assert response.status_code == 200
+        for line in response.iter_lines():
+            if line.startswith("id: "):
+                current["id"] = int(line[4:])
+            elif line.startswith("event: "):
+                current["event"] = line[7:]
+            elif line.startswith("data: "):
+                frames.append((current["id"], current["event"], json.loads(line[6:])))
+                if current["event"] == "done":
+                    break
+                current = {"id": None, "event": None}
+    return frames
+
+
+class _BlockingProcess:
+    """A process that produces two lines and then waits to be stopped — the
+    only way to test a halt that must arrive *during* a run against a replay
+    that otherwise finishes in milliseconds."""
+
+    def __init__(self):
+        import threading
+        self.released = threading.Event()
+        self.stopped = False
+        self.skipped: list[str] = []
+
+    def start(self):
+        return None
+
+    def lines(self):
+        for raw in ('{"type": "system", "subtype": "init"}',
+                    '{"type": "assistant", "message": {"content": [{"type": "text", "text": "FLOW-1"}]}}'):
+            yield raw, json.loads(raw)
+        self.released.wait(timeout=10)
+
+    def events(self):
+        for _, e in self.lines():
+            yield e
+
+    def stop(self):
+        self.stopped = True
+        self.released.set()
+
+    @property
+    def returncode(self):
+        return None
+
+    def stderr_text(self):
+        return ""
+
+
+def test_halt_stops_the_process_and_marks_halted_user(db, tmp_path):
+    """AC-18. The user's halt goes through the same _finish path the watchers
+    use: archive, warnings, and the sentinel that frees every follower."""
+    settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=True)
+    service = RunService(db, settings)
+    fake = _BlockingProcess()
+    service._process = lambda *a, **k: fake  # the seam the recorded stream uses
+    created = service.start(PREMISE, "tiny", "")
+    run_id = created["id"]
+    import time
+    for _ in range(100):
+        if service._live and service._live.seq >= 2:
+            break
+        time.sleep(0.02)
+    assert service._live.seq == 2, "the process produced its two lines and is now blocked"
+
+    service.halt(run_id)
+    for _ in range(100):
+        if service._live.done:
+            break
+        time.sleep(0.02)
+    assert fake.stopped
+    run = service.get(run_id)
+    assert run["halted"] == "user"
+    assert "user" in run["halted_detail"]
+    assert service._live.result == "halted: user"
+
+
+def test_halt_keeps_what_was_persisted_readable(db, tmp_path):
+    settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=True)
+    service = RunService(db, settings)
+    fake = _BlockingProcess()
+    service._process = lambda *a, **k: fake
+    run_id = service.start(PREMISE, "tiny", "")["id"]
+    import time
+    for _ in range(100):
+        if service._live and service._live.seq >= 2:
+            break
+        time.sleep(0.02)
+    service.halt(run_id)
+    for _ in range(100):
+        if service._live.done:
+            break
+        time.sleep(0.02)
+    rows = db.execute("SELECT seq FROM events WHERE run_id = ? ORDER BY seq", (run_id,)).fetchall()
+    assert [r["seq"] for r in rows] == [1, 2], "the two lines read before the halt are the record"
+    assert service.detail(run_id)["run"]["halted"] == "user"
+
+
+def test_halt_on_an_unknown_or_finished_run_is_404_or_409(client):
+    assert client.post("/api/runs/nope/halt").status_code == 404
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    response = client.post(f"/api/runs/{run_id}/halt")
+    assert response.status_code == 409
+    assert client.get(f"/api/runs/{run_id}").json()["run"]["halted"] is None, "a finished run is not re-marked"
+
+
+def test_a_run_left_running_is_marked_halted_process_on_startup(db, tmp_path):
+    """AC-19 / FR-RUN-7. A server restarted mid-run used to leave the row
+    `running` forever, and the panel showed a run that was still going."""
+    from backend.commons.db import repository as repo
+    repo.create_run(db, run_id="orphan", slug="orphan-slug", premise=PREMISE,
+                    profile="tiny", tone=None, snapshot={})
+    repo.set_stage(db, "orphan", "FLOW-4")
+    repo.create_run(db, run_id="finished", slug="finished-slug", premise=PREMISE,
+                    profile="tiny", tone=None, snapshot={})
+    repo.finish(db, "finished")
+    db.execute("INSERT INTO runs (id, slug, premise, profile, config_snapshot, stage, source, started_at) "
+               "VALUES ('imported','imported-slug','p','tiny','{}','FLOW-6','pre-loop003','then')")
+
+    settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=True)
+    swept = RunService(db, settings).sweep_orphans()
+
+    assert swept == ["orphan"]
+    orphan = db.execute("SELECT halted, halted_detail, finished_at FROM runs WHERE id = 'orphan'").fetchone()
+    assert orphan["halted"] == "process"
+    assert "startup" in orphan["halted_detail"]
+    assert orphan["finished_at"] is not None
+    assert db.execute("SELECT halted FROM runs WHERE id = 'finished'").fetchone()["halted"] is None
+    assert db.execute("SELECT halted FROM runs WHERE id = 'imported'").fetchone()["halted"] is None, \
+        "an imported run with no finished_at is history, not an orphan"
+
+
+def test_sse_id_field_is_the_persisted_seq(client, db):
+    """AC-20: every live frame says which stream line produced it."""
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    frames = _frames(client, run_id)
+    progress = [(i, d) for i, e, d in frames if e == "progress"]
+    assert progress, "the replay produces progress frames"
+    ids = [i for i, _ in progress]
+    assert all(isinstance(i, int) for i in ids)
+    assert ids == sorted(ids)
+    last = db.execute("SELECT MAX(seq) AS n FROM events WHERE run_id = ?", (run_id,)).fetchone()["n"]
+    assert ids[-1] == last
+
+
+def test_last_event_id_replays_from_the_next_seq_then_goes_live(client, db):
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    last = db.execute("SELECT MAX(seq) AS n FROM events WHERE run_id = ?", (run_id,)).fetchone()["n"]
+    frames = _frames(client, run_id, last_event_id=str(last - 2))
+    kinds = [e for _, e, _ in frames]
+    assert kinds[0] == "snapshot", "a reconnect still gets the state first"
+    replayed = [(i, d) for i, e, d in frames if e == "line"]
+    assert [i for i, _ in replayed] == [last - 1, last]
+    for i, d in replayed:
+        assert d["seq"] == i and json.loads(d["payload"])["type"] == d["type"]
+    assert kinds[-1] == "done", "the run is over, so after the replay the stream ends"
+
+
+def test_last_event_id_beyond_the_end_yields_only_done(client, db):
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    frames = _frames(client, run_id, last_event_id="999999")
+    assert [e for _, e, _ in frames] == ["snapshot", "done"]

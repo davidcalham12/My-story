@@ -17,7 +17,11 @@ def build_service() -> RunService:
     settings = load_settings()
     conn = connect(settings.db_path)
     migrate(conn)  # the same function the tests run, so the schemas cannot drift
-    return RunService(conn, settings)
+    service = RunService(conn, settings)
+    # A run left `running` by a server that died has no process behind it now
+    # (FR-RUN-7). Marked before the first request, or the panel shows it live.
+    service.sweep_orphans()
+    return service
 
 
 _service: RunService | None = None

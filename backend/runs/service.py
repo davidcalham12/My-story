@@ -44,6 +44,10 @@ class AlreadyRunning(Exception):
     """A queue of one: a single `claude -p` alive at a time."""
 
 
+class NotLive(Exception):
+    """A halt for a run that is not the one in flight, or is already over."""
+
+
 class NotFound(Exception):
     pass
 
@@ -71,6 +75,9 @@ class Live:
     result: str = ""
     process: object | None = None
     seq: int = 0  # the last stream line persisted to `events`; dense per run
+    # Set by halt(): the user's reason wins over what the loop would otherwise
+    # conclude from a stream that simply ended.
+    halt_requested: tuple[str, str] | None = None
 
 
 class RunService:
@@ -153,6 +160,7 @@ class RunService:
                     "stage": state.stage, "detail": state.headline,
                     "chapter": state.chapter, "attempt": state.attempt,
                     "agent": state.agent, "slug": state.slug,
+                    "seq": live.seq,  # the SSE `id:` — which line produced this
                 })
                 try:
                     context.observe_event(event)
@@ -162,7 +170,11 @@ class RunService:
                     process.stop()
                     break
 
-            if halted is None and not state.finished:
+            if live.halt_requested:
+                # The stream ended because we ended it. Saying `process` here
+                # would file the user's decision as the orchestrator's death.
+                halted = live.halt_requested
+            elif halted is None and not state.finished:
                 # The process ended without a `result`. Whatever it wrote is on
                 # disk and stays readable; it is not resumable, and resuming
                 # would be a different run.
@@ -406,22 +418,71 @@ class RunService:
             "provenance": "measured",
         }, indent=2) + "\n", encoding="utf-8")
 
+    # ------------------------------------------------------------- halting
+
+    def halt(self, run_id: str) -> None:
+        """The user's halt (FR-RUN-5). The process is stopped and the run is
+        marked `halted: user` through the same `_finish` the watchers use — the
+        archive, the warnings and the sentinel that frees every follower are
+        not special-cased for this reason any more than for `budget`."""
+        self.get(run_id)  # NotFound if it never existed
+        with self._lock:
+            live = self._live
+            if not live or live.run_id != run_id or live.done:
+                raise NotLive(run_id)
+            live.halt_requested = ("user", "halted by the user")
+            process = live.process
+        if process is not None:
+            process.stop()
+
+    def sweep_orphans(self) -> list[str]:
+        """FR-RUN-7. A v2 run with no `finished_at` when the server starts has
+        no process behind it — the one that had it died with the server. Mark
+        it, or the panel shows a run that is still going, forever.
+
+        Imported runs are left alone: `pre-loop003` history has no process and
+        may honestly lack a finish time."""
+        rows = self.conn.execute(
+            "SELECT id FROM runs WHERE finished_at IS NULL AND source = 'v2'"
+        ).fetchall()
+        swept = [r["id"] for r in rows]
+        for run_id in swept:
+            write_repo.halt(self.conn, run_id, "process",
+                            "found running at startup; the process is gone")
+        return swept
+
     # ----------------------------------------------------------- following
 
-    def follow(self, run_id: str) -> Iterator[dict]:
-        """A snapshot from the database, then live events."""
+    def follow(self, run_id: str, after_seq: int | None = None) -> Iterator[dict]:
+        """A snapshot from the database, the persisted lines after `after_seq`
+        if a client says where it stopped (`Last-Event-ID`), then live events.
+
+        Every live frame carries the `seq` of the line that produced it, so the
+        client's `Last-Event-ID` is a row number in `events` and nothing has to
+        be interpreted on either side.
+        """
         yield {"event": "snapshot", "data": self.detail(run_id)}
+
+        if after_seq is not None:
+            for row in write_repo.events_after(self.conn, run_id, after_seq):
+                yield {"event": "line", "id": row["seq"], "data": row}
 
         live = self._live
         if not live or live.run_id != run_id:
             yield {"event": "done", "data": {"result": "not live"}}
+            return
+        if live.done:
+            # A follower arriving after the end. The queue's sentinel was
+            # consumed by whoever was following at the time; waiting on it
+            # again used to block this reader forever.
+            yield {"event": "done", "data": {"result": live.result, **self.detail(run_id)}}
             return
 
         while True:
             item = live.events.get()
             if item is None:
                 break
-            yield {"event": "progress", "data": item}
+            yield {"event": "progress", "id": item.get("seq"), "data": item}
         yield {"event": "done", "data": {"result": live.result, **self.detail(run_id)}}
 
     def stop(self, run_id: str) -> None:

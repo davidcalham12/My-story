@@ -363,3 +363,41 @@ def import_all(
             continue
         reports.append(import_run(conn, run_dir))
     return reports
+
+
+def main(argv: list[str] | None = None) -> int:
+    """`python -m backend.commons.db.import_v1 --output <dir> --db <path> [slug ...]`
+
+    FR-RUN-6 as decided at Paso 4 (Q7): a command, not an endpoint. Runs already
+    in the database are skipped, so running it twice imports nothing twice.
+    """
+    import argparse
+    import sys
+
+    from backend.commons.db.connection import connect
+    from backend.commons.db.migrate import migrate
+
+    parser = argparse.ArgumentParser(description="Import v1 runs from output/ into SQLite.")
+    parser.add_argument("--output", type=Path, required=True, help="the output/ directory")
+    parser.add_argument("--db", type=Path, required=True, help="the SQLite file")
+    parser.add_argument("slugs", nargs="*", help="only these runs; default: every run not yet imported")
+    args = parser.parse_args(argv)
+
+    conn = connect(args.db)
+    migrate(conn)
+    known = {row["slug"] for row in conn.execute("SELECT slug FROM runs WHERE slug IS NOT NULL")}
+    wanted = [s for s in args.slugs if s not in known] if args.slugs else None
+    if args.slugs and not wanted:
+        print("nothing to import: every named run is already in the database", file=sys.stderr)
+        return 0
+    reports = import_all(conn, args.output, slugs=wanted)
+    for r in reports:
+        missing = ", ".join(sorted(r.missing)) or "nothing"
+        print(f"{r.slug}: {r.chapters} chapters, {r.attempts} attempts, {r.calls} calls, "
+              f"{r.gate_rows} gate rows; not recorded: {missing}")
+    print(f"{len(reports)} run(s) imported", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover - exercised through main() in tests
+    raise SystemExit(main())

@@ -186,6 +186,11 @@ The reasons a run halts, each leaving it readable up to where it reached:
 | `halted: gate` | `patch_then_halt` exhausted; no chapter file is promoted |
 | `halted: process` | the orchestrator ended without a `result` event |
 | `halted: interrupted` | the launcher itself failed |
+| `halted: user` | `POST /api/runs/{id}/halt` (PLAN-007 6.7): the process is stopped and the run goes through the same finish as a watcher trip — archive, warnings, followers released |
+
+A server that starts finds any v2 run with no `finished_at` and marks it
+`halted: process` — its process died with the previous server (FR-RUN-7,
+PLAN-007 6.7).
 
 **A `claude -p` process that dies is not resumed.** The run halts, stays readable,
 and resuming would be a different run. That is an honest limit of this
@@ -201,6 +206,9 @@ events — so a reconnection cannot leave half a state.
 the database holds the stream itself: every line `claude -p` writes lands in
 `events` under a dense `seq` *before* anything is derived from it, so what the
 run is judged by is what it ran, not a reconstruction (SPEC-007 FR-RNR-3).
+Every live frame carries that `seq` as its SSE `id:`, so a client that reconnects
+with `Last-Event-ID` is replayed the persisted lines it missed and then rejoined
+to the live stream — or told `done` if the run is over (PLAN-007 6.7).
 
 ---
 
