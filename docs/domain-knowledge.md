@@ -159,6 +159,34 @@ twenty minutes where the rule required *more than* twenty.
 
 Cheap in an outline, expensive in a chapter.
 
+**On a longer book it finds a different thing, and that changes what it is for.**
+Run against an eight-chapter outline it reported **zero impossible beats and
+three ambiguous rules**, all three load-bearing:
+
+- *whose measurement is it* — the hand on the chain or the hand in the field
+  book. Under one reading two figures three chapters apart must be identical,
+  which the outline contradicts.
+- *do repeats stabilise or never repeat again* — the critic proposed the first,
+  and the orchestrator **OVERRULED it**: that reading contradicts a later beat
+  and the chapter-4 plant, and *a replacement built on it would have written the
+  error into six chapters by hand*.
+- a third about what a constant guarantees.
+
+So the audit was built to catch beats that break a rule, and what it actually
+catches on a real book is **rules that read two ways**. That is the failure that
+deadlocked a run, it cannot be found by re-reading a chapter, and it is the one
+thing here that gets cheaper the earlier it is asked.
+
+It is also the second time the arbitration has earned its place by refusing a
+critic — §3.8 — and the first time refusing one saved six chapters rather than
+one paragraph.
+
+**And the file came back in a different shape from the last run's.** One wrote
+`ambiguities`, the other `ambiguous_rules` with a `violations_note` beside an
+empty `violations`. Nobody had said which, so both are correct and neither is
+queryable — v1 wrote its critiques in three shapes for exactly this reason.
+`SKILL.md` now states the shape.
+
 ### 3.4 Repairing one characteristic breaks another
 
 Confirmed twice. In the halted run, the repair prompted by `science` took

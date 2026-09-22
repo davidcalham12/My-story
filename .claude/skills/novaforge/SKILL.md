@@ -141,6 +141,33 @@ again with that finding, or fix the rule, and do not start FLOW-4 on a commissio
 that contradicts canon. A chapter cannot be redrafted into obeying a rule its own
 outline told it to break.
 
+### Write the audit down in this exact shape
+
+`output/<slug>/critiques/outline.audit.json`, and **these keys, spelled this
+way**:
+
+```json
+{"stage": "FLOW-3", "agent": "science-critic", "ts": "<a real clock reading>",
+ "verdict": "clean" | "defects",
+ "violations":  [{"chapter": 3, "beat": 4, "rule": "R1", "clause": "...",
+                  "severity": "high", "claim": "...", "fix": "...",
+                  "arbitration": "UPHELD ... | OVERRULED ..."}],
+ "ambiguities": [{"rule": "R5", "clause": "...", "reading_a": "...",
+                  "reading_b": "...", "outline_assumes": "a" | "b" | "neither",
+                  "arbitration": "...", "applied": "..."}]}
+```
+
+**Both arrays always, even when empty.** Two real runs wrote this file two
+different ways — one used `ambiguities`, the other `ambiguous_rules` with a
+`violations_note` beside an empty `violations` — and a reader that wants to ask
+"how often does the audit find something" cannot, because the question has two
+spellings. v1 wrote its critiques in three shapes for the same reason: nobody
+said which. **A contract nobody stated cannot be enforced, and this is the
+statement.**
+
+Start every `arbitration` with `UPHELD` or `OVERRULED`. The word is read by a
+script; the sentence after it is for a person.
+
 Then split it on `### Chapter N — Title` and keep one entry per chapter. If the
 split yields fewer entries than `novel.chapters`, the outline is malformed —
 dispatch again rather than writing chapters from nothing. Anything other than
