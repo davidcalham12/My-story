@@ -111,3 +111,35 @@ def test_the_run_list_includes_what_was_imported(client, db):
     rows = client.get("/api/runs").json()
     sources = {r["source"] for r in rows}
     assert "pre-loop003" in sources
+
+
+def test_a_failure_in_the_post_run_bookkeeping_still_ends_the_stream(client, monkeypatch):
+    """Everything after the halt is bookkeeping, and every line of it was added
+    after the SSE follower was written.
+
+    **A failure in any of them used to hang every follower forever**, because the
+    sentinel that ends the stream came last and never ran. A reader waiting on a
+    finished run is worse than a missing figure: it looks like the run is still
+    going. Found by adding one more bookkeeping step and watching the whole suite
+    stop.
+    """
+    import backend.runs.service as service
+
+    def explode(*args, **kwargs):
+        raise RuntimeError("the archive fell over")
+
+    monkeypatch.setattr(service.RunService, "_archive", explode)
+
+    created = client.post("/api/runs", json={
+        "premise": "A lighthouse keeper on a drowned coast keeps a ledger.",
+        "profile": "tiny", "tone": ""})
+    assert created.status_code == 201
+
+    kinds = []
+    with client.stream("GET", f"/api/runs/{created.json()['id']}/events") as stream:
+        for line in stream.iter_lines():
+            if line.startswith("event:"):
+                kinds.append(line.split(":", 1)[1].strip())
+            if kinds and kinds[-1] == "done":
+                break
+    assert kinds[-1] == "done", "the stream must end even when bookkeeping fails"

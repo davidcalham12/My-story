@@ -1,0 +1,11 @@
+{
+  "_comment": "Recomputed from this run's own record: what the gate decided, against the rule it was supposed to follow. `breached` means a chapter entered this book that should not have.",
+  "attempts_checked": 14,
+  "unjudgeable": 0,
+  "breaches": [
+    "ch03 attempt 2: promoted below the threshold \u2014 aggregate 5 was put in the book with verdict 'patched'",
+    "ch03 attempt 2: verdict the rule would not give \u2014 recorded 'patched', the rule says 'halt' (aggregate 5 after the patch was applied: a critic's replacement was itself wrong and arbitration did not catch it, so the run stops rather than putting the chapter in the book)",
+    "ch07 attempt 2: promoted on an incomplete gate \u2014 continuity produced no usable verdict, so the aggregate of 10 is a minimum over the critics that answered \u2014 not a pass"
+  ],
+  "verdict": "breached"
+}

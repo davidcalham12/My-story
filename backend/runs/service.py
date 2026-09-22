@@ -212,21 +212,37 @@ class RunService:
             ))
 
     def _finish(self, live: Live, state: State, halted: tuple[str, str] | None) -> None:
-        if halted:
-            write_repo.halt(self.conn, live.run_id, halted[0], halted[1])
-            live.result = f"halted: {halted[0]}"
-        else:
-            write_repo.finish(self.conn, live.run_id)
-            live.result = "complete"
+        """Close the run, and **always** release whoever is following it.
 
-        if state.total_cost_usd is not None:
-            self._write_cost(state)
+        Everything between the halt and the `None` is bookkeeping — cost,
+        fingerprint, archive, conformance — and every line of it was added after
+        the SSE follower was written. **A failure in any of them used to hang
+        every follower forever**, because the sentinel that ends the stream came
+        last and never ran. A reader waiting on a finished run is worse than a
+        missing figure: it looks like the run is still going.
 
-        self._check_procedure_held(live)
-        self._archive(live, state)
+        Found by adding one more bookkeeping step and watching the whole test
+        suite stop. The `finally` is the fix; the individual `try`s inside are
+        belt and braces.
+        """
+        try:
+            if halted:
+                write_repo.halt(self.conn, live.run_id, halted[0], halted[1])
+                live.result = f"halted: {halted[0]}"
+            else:
+                write_repo.finish(self.conn, live.run_id)
+                live.result = "complete"
 
-        live.done = True
-        live.events.put(None)
+            if state.total_cost_usd is not None:
+                self._write_cost(state)
+
+            self._check_procedure_held(live)
+            self._archive(live, state)
+        except Exception as exc:  # noqa: BLE001 - see the docstring
+            live.result = (live.result or "complete") + f" | bookkeeping failed: {exc!r}"
+        finally:
+            live.done = True
+            live.events.put(None)
 
     def _skill_sha(self) -> str | None:
         """A fingerprint of the procedure, taken at the start and at the end.
@@ -295,6 +311,7 @@ class RunService:
         for breach in conformance.audit(self.conn, live.run_id):
             write_repo.warn(self.conn, live.run_id, "gate-breach", str(breach),
                             chapter=breach.chapter)
+        self._write_conformance(live, state)
 
         # `result` stays `complete` or `halted: x`. It is the run's outcome, not
         # a place to report bookkeeping, and a reader parsing it should not have
@@ -306,6 +323,37 @@ class RunService:
                 "archive; the gate's record is missing, which is not the same "
                 "as a run that had no attempts",
             )
+
+    def _write_conformance(self, live: Live, state: State) -> None:
+        """The audit, written beside the book it is about.
+
+        The database has it, and the database is on one machine. **A novel gets
+        copied, attached, read somewhere else** — and a book that failed its gate
+        on two chapters should not travel without saying so. The evidence goes
+        with the artefact or it is evidence nobody has.
+        """
+        if not state.slug:
+            return
+        path = Path(self.settings.output_dir) / state.slug / "conformance.json"
+        if not path.parent.is_dir():
+            return
+        try:
+            summary = conformance.summary(self.conn, live.run_id)
+            path.write_text(json.dumps({
+                "_comment": "Recomputed from this run's own record: what the gate "
+                            "decided, against the rule it was supposed to follow. "
+                            "`breached` means a chapter entered this book that "
+                            "should not have.",
+                **summary,
+            }, indent=2) + "\n", encoding="utf-8")
+        except Exception as exc:  # noqa: BLE001 - the run is over; never fail it
+            try:
+                write_repo.warn(self.conn, live.run_id, "conformance",
+                                f"could not write conformance.json: {exc!r}")
+            except Exception:
+                # The handler must not become the failure. A warning that cannot
+                # be written is still better than a follower that never returns.
+                pass
 
     def _write_cost(self, state: State) -> None:
         """The whole run's cost, orchestrator included, straight from Claude Code.

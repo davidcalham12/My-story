@@ -678,7 +678,28 @@ defect there is: **every test of it passes**, because tests call it directly. Th
 only thing that finds it is asking *who calls this* — and the only thing that
 keeps it found is a test that fails when the answer changes.
 
-### 7.8 A rule lives in one place, and the count is the tell
+### 7.8 The sentinel that ends a stream must come last, and in a `finally`
+
+Everything a run does after it halts is bookkeeping — the cost, the fingerprint,
+the archive, the conformance audit — and **every line of it was added after the
+SSE follower was written.** The sentinel that ends the stream came last.
+
+So a failure in any of them hung every follower forever. Not an error: a wait. **A
+reader on a finished run that never returns looks exactly like a run still
+going**, which is the worst way for a system to fail in front of someone.
+
+It was found by adding one more bookkeeping step and watching the entire test
+suite stop at its 300-second limit — a defect that had been reachable since the
+first one of those steps was written, and that no test covered because no test
+made any of them fail.
+
+The `finally` is the fix. The second lesson is smaller and worth as much: the
+underlying error was a `NameError` from an edit that moved a block into the wrong
+method, and **`_archive`'s own `except` had been swallowing it into a warning row
+nobody reads.** A handler that turns a programming error into a log line is a
+handler that hides it.
+
+### 7.9 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -699,7 +720,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.9 Zero is a value, and this is the family the bugs come in
+### 7.10 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 
