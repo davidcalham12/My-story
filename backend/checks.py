@@ -59,6 +59,10 @@ BY_STAGE: dict[str, list[tuple[str, list[str]]]] = {
         ("every promise landed in a chapter that exists",
          ["backend.chapters.check_promises", "{run}"]),
         ("summaries within their cap", ["backend.chapters.check_summary", "{run}"]),
+        # SPEC-007 §8 point 2: every call has a timestamp, and the log says
+        # which were measured and which derived. Reported, never refused.
+        ("call log timestamps parse, in order, with their provenance",
+         ["backend.chapters.check_log", "{run}"]),
     ],
 }
 

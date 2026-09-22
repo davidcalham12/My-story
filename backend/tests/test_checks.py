@@ -102,3 +102,59 @@ def test_the_skill_calls_the_combined_command_for_every_stage_that_has_one(stage
     """A mapping the procedure never invokes is a list nobody reads."""
     skill = (ROOT / ".claude/skills/novaforge/SKILL.md").read_text(encoding="utf-8")
     assert f"backend.checks {stage}" in skill, stage
+
+
+# ------------------------------------------------------- PLAN-007 6.12
+
+
+def _log(tmp_path, rows):
+    run_dir = tmp_path / "run"
+    (run_dir / "logs").mkdir(parents=True)
+    (run_dir / "logs" / "agents.jsonl").write_text(
+        "\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+    return run_dir
+
+
+def _check_log(run_dir):
+    return subprocess.run([sys.executable, "-m", "backend.chapters.check_log", str(run_dir)],
+                          capture_output=True, text=True, cwd=ROOT)
+
+
+def test_a_log_with_parseable_monotonic_timestamps_passes_and_reports_their_provenance(tmp_path):
+    """SPEC-007 §8 point 2 / AC-16 (I): every call row has a `ts`. The check
+    does not demand `measured` — a derived timestamp honestly labelled is
+    provenance, not a defect — but it counts them, because 47 of 50 rows on the
+    first real v2 run were `derived_from_duration`."""
+    run_dir = _log(tmp_path, [
+        {"ts": "2026-09-22T15:55:20Z", "ts_source": "measured", "agent": "worldbuilder"},
+        {"ts": "2026-09-22T15:57:00Z", "ts_source": "derived_from_duration", "agent": "character-architect"},
+        {"ts": "2026-09-22T15:57:00Z", "ts_source": "derived_from_duration", "agent": "plot-architect"},
+    ])
+    result = _check_log(run_dir)
+    assert result.returncode == 0, result.stdout + result.stderr
+    body = json.loads(result.stdout)
+    assert body["rows"] == 3 and body["monotonic"] is True
+    assert body["ts_source"] == {"measured": 1, "derived_from_duration": 2}
+
+
+def test_a_log_with_an_unparseable_or_backwards_timestamp_fails_and_names_the_row(tmp_path):
+    run_dir = _log(tmp_path, [
+        {"ts": "2026-09-22T15:55:20Z", "ts_source": "measured", "agent": "worldbuilder"},
+        {"ts": "yesterday-ish", "agent": "character-architect"},
+        {"ts": "2026-09-22T15:50:00Z", "ts_source": "measured", "agent": "plot-architect"},
+    ])
+    result = _check_log(run_dir)
+    assert result.returncode == 1
+    body = json.loads(result.stdout)
+    assert body["monotonic"] is False
+    problems = " ".join(body["problems"])
+    assert "row 2" in problems and "row 3" in problems
+    assert body["ts_source"].get("absent") == 1, "a row with no ts_source is counted as absent, not as measured"
+
+
+def test_the_real_run_log_is_checked_at_flow_6():
+    assert any(parts[0] == "backend.chapters.check_log" for _, parts in BY_STAGE["FLOW-6"])
+    result = _check_log(OUTPUT / "lighthouse-keeper-ledger")
+    assert result.returncode == 0, result.stdout + result.stderr
+    body = json.loads(result.stdout)
+    assert body["rows"] > 0 and body["ts_source"].get("derived_from_duration", 0) > 0
