@@ -65,7 +65,7 @@ with the reason attached — two have, and they say so.
 | G10 | the manuscript is assembled in code | important | **A** | yes |
 | G11 | the outline is audited against `## Rules` before FLOW-4 | important | **D** | **no → §3.2** |
 | G12 | every figure carries its provenance | important | **T** + **A** | yes |
-| G13 | cost is not invented | important | **D** | **no → §3.3** |
+| G13 | cost is not invented | important | **T** for the run, **absent** per agent | yes |
 | G14 | a run stops when it reaches its budget | **critical** | **T** | yes |
 | G15 | no agent declares a genre | incidental | **A** | yes |
 | G16 | no prompt asks a quantity without saying how to decide it | incidental | **I** | yes |
@@ -442,7 +442,8 @@ time.
 
 ### G13 — Cost is not invented
 
-**Important · Class D**, and better than it was. **Below its minimum: §3.3.**
+**Important · Class T** for the run's total, **absent** for the split by agent.
+**Raised from D on 2026-09-22**, when the figure stopped living only in a file.
 
 **Method.** Claude Code's final `result` event carries `total_cost_usd` for the
 **whole run, orchestrator turns included**. It is written to
@@ -469,9 +470,19 @@ actual** on the same run. The difference was never a modelling error — it was 
 quantity nobody could see. Now it arrives measured, from the only party that
 knows it.
 
-**Per-agent breakdown is weaker.** It comes from `task_progress.usage`, which
-reads zero in both recordings, so those rows are graded `absent` rather than
-zero. The run total is solid; the split by agent is not yet. **§3.3.**
+**Why T now.** The figure is read from the `result` event, stored on the run with
+its grade, and preferred over the sum of `calls` — and `test_archive.py` asserts
+each of those against a real recorded run. It is no longer "a file exists with a
+number in it".
+
+**What T does not cover, and cannot.** That Claude Code's own accounting is
+correct. It counted, we record what it counted, and the grade `measured` means
+*counted by something that was there* — which is true and is not the same as
+*audited*. Nothing here can check a bill against the meter that wrote it.
+
+**Per-agent breakdown is `absent`.** It comes from `task_progress.usage`, which
+reads zero in every recording, so those rows are graded `absent` rather than
+zero. The run total is solid; the split by agent does not exist. **§3.3.**
 
 **Imported runs stay bounded**, `low / estimate / high`, graded `reconstructed`.
 Any bounded figure of that shape is a **floor, not a range**, and the interface
@@ -620,10 +631,12 @@ It reduces; it does not prevent.
 the outline should never have commissioned against.
 **Reviewed by:** every run that halts at the gate, by reading why.
 
-### 3.3 Cost is measured per run and absent per agent, and G13 is important
+### 3.3 Cost has no split by agent
 
-**What is not verified:** the split of cost by agent. The run total is measured
-and solid.
+**What is not verified:** the split of cost by agent. **The run total is now T**
+— read from the `result` event, stored with its grade, preferred over the sum,
+each asserted by a test — so this row has shrunk to the half that is genuinely
+missing.
 **Why accepted:** `task_progress.usage` reads zero in both recordings; the
 quantity is not in the stream today.
 **Scope of damage:** we cannot say which agent is expensive, only what the run
