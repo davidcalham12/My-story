@@ -5,5 +5,8 @@ node_modules/
 *.db-wal
 *.db-shm
 .env
-dist/
+# The frontend build only. A bare `dist/` also matched output/<slug>/dist/, so
+# every generated manuscript was silently untracked: the repo kept the rejected
+# drafts, the critiques and the feedback sheets, and threw away the book.
+frontend/dist/
 .pytest_cache/
