@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { Attempt, Cost, Run } from '@/shared/api/types'
 import { acceptedAttempt, bestAttempt, chapters, haltReason, unscored, worst } from './lib'
-import { gradeOf, money, weakestCall } from '@/shared/lib/provenance'
+import { gradeOf, money, tokens, weakestCall } from '@/shared/lib/provenance'
 
 const attempt = (over: Partial<Attempt>): Attempt => ({
   chapter: 1,
@@ -57,7 +57,8 @@ describe('scores', () => {
 
 describe('provenance', () => {
   const cost = (over: Partial<Cost>): Cost => ({
-    calls: 10, input_tokens: 1, output_tokens: 1, total_usd: 1,
+    calls: 10, input_tokens: 1, output_tokens: 1, tokens_provenance: 'measured',
+    total_usd: 1,
     summed_from_calls_usd: 1, total_provenance: 'measured',
     provenance: ['measured'], turns: null, duration_ms: null,
     subagent_dispatches: null, ...over,
@@ -80,6 +81,16 @@ describe('provenance', () => {
   it('takes the weakest grade across the calls, because a series is only as good as its worst part', () => {
     expect(weakestCall(cost({ provenance: ['measured', 'reconstructed'] }))).toBe('reconstructed')
     expect(weakestCall(cost({ provenance: ['measured'] }))).toBe('measured')
+  })
+
+  it('says "not recorded" for a token count nobody reported', () => {
+    // The panel printed "0 / 0" tokens for a run that spent $18.82. Every call
+    // had stored NULL, honestly; a COALESCE in the query turned the truth into
+    // a zero on the way out.
+    expect(tokens(null)).toBe('not recorded')
+    expect(tokens(undefined)).toBe('not recorded')
+    expect(tokens(0)).toBe('0')
+    expect(tokens(1234567)).toMatch(/1.234.567/)
   })
 
   it('says "not recorded" rather than zero', () => {

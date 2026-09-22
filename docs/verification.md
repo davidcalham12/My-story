@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **277 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **279 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -400,6 +400,19 @@ way among several.
 **The rule this exists to hold: what cannot be measured is reported as
 unmeasurable, never as zero.** A run that destroyed its evidence and a run where
 nothing changed are identical in a number and must not be identical in a report.
+
+**And the rule was broken here, on this system's own main screen.** Every `calls`
+row of the first real run stored `input_tokens` as `NULL` — correctly, because
+the stream's per-agent packets report nothing. The reader wrapped the sum in
+`COALESCE(..., 0)`, and the panel printed **"0 / 0 tokens" for a run that spent
+$18.82**. The database told the truth, the query threw it away, and the screen
+stated a measurement nobody made.
+
+It was found by grepping the frontend for `.toLocaleString()` on a figure that
+can be absent — not by a test, and not by anyone reading the page. `total_usd`
+had already been fixed the same way an hour earlier and the token pair beside it
+had been missed, which is the honest shape of this class of bug: **it is never
+fixed once.**
 
 ### G13 — Cost is not invented
 

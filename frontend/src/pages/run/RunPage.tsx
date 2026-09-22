@@ -1,6 +1,6 @@
 import { useRun } from '@/features/watch-progress/useRun'
 import { haltReason } from '@/entities/run/lib'
-import { gradeOf, money } from '@/shared/lib/provenance'
+import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
 import { Quality } from '@/pages/quality/Quality'
 
@@ -91,7 +91,8 @@ export function RunPage({ runId }: { runId: string }) {
           <tr>
             <th>tokens in / out</th>
             <td className="num">
-              {cost.input_tokens.toLocaleString()} / {cost.output_tokens.toLocaleString()}
+              {tokens(cost.input_tokens)} / {tokens(cost.output_tokens)}{' '}
+              <Provenance grade={cost.tokens_provenance} />
             </td>
           </tr>
           <tr>

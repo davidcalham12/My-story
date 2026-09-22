@@ -53,9 +53,16 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
 
     `total_usd` is None, never 0, when nothing measured and nothing summed.
     """
+    # No COALESCE on the token sums, deliberately. SUM over rows that are all
+    # NULL is NULL, and NULL is the answer: every call of the first real run
+    # stored `input_tokens` as NULL — honestly, because the stream's per-agent
+    # packets report nothing — and a COALESCE here printed **"0 / 0" tokens for
+    # a run that spent $18.82**. The database told the truth and this query
+    # threw it away.
     row = conn.execute(
-        "SELECT COUNT(*) AS calls, COALESCE(SUM(input_tokens),0) AS input_tokens, "
-        "COALESCE(SUM(output_tokens),0) AS output_tokens, "
+        "SELECT COUNT(*) AS calls, SUM(input_tokens) AS input_tokens, "
+        "SUM(output_tokens) AS output_tokens, "
+        "COUNT(input_tokens) AS token_rows, "
         "COALESCE(SUM(cost_usd),0) AS total_usd FROM calls WHERE run_id = ?",
         (run_id,),
     ).fetchone()
@@ -76,8 +83,12 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
     else:
         total, grade = None, "absent"
 
+    out = dict(row)
+    token_rows = out.pop("token_rows")
+
     return {
-        **dict(row),
+        **out,
+        "tokens_provenance": "measured" if token_rows else "absent",
         "total_usd": total,
         "summed_from_calls_usd": summed,
         "total_provenance": grade,

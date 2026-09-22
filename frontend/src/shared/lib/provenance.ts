@@ -47,6 +47,19 @@ export function weakestCall(cost: Cost | undefined): Provenance {
   return 'absent'
 }
 
+/**
+ * A token count, or the fact that there is not one.
+ *
+ * The panel printed **"0 / 0" tokens for a run that spent $18.82**. Every call
+ * had stored NULL, honestly — the stream's per-agent packets report nothing —
+ * and a COALESCE in the query turned the truth into a zero on the way out. This
+ * is the same rule as `money`, applied to the figure that actually got it wrong.
+ */
+export function tokens(value: number | null | undefined): string {
+  if (value === null || value === undefined) return 'not recorded'
+  return value.toLocaleString()
+}
+
 export function money(cost: Cost | undefined): string {
   if (!cost) return 'not recorded'
   // null is the backend saying "absent". It used to have to say 0, because the

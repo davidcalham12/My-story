@@ -58,8 +58,11 @@ export interface Attempt {
 
 export interface Cost {
   calls: number
-  input_tokens: number
-  output_tokens: number
+  /** null when no call reported a token figure. Never 0 to mean "not recorded". */
+  input_tokens: number | null
+  output_tokens: number | null
+  /** How the token figures were obtained. Today: absent, on every real run. */
+  tokens_provenance: Provenance
   /** The run's own measured total when there is one, else the sum of the calls,
    *  else null. Never 0 to mean "nothing recorded". */
   total_usd: number | null

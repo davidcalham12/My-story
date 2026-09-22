@@ -235,3 +235,40 @@ def test_a_rescore_beyond_the_draft_count_is_recorded_not_dropped(archived):
         (RUN_ID,),
     ).fetchone()["n"]
     assert n == 2
+
+
+def test_absent_token_figures_do_not_reach_the_reader_as_zero(archived):
+    """The project's cardinal rule, broken on its own main screen.
+
+    Every `calls` row of the first real run stored `input_tokens` as NULL,
+    honestly, because the stream's per-agent packets report nothing. The reader
+    wrapped the sum in COALESCE(..., 0) and the panel printed **"0 / 0" tokens
+    for a run that spent $18.82**. The database told the truth and the query
+    threw it away.
+    """
+    from backend.runs import repository as read_repo
+
+    db, _ = archived
+    payload = read_repo.cost(db, RUN_ID)
+    assert payload["input_tokens"] is None
+    assert payload["output_tokens"] is None
+    assert payload["tokens_provenance"] == "absent"
+
+
+def test_measured_token_figures_are_summed_and_graded_measured(db):
+    from backend.commons.log.calls import CallRow, write_call
+    from backend.runs import repository as read_repo
+
+    repository.create_run(db, run_id="r", slug="s", premise="p", profile="tiny",
+                          tone=None, snapshot="{}")
+    for tokens in (100, 250):
+        write_call(db, CallRow(
+            run_id="r", stage="FLOW-4", agent="chapter-writer",
+            model="claude-code-session", ts="2026-09-22T00:00:00Z",
+            input_tokens=tokens, output_tokens=tokens // 2,
+            provenance="measured",
+        ))
+    payload = read_repo.cost(db, "r")
+    assert payload["input_tokens"] == 350
+    assert payload["output_tokens"] == 175
+    assert payload["tokens_provenance"] == "measured"
