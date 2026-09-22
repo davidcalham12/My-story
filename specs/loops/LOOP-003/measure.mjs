@@ -29,8 +29,9 @@ const HERE = path.dirname(fileURLToPath(import.meta.url))
 const REPO = path.resolve(HERE, '..', '..', '..')
 const OUTPUT = path.join(REPO, 'output')
 
-/** The five characteristics of §1, in the order the sheet prints them. */
-export const FEATURES = ['continuity', 'science', 'outline', 'length', 'chatter']
+/** The six characteristics, in the order the sheet prints them. `prose` is the
+ * sixth (SPEC-006); a run that predates it shows `—` for it, never nothing. */
+export const FEATURES = ['continuity', 'science', 'outline', 'length', 'chatter', 'prose']
 export const THRESHOLD = 8
 export const MAX_ATTEMPTS = 3
 
@@ -378,11 +379,12 @@ const SELF_TEST = {
 }
 
 function selfTest() {
-  // The committed run predates the fifth characteristic, so `outline` has no
-  // critique file and every attempt is "unscored" on it. The self-test asks
-  // about the four that existed; a run measured against five is the point of
-  // the loop, not of its instrument.
-  const original = FEATURES.splice(FEATURES.indexOf('outline'), 1)
+  // The committed run predates the fifth and sixth characteristics, so
+  // `outline` and `prose` have no critique files and every attempt is
+  // "unscored" on them. The self-test asks about the four that existed; a run
+  // measured against six is the point of the loop, not of its instrument.
+  const absent = ['outline', 'prose']
+  const original = absent.map((f) => FEATURES.splice(FEATURES.indexOf(f), 1)[0])
   let failures = 0
   try {
     const result = measureRun(SELF_TEST.slug)
@@ -398,6 +400,7 @@ function selfTest() {
       console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail}`)
     }
     for (const note of SELF_TEST.unmeasurable) console.log(`SKIP  ${note}`)
+    for (const f of absent) console.log(`SKIP  ${f} — the committed run predates this characteristic`)
   } finally {
     FEATURES.push(...original)
   }
@@ -405,7 +408,7 @@ function selfTest() {
   console.log(
     failures
       ? `\n${failures} check(s) failed — the instrument does not reproduce the run, so do not trust it`
-      : `\nthe instrument reproduces the committed run (${SELF_TEST.unmeasurable.length} assertions skipped, named above)`,
+      : `\nthe instrument reproduces the committed run (${SELF_TEST.unmeasurable.length + absent.length} assertions skipped, named above)`,
   )
   return failures
 }

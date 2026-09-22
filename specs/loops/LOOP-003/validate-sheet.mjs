@@ -46,10 +46,11 @@ export function validateSheet(text, { attempt } = {}) {
   if (!header) problems.push('no "CHAPTER n — ATTEMPT k OF 3" header')
   const k = attempt ?? (header ? Number(header[2]) : null)
 
-  // §3 rule 1 — all five scores, including the passing ones. A writer that
-  // cannot see what is already right will improve it.
-  const FIVE = ['Continuity', 'Science', 'Outline', 'Length', 'Heading']
-  for (const feature of FIVE) {
+  // §3 rule 1 — all six scores, including the passing ones. A writer that
+  // cannot see what is already right will improve it. `Prose` is the sixth
+  // (SPEC-006); this list said five for a day after the gate had six.
+  const SIX = ['Continuity', 'Science', 'Outline', 'Length', 'Heading', 'Prose']
+  for (const feature of SIX) {
     if (!new RegExp(`${feature}\\s+(\\d+|—)`).test(text)) {
       problems.push(`score not shown for: ${feature}`)
     }
@@ -98,11 +99,11 @@ export function validateSheet(text, { attempt } = {}) {
 const GOOD = `CHAPTER 2 — ATTEMPT 2 OF 3
 
 SCORES FROM THE PREVIOUS ATTEMPT
-  Continuity 7 · Science 8 · Outline 10 · Length 10 · Heading 10
-  The lowest is 7. All five must reach 8.
+  Continuity 7 · Science 8 · Outline 10 · Length 10 · Heading 10 · Prose 9
+  The lowest is 7. All six must reach 8.
 
 DO NOT TOUCH — these passed, and changing them can only cost you:
-  Science · Outline · Length · Heading
+  Science · Outline · Length · Heading · Prose
 
 OPEN — Continuity (1 finding, worst first)
   1. [medium] Timeline arithmetic
