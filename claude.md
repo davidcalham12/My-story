@@ -151,8 +151,9 @@ Full statements with their class of evidence are in `docs/verification.md`.
 9. **Provenance on every figure**: `measured` · `reported` · `reconstructed` ·
    `estimated` · `absent`. **What cannot be measured is said to be unmeasurable,
    never reported as zero.**
-10. **Budget ceiling checked before every call.** Exceeding it halts the run with
-    what it produced left readable.
+10. **Budget ceiling measured on the stream.** The call that crosses it finishes
+    and the next does not start — the overshoot is bounded by one call, not by
+    zero. What the run produced is left readable.
 11. **No agent declares a genre.** The genre is read off the premise and recorded
     in the run's config snapshot.
 

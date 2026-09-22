@@ -29,9 +29,9 @@ built around that trade.
 
 ---
 
-## 2. What eight runs showed
+## 2. What the eight v1 runs showed
 
-Eight novels across seven premises, three to eight chapters each. Every figure
+Eight v1 novels across seven premises, three to eight chapters each. Every figure
 below is measured.
 
 ### 2.1 The critics are the expensive half
