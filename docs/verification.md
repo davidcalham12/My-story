@@ -100,6 +100,7 @@ in CI, at $0.** The suite that carries these:
 | `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
 | `test_six_end_to_end.py` | a chapter stopped by `prose` alone, through the real archive path |
+| `test_promote.py` | that a failing chapter cannot be promoted by the script that promotes |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
@@ -562,9 +563,16 @@ moved into code has been.
 disobeying would take**: a chapter entering the book now needs the orchestrator
 to ignore a script that printed `halt` and its reason, rather than to reason its
 way through a paragraph. That is a sharper thing to do wrong.
+**It has happened, and this row is no longer hypothetical.** On the
+eight-chapter run, chapter 3 scored `continuity` 5 and was promoted: no third
+attempt, no patch, no halt, and `ch03.md` byte-identical to the failing draft.
+G6's central claim, violated on a real run. `domain-knowledge.md` §7.3 has it in
+full.
+
 **How we would find out:** `runs/conformance.py`, which recomputes what
 `decide()` would have answered at every archived attempt and reports where the
-record and the rule disagree. **It runs the moment a run ends**, writes a
+record and the rule disagree. It found that chapter within minutes, twice, from
+two independent rules. **It runs the moment a run ends**, writes a
 `gate-breach` warning per contradiction, and the run's page leads with the
 answer.
 
@@ -573,8 +581,18 @@ and there is no earlier signal".* There is one now. It does not prevent a
 disobeyed halt; it makes one visible in seconds instead of never, which is the
 difference between an accepted risk and an undetectable one. **The row stays
 critical** because detecting is not preventing.
-**Reviewed by:** every run, automatically, and `test_conformance.py` on every
-commit.
+**And the correct path is now the shorter one.** `backend/chapters/promote.py`
+re-reads a chapter's critiques, recomputes the aggregate, asks `decide` and
+copies the draft **only on `accept`** — refusing, non-zero, file untouched,
+otherwise. Run against the chapter that actually shipped it answers
+`promoted: false`.
+
+It is not a guarantee and is not claimed as one: the orchestrator holds `Write`
+and always will, because it writes every other file in the run. What it removes
+is the version where nothing says no.
+
+**Reviewed by:** every run, automatically, and `test_conformance.py` and
+`test_promote.py` on every commit.
 
 *This row claimed the opposite when first written* — that the mock engine could
 close it in an afternoon. It could not: the decision was not in Python at all.
@@ -816,6 +834,7 @@ reliability and cost at the same time, so each one is recorded here.
 | applying corrections | the writer rewrote | literal `{find, replace}` substitutions |
 | beats against the world's rules | nothing | a script audit before FLOW-4 (D25) |
 | **what happens after an attempt** | **a paragraph the orchestrator applied** | **`decide()`, a script it runs and obeys (SPEC-004)** |
+| **promoting a chapter into the book** | **a copy the orchestrator made** | **`promote`, which refuses unless the gate passed** |
 | critics' arithmetic findings | believed | recomputed |
 | **mechanical prose defects** | **nothing, and three shipped** | **`check_prose`, before promotion (SPEC-005)** |
 | the `prose` score | three numbers copied by hand into a formula | `score_prose`, which runs the mechanical check itself |
@@ -848,6 +867,7 @@ step, and that is the sentence worth writing for each one.
 | `test_skill_contract.py` | the procedure and the contract diverging in silence |
 | `archive_run` | a finished run leaving no record anyone can query |
 | `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
+| `promote` | a failing draft reaching `chNN.md` by a one-line copy, which is how one did |
 | `test_api_contract.py` | the panel and the backend describing the same JSON differently, each passing its own checks |
 | `test_formulas_agree.py` | a chapter being scored by one copy of a formula and judged by another |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |

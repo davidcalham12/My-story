@@ -325,9 +325,25 @@ note in the margin — is what rationalising looks like when it wins.
 
 What each answer asks of you:
 
-- **`accept`** — promote the draft to `chapters/chNN.md`. If the answer's
-  `verdict` is `patched`, record `patched`, not `accept`: it passed, and it did
-  not pass on its own.
+- **`accept`** — promote it, and **do not write `chapters/chNN.md` yourself**:
+
+  ```bash
+  python -m backend.chapters.promote output/<slug> <N>
+  ```
+
+  It re-reads the chapter's critiques, recomputes the aggregate, asks `decide`
+  again and copies the draft **only on `accept`**. On anything else it refuses,
+  exits non-zero and leaves the file untouched.
+
+  That is deliberate belt and braces. On a real run a chapter scored 5 and was
+  copied into the book anyway — no third attempt, no patch, no halt — because
+  writing that file was a one-line copy and nothing stood between the copy and
+  the book. You still hold `Write` and can always do it by hand; the point is
+  that the correct path is now the shorter one, and the incorrect one requires
+  choosing it.
+
+  If the answer's `verdict` is `patched`, record `patched`, not `accept`: it
+  passed, and it did not pass on its own.
 - **`retry`** — redraft against the sheet at the level the reason names.
 - **`patch`** — apply the critics' own replacement sentences by literal
   substitution, then rescore. For `length` and `chatter` this is trivial — trim
