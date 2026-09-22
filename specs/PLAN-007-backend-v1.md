@@ -47,13 +47,15 @@ missing `result`, cost overshoot, five parallel critics over 100,000, unknown
 critique shape) against what `test_runner.py`, `test_db_and_tokens.py` and
 `test_import.py` already inject.
 
-| test | criterion | state |
-|---|---|---|
-| `test_runner.py::test_a_malformed_line_is_logged_and_skipped` | AC-2 | verify exists; add if not |
-| `test_runner.py::test_a_stream_without_result_halts_process` | FR-RNR-7 | verify exists; add if not |
-| `test_runner.py::test_cost_overshoot_halts_budget` | AC-5 | verify exists; add if not |
-| `test_runner.py::test_five_critics_over_the_ceiling_halt_context` | AC-6 | verify exists; add if not |
-| `test_import.py::test_an_unknown_critique_shape_is_a_parse_error_row` | AC-7 | verify exists; add if not |
+Inventory done at round 1 of the convergence loop:
+
+| switch | test | criterion | state |
+|---|---|---|---|
+| malformed line | `test_runner.py::test_a_line_that_is_not_json_is_logged_and_skipped` | AC-2 | **add** — `test_an_unfamiliar_shape_never_raises` covers an unexpected *JSON* shape, not a non-JSON line |
+| missing `result` | `test_runner.py::test_a_stream_that_ends_without_result_halts_process` | FR-RNR-7 | **add** |
+| cost overshoot | `test_runner.py::test_the_budget_stops_the_run_when_the_reported_cost_crosses_it` | AC-5 | exists |
+| context overshoot | `test_runner.py::test_an_oversized_subagent_packet_halts_the_run` | AC-6 | exists |
+| unknown critique shape | `test_import.py::test_an_unknown_critique_shape_is_a_parse_error_row_not_a_drop` | AC-7 | **add** — `test_three_critique_shapes_all_read` covers the three known ones |
 
 **Code.** Only what the inventory shows missing: a switch is a modified copy of
 the fixture, never a change to `RecordedProcess`.
@@ -104,8 +106,8 @@ the database even when the archive is not.
 the two Bible writers hold `Write`), `test_formulas_agree.py` (gate constants
 have one home).
 
-**Tests first.** Existing tests cover AC-8 and AC-9; run and cite. One addition
-for FR-CFG-1:
+**Tests first.** Existing tests cover AC-8 and AC-9; run and cite. FR-CFG-1's
+`config_hash` **does not exist anywhere in `backend/`** (round 1); it is built:
 
 | test | criterion |
 |---|---|
@@ -137,6 +139,7 @@ raw line to `events` before fan-out** (AC-20, table from 6.2).
 | `test_runner.py::test_the_prompt_is_on_stdin_and_absent_from_argv` | AC-1, AC-21 (exists as the argv half of G17 — verify) |
 | `test_api.py::test_every_stream_line_is_in_events_before_the_stage_changes` | AC-20 |
 | `test_api.py::test_events_count_equals_recorded_stream_lines` | AC-20 |
+| `test_api.py::test_cost_json_and_conformance_are_utf8_without_bom` | NFR-7 |
 
 **Code.**
 1. `RunProcess.for_run(..., max_budget_usd: float)` appends
@@ -144,6 +147,9 @@ raw line to `events` before fan-out** (AC-20, table from 6.2).
 2. `RunService._execute`: `append_event` is the **first** statement in the loop
    body, before `apply` and before `_record`; `seq` is a per-run counter held on
    `Live`.
+3. `service.py` lines 342 and 369 call `write_text` **without an encoding**
+   (round 1): on Windows that is cp1252. Both get `encoding="utf-8"`; NFR-7 says
+   explicit everywhere.
 
 **Docs.** `architecture.md` §3.6 *Observation*: the raw stream is persisted, then
 derived. `claude.md` guarantee 2 unchanged (the watchers are unchanged).
@@ -270,8 +276,10 @@ this plan does not wire it.
 
 **State.** Both in Node, both self-tested in CI (`ci.yml` lines 49–52). **Q6:
 they stay.** `measure.mjs` has `FEATURES = ['continuity', 'science', 'outline',
-'length', 'chatter']` — five; SPEC-007 FR-INS-3 requires six. Whether
-`validate-sheet.mjs` requires `prose` on a sheet is checked first.
+'length', 'chatter']` — five; SPEC-007 FR-INS-3 requires six. `validate-sheet.mjs`
+holds `FIVE = ['Continuity', 'Science', 'Outline', 'Length', 'Heading']` (round
+1): it accepts a sheet with no `Prose` line, so FR-INS-2's "six scores" is
+unmet today and both instruments change.
 
 **Tests first.** The instruments' self-tests are their tests. Additions:
 
@@ -282,10 +290,13 @@ they stay.** `measure.mjs` has `FEATURES = ['continuity', 'science', 'outline',
 | `validate-sheet.mjs --self-test` rejects a sheet missing `prose` | AC-13 |
 | `test_instruments.py::*` (both self-tests from pytest) | AC-13, AC-14 |
 
-**Code.** `FEATURES` gains `'prose'`; the self-test's fixture assertions gain a
-named SKIP for it (the fixture predates SPEC-006 — absent, not zero).
-`validate-sheet.mjs`: add `prose` to the required scores if the check shows it
-missing.
+**Code.** `measure.mjs`: `FEATURES` gains `'prose'`; the self-test's fixture
+assertions gain a named SKIP for it (the fixture predates SPEC-006 — absent, not
+zero). `validate-sheet.mjs`: `FIVE` becomes the six with `Prose`, and its
+self-test's good sheet carries a `Prose` score. `sheet_template/v01.md` is
+checked for the line; if the template lacks it the template changes too, and
+`SKILL.md` says the template does not vary — so that is a one-line skill edit,
+listed at 6.12.
 
 **Docs.** SPEC-007 §12 `measure.mjs` row → **closed by 6.9**; `verification.md`
 G21 note rewritten to say the instrument now knows six.
@@ -384,6 +395,73 @@ the fixture) — `test_runner.py` holds it today, cited at 6.1; **AC-4** —
 **AC-12**, **AC-15**, **AC-15b** — class D, the real runs of Part 6; **AC-17**
 — `grep` in CI, verified at Part 6 by hand and recorded.
 
+## Part 3a — Coverage matrix: every requirement, its phase, its evidence
+
+Built at round 2 of the convergence loop and kept: it is how the loop knows a
+requirement has a step and a step has a requirement.
+
+| requirement | phase | evidence |
+|---|---|---|
+| C1 no API key | Part 6 | AC-17 grep; `main.health` has no API fallback |
+| C2 100,000 concurrent | 6.5, 6.12 | layer 2 `ContextWatcher` (built); layer 1 `SKILL.md` estimate (I) |
+| C3 one run at a time | built | `test_api.py::test_the_queue_is_one` |
+| C4 Windows-first | 6.4 | `test_the_prompt_is_never_an_argument` (built); UTF-8 fix (6.4 code 3) |
+| C5 no secrets | 6.4, Part 6 | prompt on stdin (built); AC-17 grep extended to `httpx|requests` outside tests |
+| C6 no literals | built | `test_the_ceiling_is_config_not_a_literal`, `test_formulas_agree.py` |
+| C7 one implementation | 6.12 | no phase re-implements a stage; `_check_procedure_held` fingerprints `SKILL.md` |
+| FR-RUN-1 | built | `test_start_a_run_and_follow_it_to_completion`, `test_a_premise_that_is_too_short_is_refused_at_the_edge`, `test_the_queue_is_one` |
+| FR-RUN-2 | built | `test_the_run_list_includes_what_was_imported` |
+| FR-RUN-3 | built | `test_the_snapshot_is_built_from_the_database_not_from_memory` |
+| FR-RUN-4 | 6.7 | `Last-Event-ID` tests |
+| FR-RUN-5 | 6.7 | halt tests |
+| FR-RUN-6 | 6.7 | CLI tests; `test_the_named_v1_runs_import` (built) |
+| FR-RUN-7 | 6.7 | sweep test |
+| FR-RNR-1 | 6.4 | `test_the_command_carries_the_flags_that_were_learned_the_hard_way` (built) + the flag test |
+| FR-RNR-2 | 6.1 | non-JSON line test (add) |
+| FR-RNR-3 | 6.2, 6.4 | `events` tests |
+| FR-RNR-4 | built | `test_the_slug_is_learned_from_the_paths_the_run_writes`, `test_subagent_dispatches_are_counted_by_name` |
+| FR-RNR-5 | 6.6 | `CallRow` carries `ts`, `duration_ms`, `in_flight_at_dispatch`; `test_db_and_tokens.py` |
+| FR-RNR-6 | built | `test_the_whole_run_cost_comes_from_the_result_event`; `halted: gate` at `service.py:163` |
+| FR-RNR-7 | 6.1 | missing-`result` test (add) |
+| FR-BUD-1 | 6.4, 6.5 | flag in argv; watcher |
+| FR-BUD-2 | built, formula as §3.2 | `test_an_oversized_subagent_packet_halts_the_run`, `test_context_size_counts_the_cache_not_just_the_input` |
+| FR-BUD-3 | built | `CallRow.tokens_reserved / in_flight_at_dispatch / wait_ms`; `test_unreported_packets_are_absent_rather_than_zero` |
+| FR-BUD-4 | 6.5 | budget-source tests |
+| FR-CFG-1 | 6.3 | hash tests (build) |
+| FR-CFG-2 | built | `test_skill_contract.py` |
+| FR-CFG-3 | built | `test_agents_frontmatter.py` |
+| FR-SRC-1, -3 | built, 6.8 | `test_vectors.py` |
+| FR-SRC-2 | retired Q5 | P-3 |
+| FR-INS-1 | retired Q4 | P-4 |
+| FR-INS-2, -3 | 6.9 | self-tests, six characteristics |
+| FR-INS-4 | Part 6 | the grep of C5, extended: no network client outside tests |
+| FR-RD-1 | built | detail payload; `test_api_contract.py::test_the_run_detail_keys_are_the_ones_the_service_serves` |
+| FR-RD-2 | 6.10 | negative route test |
+| FR-RD-3 | built | `test_absent_is_not_zero.py`; `test_the_cost_payload_has_exactly_the_fields_the_panel_declares` |
+| FR-HLT-1 | 6.11 | health tests |
+| NFR-1 | 6.1 | the three added switches; `test_a_failure_in_the_post_run_bookkeeping_still_ends_the_stream` (built) |
+| NFR-2 | 6.2, 6.4 | `events` before fan-out |
+| NFR-3 latency | declared | P-10 |
+| NFR-4 | 6.4, Part 6 | as C4, C5 |
+| NFR-5 | built / declared | real `ts` and `source` (built); structured JSON logs → P-8 |
+| NFR-6 | built / declared | live exact (built); imported low/estimate/high → P-9 |
+| NFR-7 | 6.4 | UTF-8 fix; `pathlib` throughout (built) |
+| NFR-8 | 6.1 | the recorded stream |
+| §8 points 1–7 | 6.12 | table there |
+
+Architecture decisions, the other direction:
+
+| decision | phase |
+|---|---|
+| §3.4 queue of one | built |
+| §3.5 halt marks | 6.7 adds `user` |
+| §3.6 snapshot then live; the database is the record | built; 6.7 replay |
+| §5.1 two memory layers built and not running | 6.8 leaves them so (P-3); §8 point 7 retired |
+| §6 two layers, neither a reservation | 6.5; P-11 |
+| §8.1 "the budget projects worst case — input plus `max_tokens`" | **superseded** by §6.2 and §8.4 (measured on the stream); the plan follows the newer section and the spec; the older paragraph is a coherencia-docs OBS for the user |
+| §8.1 "the mock engine takes an explicit plan" | **superseded**: the recorded stream replaced the mock; coherencia-docs EDO |
+| §9 "the writer's isolation is now typed, `ContextPacket`" | **contradicts §3.2** (structural, `Glob`); coherencia-docs FAC — no plan step depends on it |
+
 ## Part 4 — Docs by phase
 
 | phase | `architecture.md` | `verification.md` | `domain-knowledge.md` | spec |
@@ -408,6 +486,10 @@ the fixture) — `test_runner.py` holds it today, cited at 6.1; **AC-4** —
 | P-5 | §8 point 2 (skill timestamps) is checked only on a real run | incidental | the backend's `ts` comes from the stream and does not depend on it | `checks.py procedure-log` on the run |
 | P-6 | The stress run may not reach `patch_then_halt` | incidental | it is built to fail, but a model can pass what was built to fail | AC-15b says "or explains why it did not" |
 | P-7 | `events` stores every line; no retention | incidental | one machine, MBs per run | disk, eventually; a `VACUUM` note in §5 |
+| P-8 | NFR-5 "logs are structured JSON": the backend writes no log at all; the database is the record | incidental | adding a logger is scope the spec did not size; the stream is in `events` after 6.2 | an operator asking for a log file |
+| P-9 | NFR-6 "imported runs: low / estimate / high": the importer records *completeness* (what was missing) and one `reconstructed` figure, not a range | incidental | the v1 logs do not split tokens into halves that could bound a range (`test_v1_token_totals_are_not_split_into_invented_halves`); inventing bounds would be worse than one marked figure | the panel's cost provenance says `reconstructed` |
+| P-10 | NFR-3 "relayed within 500 ms": no test measures it | incidental | the relay is a queue `put` on the reading thread; a timing test on CI runners flakes | a viewer noticing lag |
+| P-11 | AC-6 is T against an injected packet only; on both real recordings the subagent `usage` reads zero, so the watcher never sees a real packet (`architecture.md` §6.3, `verification.md` §3.5) | important | the stream does not carry the figure; the watcher says `packet_series_provenance: absent` rather than pretending | the real runs of Part 6 either carry `usage` or record `absent` again |
 
 ## Part 6 — Effort, and the runbook steps after the code
 
@@ -435,4 +517,35 @@ here as `draft` with the reason written in.
 
 ## Convergence loop
 
-*Filled at Paso 7: rounds, what changed in each, and what stayed declared.*
+Stop rule (runbook Paso 7): a full round with no new gap in either direction, or
+five rounds. **Stopped at round 2.**
+
+**Round 1** — plan against `architecture.md` §2–§9, SPEC-007 §2–§12 and
+`verification.md` §3. Eight gaps, all fixed in the plan:
+
+1. 6.1 named five tests "verify exists; add if not" — the inventory showed two
+   exist and three do not; named as such.
+2. 6.3 hedged on `config_hash` — it does not exist; the phase builds it.
+3. NFR-7: two `write_text` calls without an encoding (`service.py` 342, 369) —
+   added to 6.4.
+4. 6.9 hedged on `validate-sheet.mjs` — it holds five; both instruments change,
+   and the sheet template is checked.
+5. NFR-5 structured logs — no step, no logger anywhere: declared P-8.
+6. NFR-6 imported cost range — the importer does completeness, not bounds:
+   declared P-9.
+7. NFR-3 latency — no step: declared P-10.
+8. `architecture.md` §6.3: subagent `usage` reads zero on real streams, so AC-6's
+   T holds on the fixture only — declared P-11.
+
+Three places where the architecture disagrees with itself or with the spec
+were found; none needs a plan step, all go to the coherencia-docs report of
+this Paso: §8.1 budget worst-case (superseded by §6.2/§8.4), §8.1 mock engine
+(superseded by the recorded stream), §9 `ContextPacket` bullet (contradicts
+§3.2). Also §2.1's slice tree lists `prompts/`, which no feature has; §8.3's
+"230 backend tests and 18 frontend" is 449 and 19.
+
+**Round 2** — built Part 3a and walked it: every `C`, `FR` and `NFR` of the spec
+has a phase, a "built" citation or a declared gap; every step in 6.1–6.12
+answers a row. No new gap in either direction. Stopped.
+
+**What stayed declared:** P-1 … P-11, Part 5.
