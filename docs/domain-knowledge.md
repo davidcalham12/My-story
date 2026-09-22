@@ -778,3 +778,47 @@ way to collapse them.**
 Two of the four were found an hour apart, in adjacent fields of the same payload.
 That is why `test_absent_is_not_zero.py` exists: a rule everybody agrees with
 erodes one `COALESCE` at a time.
+
+### 7.11 The procedure records the time it can compute, and says so
+
+SPEC-007 §8 point 2 asks `SKILL.md` to record a real `ts` per call. What the
+first real v2 run recorded, read by `check_log` at PLAN-007 6.12: **3 rows
+`measured`, 47 `derived_from_duration`.** The orchestrator computed most
+timestamps from durations and labelled them — which is the difference between a
+figure and a guess, and the label is why the check reports rather than refuses.
+The backend's own `calls.ts` comes from the stream and does not depend on it.
+
+### 7.12 A second follower of a finished run waited forever
+
+`follow()` yielded the snapshot, then blocked on the live queue. The queue's
+sentinel had been consumed by the first follower; a second one — a reconnecting
+panel, a test with `Last-Event-ID` — never returned. Found by the first test that
+followed a run twice (PLAN-007 6.7). The fix is one branch: `live.done` answers
+`done`. The lesson is the one §7.8 already drew, from the other side: **the
+sentinel that ends a stream is consumed once**, and every reader after the first
+needs a different signal.
+
+### 7.13 The watcher knew nine agents
+
+`watch.AGENTS` listed "the nine" — the set the file was written against — and
+`prose-critic` had existed for a day. Nothing used the set except a comment, so
+nothing failed; it was a count that had gone stale in a place no test read.
+`test_the_watcher_knows_every_agent_file` pins it to `.claude/agents/*.md` now.
+§7.9's rule, again: **a count written in prose is a count that will be wrong.**
+
+### 7.14 A pin that was committed red
+
+The route pin of PLAN-007 6.10 read `app.routes`, saw one route, and was
+committed as passing because the commit chain did not stop on a red test.
+FastAPI wraps an included router, so the test believed the app served only
+`/api/health`. **A test that has never been seen green is not a pin**; it was
+corrected in the next commit to read the OpenAPI paths, and the chain that
+commits after a test now stops on its exit code.
+
+### 7.15 The import's default sees every `state.json`, and v2 writes one too
+
+On a fresh scratch database, `import_v1` without slugs imported two v2 runs as
+`pre-loop003` history — they have a `state.json`, which was the only criterion.
+In the deployed database they are already rows and are skipped; on an empty one
+they are not. `verification.md` §3.20; the fix belongs to the next spec that
+touches the importer.

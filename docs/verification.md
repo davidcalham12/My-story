@@ -1,9 +1,9 @@
 ---
 title: NovaForge — Verification
-version: 2
+version: 3
 status: draft
 last_reviewed: 2026-09-22
-applies_to: SPEC-001 (backend v1), the built backend, and the current orchestrator (SKILL.md, LOOP-003)
+applies_to: SPEC-007 (backend v1, approved) as built by PLAN-007 6.1–6.12, and the current orchestrator (SKILL.md, LOOP-003)
 ---
 
 # Verification
@@ -89,7 +89,9 @@ with the reason attached — two have, and they say so.
 | G16 | no prompt asks a quantity without saying how to decide it | incidental | **I** | yes |
 | G17 | there is no credential to leak; nothing reaches a subprocess through argv | **critical** | **A** + **T** | yes |
 | G18 | the pipeline has one implementation, `SKILL.md`; the backend re-implements no stage | important | **A** + **I** | yes |
-| G19 | state is persisted as the stream reveals it, not at the end | important | **T** for stage and calls; **not held** for the gate record | **partly → §3.14** |
+| G19 | state is persisted as the stream reveals it, not at the end | important | **T** for every stream line (`events`), the stage and the calls; **not held** for the gate record until the archive | **partly → §3.14**, narrowed |
+| G22 | the budget ceiling is the profile's figure, and one figure reaches both `--max-budget-usd` and the watcher | important | **T** | yes |
+| G23 | a halt asked for by the user is recorded as the user's, through the same finish as a watcher trip | incidental | **T** | yes |
 | G20 | a feedback sheet is complete and never quotes a previous chapter | important | **T** for the validator, **I** for its being run | yes |
 | G21 | LOOP-003 §8.3's prohibitions hold: the threshold is 8, the attempts are three, the characteristics are the listed ones | incidental | **T** | yes |
 
@@ -111,8 +113,8 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **449 backend tests and 19 frontend tests, on a recorded stream,
-in CI, at $0.** The suite that carries these:
+Status, 2026-09-22 (after PLAN-007): **488 backend tests and 19 frontend tests, on a
+recorded stream, in CI, at $0.** The suite that carries these:
 
 | file | holds |
 |---|---|
@@ -661,6 +663,34 @@ reminder.
 and `validate-sheet.mjs` now carry the six, the sheet template has a `Prose`
 slot, and `test_instruments.py` holds all three to it.
 
+### G22 — The budget ceiling is the profile's, and it is one figure
+
+**Important · Class T.**
+
+**Method.** `test_budget_source.py`: `ceiling_for` returns the profile's
+`budget.max_cost_usd` when `NOVAFORGE_BUDGET` is unset and the smaller of the
+two when it is set — the env is a brake, never a raise; the same number is in the
+spawned argv as `--max-budget-usd` and in `BudgetWatcher.ceiling_usd`; an unset
+env is `None`, not 25. `tiny` is pinned at 25.0 (PLAN-007 P-1).
+
+**Why it exists.** Until PLAN-007 6.5 the watcher read `NOVAFORGE_BUDGET`
+(default 25) and never looked at the profile, whose figure for `tiny` was 5.0 —
+below the measured cost of a tiny run. Two numbers for one concept, and the run
+obeyed neither knowingly. Whether the CLI flag *binds* under a subscription is
+learned from the real runs and written at §3.19.
+
+### G23 — A user's halt is the user's
+
+**Incidental · Class T.**
+
+**Method.** `test_halt_stops_the_process_and_marks_halted_user`,
+`test_halt_keeps_what_was_persisted_readable`,
+`test_halt_on_an_unknown_or_finished_run_is_404_or_409`. The halt sets the
+reason before stopping the process, so a stream that ends because it was ended
+is not filed as `process` (the orchestrator's death); the run goes through the
+same `_finish` as a watcher trip — archive, warnings, the sentinel — so nothing
+a `budget` halt does is skipped for a `user` one.
+
 ## 3. Known gaps and accepted risks
 
 **A gap listed here is an engineering decision. A gap not listed here is a
@@ -1030,6 +1060,40 @@ finding**; only the notes tell the two apart.
 critiques' `note` fields.
 **Reviewed by:** LOOP-003, per run. A LOOP-004 candidate.
 
+### 3.19 The backend writes no log file; the database is the log
+
+**What is not verified:** SPEC-007 NFR-5's "logs are structured JSON". Nothing in
+`backend/` imports `logging`; a malformed stream line becomes a `run_warnings`
+row, every stream line an `events` row, every subagent call a `calls` row.
+**Why accepted:** an operator asking "what happened" is answered by the database
+and the artefacts beside the book (`cost.json`, `conformance.json`); a second
+record in a log file would be a second place for the two to disagree
+(PLAN-007 P-8).
+**Scope of damage:** a failure *before* the database is reachable — a bad
+`NOVAFORGE_DB` path, a migration error — is reported only on uvicorn's stderr.
+**How we would find out:** `/api/health` says `db: false`; the process log says
+why.
+**Reviewed by:** whoever adds the first `logging` call, who should read this row
+first.
+
+### 3.20 The import CLI on a fresh database labels v2 runs as v1 history
+
+**What is not verified:** that `python -m backend.commons.db.import_v1` run
+without slugs on an *empty* database imports only v1 runs. It imports every
+`output/*/` with a `state.json` — and v2 runs write one too — as
+`source = pre-loop003`. Found at Paso 10 on a scratch database: two v2 runs came
+in as history.
+**Why accepted:** in the deployed database the v2 runs are already rows, and
+`test_a_live_v2_run_is_not_imported_as_history` holds that path; the fresh-DB
+path is a one-time operation whose default the operator can override by naming
+the eight slugs, as `test_import.py` does.
+**Scope of damage:** a v2 run excluded from LOOP-003 statistics it belongs in,
+and read as pre-loop history in the panel.
+**How we would find out:** a `pre-loop003` row whose directory has
+`conformance.json`, which only v2 writes.
+**Reviewed by:** the next spec that touches the importer; the fix is a one-line
+skip on that file and belongs to it, not to a quick fix (`AGENTS.md` §5).
+
 ## 4. Code before agent
 
 **When a check can be done by a script, it is done by a script.** An agent judges
@@ -1153,7 +1217,7 @@ planned — and which it does not, with why.
 | static analysis / SAST | no | no `ruff`, no `bandit` configured. The spec-side document said both were in use; neither was |
 | symbolic execution | no | disproportionate |
 | formal verification | no | disproportionate |
-| unit and integration testing | yes | 449 backend tests and 19 frontend (2026-09-22), over a recorded stream, at $0, on every push |
+| unit and integration testing | yes | 488 backend tests and 19 frontend (2026-09-22, after PLAN-007), over a recorded stream, at $0, on every push |
 | property-based testing | **no library** | where the space is small it is enumerated instead: every aggregate at every attempt for `decide` (63 cases), every coefficient combination for the prose formula (64) |
 | mutation testing | no | not yet |
 | contract testing | yes | `test_api_contract.py` (backend payload ↔ panel types), `test_skill_contract.py` (procedure ↔ contract), `test_formulas_agree.py` (formula ↔ code) |
@@ -1177,6 +1241,7 @@ planned — and which it does not, with why.
 
 | version | date | what changed |
 |---|---|---|
+| 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19 and §3.20 opened. **No letter was raised without a test named beside it.** Tests 449 → 488. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
 | 2 | 2026-09-22 | **Merged.** The spec-side v1 (18 guarantees, 10 gaps, 20 failure modes) unioned with the build-side document (17 guarantees, 16 gaps). Added G18–G21, §3.17, §3.18, §6 failure modes, §7 catalogue, this header. **No letter was raised.** Kept lower where the two disagreed: v1 G4 "T" → **D for obedience** (disobeyed twice on a real run); v1 G9 "T" → **A** (the byte-for-byte fixture test does not exist); v1 G10 "T" → **D** (the `outline_audit` CLI was never built; the audit is a model); v1 G18 "T" → **split** (no `events` table; the gate record is archived at the end); v1 G16's path property test → **not applicable** (no file-backed endpoints). §7 rewritten to what runs: no `mypy`, `ruff`, `bandit` or `hypothesis`. **Candidates for a person to raise**, with their evidence: G1 and G9 also have tests (`test_agents_frontmatter.py`); G17's argv half has one (`test_runner.py`). |
 | 1 | 2026-09-22 | the spec-side draft: 18 guarantees, 10 gaps, 20 failure modes, catalogue mapping; and, separately, the build-side document that grew with SPEC-001…006 and two real runs |
 
