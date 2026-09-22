@@ -676,12 +676,31 @@ remains a decision nobody has taken.
 
 ### 3.10 The procedure in `SKILL.md` cannot be tested at $0
 
-**What is not verified:** that a change to the orchestration procedure is
-correct, before a real run.
+**What is not verified:** that a change to the orchestration procedure produces
+the right behaviour, before a real run.
 **Why accepted:** it is the price of having no API key. Everything Python does is
-covered by a recorded stream; what Claude Code does is not.
-**Scope of damage:** a broken procedure is found by spending money on a run.
-**How we would find out:** the instruments' `--self-test`, and a real `tiny` run.
+covered by a recorded stream; what a model does with a paragraph is not.
+
+**Narrower than it was, and worth saying how.** `test_skill_contract.py` now
+checks statically that `SKILL.md`:
+
+- runs exactly the stages `flow.yaml` declares, in that order;
+- dispatches only agents that exist, and names each one;
+- teaches the verdict vocabulary the database admits, and never the abolished
+  one;
+- defers the after-attempt decision to `decide` rather than restating it;
+- agrees with the config on the threshold, the aggregate, the five
+  characteristics, and three attempts being two revisions.
+
+**What that leaves is the part that was always the real gap: whether a model
+follows a procedure it can read.** No test reaches it. Every static check
+above removes a way for the procedure to be *wrong on paper*; none of them
+removes a way for it to be *ignored*.
+**Scope of damage:** a procedure that is right on paper and not followed is
+found by reading a run's artefacts, or by §3.1's conformance audit where the
+gate is concerned.
+**How we would find out:** the conformance audit, the instruments' `--self-test`,
+and a real run.
 **Reviewed by:** whoever changes `SKILL.md`, before merging.
 
 ### 3.11 The archive is as complete as the orchestrator's writing was
