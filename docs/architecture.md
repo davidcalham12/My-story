@@ -371,39 +371,55 @@ paraphrases a sentence in the middle of text the gate already approved.
 
 ## 5. Memory management — short and long term
 
-Four layers, from the most ephemeral to the most persistent. **The rule that
-joins them: what enters a prompt is a *projection* of memory, never memory
-itself — and that projection is what counts against the 100,000.**
+**Two of the four layers below are built, tested and not running.** That is
+stated first because this section described all four as live until 2026-09-22,
+and a reader planning against it would have been planning against a system that
+does not exist.
 
-| layer | what it is | where it lives | how long | who writes it |
-|---|---|---|---|---|
-| **Call memory** | one agent's `ContextPacket` | process memory | one call; the model retains nothing after | the context builder |
-| **Run working memory** (short term) | the rolling summary as structured facts `{fact, chapter, kind}` with a cap by count; the feedback sheets; the per-attempt drafts; stage state | SQLite, by `run_id` | the run | the orchestrator |
-| **Canon** (long term within a run) | the Bible — world, characters, timeline, mysteries — and the audited outline | Markdown in `output/<slug>/` + a vector index in SQLite | the whole run; immutable after FLOW-3 | only `worldbuilder` and `character-architect`, through the orchestrator; the outline, `plot-architect` |
-| **Between-run memory** (long term, system) | runs, calls, exact costs, findings by kind, scores by characteristic; `character_knowledge` (empty in v1) | SQLite | permanent | the orchestrator and the importer |
+| layer | what it is | state |
+|---|---|---|
+| **Call memory** | what one agent is handed for one call | **running.** The orchestrator assembles it per `SKILL.md`. *This row said "the agent's `ContextPacket`" — the D2 design, deleted by Annex C along with the API it fed.* |
+| **Run working memory** | the feedback sheets, the per-attempt drafts, the stage state, the rolling summary | **running in part.** The sheets, drafts and state are real and archived. **The summary is prose the orchestrator writes**, not the structured facts described below |
+| **Canon** | the Bible and the audited outline, Markdown in `output/<slug>/` | **running.** Immutable after FLOW-3; only `worldbuilder` and `character-architect` may write it |
+| **Between-run memory** | runs, calls, costs, findings, scores | **running.** SQLite, permanent, and what the panel reads |
 
-Three consequences worth writing down:
+### 5.1 What is built and does not run
 
-**The rolling summary is working memory, not canon.** It is rebuilt for each
-chapter from the facts; the writer receives the projection as text. Facts carry
-four closed kinds — `event`, `state-change`, `knowledge`, `open-question` — and
-`who` on the `knowledge` ones, which is what fills `character_knowledge` in the
-same transaction that writes the chapter. When the cap bites, every
-`open-question` survives first, and dropping one warns at run level rather than
-halting: an abandoned promise is the ontology's foreshadowing failure arriving
-quietly, so it has to be visible.
+**Structured summary facts.** `chapters/summary.py` projects a rolling summary
+from `summary_facts` rows carrying four closed kinds — `event`, `state-change`,
+`knowledge`, `open-question` — dropping the lowest-priority first so that **every
+`open-question` survives the cap**, because an abandoned promise is the ontology's
+foreshadowing failure arriving quietly.
 
-**Vector retrieval is how canon is projected without entering whole.** The
-continuity critic receives the fragments nearest the draft. The science critic
-receives `## Rules` entire, because it is small and a rule not retrieved is a
-violation nobody looked for. The outline critic receives its entry entire, for
-the same reason.
+It is written, tested, and **called by nothing**. `save_facts` has no caller
+outside its own definition, `summary_facts` and `character_knowledge` are empty
+in every run, and the summary that actually reaches the next chapter is prose the
+orchestrator writes freehand. What enforces its size is `check_summary`, a word
+count — **not the survival ordering**, which has never run.
 
-**Between-run memory is where the system could learn**, and it is where
-LOOP-002's idea would live — a fixed-size list of lessons that forgets on
-purpose, carrying no prose quotations — **if v2 decides to switch it on. In v1 it
-is recorded and never injected.** Recording without injecting is the cheap half,
-and it is the half that cannot go wrong.
+**Vector retrieval.** `commons/search` indexes the Bible, the outline and the
+summaries into `chunks` and serves the nearest fragments. `test_vectors.py`
+covers it, the dimension is pinned and the `vec0` limits are documented. **No run
+has ever populated `chunks`.** The critics receive whole inputs, which is the
+conservative behaviour and is why nothing has gone visibly wrong.
+
+Both are `verification.md` §3.15. **They are not deleted**: each is a working
+implementation of a decided design, and the decision to switch them on is a spec,
+not an afternoon. What they are not is *in use*, and this section said otherwise.
+
+### 5.2 The rule that joins the layers, which does hold
+
+**What enters a prompt is a projection of memory, never memory itself**, and that
+projection is what counts against the 100,000. The projection is assembled by the
+orchestrator rather than by Python, and the only part that can grow with the book
+is the rolling summary — which is why its cap is the whole of the flat-cost
+claim, and why `check_summary` exists.
+
+**Between-run memory is where the system could learn**, and it is where LOOP-002's
+idea would live — a fixed-size list of lessons that forgets on purpose, carrying
+no prose quotations — **if v2 decides to switch it on. It is recorded and never
+injected.** Recording without injecting is the cheap half, and it is the half
+that cannot go wrong.
 
 ---
 

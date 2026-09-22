@@ -820,7 +820,37 @@ are all still there**, and `archive_run` can be pointed at the directory by hand
 **How we would find out:** a run at `halted: process` with zero attempts.
 **Reviewed by:** nobody routinely. It is a recovery, not a loss.
 
-### 3.15 An interrupted run is not resumed
+### 3.15 Two memory layers are built, tested, and not running
+
+**What is not verified:** nothing about them is wrong — they are simply not
+exercised by any run, so every claim about their behaviour is **A** from reading
+the code and **T** from tests that call them directly. No run's behaviour
+depends on either.
+
+- **Structured summary facts.** `chapters/summary.py` projects the rolling
+  summary from typed facts, dropping the lowest priority first so every
+  `open-question` survives the cap. `save_facts` has **no caller**,
+  `summary_facts` and `character_knowledge` are empty in every run, and the
+  summary that reaches the next chapter is prose the orchestrator writes. What
+  bounds it is `check_summary`, a word count — **not the survival ordering**.
+- **Vector retrieval.** `commons/search` indexes the Bible, the outline and the
+  summaries. **No run has ever populated `chunks`.** The critics receive whole
+  inputs.
+
+**Why accepted:** the conservative behaviour is the one running. Whole inputs to
+a critic cost tokens and lose nothing; a prose summary the orchestrator wrote is
+a worse projection than a typed one but not a wrong one. Switching either on is a
+spec, not an afternoon.
+**Scope of damage:** the architecture document described both as live until
+2026-09-22, so **a reader planning against it was planning against a system that
+does not exist**. That is the damage, and it has been done: the section is
+rewritten and this row is why.
+**How we would find out:** `SELECT COUNT(*) FROM summary_facts` and
+`FROM chunks`. Both zero, on every run, today.
+**Reviewed by:** whoever writes the spec that switches one on, and nobody until
+then.
+
+### 3.16 An interrupted run is not resumed
 
 **What is not verified:** nothing — this one is absent by decision, and is here
 because absent by decision is not the same as forgotten.

@@ -62,3 +62,36 @@ def test_the_ceiling_is_config_not_a_literal():
     """Still config, still 100,000 — but under Annex C it is enforced in two
     layers rather than reserved in advance. See docs/verification.md G2."""
     assert resolve("tiny")["context"]["max_concurrent_tokens"] == 100_000
+
+
+def test_the_memory_layers_that_do_not_run_are_declared_as_such(db):
+    """`verification.md` §3.15 and `architecture.md` §5.1.
+
+    `summary.py` projects a rolling summary from typed facts and `search`
+    indexes canon into `chunks`. Both are written, tested and **called by
+    nothing**: `save_facts` has no caller, and no run has populated either
+    table.
+
+    Neither is a defect. The document describing them as live was, and this
+    test exists so the day one of them is switched on, the documentation has to
+    move with it.
+    """
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[2]
+    callers = []
+    for path in (root / "backend").rglob("*.py"):
+        if "__pycache__" in path.parts or path.name.startswith("test_"):
+            continue
+        if path.name in {"repository.py", "summary.py", "search.py"}:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if "save_facts" in text or "summary.project" in text:
+            callers.append(path.name)
+    assert not callers, (
+        f"{callers} now uses the structured-fact layer. architecture.md §5.1 and "
+        f"verification.md §3.15 say it does not run — update them."
+    )
+
+    for claim in ("summary_facts", "chunks"):
+        assert db.execute(f"SELECT COUNT(*) AS n FROM {claim}").fetchone()["n"] == 0

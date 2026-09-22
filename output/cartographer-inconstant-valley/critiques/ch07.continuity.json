@@ -1,0 +1,25 @@
+{"critic": "continuity", "chapter": 7, "kind": "model",
+ "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 4, "findings": [
+     {"kind": "broken-text", "severity": "high",
+      "quote": "and R and the rule stood plain in the printed instructions in his own bag",
+      "claim": "A stray rule label has leaked out of a reference and into the prose, leaving the grammar in pieces.",
+      "fix": "Remove the stray letter.",
+      "reference": "prose hygiene; the law it states is correct against the last rule in bible/world.md"},
+     {"kind": "rule-violation", "severity": "medium",
+      "quote": "From Hird's thorn, by the gate, a quarter of an hour at a man's pace to the sheepfold that was Wilfrid Tatham's.",
+      "claim": "A clock duration paired with a rate is convertible to a distance, which is the one thing the perambulation book is said never to hand a reader.",
+      "fix": "A recitation, in the idiom of the other passages.",
+      "reference": "bible/world.md, R4"}]},
+   {"iteration": 2, "score": 5, "findings": [
+     {"kind": "location-drift", "severity": "high", "late": true,
+      "quote": "the instrument on Sile Head, turned in the dark to face the tower with no mark in the grass at its feet",
+      "claim": "The critic held that canon puts the theodolite-found-at-dawn at the boundary oak on Raven Hause and that the draft had relocated it to Sile Head.",
+      "fix": "The critic proposed moving it to the oak.",
+      "reference": "the critic cited the world bible and the Day 8-9 facts"}]},
+   {"iteration": 2, "blocking_score": 10,
+    "note": "Iteration 2's raw score was 5. Its sole finding is marked late:true by the critic itself and was overruled entirely, so the late-excluded score is 10. Both numbers are recorded rather than one replacing the other."}],
+ "arbitration_of_the_late_finding": "OVERRULED, and the finding is simply wrong. bible/timeline.md, Day 8-9: 'Hale leaves the theodolite set up on Sile Head overnight rather than lose the sight; at dawn it faces the church tower. At that same dawn an entry is taken at the Raven Hause station...' bible/mysteries.md is more explicit: 'Hale spent the night of Day 8 on Sile Head to keep his sight. Silas Brock came up at first light with the field book... and walked him across to the Raven Hause station.' Two places, two events, and the walk between them is the point of the scene. The draft has exactly that. It was the critic that conflated the landmarks, not the draft. The orchestrator verified the wording against both bible files by grep before overruling rather than deciding from memory. Recorded in specs/loops/LOOP-003/late_findings.jsonl.",
+ "resolution": "Both iteration-1 findings addressed by literal substitution; neither skipped, neither quoted string surviving.",
+ "gap": "This is the clearest instance in the run of a model critic producing a confident, high-severity, wholly false finding on a second read of text it had already passed. Acting on it would have moved a canonical event to the wrong hill and broken two earlier chapters."}

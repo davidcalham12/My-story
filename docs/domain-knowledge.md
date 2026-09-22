@@ -584,7 +584,35 @@ does not read the chapter. A chapter that says nothing about the mystery it was
 supposed to land passes this and fails a reader — which is the part that stays
 **U**, and the part a sixth characteristic does not reach either.
 
-### 7.7 A rule lives in one place, and the count is the tell
+### 7.7 Two memory layers were built, tested, documented as live — and never ran
+
+`architecture.md` §5 described memory in four layers. Two of them do not run.
+
+**Structured summary facts.** `chapters/summary.py` projects the rolling summary
+from typed facts and drops the lowest priority first, so that every
+`open-question` survives the cap — because an abandoned promise is the
+foreshadowing failure arriving quietly. It is written and tested. `save_facts`
+has **no caller**; `summary_facts` and `character_knowledge` are empty in every
+run; the summary that reaches the next chapter is prose the orchestrator writes
+freehand.
+
+**Vector retrieval.** `commons/search` indexes canon into `chunks` and serves the
+nearest fragments, with the dimension pinned and the `vec0` limits tested. **No
+run has ever populated `chunks`.**
+
+Neither is broken and neither is deleted: each is a working implementation of a
+decided design. **What was broken is the document**, which described both as
+live, so a reader planning against §5 was planning against a system that does not
+exist.
+
+**The pattern, which is the day's pattern one more time.** `save_attempt`,
+`save_gate` and `save_sheet` were written and called by nothing. So were these.
+Code that implements a documented guarantee and has no caller is the quietest
+defect there is: **every test of it passes**, because tests call it directly. The
+only thing that finds it is asking *who calls this* — and the only thing that
+keeps it found is a test that fails when the answer changes.
+
+### 7.8 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -605,7 +633,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.8 Zero is a value, and this is the family the bugs come in
+### 7.9 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

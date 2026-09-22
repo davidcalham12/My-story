@@ -1,0 +1,13 @@
+{"critic": "science", "chapter": 7, "kind": "model",
+ "agent": "science-critic", "drafts": 2,
+ "note": "The world critic under a historical name; audits against the bullets under ## Rules and nothing else.",
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "rule-interpretation-overreach", "severity": "medium",
+      "quote": "It had been telling him where to look. It had been trying to tell him for a week, and he had been standing over it asking it how far to a wall.",
+      "claim": "R5 states only the phenomenon and gives it no motive. The narration asserts a purposive, communicative explanation as settled fact - an intentional mechanism the rule withholds.",
+      "fix": "Put the same reading in the surveyor's head rather than the narrator's mouth.",
+      "reference": "bible/world.md, R5"}]},
+   {"iteration": 2, "score": 10, "findings": []}],
+ "arbitration": "UPHELD, with one qualification recorded in the sheet. The mysteries file does state the interpretation as canon truth, so the READING was not wrong; what was wrong was its standing. The narration was asserting intention on the dale's behalf, and R5 supplies none. The sheet therefore asked for the claim to be anchored in Hale WITHOUT hedging the understanding away - because the outline commissions him understanding that the instrument was not a warning but an instruction, and over-hedging would have cost the chapter a beat. The writer's replacement did exactly that, and the outline critic confirmed on re-read that beat 3 still lands.",
+ "orchestrator_note": "This is the most useful finding any critic produced in the run that was not a factual error. It changed nothing a reader would call a fact and it made the chapter's central paragraph better: the dread now belongs to a man choosing the easier of two thoughts and knowing he is choosing it, rather than to a narrator asserting that a valley has intentions."}
