@@ -88,7 +88,13 @@ def audit(conn: sqlite3.Connection, run_id: str, *, threshold: int = THRESHOLD_D
 
             # 1. The one that matters. A promoted draft below the threshold is
             #    the outcome the whole system exists to prevent.
-            if row["promoted"] and aggregate < threshold and row["verdict"] != "patched":
+            #
+            #    `patched` is NOT a blanket exemption, and it used to be. The
+            #    verdict means *the patch brought this to the threshold*, so a
+            #    `patched` row still under it is incoherent — `decide` cannot
+            #    produce one. Exempting it unconditionally left the widest
+            #    possible door open under the one label nobody would question.
+            if row["promoted"] and aggregate < threshold:
                 breaches.append(Breach(
                     chapter, row["attempt"], "promoted below the threshold",
                     f"aggregate {aggregate} was put in the book with verdict "

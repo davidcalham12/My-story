@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **332 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **338 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -99,6 +99,7 @@ in CI, at $0.** The suite that carries these:
 | `test_gate.py` | G3, G4, G5, G7, G8 — the gate as arithmetic over values |
 | `test_decision.py` | G6's rule — what follows an attempt, exhaustively |
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
+| `test_six_end_to_end.py` | a chapter stopped by `prose` alone, through the real archive path |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |

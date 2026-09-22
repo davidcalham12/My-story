@@ -454,7 +454,31 @@ The unhedged consequence stands and is the more important one: **the next run
 picks up the change**, and a run's own config snapshot will say five while its
 procedure says six unless the snapshot is taken from the same place.
 
-### 7.2 Zero is a value, and this is the family the bugs come in
+### 7.2 The pass rule, written twice, was wrong the second time
+
+The archive decided a verdict with `aggregate >= THRESHOLD`. The gate decides it
+with `domain.aggregate`, which also requires **every** characteristic to have
+answered. Two copies of the most important rule in the project, and the second
+one was missing half of it.
+
+It was invisible while every critic always answered. The sixth characteristic
+made it reachable: a chapter whose `prose` critic returns something unparseable
+has an aggregate of 10 over the five that did answer, and the archive recorded
+**`accept`** for a chapter the gate had not passed. *A gate short a critic is a
+weaker gate, not a passing one* — the rule that already returned 10 once and let
+a malformed reply ship a draft, rediscovered in a second implementation of it.
+
+Found by a test written to exercise the new characteristic, not by reading the
+code. The fix is not a better second copy; it is having one: the archive now asks
+`domain.aggregate`.
+
+**A second door in the same wall.** The conformance audit exempted any attempt
+whose verdict was `patched` from "promoted below the threshold". But `patched`
+means *the patch brought this to the threshold*, so a `patched` row still under
+it is incoherent and `decide` cannot produce one. The exemption was the widest
+possible hole, under the one label nobody would think to question.
+
+### 7.3 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

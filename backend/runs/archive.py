@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from backend.chapters.domain import CHARACTERISTICS
+from backend.chapters.domain import aggregate as aggregate_of
 from backend.commons.db import repository
 
 THRESHOLD = 8
@@ -108,12 +109,26 @@ def _findings_of(iteration: dict, characteristic: str) -> list[dict]:
     return out
 
 
-def _verdict(aggregate: int | None, *, promoted: bool, halted: str | None) -> str:
-    if aggregate is not None and aggregate >= THRESHOLD:
+def _verdict(scores: dict[str, int | None], *, promoted: bool,
+             halted: str | None) -> str:
+    """What the gate decided, asked of the gate.
+
+    **This used to re-derive it: `aggregate >= THRESHOLD`.** That is the pass
+    rule written a second time, and the second copy was wrong — it ignored
+    completeness. A chapter whose `prose` critic returned nothing usable has an
+    aggregate of 10 over the five that answered, and this recorded it as
+    `accept`. The gate had not passed it. **A gate short a critic is a weaker
+    gate, not a passing one**, and that rule returned 10 once already and let a
+    malformed reply ship a draft.
+
+    So the verdict comes from `domain.aggregate`, which is the one place the rule
+    lives.
+    """
+    if aggregate_of(scores).passed:
         return "accept"
     if promoted:
-        # It shipped below the threshold, which under patch_then_halt can only
-        # mean the patch carried it there.
+        # It shipped without passing, which under patch_then_halt can only mean
+        # the patch carried it there.
         return "patched"
     return "halt" if halted else "retry"
 
@@ -190,7 +205,7 @@ def archive_run(
             usable = [s for s in scores.values() if s is not None]
             aggregate = min(usable) if usable else None
             promoted = accepted and attempt == last
-            verdict = _verdict(aggregate, promoted=promoted, halted=halted)
+            verdict = _verdict(scores, promoted=promoted, halted=halted)
 
             repository.save_attempt(
                 conn,
