@@ -105,7 +105,7 @@
     "word_count_tolerance_pct": 0
   },
   "_comment_models": "Which model each agent runs on is declared in its own .claude/agents/<name>.md front matter, not here. Putting it in two places is how the two disagree.",
-  "_comment_budget": "Advisory only on this branch. Nothing enforces these before a call; the orchestrator states the implied call count in its plan and you decide there. The main branch enforces them.",
+  "_comment_budget": "Enforced, measured on the stream (SPEC-007 FR-BUD-1/4, PLAN-007 6.5): the profile's max_cost_usd is passed to claude -p as --max-budget-usd and watched by the backend; the call that crosses it is the last one. NOVAFORGE_BUDGET can only lower it. tiny was 5.0 against a measured $18.82 and is 25.0 since PLAN-007 (P-1, approved with the plan). max_calls is still advisory.",
   "budget": {
     "max_cost_usd": 25.0,
     "max_calls": 500

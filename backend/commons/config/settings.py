@@ -26,12 +26,16 @@ class Settings:
     # What it cannot cover is the procedure in SKILL.md.
     use_recorded_stream: bool = True
     recorded_stream: Path = RECORDED
-    budget_ceiling_usd: float = 25.0
+    # None means: the profile decides (FR-BUD-4). A number here can only
+    # LOWER the profile's `budget.max_cost_usd`, never raise it — it is the
+    # operator's brake, not a second source for the figure.
+    budget_ceiling_usd: float | None = None
 
 
 def load_settings() -> Settings:
     return Settings(
         db_path=Path(os.environ.get("NOVAFORGE_DB", ROOT / "novaforge.db")),
         use_recorded_stream=os.environ.get("USE_RECORDED_STREAM", "true").lower() != "false",
-        budget_ceiling_usd=float(os.environ.get("NOVAFORGE_BUDGET", "25")),
+        budget_ceiling_usd=(float(os.environ["NOVAFORGE_BUDGET"])
+                            if os.environ.get("NOVAFORGE_BUDGET") else None),
     )

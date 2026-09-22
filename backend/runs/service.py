@@ -129,11 +129,10 @@ class RunService:
         return {"id": run_id, "slug": slug}
 
     def _execute(self, live: Live, premise: str, profile: str, tone: str, cfg: dict) -> None:
-        process = self._process(premise, profile, tone)
+        process = self._process(premise, profile, tone, cfg)
         live.process = process
         state = State()
-        budget = BudgetWatcher(ceiling_usd=self.settings.budget_ceiling_usd,
-                               pricing=loader.load_pricing())
+        budget = self._budget_watcher(cfg)
         context = ContextWatcher(ceiling=cfg["context"]["max_concurrent_tokens"])
         halted: tuple[str, str] | None = None
 
@@ -175,7 +174,22 @@ class RunService:
         finally:
             self._finish(live, state, halted)
 
-    def _process(self, premise: str, profile: str, tone: str):
+    def ceiling_for(self, cfg: dict) -> float:
+        """The run's budget ceiling: the profile's figure, lowered — never raised
+        — by `NOVAFORGE_BUDGET` when set (FR-BUD-4).
+
+        Two lines of defence read this one number: `--max-budget-usd` on the
+        `claude -p` argv and the `BudgetWatcher` on the stream. Two sources would
+        mean two ceilings, and a run obeys whichever is smaller without saying so.
+        """
+        figure = float(cfg["budget"]["max_cost_usd"])
+        env = self.settings.budget_ceiling_usd
+        return figure if env is None else min(figure, env)
+
+    def _budget_watcher(self, cfg: dict) -> BudgetWatcher:
+        return BudgetWatcher(ceiling_usd=self.ceiling_for(cfg), pricing=loader.load_pricing())
+
+    def _process(self, premise: str, profile: str, tone: str, cfg: dict):
         """The real `claude`, or the recorded stream that stands in for it.
 
         The recording covers the runner, the parser, the persistence, the SSE and
@@ -188,9 +202,8 @@ class RunService:
         return RunProcess.for_run(
             premise=premise, profile=profile, tone=tone,
             cwd=Path(self.settings.repo_root),
-            # The same figure the BudgetWatcher holds. 6.5 makes the profile
-            # its source; until then it is the settings ceiling.
-            max_budget_usd=self.settings.budget_ceiling_usd,
+            # The same figure the BudgetWatcher holds (ceiling_for).
+            max_budget_usd=self.ceiling_for(cfg),
         )
 
     def _record(self, run_id: str, state: State, event: dict) -> None:

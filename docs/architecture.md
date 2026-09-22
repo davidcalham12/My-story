@@ -181,7 +181,7 @@ The reasons a run halts, each leaving it readable up to where it reached:
 
 | mark | cause |
 |---|---|
-| `halted: budget` | the cost ceiling was reached; the attempt in flight is kept, unpromoted |
+| `halted: budget` | the profile's `budget.max_cost_usd` was reached (`tiny`: 25.0 since PLAN-007 P-1 — it was 5.0, below a measured tiny run), passed to `claude -p` as `--max-budget-usd` and watched on the stream; `NOVAFORGE_BUDGET` can only lower it; the attempt in flight is kept, unpromoted |
 | `halted: context` | a subagent packet was reported above the ceiling |
 | `halted: gate` | `patch_then_halt` exhausted; no chapter file is promoted |
 | `halted: process` | the orchestrator ended without a `result` event |
