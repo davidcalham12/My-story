@@ -558,7 +558,33 @@ record decays silently, which is the failure mode this whole document is about.
 dangling references" about a file with no reference system is the same mistake as
 reporting an unmeasured figure as zero.
 
-### 7.6 A rule lives in one place, and the count is the tell
+### 7.6 The promises to the reader were unverifiable in ten runs of eleven
+
+`bible/mysteries.md` holds the questions the book undertakes to answer. The
+ontology calls a promise made and never paid a **foreshadowing failure**, and
+`verification.md` has always listed it under what nothing checks.
+
+It turns out to be *almost* checkable. One run wrote each mystery with two extra
+lines — `Planted: Chapter 1` and `Lands: Chapter 3` — and those make the promise
+a commitment a script can hold: landing before planting, landing past the last
+chapter, landing in a chapter the run never reached.
+
+**One run of eleven had them.** The other ten wrote mysteries in four different
+shapes — bullets with prose answers, numbered `## 1.` headings, bullets with a
+`True:` line — because **nobody had said which**. It is v1's three critique
+shapes again, and the outline audit's two, in a third place.
+
+So the format is now stated in `character-architect`, and `check_promises` holds
+it. **A file whose promises name no chapters reports `unstated`, never
+`coherent`** — that is not a book that kept its promises, it is one where the
+question cannot be asked.
+
+**What it still cannot do is most of the question.** It reads a commitment; it
+does not read the chapter. A chapter that says nothing about the mystery it was
+supposed to land passes this and fails a reader — which is the part that stays
+**U**, and the part a sixth characteristic does not reach either.
+
+### 7.7 A rule lives in one place, and the count is the tell
 
 Finding the pass rule written twice was worth searching for the others. The
 threshold — 8 — turned out to be written in **four**:
@@ -579,7 +605,7 @@ difference between a rule and a reminder.
 **The pattern worth keeping:** when a defect turns out to be two copies of one
 fact, the next move is not to fix that pair. It is to count the copies.
 
-### 7.7 Zero is a value, and this is the family the bugs come in
+### 7.8 Zero is a value, and this is the family the bugs come in
 
 Four in one day, in four languages and four places, all the same mistake:
 

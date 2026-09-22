@@ -103,6 +103,7 @@ in CI, at $0.** The suite that carries these:
 | `test_promote.py` | that a failing chapter cannot be promoted by the script that promotes |
 | `test_summary_cap.py` | the rolling summary against its cap — the flat cost curve, measured |
 | `test_rules_resolve.py` | that a cited rule is one the Bible declares |
+| `test_promises.py` | that every promise names a chapter the book actually reaches |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
@@ -872,6 +873,7 @@ step, and that is the sentence worth writing for each one.
 | `promote` | a failing draft reaching `chNN.md` by a one-line copy, which is how one did |
 | `check_summary` | the one component that can grow with the book growing unwatched |
 | `check_rules` | an arbitration record citing rules that do not exist |
+| `check_promises` | a book ending before the chapter that owed the reader an answer |
 | `test_api_contract.py` | the panel and the backend describing the same JSON differently, each passing its own checks |
 | `test_formulas_agree.py` | a chapter being scored by one copy of a formula and judged by another |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |

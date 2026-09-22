@@ -109,6 +109,26 @@ count, the canonical names, and `novel.promises` and `novel.beats_per_chapter`.
 
 It returns the outline as text. **You** write it to `output/<slug>/outline.md`.
 
+**Check the promises are answerable before FLOW-4 writes anything:**
+
+```bash
+python -m backend.chapters.check_promises output/<slug>
+```
+
+`bible/mysteries.md` is the only part of the Bible that commits to *when*: each
+question names the chapter that plants it and the chapter that lands it. A
+promise planted and never paid is the foreshadowing failure the ontology names,
+and it is **the one literary defect a script can reach** — but only because the
+Bible names chapters.
+
+If it reports `unstated`, the promises exist and nothing can tell whether the
+book keeps them; send `character-architect` back for the `Planted:` and `Lands:`
+lines. If it reports a landing past the last chapter, the outline owes an answer
+the book will not reach, and that is cheaper to fix now than at chapter eight.
+
+**It reads the commitment, not the chapter.** A chapter that says nothing about
+the mystery it was supposed to land passes this and fails a reader.
+
 **Check the rules resolve before anything cites them:**
 
 ```bash

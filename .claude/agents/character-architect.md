@@ -60,6 +60,28 @@ happened before the story starts included.
 Bullets, each a question the reader will want answered. Each is a promise the
 outline has to pay off, so do not ask one the world cannot answer.
 
+**This exact shape, per mystery — it is the only part of the Bible that states a
+commitment about *when*:**
+
+```markdown
+- **The question, as the reader would ask it?**
+  - True: the answer, which is canon and which the chapters may not contradict.
+  - Planted: Chapter 1, and in one clause, how.
+  - Lands: Chapter 3, and in one clause, how.
+```
+
+**`Planted` and `Lands` are not decoration.** A promise made to a reader and
+never paid is the ontology's foreshadowing failure, and it is the one literary
+defect a script can catch — but only if the promise says which chapter owes it.
+Of eleven runs, **one** wrote these lines; in the other ten the promises exist
+and nothing can tell whether the book kept them.
+
+`Lands` may equal `Planted` for a question raised and answered in one chapter.
+It may not come before it.
+
+Write both lines even when the answer is "the book does not explain it" — that
+is still a landing, and a reader meets it in a particular chapter.
+
 ## Your authority
 
 You may write exactly three files under `<workspace>/bible/`: `characters.md`,
