@@ -63,7 +63,7 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
         "SELECT COUNT(*) AS calls, SUM(input_tokens) AS input_tokens, "
         "SUM(output_tokens) AS output_tokens, "
         "COUNT(input_tokens) AS token_rows, "
-        "COALESCE(SUM(cost_usd),0) AS total_usd FROM calls WHERE run_id = ?",
+        "SUM(cost_usd) AS total_usd FROM calls WHERE run_id = ?",
         (run_id,),
     ).fetchone()
     kinds = [r["provenance"] for r in conn.execute(
@@ -74,7 +74,8 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
         "FROM runs WHERE id = ?", (run_id,)
     ).fetchone()
 
-    summed = row["total_usd"] if row["calls"] else None
+    # NULL when no call reported a cost, which is not the same as $0.00.
+    summed = row["total_usd"]
     measured = run["cost_usd"] if run else None
     if measured is not None:
         total, grade = measured, (run["cost_provenance"] or "measured")

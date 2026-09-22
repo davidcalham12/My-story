@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **279 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **284 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -104,6 +104,7 @@ in CI, at $0.** The suite that carries these:
 | `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
 | `test_vectors.py` | what retrieval may and may not be used for |
+| `test_absent_is_not_zero.py` | G12's rule as a structural guard, not a memory |
 | `test_verification_doc.py` | this document — that it still refers to things that exist |
 | `test_architecture_doc.py` | `architecture.md` against reality: the `commons/` map, and §4's agent catalogue against their front matter |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
@@ -413,6 +414,12 @@ can be absent — not by a test, and not by anyone reading the page. `total_usd`
 had already been fixed the same way an hour earlier and the token pair beside it
 had been missed, which is the honest shape of this class of bug: **it is never
 fixed once.**
+
+So it is guarded rather than remembered. `test_absent_is_not_zero.py` fails on
+any `COALESCE(SUM(...), 0)` in a read query, and on any `toFixed` or
+`toLocaleString` outside `shared/lib/provenance.ts`, where the null check lives.
+A rule everybody agrees with is exactly the kind that erodes one `COALESCE` at a
+time.
 
 ### G13 — Cost is not invented
 
