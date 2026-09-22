@@ -4,8 +4,14 @@ A multi-agent harness that writes novels under a bounded context.
 
 **The central claim:** the writer of a chapter never receives the prose of a
 previous chapter. It gets the Story Bible, its own outline entry and a bounded
-rolling summary — so chapter thirty-four's prompt is the same size as chapter
-one's, and the cost curve is flat.
+rolling summary, so a later chapter's prompt is the size of an early one's.
+
+That is **structural** — `chapter-writer` holds `tools: Glob`, which returns
+paths and cannot return contents, so prior prose is unreachable rather than
+merely unpassed. **Whether the resulting book holds together over thirty-four
+chapters is not established**: the longest run is eight, and the two runs that
+exist disagree about whether later chapters get harder. `docs/verification.md` §7
+and `docs/domain-knowledge.md` §3.3b.
 
 ## Running it
 
@@ -32,7 +38,7 @@ subscription, which is why the tests replay a recording instead.
 | how work gets done here | `AGENTS.md` |
 | the stack, the orchestration, memory, the token ceiling | `docs/architecture.md` |
 | the vocabulary, mapped from the ontology | `docs/definitions.md` |
-| what eight runs actually showed, with numbers | `docs/domain-knowledge.md` |
+| what eleven runs actually showed, with numbers | `docs/domain-knowledge.md` |
 | every guarantee and the evidence behind it | `docs/verification.md` |
 | **what is *not* verified, and why that is a decision** | `docs/verification.md` §3 |
 | the quality gate and how it was arrived at | `specs/loops/LOOP-003/README.md` |
@@ -52,17 +58,30 @@ It exits non-zero only for a gate breach. A run nobody archived reports
 `unchecked` and exits 0: it has not failed, it has not passed, and an exit code
 cannot say the second without lying.
 
-## What one real run cost
+## What a real run costs
 
-`lighthouse-keeper-ledger`: three chapters, seven drafts, four feedback sheets,
-**$18.82 measured** from Claude Code's own `result` — 136 turns, 56 minutes. The
-same shape under v1 cost $7.45, judged by two characteristics instead of five and
-with nothing auditing the outline first.
+Two v2 runs are measured, both from Claude Code's own `result` event.
+
+| | chapters | words | cost | v1, comparable |
+|---|---|---|---|---|
+| `lighthouse-keeper-ledger` | 3 | 1,831 | **$18.82** | $7.45 |
+| `cartographer-inconstant-valley` | 8 | 11,133 | **$54.87** | $49.33 |
+
+**The overhead does not scale with the book.** At three chapters v2 costs 2.5×
+what v1 did; at eight, **eleven per cent** — for roughly twice the judging and
+*fewer* orchestrator turns. Most of the extra is fixed: the Bible, the outline,
+the audit before anyone writes. Per thousand words the eight-chapter runs are
+$4.60 and $4.93.
 
 ## What it does not give you
 
-- **The gate does not reproduce.** Three of its five characteristics are model
+- **The gate does not reproduce.** Four of its six characteristics are model
   judgements, so "it passed the gate" is a statement about one run.
+- **The gate can be disobeyed, and has been.** On the eight-chapter run two
+  chapters entered the book that should not have. The decision is arithmetic and
+  promotion is a script that refuses — but the orchestrator holds `Write` and
+  always will, so what the system guarantees is **detection**, not prevention.
+  Every run writes a `conformance.json` beside its book saying which it was.
 - **No tamper-evident audit.** The log is a record the orchestrator writes.
 - **One user, one run at a time.** A local tool.
 - **Retrieval is not exhaustive**, which is why the rules and the outline entry

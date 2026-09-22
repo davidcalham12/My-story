@@ -139,3 +139,39 @@ def test_every_concrete_path_the_docs_name_exists():
             if not (target.exists() or list(ROOT.glob(cited))):
                 missing.append(f"{doc} -> {cited}")
     assert not missing, missing
+
+
+# ------------------------------------------- the front door
+
+README = (ROOT / "README.md").read_text(encoding="utf-8")
+
+
+def test_the_readme_does_not_state_the_unverified_claim_as_fact():
+    """"chapter thirty-four's prompt is the same size as chapter one's, and the
+    cost curve is flat" was the opening sentence, as a statement of fact.
+
+    The prompt size is structural and holds. **Whether the book holds over
+    thirty-four chapters is U** — the longest run is eight, and the two runs that
+    exist disagree about whether later chapters get harder. The front door is the
+    one place a reader will believe without checking.
+    """
+    opening = README[:README.index("## Running it")]
+    assert "not established" in opening or "is not established" in opening
+    assert "verification.md" in opening
+
+
+def test_the_readme_counts_the_characteristics_the_gate_has():
+    from backend.chapters.domain import CHARACTERISTICS
+
+    words = {5: "five", 6: "six", 7: "seven"}
+    assert f"of its {words[len(CHARACTERISTICS)]} characteristics" in README, (
+        "the README states how many characteristics are model judgements; "
+        "SPEC-006 changed the denominator"
+    )
+
+
+def test_the_readme_says_detection_is_not_prevention():
+    """Two chapters entered a book that should not have. A front page that
+    implies the gate cannot be disobeyed would be the most expensive sentence in
+    the repository."""
+    assert "detection" in README and "not prevention" in README
