@@ -64,7 +64,7 @@ with the reason attached — two have, and they say so.
 | G9 | only two agents write the Story Bible | **critical** | **A** | yes |
 | G10 | the manuscript is assembled in code | important | **A** | yes |
 | G11 | the outline is audited against `## Rules` before FLOW-4 | important | **D** | **no → §3.2** |
-| G12 | every figure carries its provenance | important | **T** *(partial)* | yes |
+| G12 | every figure carries its provenance | important | **T** + **A** | yes |
 | G13 | cost is not invented | important | **D** | **no → §3.3** |
 | G14 | a run stops when it reaches its budget | **critical** | **T** | yes |
 | G15 | no agent declares a genre | incidental | **A** | yes |
@@ -84,7 +84,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **106 backend tests and 11 frontend tests, on the mock engine,
+Status, 2026-09-22: **106 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -98,6 +98,7 @@ in CI, at $0.** The suite that carries these:
 | `test_vectors.py` | what retrieval may and may not be used for |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
 | `test_archive.py` | SPEC-003 — that a finished run's own record reaches the database |
+| `Provenance.test.tsx`, `figures.test.ts` | G12's other half — the grade reaches the screen |
 | `test_api.py` | the HTTP edge and the SSE snapshot |
 
 ---
@@ -326,14 +327,24 @@ possibility.
 
 ### G12 — Every figure carries its provenance
 
-**Important · Class T** *(partial — the render half is untested)*
+**Important · Class T** for storing it, **A** for showing it. **No longer
+partial.**
 
 **Method.** Each number is typed with `measured` / `reported` / `reconstructed` /
 `estimated` / `absent`. A `CHECK` constraint on the `calls` table refuses a row
 without a grade. The interface renders the grade beside the figure.
 
-**Evidence.** The schema, and tests that a figure cannot be persisted without a
-grade. The render assertion is not written; the `(partial)` stays until it is.
+**Evidence, both halves.** The schema, and tests that a figure cannot be
+persisted without a grade — **T**. `Provenance.test.tsx` renders all five grades
+and asserts each mark, its name and its meaning reach the output, including that
+`absent` reads *not the same as zero* — **T**. And `figures.test.ts` reads the
+pages through Vite's glob and fails if any line rendering `money()` is not
+accompanied by a `<Provenance>` — **A**, true while the source is that shape.
+
+**What the pair still does not cover.** A figure printed by some future helper
+that is not `money()`. That is the limit of reading source as text, and it is why
+`money()` is the only sanctioned way a cost reaches the screen rather than one
+way among several.
 
 **The rule this exists to hold: what cannot be measured is reported as
 unmeasurable, never as zero.** A run that destroyed its evidence and a run where
@@ -689,8 +700,12 @@ a validator is: not a check, a thing that makes the reading happen.
   validator as a test found a live divergence in the verdict vocabulary the same
   hour — see §5. §3.1 was also corrected: it had claimed the halt was testable
   with the mock engine, and the decision is not in Python at all.
-- **Four rows** lost a `(planned)` marker when their tests were written. **G12
-  keeps a partial one**, and keeping it is the point.
+- **G12 lost its `(partial)`.** The grade was refused by the database and
+  unchecked on the screen; both halves now have tests, and the one that reads
+  source as text is marked **A** rather than dressed up as **T**.
+- **Four rows** lost a `(planned)` marker when their tests were written. No row
+  carries one now — which is a fact about this date, not a property of the
+  document.
 
 ---
 
