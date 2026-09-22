@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **284 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **286 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |

@@ -105,3 +105,37 @@ def test_each_agents_stage_matches_its_description():
     for name, (stage, _model) in sorted(documented_agents().items()):
         description = front_matter(AGENTS_DIR / f"{name}.md").get("description", "")
         assert stage in description, f"{name}: doc says {stage}, its description does not"
+
+
+# ------------------------------------------- paths the docs point at
+
+BACKTICKED_PATH = re.compile(r"`((?:backend|frontend|config|specs|docs)/[\w./<>-]+)`")
+
+
+def cited_paths(doc: Path) -> set[str]:
+    """Paths a document names, minus the ones with a `<placeholder>` in them."""
+    text = doc.read_text(encoding="utf-8")
+    # `<feature>` and `SPEC-NNN` are templates, not paths.
+    return {p for p in BACKTICKED_PATH.findall(text)
+            if "<" not in p and "NNN" not in p}
+
+
+def test_the_documents_cite_paths_at_all():
+    assert len(cited_paths(ROOT / "claude.md")) >= 4
+
+
+def test_every_concrete_path_the_docs_name_exists():
+    """`claude.md` is the first file a coding agent is told to read.
+
+    It pointed at `backend/<feature>/prompts/` and `backend/commons/context/` —
+    the D2 design, where Python built a typed packet and called an API. Annex C
+    removed the API and the packet with it. A path that does not resolve teaches
+    a reader that the document is decoration.
+    """
+    missing = []
+    for doc in ("claude.md", "README.md", "AGENTS.md"):
+        for cited in sorted(cited_paths(ROOT / doc)):
+            target = ROOT / cited
+            if not (target.exists() or list(ROOT.glob(cited))):
+                missing.append(f"{doc} -> {cited}")
+    assert not missing, missing

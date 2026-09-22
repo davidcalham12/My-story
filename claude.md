@@ -19,16 +19,20 @@ The repository is in **English** — documentation, code, comments, prompts.
 ## Running it
 
 ```bash
-# backend
-uv sync
-uv run pytest                      # mock engine; no network, no cost
-uv run fastapi dev backend/main.py
+# backend — plain pip and the stdlib runner. `uv` is not installed here and
+# every command in this block used to assume it was.
+pip install fastapi uvicorn pydantic pyyaml pytest httpx sqlite-vec
+USE_RECORDED_STREAM=true python -m pytest backend/tests -q   # replayed; $0
+python -m uvicorn backend.main:app --port 8000
+
+# to orchestrate for real — this costs the subscription, every time
+USE_RECORDED_STREAM=false NOVAFORGE_DB="$PWD/novaforge.db" NOVAFORGE_BUDGET=20   python -m uvicorn backend.main:app --port 8000
 
 # frontend
 cd frontend && npm install && npm run dev
 
-# database
-uv run python -m backend.commons.db.migrate
+# migrations run themselves on startup; to apply them by hand:
+python -c "from pathlib import Path; from backend.commons.db.connection import connect;   from backend.commons.db.migrate import migrate; print(migrate(connect(Path('novaforge.db'))))"
 ```
 
 **Claude Code is the orchestrator. There is no API key and no SDK.** The backend
@@ -51,8 +55,15 @@ persistence, the SSE and both watchers; what it cannot cover is the procedure in
 |---|---|
 | stage order, inputs, outputs, `on_fail` | `specs/flow.yaml` |
 | every number: chapters, words, thresholds, counts | `config/novel.config.json` + `config/profiles/` |
-| what each agent is told | `backend/<feature>/prompts/<agent>.md` |
-| what each agent is *handed* | its `ContextPacket` in `backend/commons/context/` |
+| what each agent is told | `.claude/agents/<agent>.md` — its prompt **and** its `tools:` line |
+| what each agent is *handed* | the orchestrator assembles it, following `.claude/skills/novaforge/SKILL.md` |
+| what happens after an attempt | `backend/chapters/domain.py::decide`, asked as a script |
+
+Those first two rows used to name a prompts directory under each feature and a
+`ContextPacket` module under commons. **Neither exists.** They
+were the D2 design, where Python built a typed packet and called an API; Annex C
+removed the API and the packet with it, and the authority model went back to
+being the `tools:` line.
 
 **The orchestrator contains no literal of structure or number.** A chapter count,
 a threshold, a stage order written into Python is a second source of truth, and
