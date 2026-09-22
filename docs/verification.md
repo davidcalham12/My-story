@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **230 backend tests and 18 frontend tests, on the mock engine,
+Status, 2026-09-22: **270 backend tests and 18 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -101,14 +101,13 @@ in CI, at $0.** The suite that carries these:
 | `test_conformance.py` | G6's obedience, checked after the fact against the archive |
 | `test_prose.py` | §3.9's mechanical floor, measured over the nine shipped books |
 | `test_names.py` | canonical names against the Bible — and the measurement that it has never fired |
-| `test_end_to_end.py` | all of them, in a whole run, including the halt |
+| `test_api.py` | the HTTP edge, the SSE snapshot, and a whole run followed to completion |
 | `test_import.py` | G12, G13 — the eight v1 runs and their recorded gaps |
-| `test_outline_audit.py` | G11 — the commission checked before FLOW-4 |
 | `test_vectors.py` | what retrieval may and may not be used for |
+| `test_verification_doc.py` | this document — that it still refers to things that exist |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
 | `test_archive.py` | SPEC-003 — that a finished run's own record reaches the database |
 | `Provenance.test.tsx`, `figures.test.ts` | G12's other half — the grade reaches the screen |
-| `test_api.py` | the HTTP edge and the SSE snapshot |
 
 ---
 
@@ -362,6 +361,13 @@ of R5, a chapter's central act became impossible before it began. `world.md` was
 amended by the only agent allowed to write it, the outline was reissued against
 the amended rules, and **FLOW-4 did not start until both had landed** — the
 failure mode this exists to prevent, prevented, in the run where it appeared.
+
+**No test file, and that is correct rather than missing.** This table used to
+name `test_outline_audit.py`. There is no such file and there should not be: the
+audit is a model reading an outline against rules written in prose, so there is
+nothing in Python to assert. The row promised evidence of a kind this guarantee
+cannot have — which is the failure the document exists to prevent, committed by
+the document.
 
 **Not covered (U).** That it finds *every* impossible beat. On the outline that
 halted a run, none of the three methods flagged the beat the run blamed — and
