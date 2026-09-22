@@ -10,9 +10,18 @@
   "outline_complete": true,
   "outline_audited": true,
   "canonical_names": ["Edmund Hale", "Silas Brock", "Amos Dent", "Nat Fowler", "Hannah Rigg"],
+  "orchestrator_lesson": "The rolling summary must carry every figure a later chapter has to reproduce. Chapter 3 failed its gate because the compressed rolling summary dropped 'ten chains, fifty-three links', which chapters/ch02.summary.md had recorded correctly. The summary chain is the only channel between chapters, and compressing it is where a figure gets lost.",
   "chapters": [
     {"n": 1, "title": "The Ford Stone", "verdict": "accept", "attempts": 1, "words": 1331,
      "scores": {"continuity": 8, "science": 10, "outline": 10, "length": 10, "chatter": 10},
-     "aggregate": 8, "best_aggregate": 8, "prose_check": "clean"}
+     "aggregate": 8, "best_aggregate": 8, "prose_check": "clean"},
+    {"n": 2, "title": "Ten Arrows", "verdict": "accept", "attempts": 1, "words": 1297,
+     "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+     "aggregate": 10, "best_aggregate": 10, "prose_check": "clean"},
+    {"n": 3, "title": "Identical to the Link", "verdict": "accept", "attempts": 2, "words": 1272,
+     "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10},
+     "aggregate": 10, "best_aggregate": 10, "prose_check": "clean",
+     "raw_scores_attempt_2": {"continuity": 5, "science": 8},
+     "note": "Rejected at attempt 1 on aggregate 2 and redrafted. Attempt 2's scores above are late-excluded per feedback.late_finding_blocks=false; the two raw numbers are kept beside them and in the critique files. Both late findings are in specs/loops/LOOP-003/late_findings.jsonl, one overruled and one upheld and patched."}
   ]
 }

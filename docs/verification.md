@@ -89,7 +89,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22: **319 backend tests and 19 frontend tests, on the mock engine,
+Status, 2026-09-22: **325 backend tests and 19 frontend tests, on the mock engine,
 in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -108,6 +108,7 @@ in CI, at $0.** The suite that carries these:
 | `test_instruments.py` | LOOP-003's two `--self-test`s, which ran nowhere automatic |
 | `test_api_contract.py` | the payload the backend serves against the types the panel declares |
 | `test_figures_in_docs.py` | every run cost quoted in the docs against the `cost.json` it came from |
+| `test_formulas_agree.py` | the scoring formulas, wherever they are written, executed against the code |
 | `test_verification_doc.py` | this document — that it still refers to things that exist |
 | `test_architecture_doc.py` | `architecture.md` against reality: the `commons/` map, and §4's agent catalogue against their front matter |
 | `test_skill_contract.py` | §5 — that `SKILL.md`, `flow.yaml`, the config and the schema still describe one system |
@@ -846,6 +847,7 @@ step, and that is the sentence worth writing for each one.
 | `archive_run` | a finished run leaving no record anyone can query |
 | `decide` | a chapter below the threshold being talked into the book at the moment a run is about to be thrown away |
 | `test_api_contract.py` | the panel and the backend describing the same JSON differently, each passing its own checks |
+| `test_formulas_agree.py` | a chapter being scored by one copy of a formula and judged by another |
 | `conformance.audit` | a run disobeying its own gate and nobody finding out until someone reads the book |
 | `check_prose` | a sentence the gate cannot see appearing twice in a chapter that passed |
 
