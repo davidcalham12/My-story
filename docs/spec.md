@@ -146,3 +146,11 @@ extended with the exam's validators), `browser-mcp.md`, `skills.md`,
 | the reader change regenerates chapters through the same gate and may fail it | important | `patch_then_halt`; a halted regeneration leaves v1 intact | `halted: gate` on a version > 1 |
 | `visual_check` is a documented manual session, not a test | incidental | two days | `docs/browser-mcp.md` |
 | Lean and TLA+ conditional on tooling | important | admin rights on the VM unknown | the reason line in `/docs` |
+
+## 8. Decisions taken after approval
+
+| date | decision | why | owner's words |
+|---|---|---|---|
+| 2026-09-23 | **The orchestrator stays on the session's model** (`models.orchestrator: null`); only the ten agents run on Haiku | a real run with the orchestrator on Haiku dispatched 58 subagents, all `general-purpose`, none of the project's ten: the chapter writer held every tool, the central guarantee (no prior prose) did not exist, and no critique reached disk (`novaforge-v2`, run `phantom-station`) | — (measured; SPEC-011 already said `null`) |
+| 2026-09-23 | **The exam profile's budget ceiling is 60.0 USD** (was 15.0) — `AGENTS.md` §6 protects this figure, and this row is the recorded decision | one turn of the orchestrator costs about 1 USD (`novaforge-v2` `ebe008b`); the last 8-chapter novel with a session orchestrator cost 54.87 USD; a ceiling of 15 would stop the example novel near chapter 3 and spend it for nothing | "si", answering Q25: raise the ceiling to 60 |
+| 2026-09-23 | **The five evaluation briefs run with 3 chapters each** (profile `eval` = `exam` with `novel.chapters` 3 and the `tiny` word band); the example novel is the full 10 chapters | five full novels would cost about 250 USD and do not fit before Friday; every validator (brief, forbidden words, mandatory facts, judge, chronology) is exercised the same on 3 chapters; stated in `evals/results.md` and in the presentation | "si", answering Q26 |
