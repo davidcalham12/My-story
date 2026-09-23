@@ -1,28 +1,11 @@
-/* One accent, spent on the one thing that matters: a score that failed.
-   Everything else stays quiet, because a page where everything is emphasised
-   says nothing. */
+/* Every value here comes from `tokens.css`. Nothing below names a colour or a
+   typeface — `identity.test.ts` fails the build on the first one that does.
 
-:root {
-  --ink: #14181d;
-  --muted: #5d6874;
-  --line: #d9dee4;
-  --panel: #ffffff;
-  --page: #f4f6f8;
-  --fail: #a3301f;
-  --pass: #1f6b4a;
-  --halt: #7a4a12;
-}
+   One accent, spent on the one thing on a screen that needs attention: the
+   primary action, or the figure a reader has to act on. A page where everything
+   is emphasised says nothing. */
 
-:root[data-theme='dark'] {
-  --ink: #e6e9ed;
-  --muted: #98a3b0;
-  --line: #2b3239;
-  --panel: #171c21;
-  --page: #0f1317;
-  --fail: #e88372;
-  --pass: #6fc79c;
-  --halt: #d9a860;
-}
+@import './tokens.css';
 
 * { box-sizing: border-box; }
 
@@ -30,73 +13,183 @@ body {
   margin: 0;
   background: var(--page);
   color: var(--ink);
-  font: 16px/1.55 ui-serif, Georgia, 'Times New Roman', serif;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
-main { max-width: 74ch; margin: 0 auto; padding: 32px 16px 96px; }
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--s6) var(--gutter) var(--s7);
+}
 
-h1, h2, h3 { line-height: 1.2; font-weight: 600; letter-spacing: -0.01em; }
-h1 { font-size: 1.9rem; margin: 0 0 4px; }
-h2 { font-size: 1.25rem; margin: 32px 0 8px; }
+h1, h2, h3 { line-height: var(--leading-tight); font-weight: 700; letter-spacing: -0.01em; }
+h1 { font-size: var(--text-title); margin: 0 0 var(--s1); }
+h2 { font-size: var(--text-lead); margin: var(--s6) 0 var(--s2); }
+h3 { font-size: var(--text-card-title); margin: var(--s5) 0 var(--s2); }
+
+.eyebrow {
+  font-size: var(--text-eyebrow);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 var(--s1);
+}
 
 .muted { color: var(--muted); }
-.lede { color: var(--muted); margin-top: 0; }
+.lede { color: var(--muted); font-size: var(--text-lead); margin-top: 0; }
+.figure { font-size: var(--text-figure); font-variant-numeric: tabular-nums; }
+
+/* Anything typed by the buyer and shown back: their words, exactly as typed. */
+.verbatim { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .panel {
-  background: var(--panel);
+  background: var(--card);
   border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 16px 18px;
-  margin: 12px 0;
+  border-radius: var(--radius);
+  padding: var(--s4) var(--s5);
+  margin: var(--s3) 0;
 }
-.panel--bad { border-left: 3px solid var(--fail); }
-.panel--halt { border-left: 3px solid var(--halt); }
+.panel--bad { border-left: var(--s1) solid var(--fail); }
+.panel--halt { border-left: var(--s1) solid var(--halt); }
+.panel--ok { border-left: var(--s1) solid var(--pass); }
+/* The buyer's attention, once per screen. */
+.panel--note { border-left: var(--s1) solid var(--primary); background: var(--panel); }
 
-table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
-th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); }
-th { font-weight: 600; color: var(--muted); font-size: 0.82rem; }
+/* A table of eight columns does not fit a 375px phone. The page must not
+   scroll sideways; the table may, inside its own box. */
+.scroll-x { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; width: 100%; font-size: var(--text-footnote); }
+th, td { text-align: left; padding: var(--s2) var(--s3); border-bottom: 1px solid var(--line); }
+th { font-weight: 700; color: var(--muted); font-size: var(--text-eyebrow); }
 td.num { font-variant-numeric: tabular-nums; }
 
 .score { font-variant-numeric: tabular-nums; }
 .score--fail { color: var(--fail); font-weight: 700; }
 .score--none { color: var(--muted); font-style: italic; }
 
-.prov { text-decoration: none; cursor: help; color: var(--muted); margin-left: 4px; }
+.prov { text-decoration: none; cursor: help; color: var(--muted); margin-left: var(--s1); }
 
 button {
-  font: inherit;
-  padding: 8px 14px;
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  padding: var(--s2) var(--s4);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
+  min-height: 44px; /* a thumb on a 375px phone, not a mouse on a desk */
 }
-button.primary { background: var(--ink); color: var(--page); border-color: var(--ink); }
+button.primary {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+  font-weight: 700;
+}
+button.primary:active { background: var(--primary-pressed); border-color: var(--primary-pressed); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.link {
+  background: none;
+  border: 0;
+  padding: var(--s1) 0;
+  min-height: 0;
+  color: var(--primary-pressed);
+  text-decoration: underline;
+}
 
-input[type='text'], textarea, select {
-  font: inherit;
+/* The focus ring is never removed, only replaced by a better one: a keyboard is
+   the only way through this form for anyone who cannot use a mouse. */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+input[type='text'], input[type='number'], textarea, select {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
   width: 100%;
-  padding: 9px 11px;
+  padding: var(--s3);
   border: 1px solid var(--line);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   background: var(--panel);
   color: var(--ink);
 }
+/* A field the check has a question about. The border is the quiet half; the
+   question underneath is the half that carries the meaning, because colour is
+   never the only signal. */
+input.asked, textarea.asked, select.asked { border-color: var(--primary); border-width: 2px; }
 
 .code {
-  font: 0.85rem ui-monospace, SFMono-Regular, Menlo, monospace;
-  background: var(--page);
+  font-family: var(--font-mono);
+  font-size: var(--text-footnote);
+  background: var(--card);
   border: 1px solid var(--line);
-  padding: 10px 12px;
+  padding: var(--s3);
   overflow-x: auto;
   white-space: pre-wrap;
 }
 
-nav { display: flex; gap: 4px; flex-wrap: wrap; margin: 16px 0 8px; }
-nav button.active { background: var(--ink); color: var(--page); border-color: var(--ink); }
+nav { display: flex; gap: var(--s1); flex-wrap: wrap; margin: var(--s4) 0 var(--s2); }
+nav button.active { background: var(--deep); color: var(--on-primary); border-color: var(--deep); }
 
-.field { margin: 18px 0; }
-.field label { display: block; font-weight: 600; margin-bottom: 6px; }
-.hint { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+fieldset {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--s3) var(--s4) var(--s4);
+  margin: var(--s5) 0;
+}
+legend { font-weight: 700; font-size: var(--text-card-title); padding: 0 var(--s2); }
+
+.field { margin: var(--s5) 0; }
+.field label { display: block; font-weight: 500; margin-bottom: var(--s2); }
+.hint { font-size: var(--text-footnote); color: var(--muted); margin-top: var(--s2); }
+
+/* A question the check asked about this field. Carried by a word as much as by
+   the rule beside it: "we still need" reads the same to someone who sees
+   neither the colour nor the border. */
+.asked-about {
+  font-size: var(--text-footnote);
+  color: var(--primary-pressed);
+  margin: var(--s2) 0 0;
+  border-left: 2px solid var(--primary);
+  padding-left: var(--s2);
+}
+
+.row { display: flex; gap: var(--s2); flex-wrap: wrap; align-items: flex-start; }
+.row > * { min-width: 0; }
+.list { list-style: none; padding: 0; margin: var(--s2) 0; }
+.list li { padding: var(--s2) 0; border-bottom: 1px solid var(--line); }
+.findings { padding-left: var(--s5); }
+
+/* Read: the book beside its apparatus on a desk, stacked on a phone.
+   The single column is the default and the two-column rule the exception, so
+   375px cannot start scrolling sideways because a breakpoint was forgotten. */
+.reader { display: grid; gap: var(--s5); grid-template-columns: 1fr; }
+.reader__viewer {
+  width: 100%;
+  height: 70vh;
+  min-height: 320px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+@media (min-width: 900px) {
+  .reader { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+
+.chosen { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* Asked for by the device, honoured by the page. Nothing here animates today;
+   the rule is the floor, so the first transition someone adds is already
+   covered rather than needing to be remembered. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -2,7 +2,7 @@ import { useRun } from '@/features/watch-progress/useRun'
 import { haltReason } from '@/entities/run/lib'
 import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
-import { Quality } from '@/pages/quality/Quality'
+import { GateTable } from '@/entities/critique/GateTable'
 
 /** One run: what it is doing, what it cost, and how its gate behaved. */
 export function RunPage({ runId }: { runId: string }) {
@@ -144,7 +144,7 @@ export function RunPage({ runId }: { runId: string }) {
         </>
       )}
 
-      <Quality detail={detail} />
+      <GateTable detail={detail} />
     </>
   )
 }

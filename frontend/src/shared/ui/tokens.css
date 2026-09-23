@@ -1,0 +1,95 @@
+/* The Qaracter identity, in the only file allowed to name a colour or a face.
+ *
+ * `identity.test.ts` fails the build if a hex code or a typeface appears
+ * anywhere else. That test exists because the previous panel carried four
+ * different oranges, none of them the brand's: a colour typed into a component
+ * is a colour nobody decided, invisible to a grep and immune to a redesign.
+ *
+ * The reasoning behind the scale, the step and the layout is in
+ * `frontend/DESIGN.md`, so the choice is a decision on file rather than taste in
+ * a stylesheet.
+ */
+
+/* The webfont, from the one place the face is named. The stack below carries
+ * the page on a machine with no network — the demo laptop may well be one —
+ * and the fallback is a grotesque of the same proportions, so a missing DM Sans
+ * changes the texture and not the layout. */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap');
+
+:root {
+  /* --- Qaracter brand, verbatim ------------------------------------------ */
+  --qr-primary: #FF7932;
+  --qr-primary-pressed: #F4631E;
+  --qr-ink: #233441;
+  --qr-deep: #1E2D3D;
+  --qr-card: #F5F5F5;
+
+  /* --- supporting greys and states --------------------------------------- *
+   * Not brand colours: the three state hues below are the smallest set that
+   * keeps "rewritten", "stopped" and "passed" apart. None of them is ever the
+   * only signal — every state also carries a word (SPEC-EXAM-002 §7). */
+  --page: #FFFFFF;
+  --muted: #5D6874;
+  --line: #D9DEE4;
+  --fail: #A3301F;
+  --pass: #1F6B4A;
+  --halt: #7A4A12;
+
+  /* --- roles ------------------------------------------------------------- */
+  --ink: var(--qr-ink);
+  --deep: var(--qr-deep);
+  --panel: var(--page);
+  --card: var(--qr-card);
+  --primary: var(--qr-primary);
+  --primary-pressed: var(--qr-primary-pressed);
+  --on-primary: var(--page);
+  --focus: var(--qr-primary-pressed);
+
+  /* --- type -------------------------------------------------------------- */
+  --font-body: 'DM Sans', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-eyebrow: 0.75rem;   /* 12 — the label above a title */
+  --text-footnote: 0.8125rem;/* 13 — hints, provenance meanings, table heads */
+  --text-body: 1rem;         /* 16 — everything the buyer reads */
+  --text-card-title: 1.125rem;/* 18 — a card's own heading */
+  --text-lead: 1.25rem;      /* 20 — the one paragraph under a page title */
+  --text-figure: 1.5rem;     /* 24 — a number that is the point of its panel */
+  --text-title: 2rem;        /* 32 — one per screen */
+
+  --leading-tight: 1.2;
+  --leading-body: 1.55;
+
+  /* --- space: one step of 4, and nothing between its multiples ----------- */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+
+  /* --- surfaces ---------------------------------------------------------- */
+  --radius: 10px;
+  --radius-sm: 6px;
+  --gutter: var(--s4);       /* never smaller: 375px − 2×16 is the phone column */
+  --measure: 72ch;
+}
+
+:root[data-theme='dark'] {
+  --page: #11171D;
+  --ink: #E9ECEF;
+  --muted: #9AA5B1;
+  --line: #2B3239;
+  --card: #1A2129;
+  --panel: #161C23;
+  --fail: #E88372;
+  --pass: #6FC79C;
+  --halt: #D9A860;
+  --on-primary: #11171D;
+  /* The brand orange holds its contrast on a dark ground; the pressed one does
+     not, so the roles swap rather than the values being invented. */
+  --primary: var(--qr-primary);
+  --primary-pressed: var(--qr-primary);
+  --focus: var(--qr-primary);
+}

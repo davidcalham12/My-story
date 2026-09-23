@@ -137,7 +137,10 @@ def test_the_panel_and_the_config_agree_on_the_threshold():
     import json
 
     config = json.loads((ROOT / "config/novel.config.json").read_text(encoding="utf-8"))
-    lib = (ROOT / "frontend/src/entities/run/lib.ts").read_text(encoding="utf-8")
+    # The helpers moved to `entities/critique` when `pages/run` stopped
+    # importing `pages/quality` (FSD forbids it): an attempt's score belongs to
+    # the critique, not to the run. The check follows the number.
+    lib = (ROOT / "frontend/src/entities/critique/lib.ts").read_text(encoding="utf-8")
     match = re.search(r"export const THRESHOLD = (\d+)", lib)
     assert match, "the panel no longer states a threshold"
     assert int(match.group(1)) == config["quality_gate"]["threshold"]
@@ -150,7 +153,7 @@ def test_the_panel_names_every_characteristic_it_shows_a_column_for():
     the type cannot be loosened back without a red test."""
     from backend.chapters.domain import CHARACTERISTICS
 
-    quality = (ROOT / "frontend/src/pages/quality/Quality.tsx").read_text(encoding="utf-8")
+    quality = (ROOT / "frontend/src/entities/critique/GateTable.tsx").read_text(encoding="utf-8")
     assert "Record<Characteristic, string>" in quality, (
         "LABEL is no longer typed against Characteristic; a missing column name "
         "would render empty again"

@@ -140,3 +140,121 @@ export interface OrchestratorContext {
   provenance: Provenance
   note: string
 }
+
+/* ------------------------------------------------------------------------- *
+ * storyMaker: the brief, the book, and a reader's change.
+ *
+ * Same warning as above — these describe what the backend says it sends, not
+ * what arrived. Everything that indexes into them guards first.
+ * ------------------------------------------------------------------------- */
+
+export interface Memory {
+  text: string
+  /** Absent far more often than present, and absent is `null`. Never "today"
+   *  and never the epoch: the temporal validator reads these, and an invented
+   *  date is an invented contradiction (`backend/brief/models.Memory`). */
+  date: string | null
+}
+
+export interface Recipient {
+  /** An alias and not a name: the brief travels through a model, a database and
+   *  a PDF, and the less of a real person is in it the better. */
+  alias: string
+  /** Empty means unknown. An unknown age is unknown, not a newborn. */
+  age: number | null
+  pronouns: string
+  traits: string[]
+  relationship_to_buyer: string
+}
+
+export interface Brief {
+  occasion: string
+  recipient: Recipient
+  memories: Memory[]
+  genre: string
+  tone: string
+  length_chapters: number
+  forbidden_terms: string[]
+  mandatory_facts: string[]
+  dedication: string
+  /** The one field the buyer writes freely, which makes it the one field an
+   *  attacker controls. Carried as data, shown labelled, never placed inside an
+   *  instruction (SPEC-EXAM-002 §5.3, AC-3). */
+  free_text: string
+}
+
+/** `ok` is the only value that may enable *Write it*. */
+export type CheckStatus = 'ok' | 'incomplete' | 'contradiction' | 'invalid'
+
+export interface CheckResult {
+  status: CheckStatus
+  questions: string[]
+  contradictions: string[]
+  /** Only for `invalid`: the schema's own complaints. */
+  errors: string[]
+}
+
+export interface FactRow {
+  id: number
+  kind: string
+  text: string
+  /** `brief` is a promise the publish gate checks for; `freetext` is a lead for
+   *  a human. Same table, different trust. */
+  source: string
+  mandatory: boolean
+  /** `[]` is a fact with no usage rows — not a fact used in chapter zero. */
+  chapters: number[]
+}
+
+export interface Impact {
+  fact_id: number
+  text: string
+  kind: string
+  source: string
+  mandatory: boolean
+  version: number
+  chapters: number[]
+  /** Always false, and sent on every answer so no page can present this list as
+   *  the complete one. */
+  exact: boolean
+  matching: string
+}
+
+export interface VersionRow {
+  n: number
+  /** The version this one was made from; null for the first. */
+  parent: number | null
+  reason: string
+  created_at: string
+  /** Read off the disk, not assumed from the row: the print needs a browser and
+   *  can fail where the publish did not. */
+  pdf: boolean
+}
+
+export interface ChapterEntry {
+  n: number
+  title: string
+}
+
+export interface CharacterEntry {
+  canonical_name: string
+  role: string | null
+  birth_date: string | null
+  /** null when no chapter was recorded for them. Absent, not chapter zero. */
+  first_chapter: number | null
+}
+
+export interface PlaceEntry {
+  canonical_name: string
+  note: string | null
+  first_chapter: number | null
+}
+
+/** What `POST /api/runs/{id}/changes` answers: a plan, not a finished book. */
+export interface ChangePlan {
+  run_id: string
+  fact_id: number | string
+  chapters: number[]
+  version: number
+  status: string
+}
