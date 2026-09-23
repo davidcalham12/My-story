@@ -72,7 +72,7 @@ with the reason attached — two have, and they say so.
 | # | promise | level | letter | minimum met? |
 |---|---|---|---|---|
 | G1 | the writer never receives a previous chapter's prose | **critical** | **A** + **T** | yes — but see §3.17 |
-| G2 | the 100,000-token ceiling | important | **I** + **T** | yes |
+| G2 | the 100,000-token ceiling | important | **I** + **T** — layer 2 measures real packets since PLAN-010 10.2 (as totals: §3.5) | yes |
 | G3 | six characteristics, all at 8 or above | important | **T** / **D** | yes |
 | G4 | `outline` scores 10 − 3·missing − 1·out-of-order | important | **T** / **D** | yes |
 | G5 | three attempts, feedback escalating | important | **T** | yes |
@@ -113,7 +113,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22 (after PLAN-007): **509 backend tests and 19 frontend tests, on a
+Status, 2026-09-22 (after PLAN-007): **521 backend tests and 19 frontend tests, on a
 recorded stream, in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -797,18 +797,31 @@ way.
 the figure that crossed.
 **Reviewed by:** nobody routinely, and that is accepted.
 
-### 3.5 The packets the ceiling is about report zero
+### 3.5 The packets the ceiling is about are measured as a total, not as a packet
 
-**What is not verified:** that any given agent packet was under the ceiling.
-`task_progress.usage` reads **zero** in both recorded runs.
-**Why accepted:** it is a property of the stream, not of our code. The watcher
-reports `packet_series_provenance: absent` rather than reading zero as small.
-**Scope of damage:** **layer 2 of G2 is armed and has never fired on the thing it
-exists for.** It is a check in waiting, and calling it a working check would be
-the exact dishonesty this document is against.
-**How we would find out:** the provenance flips from `absent` to `measured` the
-day those figures populate, and the halt becomes possible.
-**Reviewed by:** every new recorded stream, automatically, by that flag.
+**What this row said until 2026-09-23, and why it was wrong.** *"`task_progress.usage`
+reads zero in both recorded runs; layer 2 of G2 is armed and has never fired."*
+The event carries `usage: {total_tokens, tool_uses, duration_ms}` — 13,921 on
+the fixture, 7 of 7 on the run `night-translator-rewriting-phrasebook` — and
+`context_size()` summed `input_tokens + cache_creation + cache_read`, three keys
+that event does not have. Three runs were read as "no packet data" because of a
+key name. Found by the code audit of 2026-09-23 (SPEC-010 W2); fixed at
+PLAN-010 10.2 (`test_context_size_reads_total_tokens_when_the_input_fields_are_absent`,
+`test_the_fixture_packet_is_measured_not_absent`,
+`test_a_task_progress_call_row_carries_the_subagent_total_with_a_note`). The
+old test that asserted the packets read empty was the mistake itself, and is gone.
+**What is not verified now:** that the figure is the *packet*. `total_tokens` is
+the subagent's whole usage, input and output together — the only per-subagent
+figure the CLI emits. It is an upper bound on the packet, and the `calls` row
+says so in `note`.
+**Why accepted:** an upper bound trips the ceiling early, which is the correct
+direction to be wrong in; the packet itself is not in the stream.
+**Scope of damage:** a subagent whose packet was under 100k but whose total
+exceeded it halts a run that would have fit.
+**How we would find out:** a `halted: context` whose detail names a total near
+the ceiling; `packets_measured` on every real run from now on.
+**Reviewed by:** every new recorded stream, automatically, by the provenance flag
+— which now reads `measured`.
 
 ### 3.6 Four of the six gate scores are a model's judgement
 
@@ -978,7 +991,9 @@ as a pass.
 since PLAN-007 6.4 — **every stream line it read** in `events`; what it lacks is
 the archive (attempts, scores, sheets). **The files are all still there**, and
 `archive_run` can be pointed at the directory by hand.
-**How we would find out:** a run at `halted: process` with zero attempts.
+**How we would find out:** a run at `halted: process` with zero attempts —
+**and there is one**: `output/salvage-crew-derelict-remembers-them/`, died with
+its server in FLOW-4 on 2026-09-23 02:45Z, tracked as evidence (PLAN-010 10.4).
 **A restart used to make it worse.** SPEC-007 FR-RUN-7 asks that a run left
 `running` be marked `halted: process` when the server starts. **Built at
 PLAN-007 6.7** (`sweep_orphans`, called from `build_service`;
@@ -1075,6 +1090,18 @@ record in a log file would be a second place for the two to disagree
 why.
 **Reviewed by:** whoever adds the first `logging` call, who should read this row
 first.
+
+### 3.22 `GET /api/runs/{id}/events` with an unknown id fails inside the generator
+
+**What is not verified:** that the events endpoint answers 404 for a run that
+does not exist. `follow()` calls `detail()` inside the streaming generator, so
+an unknown id raises after the response has started.
+**Why accepted:** found in the review of PLAN-010 10.1; pre-existing; the panel
+only opens streams for runs it listed. The fix belongs to SPEC-009's backend
+phase (the endpoint work), not to a quick fix.
+**Scope of damage:** a hand-typed URL gets a broken stream instead of a 404.
+**How we would find out:** `curl /api/runs/nope/events`.
+**Reviewed by:** PLAN-009 phase 1.
 
 ### 3.21 Whether `--max-budget-usd` binds under a subscription is unknown
 
@@ -1233,7 +1260,7 @@ planned — and which it does not, with why.
 | static analysis / SAST | no | no `ruff`, no `bandit` configured. The spec-side document said both were in use; neither was |
 | symbolic execution | no | disproportionate |
 | formal verification | no | disproportionate |
-| unit and integration testing | yes | 509 backend tests and 19 frontend (2026-09-22, after PLAN-007), over a recorded stream, at $0, on every push |
+| unit and integration testing | yes | 521 backend tests and 19 frontend (2026-09-22, after PLAN-007), over a recorded stream, at $0, on every push |
 | property-based testing | **no library** | where the space is small it is enumerated instead: every aggregate at every attempt for `decide` (63 cases), every coefficient combination for the prose formula (64) |
 | mutation testing | no | not yet |
 | contract testing | yes | `test_api_contract.py` (backend payload ↔ panel types), `test_skill_contract.py` (procedure ↔ contract), `test_formulas_agree.py` (formula ↔ code) |
@@ -1257,6 +1284,7 @@ planned — and which it does not, with why.
 
 | version | date | what changed |
 |---|---|---|
+| 5 | 2026-09-23 | **PLAN-010 (SPEC-010).** §3.5 rewritten: the stream *does* carry a per-subagent figure (`total_tokens`) and the parser had ignored it — the old claim is kept as history; G2's layer 2 measures; §3.22 opened (events with an unknown id); §3.14 gains its first real evidence (the tracked dead run). Tests 509 → 521 (+2 skipped with reasons). |
 | 4 | 2026-09-23 | **SPEC-008.** §3.20 closed with its test; the archive knows `prose_check.json` (`test_the_prose_check_file_is_known_and_not_warned_about`), so a run archives with no noise warnings. Tests 506 → 509. |
 | 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19, §3.20 and §3.21 opened. **No letter was raised without a test named beside it.** Tests 449 → 506. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
 | 2 | 2026-09-22 | **Merged.** The spec-side v1 (18 guarantees, 10 gaps, 20 failure modes) unioned with the build-side document (17 guarantees, 16 gaps). Added G18–G21, §3.17, §3.18, §6 failure modes, §7 catalogue, this header. **No letter was raised.** Kept lower where the two disagreed: v1 G4 "T" → **D for obedience** (disobeyed twice on a real run); v1 G9 "T" → **A** (the byte-for-byte fixture test does not exist); v1 G10 "T" → **D** (the `outline_audit` CLI was never built; the audit is a model); v1 G18 "T" → **split** (no `events` table; the gate record is archived at the end); v1 G16's path property test → **not applicable** (no file-backed endpoints). §7 rewritten to what runs: no `mypy`, `ruff`, `bandit` or `hypothesis`. **Candidates for a person to raise**, with their evidence: G1 and G9 also have tests (`test_agents_frontmatter.py`); G17's argv half has one (`test_runner.py`). |

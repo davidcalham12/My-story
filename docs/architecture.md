@@ -480,11 +480,13 @@ is about the packets the *agents* receive, the quantity the architecture claims
 stays flat as a book grows.
 
 Those packets have a slot in the stream — `task_progress` carries `subagent_type`
-and `usage` — and **in both recordings that `usage` reads zero**. So the one
-quantity the ceiling is actually about is, from the stream, **not measurable
-today**. The watcher therefore reports `packet_series_provenance: absent` rather
-than claiming every packet was small. Zero and unmeasured are different
-statements, and this one says which.
+and `usage`. **This paragraph said, until 2026-09-23, that the `usage` read zero
+in both recordings and the quantity was not measurable.** It was measurable: the
+event carries `total_tokens` (the subagent's input and output together), and the
+parser was summing three other keys (SPEC-010 W2, PLAN-010 10.2). The watcher
+now measures every packet as that total — an upper bound, labelled as such — and
+`packet_series_provenance` reads `measured`. Zero, unmeasured and mis-parsed are
+three different statements; this one was the third.
 
 ## 7. Skills installed for building this
 
@@ -651,7 +653,7 @@ before the code exists.
 | 5 — retrieval | `sqlite-vec` with the dimension pinned and the limits tested |
 | 6 — the outline audit | at FLOW-3, with its own tests, and it earned its place on the first real run |
 
-**509 backend tests and 19 frontend tests** (2026-09-22, after PLAN-007), seconds, no network and no
+**521 backend tests and 19 frontend tests** (2026-09-22, after PLAN-007), seconds, no network and no
 credential.
 
 **The first real run happened.** `lighthouse-keeper-ledger` — three chapters,

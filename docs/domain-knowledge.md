@@ -873,13 +873,21 @@ characteristic that blocked nine of twelve failures across the earlier runs
 (§3.3a) — blocked nothing here, and dipped to 8 once. Two runs; but the sixth
 characteristic, added because nothing read the prose, is the one reading it.
 
-### 8.4 The one quantity the ceiling is about is still not in the stream
+### 8.4 The one quantity the ceiling is about was in the stream all along
 
-27 dispatches per run; **7 and 5 `calls` rows, none with tokens**. The
-`task_progress` events that name a subagent carry no `usage`, exactly as
-`architecture.md` §6.3 measured on the two earlier recordings. Three runs now.
-The context watcher has never seen a real packet, and says `absent`
-(`verification.md` §3.5); AC-6 holds on an injected packet and on nothing else.
+**This section said, on 2026-09-22:** *"the `task_progress` events that name a
+subagent carry no `usage` … three runs now; the watcher has never seen a real
+packet."* **It was wrong**, and the way it was wrong is the lesson. Every one
+of those events carries `usage: {total_tokens, tool_uses, duration_ms}` — 7 of 7
+on the tiny run, 10,226 to 25,004 tokens. The parser summed
+`input_tokens + cache_creation + cache_read`, the three keys an *orchestrator*
+turn carries and a *subagent* event does not, got 0, and reported `absent`.
+Three runs, two documents and a verification row agreed with each other and
+with nothing in the data, because they all read the same function's output.
+Found by a code audit against the docs (SPEC-010 W2), fixed at PLAN-010 10.2.
+The figure is the subagent's *total* (input and output together), an upper
+bound on the packet, and every `calls` row now says so. §7.10's rule, in a new
+coat: **absent is a claim too, and a parser can manufacture it.**
 
 ### 8.5 `--max-budget-usd` was on the argv and was never tested by the run
 
