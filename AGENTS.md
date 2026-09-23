@@ -28,6 +28,15 @@ something is obviously right. If the header does not say `approved`, it is not.
 The reason is narrow and worth keeping: a state written in a file survives the
 conversation that produced it. Anything else has to be remembered by someone.
 
+### The mailbox
+
+**At the start of any session, read `docs/handoff/` before anything else. At
+the end of a block of work, update your file there.** Two sessions work on this
+repository — a design session and a building session — and they cannot always
+talk to each other; `docs/handoff/from-design.md` and `docs/handoff/from-build.md`
+are the conversation, and it is versioned. A message in a chat is lost with the
+chat; a line in the mailbox is not.
+
 ---
 
 ## 2. Working on `docs/`
