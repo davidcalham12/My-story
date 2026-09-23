@@ -474,3 +474,39 @@ def test_a_task_progress_call_row_carries_the_subagent_total_with_a_note(client,
     assert row["output_tokens"] is None
     assert row["provenance"] == "measured"
     assert row["note"] and "total_tokens" in row["note"] and "input and output" in row["note"]
+
+
+# ------------------------------------------------------- PLAN-010 10.3 (SPEC-010 W3)
+
+
+def test_a_taken_fallback_slug_gets_a_suffix_instead_of_a_500(client_for, db):
+    """SPEC-010 W3 / AC-3. `runs.slug` is UNIQUE and the fallback slug is the
+    premise's first six words: two premises that share them used to 500."""
+    from backend.commons.db import repository as repo
+    from backend.runs.service import slugify
+    taken = slugify(PREMISE)
+    repo.create_run(db, run_id="earlier", slug=taken, premise=PREMISE, profile="tiny",
+                    tone=None, snapshot={})
+    repo.finish(db, "earlier")
+    # A one-line stream that writes no output/ path, so nothing overwrites the fallback.
+    with client_for(['{"type": "result", "total_cost_usd": 0.01, "num_turns": 1}']) as client:
+        second = client.post("/api/runs", json={"premise": PREMISE})
+        assert second.status_code == 201, second.text
+        assert second.json()["slug"] == taken + "-2"
+        _wait(client, second.json()["id"])
+        third = client.post("/api/runs", json={"premise": PREMISE})
+        assert third.status_code == 201, third.text
+        assert third.json()["slug"] == taken + "-3"
+
+
+def test_the_learned_slug_still_overwrites_the_suffixed_fallback(client, db):
+    from backend.commons.db import repository as repo
+    from backend.runs.service import slugify
+    repo.create_run(db, run_id="earlier", slug=slugify(PREMISE), premise=PREMISE,
+                    profile="tiny", tone=None, snapshot={})
+    repo.finish(db, "earlier")
+    created = client.post("/api/runs", json={"premise": PREMISE}).json()
+    assert created["slug"].endswith("-2")
+    _wait(client, created["id"])
+    final = client.get(f"/api/runs/{created['id']}").json()["run"]["slug"]
+    assert not final.endswith("-2") and final != slugify(PREMISE), final

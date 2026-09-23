@@ -63,6 +63,22 @@ def slugify(premise: str) -> str:
     return "-".join(words[:6])[:40] or "untitled"
 
 
+def unique_slug(conn, base: str) -> str:
+    """`base`, or `base-2`, `base-3`, … — the first one no run holds.
+
+    `runs.slug` is UNIQUE and the fallback is the premise's first six words, so
+    two premises that share them used to 500 (SPEC-010 W3). The learned slug
+    still overwrites this one when the stream reveals it.
+    """
+    taken = {row[0] for row in conn.execute("SELECT slug FROM runs WHERE slug LIKE ?", (base + "%",))}
+    if base not in taken:
+        return base
+    n = 2
+    while f"{base}-{n}" in taken:
+        n += 1
+    return f"{base}-{n}"
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -118,7 +134,7 @@ class RunService:
             if self._live and not self._live.done:
                 raise AlreadyRunning("a run is already in flight; the queue is one")
             run_id = uuid.uuid4().hex[:12]
-            slug = slugify(premise)
+            slug = unique_slug(self.conn, slugify(premise))
             cfg = loader.resolve(profile)
             write_repo.create_run(
                 self.conn, run_id=run_id, slug=slug, premise=premise, profile=profile,
