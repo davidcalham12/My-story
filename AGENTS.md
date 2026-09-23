@@ -191,7 +191,7 @@ implementation detail.
 | the guarantees and their T/A/I/D/U letters | `docs/verification.md` |
 | the vocabulary | `docs/definitions.md` |
 | what the runs taught | `docs/domain-knowledge.md` |
-| commands, permissions, Claude Code specifics | `claude.md` |
+| commands, permissions, Claude Code specifics | `CLAUDE.md` |
 
 Repeating them here would create a second source of truth, and the two would
 disagree within a month.

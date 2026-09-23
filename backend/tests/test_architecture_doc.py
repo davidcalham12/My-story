@@ -121,7 +121,7 @@ def cited_paths(doc: Path) -> set[str]:
 
 
 def test_the_documents_cite_paths_at_all():
-    assert len(cited_paths(ROOT / "claude.md")) >= 4
+    assert len(cited_paths(ROOT / "CLAUDE.md")) >= 4
 
 
 def test_every_concrete_path_the_docs_name_exists():
@@ -133,7 +133,7 @@ def test_every_concrete_path_the_docs_name_exists():
     a reader that the document is decoration.
     """
     missing = []
-    for doc in ("claude.md", "README.md", "AGENTS.md"):
+    for doc in ("CLAUDE.md", "README.md", "AGENTS.md"):
         for cited in sorted(cited_paths(ROOT / doc)):
             target = ROOT / cited
             if not (target.exists() or list(ROOT.glob(cited))):
