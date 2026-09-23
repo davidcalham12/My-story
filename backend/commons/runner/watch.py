@@ -297,9 +297,21 @@ class ContextWatcher:
     packets_measured: int = 0
     largest_orchestrator_turn: int = 0
     orchestrator_turns: int = 0
-    #: Turns above the ceiling. Counted, reported, and never a reason to
-    #: halt: the ceiling is about the agents' packets, not this (docs/spec.md §8).
+    #: Turns above the ceiling.
     turns_over_ceiling: int = 0
+    #: Whether crossing it stops the run.
+    #:
+    #: **False under one orchestrator per novel**, which is the fallback
+    #: path: that conversation carries the whole book, ran at a median of
+    #: 147,000 tokens across two real runs, and halting on it would halt
+    #: every novel inside a minute. The figure is counted and reported
+    #: instead (docs/spec.md §8).
+    #:
+    #: **True under the conductor** (SPEC-EXAM-003), where each unit gets a
+    #: fresh process whose context is bounded by the unit rather than by
+    #: the book. There the ceiling is a real bound, and the owner requires
+    #: it: no part of a run above 100,000 concurrent tokens.
+    halt_on_orchestrator_turn: bool = False
     # Per agent, so "chapter 34 weighs what chapter 1 weighed" can be drawn the
     # day the figures arrive.
     by_agent: dict[str, int] = field(default_factory=dict)
@@ -330,6 +342,11 @@ class ContextWatcher:
         self.largest_orchestrator_turn = max(self.largest_orchestrator_turn, size)
         if size > self.ceiling:
             self.turns_over_ceiling += 1
+            if self.halt_on_orchestrator_turn:
+                raise WatchTripped(
+                    "context",
+                    f"an orchestrator turn carried {size:,} tokens against a "
+                    f"ceiling of {self.ceiling:,}")
 
     @property
     def packet_series_provenance(self) -> str:

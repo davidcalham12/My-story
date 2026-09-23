@@ -23,7 +23,11 @@ def run(db):
 
 def test_migration_009_creates_events_with_seq_per_run(db, run):
     cols = {r["name"] for r in db.execute("PRAGMA table_info(events)")}
-    assert cols == {"run_id", "seq", "ts", "type", "payload"}
+    # `unit` arrived with migration 016 (SPEC-EXAM-003): a novel is no longer
+    # one stream but one per unit of work, and a reader has to be able to ask
+    # which fresh orchestrator said a thing. `seq` stays dense across them all,
+    # because it is still what `Last-Event-ID` resumes from.
+    assert cols == {"run_id", "seq", "ts", "type", "payload", "unit"}
     repo.append_event(db, run, seq=1, type="system", payload='{"type": "system"}')
     repo.append_event(db, run, seq=2, type="assistant", payload='{"type": "assistant"}')
     # The same seq twice on one run is a bug in the writer, not a second event.

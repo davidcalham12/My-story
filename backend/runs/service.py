@@ -35,6 +35,7 @@ from backend.commons.runner.watch import (
     apply,
     context_size,
 )
+from backend.runs import conductor
 from backend.runs import repository as read_repo
 from backend.runs import conformance
 from backend.runs.archive import archive_run
@@ -96,6 +97,9 @@ class Live:
     halt_requested: tuple[str, str] | None = None
     #: The context watcher, so `_finish` can write down what it measured.
     context: object | None = None
+    #: Under the conductor: the units that ran, and each one's largest turn.
+    units: list[str] = field(default_factory=list)
+    largest_turn: dict[str, int] = field(default_factory=dict)
 
 
 class RunService:
@@ -156,6 +160,56 @@ class RunService:
         return {"id": run_id, "slug": slug}
 
     def _execute(self, live: Live, premise: str, profile: str, tone: str, cfg: dict) -> None:
+        """Conduct the run, one fresh orchestrator per unit (SPEC-EXAM-003).
+
+        The single process that used to write a whole novel carried the whole
+        novel in its context. The conductor launches one per unit instead, so
+        the 100,000 ceiling is a bound a run can actually keep.
+        """
+        if self.settings.use_recorded_stream:
+            # The recording is one stream for a whole novel, so replaying it
+            # through a conductor would be replaying a shape that no longer
+            # exists. The fixture keeps testing the single-process path, which
+            # is also the fallback, and `test_conductor.py` tests the other.
+            return self._execute_single(live, premise, profile, tone, cfg)
+
+        budget = self._budget_watcher(cfg)
+        state = State()
+        halted: tuple[str, str] | None = None
+        run_dir = Path(self.settings.output_dir) / self.get(live.run_id)["slug"]
+
+        def on_event(item: dict) -> None:
+            nonlocal state
+            state = item.pop("state")
+            self._record(live.run_id, state, item.pop("event"))
+            budget.observe(state)          # may raise; the conductor catches it
+            live.events.put(item)
+
+        maestro = conductor.Conductor(
+            conn=self.conn, run_id=live.run_id, slug=run_dir.name, run_dir=run_dir,
+            cfg=cfg, on_event=on_event,
+            process_factory=conductor.real_process(
+                run_dir, cwd=Path(self.settings.repo_root),
+                max_budget_usd=self.ceiling_for(cfg),
+                model=(cfg.get("models") or {}).get("orchestrator")),
+        )
+        live.process = maestro             # `halt` stops the unit in flight
+        try:
+            outcome = maestro.run()
+            state, halted = outcome.state, outcome.halted
+            live.units = [u.name for u in outcome.units_run]
+            live.largest_turn = outcome.largest_turn
+            if live.halt_requested:
+                halted = live.halt_requested
+        except Exception as exc:
+            halted = ("interrupted", str(exc)[:500])
+        finally:
+            self._finish(live, state, halted)
+
+    def _execute_single(self, live: Live, premise: str, profile: str, tone: str,
+                        cfg: dict) -> None:
+        """One orchestrator for the whole novel: the fallback, and what the
+        recorded stream replays."""
         process = self._process(premise, profile, tone, cfg)
         live.process = process
         state = State()

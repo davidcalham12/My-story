@@ -93,6 +93,22 @@ class RunProcess:
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     @classmethod
+    def for_prompt(cls, *, prompt: str, cwd: Path, executable: str = "claude",
+                   max_budget_usd: float | None = None,
+                   model: str | None = None) -> "RunProcess":
+        """A process given its task directly, rather than a whole novel.
+
+        SPEC-EXAM-003's conductor launches one of these per unit of work. The
+        argv is identical to `for_run`'s — the flags were learned the hard way
+        and there is no reason for a second copy of them — and the prompt still
+        goes on stdin, never in argv.
+        """
+        run = cls.for_run(premise="placeholder", profile="placeholder", tone="",
+                          cwd=cwd, executable=executable,
+                          max_budget_usd=max_budget_usd, model=model)
+        return cls(command=run.command, prompt=prompt, cwd=cwd)
+
+    @classmethod
     def for_run(cls, *, premise: str, profile: str, tone: str, cwd: Path,
                 executable: str = "claude",
                 max_budget_usd: float | None = None,

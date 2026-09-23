@@ -39,9 +39,13 @@ def test_the_watcher_counts_the_turns_that_crossed_the_ceiling(watched):
     assert watched.turns_over_ceiling <= watched.orchestrator_turns
 
 
-def test_a_run_whose_orchestrator_crossed_the_ceiling_is_not_halted(watched):
-    """The whole point. A watcher that counted these and stopped would have
-    stopped every run this project has ever made."""
+def test_under_one_orchestrator_a_crossing_is_counted_and_not_halted(watched):
+    """The default, and the fallback path. A watcher that counted these and
+    stopped would have stopped every run this project has ever made.
+
+    Under the conductor (SPEC-EXAM-003) the same watcher is constructed with
+    `halt_on_orchestrator_turn=True`, because a unit's context is bounded by
+    its unit; `test_conductor.py` holds that half."""
     assert watched.turns_over_ceiling >= 1  # it did cross
     # `observe_event` raised nothing above; the run is free to continue.
 
