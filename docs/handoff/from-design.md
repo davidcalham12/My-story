@@ -145,3 +145,102 @@ respuestas del examen (fecha, web+PDF, Java/elan, my-factory); qué son los
 **`my-factory`.** Visto `b654582` con las siete skills de la VM. Regla para
 todos: cada enlace nuevo de la profesora es una fila fechada en
 `references/README.md`, en el mismo commit en que se use.
+
+
+---
+
+## Diseño → coordinación y construcción — 2026-09-23, 20:30 UTC (leído `2bc3c22`)
+
+Recibido §5 de `from-build.md` en `novaforge-v2`. A partir de aquí escribo en
+este fichero. Revisado: `docs/spec.md` §5 y §7, `PLAN-001-exam` partes 1, 6 y
+7, `SPEC-EXAM-002` §10–§13. **El plan es bueno y realista para el viernes si
+E1–E3 aterrizan esta noche.** Lo que sigue son ajustes, no objeciones.
+
+### 1. Sobre el orden de recortes (PLAN-001 Parte 6)
+
+De acuerdo con el orden, con una precisión: **decidid los recortes 1 y 2 con
+dato, no con suposición.** El primer bloque del jueves (07:00) debería ser
+cinco minutos de `elan --version` / `java -version` en la VM, o su intento de
+instalación sin admin. Si entran, Lean y TLA+ dejan de ser condicionales y el
+plan gana dos evidencias; si no entran, el recorte queda justificado con la
+salida del comando pegada en `/docs`. El examen admite "justificar por qué no"
+para Lean; una justificación con evidencia vale más que una con "no había
+tiempo".
+
+Y Lean antes que TLA+ en el orden de conservación es correcto: sólo Lean tiene
+el requisito de "un caso real que los otros validadores no detectaron", y el
+brief 05 está hecho para eso.
+
+### 2. Sobre los huecos de `docs/spec.md` §7
+
+- **Langfuse post-hoc.** El examen exige que *cada validador envíe su resultado
+  como score*. Post-hoc sirve **si el exportador adjunta los scores a la traza**,
+  no sólo tokens y coste. Hoy `export_to_langfuse.py` exporta generaciones;
+  comprobad que E5/E7 añaden `score(name=<validador>, value, comment)` por cada
+  fila de `validations`. Y **una sesión por novela** que agrupe entrevista,
+  generación y regeneraciones: `session_id = novel_id`, no `run_id`, o la
+  regeneración del cambio del lector saldrá como sesión aparte.
+- **PII en Langfuse.** El alias del destinatario debe sustituir al nombre real
+  **antes** de exportar, en el texto de los spans también (los capítulos llevan
+  el nombre). Un `replace` del nombre canónico por el alias en el exportador,
+  con test. Es la respuesta a "tratamiento de datos personales" de la slide de
+  guardrails.
+- **`fact_usage` por coincidencia de cadena.** Honesto y suficiente si el
+  escritor usa los nombres canónicos tal cual — y `canonical_names` ya lo
+  fuerza. Añadid al prompt del writer una línea: *"usa el nombre exacto de la
+  bible; nunca apodos ni variantes"*. El hueco se encoge por prompt, no por
+  código.
+
+### 3. Sobre SPEC-EXAM-002 §12 — un criterio que falta
+
+El examen, en la ruta PDF, pide que la versión regenerada incluya **una página
+inicial de "novedades" con los capítulos modificados y enlaces internos a cada
+uno**. En §12 el criterio 5 cubre la marca de capítulos cambiados en *Read*,
+pero no la página de novedades en el PDF. Sugiero un criterio 5b: *"el PDF de
+una versión > 1 abre con la página de novedades y cada enlace lleva al capítulo
+correcto"* — **T + D**. Es evidencia obligatoria de la demo.
+
+### 4. Sobre `models.orchestrator: haiku`
+
+Es la decisión de más impacto en coste y en riesgo, y conviene tomarla con un
+dato que ya se puede tener esta noche: **un run `tiny-haiku`** (el perfil
+existe para eso). Si el gate converge y `conformance` sale limpia, las cinco
+evals pueden ir con orquestador Haiku y el coste por novela baja de forma
+drástica. Si no converge —el orquestador ejecuta 40 KB de procedimiento con
+arbitrajes y hojas—, se queda el modelo por defecto para los runs que cuentan
+(ejemplo, evals) y se documenta el intento. Riesgo de hacerlo sin probar:
+cinco novelas de 10 capítulos que fallan el gate el jueves por la tarde, sin
+tiempo para repetirlas.
+
+### 5. Sobre el coste en la slide de presupuesto
+
+Con las novelas en Haiku, el coste medido es Haiku (hueco 1 de §7, bien
+declarado). Para no presentar sólo la tarifa de prueba: la **sensibilidad**
+puede incluir *"si el cliente exige el modelo premium"* calculada desde
+`pricing.json` (Opus/Sonnet × los tokens medidos), marcada `estimated`. No es
+medición, es análisis, y así se dice. Cumple "reales o razonados".
+
+### 6. Sobre el perfil `final`
+
+Confirmado que el modelo vive en el front matter del agente, así que un perfil
+no puede cambiarlo. Si algún día hace falta, la vía barata es que `SKILL.md`
+lea `models.agents_override` del perfil y lo pase en el despacho (`model:` es
+parámetro del Agent tool). No para esta semana.
+
+### 7. Dos repos del examen
+
+El dueño me indicó `My-story`; vosotros creasteis `StoryMaker` con la historia
+de `backend-v1`, la spec aprobada y el plan. **`StoryMaker` es el canónico**:
+tiene el código y las aprobaciones. He dejado en `My-story` un aviso en el
+README que remite aquí, y `docs/HANDBOOK.md` y `docs/EXAM-RUNBOOK.md` allí como
+material de referencia (el runbook está parcialmente superado por vuestro
+PLAN-001, que es mejor por estar hecho con el código delante). **El dueño debe
+confirmar** que la entrega es `StoryMaker` y, si quiere, borrar `My-story` o
+dejarlo como histórico. Lo pregunto yo.
+
+### 8. Recordatorio de calendario
+
+El vídeo lo graba el dueño: la demo del cambio del lector (E8) tiene que estar
+grabable el jueves por la noche, no el viernes a las 06:00. Y la frase de la
+decisión de diseño del email (≤ 3 líneas) conviene decidirla el jueves; tres
+candidatas en `My-story/docs/EXAM-PLAN.md` §10.
