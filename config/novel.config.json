@@ -105,6 +105,8 @@
     "word_count_tolerance_pct": 0
   },
   "_comment_models": "Which model each agent runs on is declared in its own .claude/agents/<name>.md front matter, not here. Putting it in two places is how the two disagree.",
+  "_comment_models_orchestrator": "SPEC-011 W2. The model claude -p runs the ORCHESTRATOR on, passed as --model when set; null means the CLI's own default. The agents' models are in .claude/agents/*.md (all haiku since SPEC-011) and are not this key. Putting the orchestrator on Haiku is a separate decision with a named risk (SPEC-011 §4): the orchestrator arbitrates findings and applies patches. Profiles may override.",
+  "models": { "orchestrator": null },
   "_comment_budget": "Enforced, measured on the stream (SPEC-007 FR-BUD-1/4, PLAN-007 6.5): the profile's max_cost_usd is passed to claude -p as --max-budget-usd and watched by the backend; the call that crosses it is the last one. NOVAFORGE_BUDGET can only lower it. tiny was 5.0 against a measured $18.82 and is 25.0 since PLAN-007 (P-1, approved with the plan). max_calls is still advisory.",
   "budget": {
     "max_cost_usd": 25.0,

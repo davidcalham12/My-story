@@ -95,7 +95,8 @@ class RunProcess:
     @classmethod
     def for_run(cls, *, premise: str, profile: str, tone: str, cwd: Path,
                 executable: str = "claude",
-                max_budget_usd: float | None = None) -> "RunProcess":
+                max_budget_usd: float | None = None,
+                model: str | None = None) -> "RunProcess":
         command = [
             executable, "-p",
             # stream-json REQUIRES --verbose. Without it the process exits 1 and
@@ -111,6 +112,11 @@ class RunProcess:
             # The CLI's own ceiling: the first line of defence. The watcher in
             # watch.py is the second, on the same figure (FR-BUD-1, AC-21).
             command += ["--max-budget-usd", str(max_budget_usd)]
+        if model:
+            # The ORCHESTRATOR's model (SPEC-011 W2): `models.orchestrator` in the
+            # config, null = the CLI's default. The agents' models live in their
+            # own front matter and are not this flag's business.
+            command += ["--model", model]
         return cls(command=command, prompt=build_prompt(premise, profile, tone), cwd=cwd)
 
     def start(self) -> None:

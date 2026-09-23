@@ -117,6 +117,10 @@ the part that took longest to learn. The visual layer is rebuilt.
 service. There is no Anthropic API key and no way to obtain one, so the only
 access to a model is the user's own Claude Code session on this machine.
 
+The orchestrator's own model is `models.orchestrator` in `config/novel.config.json`
+— `null` means the CLI's default; a value is passed as `--model` (SPEC-011 W2).
+The agents' models are their own front matter (§4).
+
 FastAPI is the **launcher, the observer and the archive**. It starts
 `claude -p --output-format stream-json --verbose` as a subprocess with the prompt
 on stdin, reads the stream line by line, forwards it over SSE, persists state in

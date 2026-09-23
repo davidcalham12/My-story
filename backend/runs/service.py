@@ -232,6 +232,7 @@ class RunService:
             cwd=Path(self.settings.repo_root),
             # The same figure the BudgetWatcher holds (ceiling_for).
             max_budget_usd=self.ceiling_for(cfg),
+            model=(cfg.get("models") or {}).get("orchestrator"),
         )
 
     def _record(self, run_id: str, state: State, event: dict) -> None:

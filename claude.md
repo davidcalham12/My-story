@@ -27,6 +27,7 @@ python -m uvicorn backend.main:app --port 8000
 
 # to orchestrate for real — this costs the subscription, every time
 USE_RECORDED_STREAM=false NOVAFORGE_DB="$PWD/novaforge.db" NOVAFORGE_BUDGET=20   python -m uvicorn backend.main:app --port 8000
+# the orchestrator's model: config/novel.config.json -> models.orchestrator (null = CLI default; e.g. "haiku"); the agents' models are in .claude/agents/*.md
 
 # frontend
 cd frontend && npm install && npm run dev

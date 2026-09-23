@@ -288,3 +288,36 @@ def test_the_watcher_knows_every_agent_file():
     from backend.commons.runner.watch import AGENTS
     on_disk = {p.stem for p in (Path(__file__).resolve().parents[2] / ".claude" / "agents").glob("*.md")}
     assert AGENTS == on_disk, sorted(AGENTS ^ on_disk)
+
+
+# ------------------------------------------------------- PLAN-011 11.2 (SPEC-011 W2)
+
+
+def test_argv_carries_the_orchestrator_model_when_the_config_sets_one():
+    run = RunProcess.for_run(premise="p", profile="tiny", tone="", cwd=Path("."), model="haiku")
+    i = run.command.index("--model")
+    assert run.command[i + 1] == "haiku"
+    assert i > run.command.index("--allowedTools"), "after the tool list, so the list stays contiguous"
+    assert "p" not in run.command, "the prompt is still on stdin"
+
+
+def test_argv_carries_no_model_flag_when_the_config_leaves_it_null():
+    run = RunProcess.for_run(premise="p", profile="tiny", tone="", cwd=Path("."), model=None)
+    assert "--model" not in run.command
+    default = RunProcess.for_run(premise="p", profile="tiny", tone="", cwd=Path("."))
+    assert "--model" not in default.command
+
+
+def test_the_orchestrator_model_is_read_from_the_resolved_config_not_a_literal(db, tmp_path):
+    """SPEC-011 W2 / C6: `models.orchestrator` in novel.config.json, null by
+    default (the CLI's own default); a profile overlay wins."""
+    from backend.commons.config import loader
+    from backend.commons.config.settings import Settings
+    from backend.runs.service import RunService
+    base = loader.resolve("tiny")
+    assert "models" in base and base["models"]["orchestrator"] is None, "the knob exists and is null by default"
+    svc = RunService(db, Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=False))
+    assert "--model" not in svc._process("A premise long enough.", "tiny", "", base).command
+    overlaid = {**base, "models": {**base["models"], "orchestrator": "haiku"}}
+    cmd = svc._process("A premise long enough.", "tiny", "", overlaid).command
+    assert cmd[cmd.index("--model") + 1] == "haiku"
