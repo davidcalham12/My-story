@@ -1,3 +1,14 @@
+> ⚠️ **Aviso (2026-09-23, 20:30 UTC).** El repositorio del examen que tiene el
+> código, la spec aprobada (`SPEC-EXAM-001`), el plan por horas (`PLAN-001-exam`)
+> y los cinco briefs es **https://github.com/davidcalham12/StoryMaker**, clonado
+> de `novaforge-v2` @ `055c31d` con historia. Este repo (`My-story`) conserva el
+> esqueleto del 15-09 y los documentos de la sesión de diseño (`docs/HANDBOOK.md`,
+> `docs/EXAM-PLAN.md`, `docs/EXAM-RUNBOOK.md`) como referencia. **Pendiente de
+> que el dueño confirme cuál es la entrega.** Decisiones del dueño ya tomadas:
+> entrega **viernes 2026-09-25 por la mañana**; empresa presentadora **Qaracter**
+> (identidad del sistema de diseño de la organización); lectura en **PDF**, no
+> web; novelas en Haiku.
+
 # Handbook — qué se hizo, qué fue lo último, cómo seguir
 
 Para la sesión de Claude Code (o la persona) que retome este repositorio sin
