@@ -787,6 +787,8 @@ first real v2 run recorded, read by `check_log` at PLAN-007 6.12: **3 rows
 timestamps from durations and labelled them — which is the difference between a
 figure and a guess, and the label is why the check reports rather than refuses.
 The backend's own `calls.ts` comes from the stream and does not depend on it.
+**The two Paso 10 runs recorded 33 of 33 and 37 of 37 `measured`** — the
+procedure had already moved; the check is what lets that be said as a count.
 
 ### 7.12 A second follower of a finished run waited forever
 
@@ -822,3 +824,75 @@ On a fresh scratch database, `import_v1` without slugs imported two v2 runs as
 In the deployed database they are already rows and are skipped; on an empty one
 they are not. `verification.md` §3.20; the fix belongs to the next spec that
 touches the importer.
+
+## 8. What the two runs through the backend showed, 2026-09-22
+
+Both started by `POST /api/runs`, followed over SSE to `done`, archived by the
+backend. Every figure below is **measured** from Claude Code's own `result`
+event or the run's own files; nothing is estimated.
+
+| | `tiny` | `stress` |
+|---|---|---|
+| slug | `night-translator-rewriting-phrasebook` | `cartographer-valley-funding-review` |
+| cost | **$16.25** | **$20.15** |
+| ceiling (profile) | 25.0 | 40.0 |
+| turns · wall | 136 · 35.7 min | 158 · 45.8 min |
+| subagent dispatches | 27 | 27 |
+| chapters · attempts | 3 · 4 | 3 · 4 |
+| retries | ch3: `prose` 7 → attempt 2 → 10 | ch3: `prose` 7, `continuity` 8 → attempt 2 → 10 |
+| lowest passing aggregate | 9 | **8** (ch1 on `science`, ch2 on `prose`) |
+| conformance | conformant, 4 attempts checked | conformant, 4 attempts checked |
+| `patch_then_halt` | not reached | **not reached** |
+| stream lines in `events` | 876 | 958 |
+| `calls` rows · with tokens | 7 · 0 | 5 · 0 |
+| `logs/agents.jsonl` timestamps | 33 measured | 37 measured |
+
+### 8.1 A tiny run costs less than it did, and the difference is not the backend
+
+$16.25 against the $18.82 of `lighthouse-keeper-ledger`, the previous tiny run
+(−14%). Same profile, one more characteristic, one retry each. The backend adds
+nothing to the bill — it reads a stream — so the difference is the orchestrator's
+own turn count and the length of what it carried, which vary run to run. **One
+pair is not a trend**; it is two points, and the second is lower.
+
+### 8.2 The stress profile did not fail
+
+It is *built to fail* (`stress.json`), and both real runs of it now — LOOP-003's
+in v1 and this one — reached the third attempt or the patch path only once, in
+v1. Here chapter 3 needed one redraft and chapters 1–2 passed **at exactly 8**,
+the threshold. `patch_then_halt` is still demonstrated once and tested never
+(`verification.md` §3.1). AC-15b says "or explains why it did not": the model
+wrote chapters that cleared a gate designed against them, on the first or second
+try. What the profile stresses is the writer; the writer got better than the
+profile.
+
+### 8.3 `prose` is what blocks now
+
+Both retries in both runs were `prose` at 7, both on chapter 3. Continuity — the
+characteristic that blocked nine of twelve failures across the earlier runs
+(§3.3a) — blocked nothing here, and dipped to 8 once. Two runs; but the sixth
+characteristic, added because nothing read the prose, is the one reading it.
+
+### 8.4 The one quantity the ceiling is about is still not in the stream
+
+27 dispatches per run; **7 and 5 `calls` rows, none with tokens**. The
+`task_progress` events that name a subagent carry no `usage`, exactly as
+`architecture.md` §6.3 measured on the two earlier recordings. Three runs now.
+The context watcher has never seen a real packet, and says `absent`
+(`verification.md` §3.5); AC-6 holds on an injected packet and on nothing else.
+
+### 8.5 `--max-budget-usd` was on the argv and was never tested by the run
+
+Both runs ended at 65% and 50% of their ceilings. Whether the CLI flag binds
+under a subscription — stops the run, or is ignored — is not known from a run
+that never reached it (`verification.md` §3.21, PLAN-007 P-2). The
+watcher is the second line and *is* tested; the first line is passed and
+unproven.
+
+### 8.6 The archive warns about a file the procedure writes on purpose
+
+Three warnings per run: `chNN.prose_check.json: not a chapter critique, skipped`.
+That file is `check_prose`'s output, written beside the critiques by design; the
+archiver does not know the name and says so every time. Harmless, and noise —
+a warning that fires on every run stops being read. The next spec that touches
+the archive gives it the name.

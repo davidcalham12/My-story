@@ -1,0 +1,28 @@
+{
+  "critic": "prose",
+  "chapter": 2,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:31:48Z",
+      "score": 9,
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "the chained phrasebook, which stayed on its chain, as it did",
+          "claim": "the clause repeats the fact of the chain twice inside one sentence and 'as it did' adds nothing, so the sentence drags where the paragraph should be moving toward the cupboard's contents",
+          "fix": "cut the trailing clause after 'phrasebook' so the sentence ends on the placement of the volume, letting the chain detail stand once",
+          "reference": "prose: minor, verified verbatim in the draft"
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×1 = 9",
+      "critic_notes": "0 major, 1 minor. Deliberate repetitions read as the device working; indirect speech stays in the described voices.",
+      "tokens": 15465,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

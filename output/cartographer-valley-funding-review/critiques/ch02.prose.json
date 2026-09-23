@@ -1,0 +1,37 @@
+{
+  "critic": "prose",
+  "chapter": 2,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:09:00Z",
+      "score": 8,
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "wrote the levy figures on the facing page, opposite her own ruled-through columns",
+          "claim": "the sentence states the spatial relation twice — 'facing page' and 'opposite her own columns'",
+          "fix": "state the relation once and let the single fact carry the sentence",
+          "reference": "bible/characters.md, Hartley register: field-notebook plain, nothing spare",
+          "arbitration": "UPHELD: quote present verbatim; the redundancy is real"
+        },
+        {
+          "severity": "minor",
+          "quote": "she said, aloud, the way one says a number to keep it",
+          "claim": "'said' already implies spoken; 'aloud' repeats the fact",
+          "fix": "drop the redundant modifier",
+          "reference": "bible/characters.md, Hartley register: dry understatement inside procedural sentences",
+          "arbitration": "UPHELD as minor: quote present verbatim; 'aloud' is defensible as marking speech to herself rather than to Ord, but the critic's reading is a fair editor's note and costs one point"
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×2 = 8",
+      "critic_notes": "0 major, 2 minor. Registers held distinctly; Rosa's direct total noted as a character nuance, not raised.",
+      "tokens": 20480,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

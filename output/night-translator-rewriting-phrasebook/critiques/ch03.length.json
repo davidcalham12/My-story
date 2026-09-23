@@ -1,0 +1,23 @@
+{
+  "critic": "length",
+  "chapter": 3,
+  "kind": "arithmetic",
+  "agent": "orchestrator (wc -w)",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:36:53Z",
+      "words": 438,
+      "score": 10,
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T22:41:17Z",
+      "words": 433,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

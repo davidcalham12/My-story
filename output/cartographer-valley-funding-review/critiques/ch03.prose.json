@@ -1,0 +1,48 @@
+{
+  "critic": "prose",
+  "chapter": 3,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:14:40Z",
+      "score": 7,
+      "findings": [
+        {
+          "severity": "major",
+          "quote": "Four days before the deadline Hartley laid every reading in Notebook 12 out across the table in date order and ruled a single line under all of it that did not name a stone.",
+          "claim": "the relative clause 'that did not name a stone' can attach to the line or to the readings, and the layout (stone readings above, landmark bearings below) only becomes clear from the next paragraph; the chapter's first event costs a re-read",
+          "fix": "state the division directly, in the order the reader needs it: two groups, those named to a stone and those tied to a landmark, and one line drawn between them, without folding the line into a relative clause",
+          "reference": "outline beat 1 — she lays out every reading and rules a line under everything that is not named to a stone; bible/characters.md, Hartley register: field-notebook plain",
+          "arbitration": "UPHELD: quote present verbatim; the clause is genuinely ambiguous"
+        },
+        {
+          "severity": "minor",
+          "quote": "She stood there until it went over the ridge with light still on it.",
+          "claim": "two unmarked 'it's in one clause leave unclear what crosses the ridge and what the light is on",
+          "fix": "name what crosses the ridge once and attach the light to that same named thing",
+          "reference": "outline beat 9 — she watches the bundle go over the ridge while there is still light on it",
+          "arbitration": "UPHELD: quote present verbatim"
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×1 − 1×1 = 7",
+      "critic_notes": "1 major, 1 minor. Both sentence-level clarity problems local to this chapter.",
+      "tokens": 20886,
+      "model": "claude-sonnet-5"
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T23:21:45Z",
+      "score": 10,
+      "findings": [],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×0 = 10",
+      "critic_notes": "0 major, 0 minor. Both attempt-1 defects read as genuinely repaired. No late findings raised.",
+      "tokens": 21260,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

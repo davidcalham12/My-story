@@ -1,0 +1,28 @@
+{
+  "critic": "science",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:14:40Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 22420,
+      "model": "claude-sonnet-5",
+      "notes": "first reply: score 6, one high R4 finding. Re-examined against timeline and mysteries canon on the orchestrator's question; withdrawn, re-scored 10. Tokens 22420 cumulative: 16942 first reply + 5478 resume.",
+      "raw_score": 6
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T23:21:45Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 14544,
+      "model": "claude-sonnet-5",
+      "notes": "no findings"
+    }
+  ]
+}

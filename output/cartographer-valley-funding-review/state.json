@@ -1,0 +1,140 @@
+{
+  "premise": "A cartographer hired to map a valley that refuses to stay the same shape must deliver a final map before the funding review.",
+  "profile": "stress",
+  "slug": "cartographer-valley-funding-review",
+  "tone": "wry literary fabulism with a dry institutional edge — a landscape that will not hold still, told in the plain register of fieldwork notebooks and grant paperwork; melancholy and quiet humour, no horror, no spectacle, the strangeness always measured before it is felt",
+  "stage": "complete",
+  "started_utc": "2026-09-22T22:47:39Z",
+  "canonical_names": [
+    "Nell Hartley",
+    "Rosa Vane",
+    "Sam Ord",
+    "Arthur Penn"
+  ],
+  "chapters": [
+    {
+      "n": 1,
+      "title": "Stone Three, Full Day",
+      "verdict": "accept",
+      "accepted_attempt": 1,
+      "attempts": 1,
+      "words": 486,
+      "scores": {
+        "continuity": 10,
+        "science": 8,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 9
+      },
+      "aggregate": 8,
+      "best_aggregate": 8,
+      "promoted": true,
+      "prose_check": "clean",
+      "note": "science first returned 4 on a high finding that read two of nineteen figures as the same feature; re-examined by the critic on the orchestrator's question and revised to 8 with a low ambiguity finding, recorded and not acted on. Passed on its own, no patch."
+    },
+    {
+      "n": 2,
+      "title": "Struck Through, Kept Legible",
+      "verdict": "accept",
+      "accepted_attempt": 1,
+      "attempts": 1,
+      "words": 448,
+      "scores": {
+        "continuity": 9,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 8
+      },
+      "aggregate": 8,
+      "best_aggregate": 8,
+      "promoted": true,
+      "prose_check": "clean",
+      "note": "Passed on its own, no patch. Continuity's one low finding (Rosa's levy arithmetic does not multiply) and prose's two minors are recorded and not acted on."
+    },
+    {
+      "n": 3,
+      "title": "What the Stones Fix",
+      "verdict": "accept",
+      "accepted_attempt": 2,
+      "attempts": 2,
+      "words": 502,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 10
+      },
+      "aggregate": 10,
+      "best_aggregate": 10,
+      "promoted": true,
+      "prose_check": "clean",
+      "attempt_1": {
+        "scores": {
+          "continuity": 8,
+          "science": 10,
+          "outline": 10,
+          "length": 10,
+          "chatter": 10,
+          "prose": 7
+        },
+        "aggregate": 7,
+        "raw_science": 6,
+        "note": "Rejected on prose (1 major, 1 minor). Science first returned 6 on a high R4 finding against a sentence that reproduces bible/timeline.md Chapter 3 and the audited outline beat 10; re-examined by the critic on the orchestrator's question and withdrawn, re-scored 10."
+      },
+      "note": "Passed on its own at attempt 2, no patch. Level-1 sheet sent (validated); the writer returned 3 literal substitutions, all applied, quoted passages verified gone, word count unchanged at 502. No late findings."
+    }
+  ],
+  "bible_complete": true,
+  "outline_complete": true,
+  "outline_audited": true,
+  "outline_audit": "defects: 2 R4 violations upheld and fixed in ch3 beats 8-10; R1 ambiguity upheld and fixed in the Bible; R2, R5 ambiguities overruled",
+  "finished_utc": "2026-09-22T23:29:49Z",
+  "title": "What the Stones Fix",
+  "chapters_planned": 3,
+  "book": "output/cartographer-valley-funding-review/dist/book.md",
+  "book_words": 1684,
+  "chapter_words_total": 1436,
+  "synopsis_words": 246,
+  "gate_summary": {
+    "chapters_passed_on_their_own": 3,
+    "chapters_that_needed_the_patch_to_reach_the_threshold": 0,
+    "chapters_halted": 0,
+    "chapters_accepted_on_the_first_attempt": 2,
+    "chapters_that_took_a_second_attempt": 1,
+    "chapters_that_needed_a_third_attempt": 0,
+    "note": "stress profile (9-10 beats in a 300-550 band, tolerance 0). The outline-vs-length tension the fixture was built to force did not materialise: all six drafts sat inside the band with every beat present. The one rejection (ch3 attempt 1) was on prose (1 major, 1 minor). The third attempt, the literal-replacement sheet and patch_then_halt were therefore not exercised on this run either."
+  },
+  "style_passes_discarded": [],
+  "summaries_over_cap": {
+    "ch02.summary.md": 133,
+    "note": "measured after it had gone into chapter 3's packet; left as written per SKILL.md (trim the next, never truncate one already written). ch01 119, ch03 120."
+  },
+  "critic_reexaminations": [
+    {
+      "chapter": 1,
+      "attempt": 1,
+      "critic": "science",
+      "from": 4,
+      "to": 8,
+      "why": "read two of nineteen figures as one feature; R2 is per feature"
+    },
+    {
+      "chapter": 3,
+      "attempt": 1,
+      "critic": "science",
+      "from": 6,
+      "to": 10,
+      "why": "faulted a sentence that reproduces bible/timeline.md Chapter 3 and the audited outline beat 10 under R4"
+    }
+  ],
+  "orchestrator_lessons": [
+    "Count a summary with the script BEFORE it goes into the next packet, not beside the dispatch. ch02's went out at 133 words against 120 because the check and the dispatch were issued in the same reply.",
+    "Putting a disputed finding back to the critic with the canon it missed worked twice and kept the score the critic's rather than the orchestrator's; both times the critic withdrew or downgraded.",
+    "When the outline audit sends beats back for rewriting, re-audit the rewritten beats; here the rewritten beat 10 was not re-audited and a science critic later faulted the sentence built from it."
+  ]
+}

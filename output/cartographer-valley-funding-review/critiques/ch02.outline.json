@@ -1,0 +1,18 @@
+{
+  "critic": "outline",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:09:00Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11540,
+      "model": "claude-sonnet-5",
+      "notes": "All 10 beats present and in order; 10 - 0 = 10"
+    }
+  ]
+}

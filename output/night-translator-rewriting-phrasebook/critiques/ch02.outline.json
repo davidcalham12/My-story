@@ -1,0 +1,22 @@
+{
+  "critic": "outline",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:31:48Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 13539,
+      "model": "claude-sonnet-5",
+      "notes": [
+        "Beats 1-5 present, in order",
+        "10 - 0 (no beats missing) - 0 (no beats out of order) = 10"
+      ],
+      "note": "returned JSON inside a code fence despite the instruction; parseable, arithmetic matches findings"
+    }
+  ]
+}

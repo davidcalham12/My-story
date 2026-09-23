@@ -466,6 +466,41 @@ to Python, and each is a separate SPEC item if the team prefers.
 | AC-16 | The 100k pre-dispatch estimate in `SKILL.md` is present and applied (read the skill; inspect one run's log) | I |
 | AC-17 | No dependency on the Anthropic SDK; grep for `anthropic` and `ANTHROPIC_API_KEY` returns nothing outside docs | A |
 
+### 10.1 Results, 2026-09-22 (Paso 10)
+
+Recorded after PLAN-007 6.1–6.12 on `backend-v1`. Letters are the spec's; the
+evidence column names the test, the command, or the run. Nothing here was run
+by hand except what the letter says is inspection or demonstration.
+
+| id | letter | result | evidence |
+|---|---|---|---|
+| AC-1 | T | pass | `test_start_a_run_and_follow_it_to_completion`, `test_the_queue_is_one`, `test_the_prompt_is_never_an_argument`; and the real runs below |
+| AC-2 | T | pass | `test_a_line_that_is_not_json_is_kept_as_skipped_not_silently_dropped`, `test_a_malformed_line_becomes_a_run_warning` |
+| AC-3 | T | pass | `test_runner.py` over the recorded fixture (slug learned, dispatches counted, cost from `result`) |
+| AC-4 | T | pass | `test_the_measured_cost_is_stored_and_preferred_over_the_sum`, `test_the_whole_run_cost_comes_from_the_result_event` |
+| AC-5 | T | pass | `test_the_budget_stops_the_run_when_the_reported_cost_crosses_it` |
+| AC-6 | T (fixture) | pass on an injected packet; **on real streams the packet `usage` reads zero** (P-11, `verification.md` §3.5) | `test_an_oversized_subagent_packet_halts_the_run`, `test_unreported_packets_are_absent_rather_than_zero` |
+| AC-7 | T | pass | `test_the_cli_entry_point_imports_the_eight_v1_runs`, `test_an_unknown_critique_shape_is_a_parse_error_row_not_a_drop`; the CLI on a fresh database at Paso 10 (see §3.20 of `verification.md` for what it also did) |
+| AC-8 | T | pass | `test_agents_frontmatter.py` |
+| AC-9 | T | pass | `test_skill_contract.py`, `test_formulas_agree.py` |
+| AC-10 | T | pass | `test_no_route_takes_a_path_and_reads_a_file` (corrected once — it was committed red) |
+| AC-11 | T (module) | pass; the skill does not call it (Q5) | `test_vectors.py` |
+| AC-12 | D | **pass** — `outline.audit.json` of the stress run: verdict `defects`, one violation (chapter 3, beat 9, rule R4, severity high) found at FLOW-3 and the outline revised before FLOW-4; chapter 3 then needed one redraft, on `prose`, not on the audited beat | `output/cartographer-valley-funding-review/critiques/outline.audit.json` |
+| AC-13 | T | pass | `validate-sheet.mjs --self-test`, `test_the_sheet_validator_requires_all_six_scores` |
+| AC-14 | T | pass | `measure.mjs --self-test` (six characteristics, two named SKIPs on the fixture), `test_the_measurement_instrument_knows_six_characteristics` |
+| AC-15 | D | `night-translator-rewriting-phrasebook` — complete; halted=None (None); cost $16.25 (measured); 3 chapters, 4 attempts, 3 promoted; conformance conformant; warnings 3 | `specs/PLAN-007-results/tiny.json`, `output/<slug>/cost.json`, `docs/domain-knowledge.md` §8 |
+| AC-15b | D | `cartographer-valley-funding-review` — complete; halted=None (None); cost $20.15 (measured); 3 chapters, 4 attempts, 3 promoted; conformance conformant; warnings 3 | `specs/PLAN-007-results/stress.json`, `output/<slug>/` |
+| AC-16 | I | the skill's 100k estimate is present (`SKILL.md`, `architecture.md` §6.1); `check_log` on the real runs reports the timestamp provenance — see `domain-knowledge.md` §8 | `python -m backend.chapters.check_log output/<slug>` |
+| AC-17 | A | pass — `anthropic` / `ANTHROPIC_API_KEY` appear only in three docstrings that say there is none; no network client is imported outside tests | `grep -rn -iE "anthropic|ANTHROPIC_API_KEY" backend frontend/src`; `grep -rn -E "^(import|from) (httpx|requests)" backend` |
+| AC-18 | T | pass | `test_halt_stops_the_process_and_marks_halted_user`, `test_halt_keeps_what_was_persisted_readable`, `test_halt_on_an_unknown_or_finished_run_is_404_or_409` |
+| AC-19 | T | pass | `test_a_run_left_running_is_marked_halted_process_on_startup` |
+| AC-20 | T | pass | `test_every_stream_line_is_in_events_with_a_dense_seq`, `test_sse_id_field_is_the_persisted_seq`, `test_last_event_id_replays_from_the_next_seq_then_goes_live`, `test_last_event_id_beyond_the_end_yields_only_done` |
+| AC-21 | T | pass | `test_argv_carries_max_budget_usd_from_the_ceiling_it_is_given`, `test_the_same_figure_reaches_argv_and_the_watcher` |
+
+Suite at this table: **494 backend tests, 19 frontend**, `tsc` clean, both Node
+self-tests green. Imported at Paso 10 on a scratch database: the eight v1 runs
+(and, uninvited, two v2 runs — `verification.md` §3.20).
+
 ## 11. Failure modes considered (full table in `docs/verification.md` §6)
 
 `claude` missing or unauthenticated · malformed stream line · process exits

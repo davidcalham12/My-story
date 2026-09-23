@@ -1,0 +1,8 @@
+{
+  "_comment": "From Claude Code's own result event. The WHOLE run, orchestrator turns included \u2014 which is most of it.",
+  "total_cost_usd": 16.246258649999998,
+  "turns": 136,
+  "duration_ms": 2139520,
+  "subagent_dispatches": 27,
+  "provenance": "measured"
+}

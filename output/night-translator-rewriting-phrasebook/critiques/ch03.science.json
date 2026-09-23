@@ -1,0 +1,25 @@
+{
+  "critic": "science",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:36:53Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 13309,
+      "model": "claude-sonnet-5"
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T22:41:17Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11594,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "critic": "outline",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:14:40Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11348,
+      "model": "claude-sonnet-5",
+      "notes": "All 10 beats present and in order; 10 - 0 = 10"
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T23:21:45Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11820,
+      "model": "claude-sonnet-5",
+      "notes": "10 - 0 = 10; all 10 beats present in order"
+    }
+  ]
+}

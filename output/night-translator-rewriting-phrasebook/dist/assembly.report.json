@@ -1,0 +1,112 @@
+{
+  "ts": "2026-09-22T22:44:12Z",
+  "style": [
+    {
+      "chapter": 1,
+      "gate_words": 459,
+      "final_words": 459,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    },
+    {
+      "chapter": 2,
+      "gate_words": 443,
+      "final_words": 443,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    },
+    {
+      "chapter": 3,
+      "gate_words": 433,
+      "final_words": 433,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    }
+  ],
+  "synopsis": {
+    "words": 248,
+    "band": {
+      "min": 150,
+      "max": 250
+    },
+    "within": true,
+    "comparables_italic": 2,
+    "comparables_band": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "book": {
+    "path": "C:\\Users\\student\\Desktop\\novaforge-v2\\output\\night-translator-rewriting-phrasebook\\dist\\book.md",
+    "words_total": 1585,
+    "chapter_words": 1335,
+    "formats": [
+      "markdown"
+    ],
+    "pdf": "not available on this branch; outputs.formats asks for markdown only"
+  },
+  "flow6_checks": {
+    "failed": [],
+    "results": [
+      {
+        "check": "the assembled book repeats nothing",
+        "ok": true,
+        "detail": {
+          "defects": [],
+          "verdict": "clean"
+        }
+      },
+      {
+        "check": "every promise landed in a chapter that exists",
+        "ok": true,
+        "detail": {
+          "status": "coherent",
+          "problems": {}
+        }
+      },
+      {
+        "check": "summaries within their cap",
+        "ok": true,
+        "detail": {
+          "summaries": [
+            {
+              "summary": "ch01.summary.md",
+              "words": 118,
+              "cap": 120,
+              "over_by": 0,
+              "within": true
+            },
+            {
+              "summary": "ch02.summary.md",
+              "words": 119,
+              "cap": 120,
+              "over_by": 0,
+              "within": true
+            },
+            {
+              "summary": "ch03.summary.md",
+              "words": 119,
+              "cap": 120,
+              "over_by": 0,
+              "within": true
+            }
+          ],
+          "over": 0
+        }
+      },
+      {
+        "check": "call log timestamps parse, in order, with their provenance",
+        "ok": true,
+        "detail": {
+          "rows": 33,
+          "monotonic": true,
+          "ts_source": {
+            "measured": 33
+          },
+          "problems": [],
+          "note": "`derived_from_duration` is honest provenance, not a defect; what fails is a timestamp that does not parse or runs backwards."
+        }
+      }
+    ]
+  }
+}

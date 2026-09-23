@@ -1,0 +1,33 @@
+{
+  "critic": "outline",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:36:53Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11764,
+      "model": "claude-sonnet-5",
+      "notes": [
+        "Beats 1-5 delivered in order",
+        "10 - 0 (no missing beats) - 0 (no beats out of order) = 10"
+      ]
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T22:41:17Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11577,
+      "model": "claude-sonnet-5",
+      "notes": [
+        "All 5 beats present and in order",
+        "10 - 0 (no missing beats) - 0 (no out-of-order beats) = 10"
+      ]
+    }
+  ]
+}

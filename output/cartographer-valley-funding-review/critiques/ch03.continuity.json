@@ -1,0 +1,37 @@
+{
+  "critic": "continuity",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:14:40Z",
+      "score": 8,
+      "findings": [
+        {
+          "kind": "terminology-drift",
+          "severity": "low",
+          "quote": "Stone One through Stone Nine, sited and lettered",
+          "claim": "the Bible names the stones by number word; 'lettered' can be read as an alphabetic labelling the Bible does not establish",
+          "fix": "replace 'lettered' with a word consistent with number-word naming, e.g. 'sited and numbered'",
+          "reference": "bible/characters.md, Canonical spellings: Stone One through Stone Nine, always by number word",
+          "arbitration": "UPHELD at low, with a reservation: 'lettered' is drafting vocabulary for carrying text labels and need not mean letters A to I, but the ambiguity is real and one word removes it. Carried into the sheet."
+        }
+      ],
+      "tokens": 16944,
+      "model": "claude-sonnet-5",
+      "notes": "one low finding"
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T23:21:45Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 16767,
+      "model": "claude-sonnet-5",
+      "notes": "no findings; attempt-1 low finding ('lettered') resolved by patch"
+    }
+  ]
+}

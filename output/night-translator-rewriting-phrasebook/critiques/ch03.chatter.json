@@ -1,0 +1,23 @@
+{
+  "critic": "chatter",
+  "chapter": 3,
+  "kind": "arithmetic",
+  "agent": "orchestrator (first line matches ^#\\s+Chapter)",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:36:53Z",
+      "first_line": "# Chapter 3 — Page Two Hundred and Twelve",
+      "score": 10,
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T22:41:17Z",
+      "first_line": "# Chapter 3 — Page Two Hundred and Twelve",
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

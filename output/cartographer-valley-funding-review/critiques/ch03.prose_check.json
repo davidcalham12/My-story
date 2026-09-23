@@ -1,0 +1,15 @@
+{
+  "defects": [],
+  "checked": [
+    "duplicate-sentence",
+    "heading-without-a-blank-line",
+    "echoed-opening",
+    "name-one-letter-out"
+  ],
+  "not_checked": [
+    "whether a fact stated here contradicts one stated elsewhere",
+    "voice, pacing, dialogue, originality",
+    "whether any sentence earns its place"
+  ],
+  "verdict": "clean"
+}

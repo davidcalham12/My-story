@@ -1,0 +1,15 @@
+{
+  "defects": [],
+  "checked": [
+    "duplicate-sentence",
+    "heading-without-a-blank-line",
+    "echoed-opening"
+  ],
+  "not_checked": [
+    "whether a fact stated here contradicts one stated elsewhere",
+    "voice, pacing, dialogue, originality",
+    "whether any sentence earns its place",
+    "canonical names \u2014 no characters.md was given to compare against"
+  ],
+  "verdict": "clean"
+}

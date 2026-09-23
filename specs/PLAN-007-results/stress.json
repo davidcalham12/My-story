@@ -1,0 +1,126 @@
+{
+  "profile": "stress",
+  "premise": "A cartographer hired to map a valley that refuses to stay the same shape must deliver a final map before the funding review.",
+  "created": {
+    "id": "ed92301b908c",
+    "slug": "a-cartographer-hired-to-map-a"
+  },
+  "done_result": "complete",
+  "run": {
+    "id": "ed92301b908c",
+    "slug": "cartographer-valley-funding-review",
+    "premise": "A cartographer hired to map a valley that refuses to stay the same shape must deliver a final map before the funding review.",
+    "profile": "stress",
+    "tone": null,
+    "stage": "complete",
+    "halted": null,
+    "halted_detail": null,
+    "source": "v2",
+    "started_at": "2026-09-22T22:45:20Z",
+    "finished_at": "2026-09-22T23:31:09Z",
+    "config_hash": "62781c165069193f"
+  },
+  "cost": {
+    "calls": 5,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_usd": 20.14531315,
+    "tokens_provenance": "absent",
+    "summed_from_calls_usd": null,
+    "total_provenance": "measured",
+    "provenance": [
+      "absent"
+    ],
+    "turns": 158,
+    "duration_ms": 2747949,
+    "subagent_dispatches": 27
+  },
+  "warnings": [
+    {
+      "kind": "archive",
+      "detail": "ch01.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T23:31:09Z"
+    },
+    {
+      "kind": "archive",
+      "detail": "ch02.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T23:31:09Z"
+    },
+    {
+      "kind": "archive",
+      "detail": "ch03.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T23:31:09Z"
+    }
+  ],
+  "conformance": {
+    "attempts_checked": 4,
+    "unjudgeable": 0,
+    "breaches": [],
+    "verdict": "conformant"
+  },
+  "attempts": [
+    {
+      "chapter": 1,
+      "attempt": 1,
+      "aggregate": 8,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 9,
+        "science": 8
+      }
+    },
+    {
+      "chapter": 2,
+      "attempt": 1,
+      "aggregate": 8,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 9,
+        "length": 10,
+        "outline": 10,
+        "prose": 8,
+        "science": 10
+      }
+    },
+    {
+      "chapter": 3,
+      "attempt": 1,
+      "aggregate": 7,
+      "verdict": "retry",
+      "promoted": false,
+      "scores": {
+        "chatter": 10,
+        "continuity": 8,
+        "length": 10,
+        "outline": 10,
+        "prose": 7,
+        "science": 10
+      }
+    },
+    {
+      "chapter": 3,
+      "attempt": 2,
+      "aggregate": 10,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 10,
+        "science": 10
+      }
+    }
+  ]
+}

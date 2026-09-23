@@ -1,0 +1,66 @@
+{
+  "critic": "prose",
+  "chapter": 3,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:36:53Z",
+      "score": 7,
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "She filled it in in ink.",
+          "claim": "the doubled 'in' reads as a slip rather than a deliberate beat, snagging a sentence in a chapter whose register depends on exactness",
+          "fix": "break the collision of the two prepositions so the sentence reads cleanly",
+          "reference": "bible/characters.md register notes: Vasko's interior voice is dry and exact",
+          "arbitration": "UPHELD: quote present verbatim; the collision is real"
+        },
+        {
+          "severity": "minor",
+          "quote": "He set the blank on the counter beside her, square to the edge. He did not offer to recopy it. He did not suggest they settle it between them.",
+          "claim": "three consecutive sentences share the identical 'He [verb]' shape, giving Brandt's restraint a mechanical clatter instead of the dry, withheld quality the scene is building",
+          "fix": "fold the two negatives into one sentence so the passage keeps two shapes, not three",
+          "reference": "bible/characters.md register notes: Brandt softens by describing paperwork; the restraint should read as withheld, not mechanical",
+          "arbitration": "UPHELD: quote present verbatim; three identical shapes in a row is a listed minor"
+        },
+        {
+          "severity": "minor",
+          "quote": "and that its not writing back was the whole of what the post would ever hold of Dora Lenk",
+          "claim": "the possessive gerund 'its not writing back' snags the reading at the chapter's most weighted line",
+          "fix": "replace the possessive gerund with a plain noun for the district's silence, keeping the rest of the clause",
+          "reference": "bible/characters.md register notes: dry and exact; bible/mysteries.md: the district's silence is the only account of Lenk",
+          "arbitration": "UPHELD: quote present verbatim; awkward at the line that lands a promise"
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×3 = 7",
+      "critic_notes": "0 major, 3 minor. Dialogue voicing consistent; 'same' and the counting motif working as devices.",
+      "tokens": 16538,
+      "model": "claude-sonnet-5"
+    },
+    {
+      "iteration": 2,
+      "ts": "2026-09-22T22:41:17Z",
+      "score": 10,
+      "findings": [
+        {
+          "late": true,
+          "counted": false,
+          "severity": "major",
+          "quote": "and that the district's silence was the whole of what the post would ever hold of Dora Lenk. There was nothing else.",
+          "claim": "'There was nothing else.' restates the clause before it and blunts the sentence that follows",
+          "fix": "cut 'There was nothing else.' so the page-212 sentence lands as the new fact",
+          "arbitration": "LATE. The sentence 'There was nothing else.' stood verbatim in attempt 1, which this critic scored with no major findings; raised only on attempt 2 it moves the goalposts. Recorded in specs/loops/LOOP-003/late_findings.jsonl, not counted, and not applied: the deletion would put text in the book that the continuity, science and outline critics did not judge, and the finding is one of emphasis, not error."
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×0 = 10",
+      "critic_notes": "1 major (self-declared late), 0 minor. Everything else reads as intentional.",
+      "tokens": 15805,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

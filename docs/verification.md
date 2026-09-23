@@ -1076,6 +1076,20 @@ why.
 **Reviewed by:** whoever adds the first `logging` call, who should read this row
 first.
 
+### 3.21 Whether `--max-budget-usd` binds under a subscription is unknown
+
+**What is not verified:** that the CLI flag the runner passes (G22) stops a
+`claude -p` run at the figure, when the session is a subscription rather than
+API credit.
+**Why accepted:** the only way to learn it is a run that reaches its ceiling,
+and the two Paso 10 runs ended at 65% and 50% of theirs; provoking it costs a
+run. The watcher on the stream is the second line and is tested (G22).
+**Scope of damage:** none while the watcher holds; the flag is the cheaper stop,
+not the only one.
+**How we would find out:** a run halted `budget` by the watcher whose `result`
+shows the CLI let it past the figure — or the opposite.
+**Reviewed by:** whoever first sees a `halted: budget` on a real run.
+
 ### 3.20 The import CLI on a fresh database labels v2 runs as v1 history
 
 **What is not verified:** that `python -m backend.commons.db.import_v1` run
@@ -1241,7 +1255,7 @@ planned — and which it does not, with why.
 
 | version | date | what changed |
 |---|---|---|
-| 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19 and §3.20 opened. **No letter was raised without a test named beside it.** Tests 449 → 488. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
+| 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19, §3.20 and §3.21 opened. **No letter was raised without a test named beside it.** Tests 449 → 488. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
 | 2 | 2026-09-22 | **Merged.** The spec-side v1 (18 guarantees, 10 gaps, 20 failure modes) unioned with the build-side document (17 guarantees, 16 gaps). Added G18–G21, §3.17, §3.18, §6 failure modes, §7 catalogue, this header. **No letter was raised.** Kept lower where the two disagreed: v1 G4 "T" → **D for obedience** (disobeyed twice on a real run); v1 G9 "T" → **A** (the byte-for-byte fixture test does not exist); v1 G10 "T" → **D** (the `outline_audit` CLI was never built; the audit is a model); v1 G18 "T" → **split** (no `events` table; the gate record is archived at the end); v1 G16's path property test → **not applicable** (no file-backed endpoints). §7 rewritten to what runs: no `mypy`, `ruff`, `bandit` or `hypothesis`. **Candidates for a person to raise**, with their evidence: G1 and G9 also have tests (`test_agents_frontmatter.py`); G17's argv half has one (`test_runner.py`). |
 | 1 | 2026-09-22 | the spec-side draft: 18 guarantees, 10 gaps, 20 failure modes, catalogue mapping; and, separately, the build-side document that grew with SPEC-001…006 and two real runs |
 

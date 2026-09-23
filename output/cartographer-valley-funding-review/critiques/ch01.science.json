@@ -1,0 +1,29 @@
+{
+  "critic": "science",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:01:27Z",
+      "score": 8,
+      "findings": [
+        {
+          "kind": "rule-violation",
+          "severity": "low",
+          "quote": "Nineteen readings. Stone Three, 412. Stone Three, 406.",
+          "claim": "the sentence lists two bare figures under Stone Three without naming which feature each belongs to, so it is ambiguous whether 412 and 406 are the same feature read twice (an R2 violation) or two different features (not one)",
+          "fix": "name the feature with each figure so the nineteen readings are unambiguously nineteen distinct features",
+          "reference": "bible/world.md § Rules R2",
+          "arbitration": "UPHELD at low after re-examination. The critic first scored 4 on a high-severity reading that the two figures were the same feature; asked for the textual evidence, it withdrew that and re-scored 8 with this low finding on ambiguity. Recorded, not blocking."
+        }
+      ],
+      "tokens": 12607,
+      "model": "claude-sonnet-5",
+      "notes": "first reply: score 4, one high finding (same-feature reading). Re-examined on the orchestrator's question; revised to 8, one low finding. Tokens 12607 cumulative: 12003 first reply + 604 resume.",
+      "raw_score": 4
+    }
+  ]
+}

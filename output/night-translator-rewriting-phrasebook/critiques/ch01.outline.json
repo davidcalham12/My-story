@@ -1,0 +1,21 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:27:19Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 11893,
+      "model": "claude-sonnet-5",
+      "notes": [
+        "10 - 0 (all four beats present) - 0 (no beat out of order) = 10"
+      ],
+      "note": "returned prose commentary around a fenced JSON block; the JSON was parseable and its arithmetic matches its findings"
+    }
+  ]
+}

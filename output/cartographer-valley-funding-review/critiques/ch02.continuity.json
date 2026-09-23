@@ -1,0 +1,28 @@
+{
+  "critic": "continuity",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:09:00Z",
+      "score": 9,
+      "findings": [
+        {
+          "kind": "internal-contradiction-arithmetic",
+          "severity": "low",
+          "quote": "Three thousand six hundred and some.",
+          "claim": "Rosa's own figures (406 acres × one pound eleven the acre × 9 years) multiply to about 4,056 (decimal reading) or about 5,663 (shillings reading), not three thousand six hundred; the Bible fixes none of these numbers, so it is an internal contradiction, not a canon one",
+          "fix": "adjust one of the three stated figures or the stated total so the multiplication lands",
+          "reference": "bible/world.md, Factions — levies are assessed from filed acreage; no figure in the Bible fixes the rate or the total",
+          "arbitration": "UPHELD at low: the arithmetic is wrong under either reading of 'one pound eleven'. Recorded; the chapter passes without it being acted on, and it is left for the writer if a later attempt is needed."
+        }
+      ],
+      "tokens": 17355,
+      "model": "claude-sonnet-5",
+      "notes": "one low finding; orchestrator asked the critic to check the internal arithmetic since no other critic owns it"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:01:27Z",
+      "score": 9,
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "a notebook that does not say when it began is an argument waiting to happen",
+          "claim": "the same rhetorical template — 'a [document] that does not [state the missing detail] is [judgment]' — is used twice in under 450 words, paired with 'a reading that does not name its stone is not a measurement'; the second reads as an echo of the first",
+          "fix": "recast the second aphorism in a different shape so the two observations do not scan as the same sentence twice",
+          "reference": "bible/characters.md, Hartley register: dry understatement inside procedural sentences — one instance of the device, not two",
+          "arbitration": "UPHELD: quote present verbatim; the two sentences share the template"
+        }
+      ],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×1 = 9",
+      "critic_notes": "0 major, 1 minor. Registers held distinctly; 'she wrote' cataloguing and 'holds exactly' echo judged as deliberate procedural register and not flagged.",
+      "tokens": 19166,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

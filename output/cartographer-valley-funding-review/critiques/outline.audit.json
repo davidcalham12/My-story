@@ -1,0 +1,59 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-22T22:57:00Z",
+  "ts_source": "measured",
+  "verdict": "defects",
+  "violations": [
+    {
+      "chapter": 3,
+      "beat": 9,
+      "rule": "R4",
+      "clause": "Carried out, the sheet goes ordinary and the ground lets go.",
+      "severity": "high",
+      "claim": "Beat 9 has Hartley take a dusk reading from Stone Three that 'holds, because the stones are on the sheet', but beat 8 has already handed the sheet to the carrier and watched it go over the ridge; by beat 9 the map is outside the valley and R4 says its fixing effect has ended.",
+      "fix": "Move the last Stone Three reading before the hand-off so the sheet is still inside the valley when it is taken, or drop the causal claim.",
+      "arbitration": "UPHELD. Beat 8 puts the sheet over the ridge and beat 9 relies on it still fixing the ground; the two cannot both be true under R4. Also noted: the Means entry says the stones are the only things that do not move, so a stone's presence on the sheet never made a reading hold. plot-architect was sent back and returned new beats 8, 9 and 10: the last daylight reading is taken while the sheet is still on the table, the hand-off follows while there is light, and the letting-go happens once, after dark. outline.md updated with those three beats verbatim."
+    },
+    {
+      "chapter": 3,
+      "beat": 10,
+      "rule": "R4",
+      "clause": "Whatever a map shows stops moving, but only while that map is inside the valley.",
+      "severity": "low",
+      "claim": "Beat 10's 'the distances beyond the stones let go' is reachable only if beat 9's 'held' one beat earlier is the last moment of an effect that R4 says ended when the sheet left in beat 8; the two beats have the same rule take effect at two inconsistent moments.",
+      "fix": "Make beats 9 and 10 agree on when the map's departure ends the fixing.",
+      "arbitration": "UPHELD, and resolved by the same rewrite: in the corrected beats the sheet leaves in beat 9 and the ground lets go once, after dark, in beat 10. Read with R1 (change only between dusk and dawn), 'lets go' on carry-out and 'moves' after dark are the same event seen from two sides, not two events."
+    }
+  ],
+  "ambiguities": [
+    {
+      "rule": "R1",
+      "clause": "The valley changes shape only between dusk and dawn. Whatever is measured in daylight holds until nightfall, and holds exactly.",
+      "reading_a": "Dusk is the closing edge of the daylight-hold window; a reading taken at dusk is the last valid daylight measurement and holds exactly.",
+      "reading_b": "Dusk is the opening edge of the change window; a reading taken at dusk is already inside the period when the valley may be reshaping.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD as a live ambiguity. Two chapters take a reading at dusk (ch1 beat 7, ch3 beat 8) and the two readings would send the science critic and the continuity critic in opposite directions on the same draft. The place to fix it is the Bible, before FLOW-4.",
+      "applied": "worldbuilder rewrote R1 to: 'The valley changes shape only in full dark, between the end of dusk and first light, and never while anyone can see it happen. Any reading taken while there is still light to read the instrument by — dusk included — holds exactly until dark.' Reading a is now the only reading; every FLOW-4 prompt carries the rewritten Bible."
+    },
+    {
+      "rule": "R2",
+      "clause": "A feature reads the same twice from the same benchmark stone and differently from any other.",
+      "reading_a": "Sameness is absolute and time-independent: two readings of one feature from one stone at any two times must agree, which would make ch2 beats 1-2 (dawn re-reads that disagree) a violation.",
+      "reading_b": "Sameness holds within one stable window; after an overnight change permitted by R1, a new same reading is established and the old one is correctly struck through.",
+      "outline_assumes": "b",
+      "arbitration": "OVERRULED as a live ambiguity. R2 read with R1 — 'holds until nightfall' — can only mean sameness within a daylight window; reading a would make R1's change clause describe something that never shows up in any measurement, and would contradict the world's opening line that eleven sheets disagree. Only reading b survives the Bible as a whole.",
+      "applied": "b. Every FLOW-4 science-critic prompt states that a dawn reading differing from the previous day's from the same stone is R1 at work and not an R2 violation; a same-day disagreement from the same stone is."
+    },
+    {
+      "rule": "R5",
+      "clause": "and no resident has countersigned in nine years",
+      "reading_a": "A historical fact describing a stalemate; any resident may countersign at any time, and nine years measures how long none has chosen to.",
+      "reading_b": "A standing condition of the world on a par with the mechanical rules; Rosa Vane's signature in ch3 would break it.",
+      "outline_assumes": "a",
+      "arbitration": "OVERRULED as a live ambiguity. The clause is written in the past tense as a record, bible/timeline.md names Rosa Vane's signature nine years ago and again in Chapter 3, and bible/mysteries.md's third answer depends on her signing. Reading b would make the premise unresolvable and contradict the timeline.",
+      "applied": "a. Every FLOW-4 science-critic prompt states that a resident countersigning in Chapter 3 is permitted by R5; R5's first clause (the Survey files no sheet without a countersignature) is the enforceable one."
+    }
+  ],
+  "notes": "Audit run against the outline as first returned. After arbitration: plot-architect re-dispatched (SendMessage, same agent) for ch3 beats 8-10; worldbuilder re-dispatched for R1 wording. The checks `rules resolve` and `promises are reachable` were clean before and are re-run after the edits."
+}

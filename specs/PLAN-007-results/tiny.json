@@ -1,0 +1,126 @@
+{
+  "profile": "tiny",
+  "premise": "A night-shift translator at a mountain border post notices the official phrasebook is rewriting itself between travellers, and the new phrases are always about her.",
+  "created": {
+    "id": "47da3b865aaa",
+    "slug": "a-night-shift-translator-at-a-mountain"
+  },
+  "done_result": "complete",
+  "run": {
+    "id": "47da3b865aaa",
+    "slug": "night-translator-rewriting-phrasebook",
+    "premise": "A night-shift translator at a mountain border post notices the official phrasebook is rewriting itself between travellers, and the new phrases are always about her.",
+    "profile": "tiny",
+    "tone": null,
+    "stage": "complete",
+    "halted": null,
+    "halted_detail": null,
+    "source": "v2",
+    "started_at": "2026-09-22T22:09:39Z",
+    "finished_at": "2026-09-22T22:45:19Z",
+    "config_hash": "841135a7910bd530"
+  },
+  "cost": {
+    "calls": 7,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_usd": 16.246258649999998,
+    "tokens_provenance": "absent",
+    "summed_from_calls_usd": null,
+    "total_provenance": "measured",
+    "provenance": [
+      "absent"
+    ],
+    "turns": 136,
+    "duration_ms": 2139520,
+    "subagent_dispatches": 27
+  },
+  "warnings": [
+    {
+      "kind": "archive",
+      "detail": "ch01.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T22:45:20Z"
+    },
+    {
+      "kind": "archive",
+      "detail": "ch02.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T22:45:20Z"
+    },
+    {
+      "kind": "archive",
+      "detail": "ch03.prose_check.json: not a chapter critique, skipped",
+      "chapter": null,
+      "ts": "2026-09-22T22:45:20Z"
+    }
+  ],
+  "conformance": {
+    "attempts_checked": 4,
+    "unjudgeable": 0,
+    "breaches": [],
+    "verdict": "conformant"
+  },
+  "attempts": [
+    {
+      "chapter": 1,
+      "attempt": 1,
+      "aggregate": 10,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 10,
+        "science": 10
+      }
+    },
+    {
+      "chapter": 2,
+      "attempt": 1,
+      "aggregate": 9,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 9,
+        "science": 10
+      }
+    },
+    {
+      "chapter": 3,
+      "attempt": 1,
+      "aggregate": 7,
+      "verdict": "retry",
+      "promoted": false,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 7,
+        "science": 10
+      }
+    },
+    {
+      "chapter": 3,
+      "attempt": 2,
+      "aggregate": 10,
+      "verdict": "accept",
+      "promoted": true,
+      "scores": {
+        "chatter": 10,
+        "continuity": 10,
+        "length": 10,
+        "outline": 10,
+        "prose": 10,
+        "science": 10
+      }
+    }
+  ]
+}

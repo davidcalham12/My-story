@@ -1,0 +1,40 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-22T22:21:52Z",
+  "ts_source": "measured",
+  "verdict": "clean",
+  "violations": [],
+  "ambiguities": [
+    {
+      "rule": "R5",
+      "clause": "until then the document reads as printed",
+      "reading_a": "the document is legally treated as bearing its original, pre-change text; the observed alteration is disregarded until Form 9 returns countersigned",
+      "reading_b": "the document is read exactly as it currently, physically appears, altered or not, until Form 9 returns countersigned",
+      "outline_assumes": "b",
+      "arbitration": "OVERRULED as a live ambiguity. Read with the Means entry for the phrasebook ('officially the contents are fixed and identical in every copy; any reported change is a reader's error'), the state's position is that no change has occurred, so the 'original' text and the current text are officially the same text: what stands on the page is what was always there. Only reading b survives that sentence. The outline's assumption is the Bible's.",
+      "applied": "b. Every FLOW-4 science-critic prompt states this reading so a draft in which Vasko reads the altered phrase aloud is not faulted under R5."
+    },
+    {
+      "rule": "R2",
+      "clause": "anything else goes in the ledger as an unlisted utterance",
+      "reading_a": "an unlisted utterance is prohibited speech; the ledger entry records an infraction",
+      "reading_b": "an unlisted utterance is a lawful second channel, made legitimate by being logged",
+      "outline_assumes": "neither",
+      "arbitration": "UPHELD as ambiguous, immaterial to the commission. No beat's legality turns on which reading holds: under either, Vasko's off-page words are logged and the logging is what the plot needs. The Bible is deliberately agnostic (Brandt logs 'because he believes accuracy is a kindness').",
+      "applied": "neither. FLOW-4 science-critic prompts are told not to fault a draft for treating an unlisted utterance as either a lapse or a permitted channel; only an unlisted utterance that goes UNLOGGED breaks R2."
+    },
+    {
+      "rule": "R1",
+      "clause": "a traveller who touches it is the duty officer's business",
+      "reading_a": "the duty officer is obliged to intervene and treat the contact as a breach",
+      "reading_b": "the clause assigns jurisdiction only; the officer disposes of it as he sees fit",
+      "outline_assumes": "neither",
+      "arbitration": "UPHELD as ambiguous, immaterial to the commission. No beat has a traveller touch the phrasebook, so neither reading is exercised.",
+      "applied": "neither. If a draft has Petrik touch the book, the finding is against R1's first clause (only the duty translator may hold it), whichever reading of the second clause is taken."
+    }
+  ],
+  "notes": "Critic's own notes: the outline dramatises rule-adherence rather than breaching it; R3 and R4 compliance is stated outright in Ch.2 beat 5; R2 is satisfied every time Vasko speaks to a traveller; R5 is the outline's central engine, staged in Ch.1 beat 4 and Ch.3 beat 4. No beat shows a traveller touching the chained phrasebook, no one writes in it, and every ledger entry precedes the barrier lifting.",
+  "tokens": 22630,
+  "model": "claude-sonnet-5"
+}

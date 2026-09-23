@@ -1,0 +1,105 @@
+{
+  "premise": "A night-shift translator at a mountain border post notices the official phrasebook is rewriting itself between travellers, and the new phrases are always about her.",
+  "profile": "tiny",
+  "slug": "night-translator-rewriting-phrasebook",
+  "tone": "quiet literary uncanny: a border-post story told in the register of bureaucratic realism; the strangeness lives in paper and procedure, never in special effects; intimate, watchful, dry, with the dread of being described by something that should not know you",
+  "stage": "done",
+  "canonical_names": [
+    "Irena Vasko",
+    "Tomas Brandt",
+    "Ana Petrik",
+    "Dora Lenk"
+  ],
+  "chapters": [
+    {
+      "n": 1,
+      "title": "Page Seventy-Four, Phrase Six",
+      "accepted_attempt": 1,
+      "attempts": 1,
+      "verdict": "accept",
+      "aggregate": 10,
+      "words": 459,
+      "promoted": true
+    },
+    {
+      "n": 2,
+      "title": "The Cupboard Volume",
+      "accepted_attempt": 1,
+      "attempts": 1,
+      "verdict": "accept",
+      "aggregate": 9,
+      "words": 443,
+      "promoted": true,
+      "note": "prose 9: one minor finding recorded, not actioned"
+    },
+    {
+      "n": 3,
+      "title": "Page Two Hundred and Twelve",
+      "accepted_attempt": 2,
+      "attempts": 2,
+      "verdict": "accept",
+      "aggregate": 10,
+      "words": 433,
+      "promoted": true,
+      "attempt_1": {
+        "aggregate": 7,
+        "failed_on": "prose (3 minor)"
+      },
+      "sheet": "specs/loops/LOOP-003/sheets/night-translator-rewriting-phrasebook/ch03.attempt2.md",
+      "late_findings": 1
+    }
+  ],
+  "bible_written": true,
+  "outline_audit": {
+    "verdict": "clean",
+    "violations": 0,
+    "ambiguities": 3,
+    "ts": "2026-09-22T22:21:52Z"
+  },
+  "style_passes": [
+    {
+      "chapter": 1,
+      "gate_words": 459,
+      "final_words": 459,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    },
+    {
+      "chapter": 2,
+      "gate_words": 443,
+      "final_words": 443,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    },
+    {
+      "chapter": 3,
+      "gate_words": 433,
+      "final_words": 433,
+      "identical_text": true,
+      "action": "style pass kept (word counts equal)"
+    }
+  ],
+  "synopsis": {
+    "words": 248,
+    "band": {
+      "min": 150,
+      "max": 250
+    },
+    "within": true,
+    "comparables_italic": 2,
+    "comparables_band": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "book": {
+    "path": "C:\\Users\\student\\Desktop\\novaforge-v2\\output\\night-translator-rewriting-phrasebook\\dist\\book.md",
+    "words_total": 1585,
+    "chapter_words": 1335,
+    "formats": [
+      "markdown"
+    ],
+    "pdf": "not available on this branch; outputs.formats asks for markdown only"
+  },
+  "finished_ts": "2026-09-22T22:44:12Z"
+}

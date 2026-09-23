@@ -1,0 +1,16 @@
+{
+  "critic": "chatter",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": "orchestrator (first line matches ^#\\s+Chapter)",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T23:05:40Z",
+      "first_line": "# Chapter 1 — Stone Three, Full Day",
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

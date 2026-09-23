@@ -1,0 +1,20 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model+script",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:27:19Z",
+      "score": 10,
+      "findings": [],
+      "mechanical_defects": [],
+      "why": "10 − 3×0 − 2×0 − 1×0 = 10",
+      "critic_notes": "0 major, 0 minor. The chapter reads as intended for the named register; the repeated 'Page seventy-four, phrase [n]' frame is the chapter's device, not a rhythm stumble.",
+      "tokens": 17003,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

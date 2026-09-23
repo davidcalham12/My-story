@@ -1,0 +1,17 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "ts": "2026-09-22T22:27:19Z",
+      "score": 10,
+      "findings": [],
+      "tokens": 12542,
+      "model": "claude-sonnet-5"
+    }
+  ]
+}

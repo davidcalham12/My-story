@@ -1,0 +1,10 @@
+# Timeline
+
+| When | What |
+|---|---|
+| Eleven years before the story, in autumn | Dora Lenk, then night translator at Kolsa Pass, files Form 9 reporting that the phrasebook's contents differ between travellers. The form goes to the district and is never returned countersigned, so under R5 the book officially reads as printed. Lenk is transferred to a post that appears on no district list. Her ledger volume stays in the counter cupboard. |
+| The following winter | Irena Vasko is licensed by the Ministry of Interior Language Service and posted to the Kolsa night shift. Tomas Brandt is already duty officer. Nobody at the post mentions Lenk's Form 9 to her. |
+| The eleven years between | Brandt logs every one of Vasko's unlisted utterances in the night ledger exactly as R2 requires, where other officers on other posts quietly do not. The ledger's quarterly returns go down to the district in the bag, and the Language Service reissues approved phrasing from them. |
+| Night of the story, about 01:40 — Chapter 1 | Ana Petrik crosses outbound. Vasko reads the counter questions from the phrasebook and finds a phrase on a page she has worked from for eleven years that was not on it at the last crossing. She enters the crossing, uses the number, and says nothing to Brandt. |
+| The same night, about 03:10 — Chapter 2 | Petrik crosses back inbound. More of the right-hand column has changed, and the new phrases address the person at the counter rather than the person at the window. Vasko opens Lenk's old ledger volume and recognises, printed and numbered in the phrasebook, sentences she herself said off the page and Brandt logged. |
+| The same night, before dawn — Chapter 3 | On page 212 Vasko finds Lenk's name set as an approved term of address, and beneath it her own. She fills out Form 9, Brandt lets her, and Petrik's third crossing is entered in ink before the barrier lifts. The form goes into the district bag unanswered; until it returns countersigned, Vasko reads as printed. |
