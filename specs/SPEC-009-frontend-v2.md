@@ -105,8 +105,38 @@ them, read-only, archive-backed, every number with `source`:
 | `GET /api/profiles` | base config + profiles, for NewNovel |
 
 Paths never leave the archive's own records; nothing reads a client-supplied
-path (the retirement in SPEC-007 stands). This is a short spec of its own if the
+path (the retirement in SPEC-007 stands). **Where the text lives on disk**
+(`/chapters/{n}`, `/bible`, `/outline`, `/book`), the backend resolves
+`output/<slug>/` from `runs.slug` in the database for the given `run_id` —
+never from anything the client sends — and the pin
+`test_no_route_takes_a_path_and_reads_a_file` widens to "no route accepts a
+file-path parameter" and keeps its name (Q2). No text is migrated into SQLite.
+`/replay` for a run imported from v1 answers *not available: this run predates
+the events table* (Q9). The twelve endpoints are phase 1 of PLAN-009, tests
+first (Q3). This is a short spec of its own if the
 team prefers; it is listed here because P0 cannot ship without it.
+
+## Decisions from the grill, 2026-09-23
+
+Thirteen questions, asked by the design session against `frontend/src` and v1's
+`web/src`; the owner accepted every recommendation ("yo acepto tus
+sugerencias"). Each is cited where it changed the spec.
+
+| q | decision |
+|---|---|
+| Q1 | the owner writes the approval header by hand; no dictated approval for this spec unless he says so explicitly |
+| Q2 | texts are read from `output/<slug>/`, the directory resolved from `runs.slug` by `run_id`; never a client path; the route pin widens and keeps its name; no migration of texts into SQLite |
+| Q3 | the twelve endpoints are phase 1 of PLAN-009, tests first; no separate spec (SPEC-010 is taken) |
+| Q4 | if 48 hours do not suffice, cut from the end of the P0 order; the 48 hours count from PLAN-009's approval |
+| Q5 | zero new frontend dependencies (see Rules) |
+| Q6 | screens are tested with `renderToStaticMarkup`, no jsdom (AC-3…AC-9); AC-11 becomes I plus a text-level CSS test |
+| Q7 | one design identity, named now, serving the panel and the exam deck — **slot pending: the owner has not given the name** |
+| Q8 | the UI is in English |
+| Q9 | replay of a v1-imported run is *not available*; synthesising it from `agents.jsonl` would be P1 and `reconstructed` |
+| Q10 | cost projection from the four measured v2 runs (lighthouse 18.82 · cartographer-inconstant 54.87 · night-translator 16.25 · cartographer-valley 20.15): min, median, max per chapter × chapters, `estimated`, with the sentence that a long run amortises the fixed cost |
+| Q11 | `version: 1` constant; `entities/fact` and `entities/character` exist, empty |
+| Q12 | the orphaned `output/salvage-crew-…` was moved out of the repo as evidence of a dead run; the promises test skips unfinished runs — SPEC-010 W4 |
+| Q13 | the Run page breaking on a finished run is fixed under SPEC-010 W1 / PLAN-010, tests first |
 
 ## Out of scope
 
@@ -119,6 +149,10 @@ all with tests); P1 unless P0 is accepted.
 
 - **Only the API.** No file reads from the browser. The v1 dev-server plugins
   are not brought back.
+- **Zero new dependencies** (Q5): the Markdown renderer is v1's
+  `web/src/data/markdown.ts`, ported (it escapes everything); charts are inline
+  SVG; the diagram is CSS; navigation is state.
+- **The interface is in English** (Q8); the repository's language.
 - **Every number carries `source`** and renders through the `Provenance`
   component: `measured ● · reported ◐ · reconstructed ◌ · estimated ≈ · absent —`.
   Absent is a word, never a zero.
@@ -148,11 +182,11 @@ all with tests); P1 unless P0 is accepted.
 | AC-6 | Diagram's stages come from `/api/flow`; changing the YAML changes the diagram with no frontend change | P0 | **T** |
 | AC-7 | Run shows every event without an `agent` in the orchestrator's lane; none dropped | P0 | **T** |
 | AC-8 | Tokens render `absent` (not 0) for calls whose stream had no usage; the fixture has such rows | P0 | **T** |
-| AC-9 | NewNovel rejects an infeasible configuration before enabling Start, and shows cost as three figures | P0 | **T** |
+| AC-9 | NewNovel rejects an infeasible configuration before enabling Start, and shows cost as three figures — minimum, median and maximum per chapter over the **four measured v2 runs**, scaled by chapter count, every one labelled `estimated` (Q10) | P0 | **T** |
 | AC-10 | Presentation replays a finished run from `/replay` at 1×/4×/16× through the Run view | P0 | **D** |
-| AC-11 | Every P0 page renders at 375 px width without horizontal scroll; focus visible; `prefers-reduced-motion` honoured | P0 | **T** (viewport test) + **I** |
+| AC-11 | Every P0 page renders at 375 px width without horizontal scroll; focus visible; `prefers-reduced-motion` honoured | P0 | **I** (the built-in browser) + **T** for the CSS rules by text (Q6) |
 | AC-12 | `tsc --noEmit`, `vitest`, `vite build` green in CI | P0 | **T** |
-| AC-13 | Data model carries `version` on manuscript reads and `fact`/`character` entities exist, empty | P0 | **A** |
+| AC-13 | Manuscript reads carry `version: 1` (a constant; no migration until P1) and `entities/fact`, `entities/character` exist, empty (Q11) | P0 | **A** |
 | AC-14 | Cover, character sheet, reader change, PDF | P1 | — |
 
 ## Gaps this spec leaves
