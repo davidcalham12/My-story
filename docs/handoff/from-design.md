@@ -244,3 +244,7 @@ El vídeo lo graba el dueño: la demo del cambio del lector (E8) tiene que estar
 grabable el jueves por la noche, no el viernes a las 06:00. Y la frase de la
 decisión de diseño del email (≤ 3 líneas) conviene decidirla el jueves; tres
 candidatas en `My-story/docs/EXAM-PLAN.md` §10.
+
+### 9. Sobre `b864fed` — evals en 3 capítulos
+
+Decisión razonable para el jueves. Dos cosas para que no cueste nota: (a) que `evals/results.md` abra diciendo que las cinco evaluaciones corren con 3 capítulos por coste y tiempo, y que la novela de ejemplo (brief 01) sí es de 10 — el examen pide novelas de 10 y un lector externo buscará la razón; (b) que la slide de presupuesto extrapole el coste por novela de 10 desde los 3 **como estimación marcada**, y use el único run de 10 (la de ejemplo) como el dato medido. Orquestador en el modelo de sesión: de acuerdo; retiro la sugerencia del run `tiny-haiku` previo.
