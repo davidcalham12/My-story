@@ -385,6 +385,10 @@ makes it five. This applies to every range in every prompt.
 
 ## 5. What the tooling taught
 
+*Every cost in this document up to §8 was measured under Opus authors and
+Sonnet critics. Since SPEC-011 (2026-09-23) the agents run on Haiku; the figures
+are history, not a forecast for Haiku runs.*
+
 - **Persist after every stage and every attempt.** State kept in memory is lost
   to a restart, and a run measured in hours will meet one.
 - **Keep the rejected drafts.** "The writer changed only what was cited" can only
@@ -826,6 +830,9 @@ they are not. `verification.md` §3.20; the fix belongs to the next spec that
 touches the importer.
 
 ## 8. What the two runs through the backend showed, 2026-09-22
+
+*Measured under Opus authors and Sonnet critics — before SPEC-011 moved the
+agents to Haiku. Not comparable to what follows.*
 
 Both started by `POST /api/runs`, followed over SSE to `done`, archived by the
 backend. Every figure below is **measured** from Claude Code's own `result`

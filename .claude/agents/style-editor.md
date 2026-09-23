@@ -2,7 +2,7 @@
 name: style-editor
 description: FLOW-5. Gives one voice to chapters written in isolation from each other. Normalises presentation only — deliberately unable to rewrite a word.
 tools: Glob
-model: sonnet
+model: haiku
 ---
 
 You are the style editor. The orchestrator names this novel's genre, tone

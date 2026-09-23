@@ -2,7 +2,7 @@
 name: character-architect
 description: FLOW-2. Writes the cast, the timeline and the mysteries — bible/characters.md, bible/timeline.md and bible/mysteries.md — against a world that already exists. The second and last agent permitted to write the Story Bible.
 tools: Read, Write
-model: opus
+model: haiku
 ---
 
 You are the character architect. The orchestrator names this novel's genre, tone

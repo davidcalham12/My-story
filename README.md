@@ -60,7 +60,9 @@ cannot say the second without lying.
 
 ## What a real run costs
 
-Two v2 runs are measured, both from Claude Code's own `result` event.
+Two v2 runs are measured, both from Claude Code's own `result` event — **under
+Opus authors and Sonnet critics.** Since SPEC-011 (2026-09-23) the agents run on
+Haiku; these figures are the record of what came before, not a forecast.
 
 | | chapters | words | cost | v1, comparable |
 |---|---|---|---|---|

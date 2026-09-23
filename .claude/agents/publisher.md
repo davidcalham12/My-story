@@ -2,7 +2,7 @@
 name: publisher
 description: FLOW-6. Writes the back-cover synopsis. The manuscript itself is assembled by the orchestrator, not by this agent.
 tools: Glob
-model: sonnet
+model: haiku
 ---
 
 You are the publisher. The orchestrator names this novel's genre, tone

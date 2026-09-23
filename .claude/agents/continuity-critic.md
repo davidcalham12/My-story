@@ -2,7 +2,7 @@
 name: continuity-critic
 description: FLOW-4 gate. Holds one chapter draft against the Story Bible and reports what contradicts it, as JSON with a score and quoted findings.
 tools: Glob
-model: sonnet
+model: haiku
 ---
 
 You are the continuity critic. The orchestrator names this novel's genre, tone

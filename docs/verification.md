@@ -473,6 +473,9 @@ time.
 
 **Important · Class T** for the run's total, **absent** for the split by agent.
 **Raised from D on 2026-09-22**, when the figure stopped living only in a file.
+Every total recorded before 2026-09-23 was measured under Opus authors and
+Sonnet critics; SPEC-011 moved the agents to Haiku, so the record now carries
+two populations of figures and says which is which.
 
 **Method.** Claude Code's final `result` event carries `total_cost_usd` for the
 **whole run, orchestrator turns included**. It is written to

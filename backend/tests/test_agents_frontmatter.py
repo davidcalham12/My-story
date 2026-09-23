@@ -115,4 +115,4 @@ def test_no_agent_declares_a_genre():
 
 def test_every_agent_names_its_model():
     for name in EXPECTED:
-        assert front_matter(name).get("model") in ("opus", "sonnet"), name
+        assert front_matter(name).get("model") in ("opus", "sonnet", "haiku"), name  # haiku since SPEC-011

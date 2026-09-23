@@ -2,7 +2,7 @@
 name: outline-critic
 description: FLOW-4 gate, LOOP-003 characteristic 3. Holds one chapter draft against the beats its own outline entry assigned it, and reports which are missing or out of order, as JSON.
 tools: Glob
-model: sonnet
+model: haiku
 ---
 
 You are the outline critic. The orchestrator names this novel's genre, tone

@@ -234,17 +234,21 @@ changes, the row says so.
 
 | agent | stage | model | skills |
 |---|---|---|---|
-| `worldbuilder` | FLOW-1 | opus | — |
-| `character-architect` | FLOW-2 | opus | — |
-| `plot-architect` | FLOW-3 | opus | — |
-| `chapter-writer` | FLOW-4 | opus | — |
-| `continuity-critic` | FLOW-4 gate | sonnet | — |
-| `science-critic` | FLOW-4 gate + FLOW-3 audit | sonnet | — |
-| `outline-critic` | FLOW-4 gate | sonnet | — |
-| `style-editor` | FLOW-5 | sonnet | — |
-| `publisher` | FLOW-6 | sonnet | — |
+| `worldbuilder` | FLOW-1 | haiku | — |
+| `character-architect` | FLOW-2 | haiku | — |
+| `plot-architect` | FLOW-3 | haiku | — |
+| `chapter-writer` | FLOW-4 | haiku | — |
+| `continuity-critic` | FLOW-4 gate | haiku | — |
+| `science-critic` | FLOW-4 gate + FLOW-3 audit | haiku | — |
+| `outline-critic` | FLOW-4 gate | haiku | — |
+| `style-editor` | FLOW-5 | haiku | — |
+| `publisher` | FLOW-6 | haiku | — |
 
-### 4.1 worldbuilder — FLOW-1, opus
+**All ten on Haiku since SPEC-011 (2026-09-23).** Every cost and pass-rate figure
+elsewhere in `docs/` was measured under Opus authors and Sonnet critics and is
+not comparable to a Haiku run; the first Haiku `tiny` is the first figure that is.
+
+### 4.1 worldbuilder — FLOW-1, haiku
 
 **Receives:** the premise verbatim · the genre and tone, read off the premise ·
 the chapter count · counts for factions, means entries, world rules and the
@@ -258,7 +262,7 @@ it and nowhere else, so a constraint written elsewhere is never enforced. Rules
 must be falsifiable by a scene, and a rule whose main effect is to make someone
 check a division is worse than one about who is allowed in the room.
 
-### 4.2 character-architect — FLOW-2, opus
+### 4.2 character-architect — FLOW-2, haiku
 
 **Receives:** the premise · genre and tone · the full text of `world.md` · counts
 for characters, timeline rows and mysteries · the `names` instruction, default
@@ -271,7 +275,7 @@ It fixes canonical spelling for the whole novel; those names travel in every
 later packet. `familiar` means names a reader can pronounce on sight and tell
 apart at a glance. A real person named in the premise keeps their real name.
 
-### 4.3 plot-architect — FLOW-3, opus
+### 4.3 plot-architect — FLOW-3, haiku
 
 **Receives:** all four Bible files in full · the chapter count · the canonical
 names · the promise and beat counts.
@@ -283,7 +287,7 @@ names · the promise and beat counts.
 `3.`** so the outline critic can name which one is missing. The last agent that
 sees the whole book at once.
 
-### 4.4 chapter-writer — FLOW-4, opus
+### 4.4 chapter-writer — FLOW-4, haiku
 
 **Receives:** the four Bible files · **this chapter's outline entry only** · the
 rolling summary, projected from facts · the canonical names · the chapter number,
@@ -298,13 +302,13 @@ Its own rejected draft is not an exception: the policy forbids a *previous
 chapter's* prose. Handing back findings without the text they quote is what once
 made redrafts come back worse than what they replaced.
 
-### 4.5 continuity-critic — FLOW-4 gate, sonnet
+### 4.5 continuity-critic — FLOW-4 gate, haiku
 
 **Receives:** the draft · Bible fragments retrieved by vector search.
 **Returns:** JSON — a score 0–10 and findings, each quoting the draft exactly.
 **Never sees:** another chapter's prose.
 
-### 4.6 science-critic — FLOW-4 gate and the FLOW-3 audit, sonnet
+### 4.6 science-critic — FLOW-4 gate and the FLOW-3 audit, haiku
 
 **Receives:** the draft · **the whole of `## Rules`, never a retrieved subset**.
 **Returns:** JSON — score and findings.
@@ -320,7 +324,7 @@ its own right: a rule that reads two ways does not fail loudly — it fails as a
 disagreement nothing can arbitrate, and it cost one run three attempts, a patch
 and a halt to discover.
 
-### 4.7 outline-critic — FLOW-4 gate, sonnet
+### 4.7 outline-critic — FLOW-4 gate, haiku
 
 **Receives:** the draft · **this chapter's outline entry entire, beats numbered,
 never retrieved**.
@@ -334,7 +338,7 @@ obeying the world, in the word band and about something else entirely passes
 cleanly. A beat delivered differently is delivered: penalise absence and
 sequence, never phrasing.
 
-### 4.8 prose-critic — FLOW-4 gate, sonnet
+### 4.8 prose-critic — FLOW-4 gate, haiku
 
 **Receives:** the draft, and the genre and tone this book was decided to have.
 **Returns:** JSON — quoted `major` and `minor` findings, and **no score**.
@@ -357,7 +361,7 @@ in `notes` and raises nothing.
 five characteristics were already model judgements; it is now four of six.
 `verification.md` §3.9 and SPEC-006 both say what that buys and what it prices.
 
-### 4.9 style-editor — FLOW-5, sonnet
+### 4.9 style-editor — FLOW-5, haiku
 
 **Receives:** one approved chapter, and the word count it must return.
 **Returns:** the chapter with punctuation and spacing normalised. **No word may
@@ -368,7 +372,7 @@ differ. Arithmetic, not judgement — and it has fired on a pass that changed no
 word at all, when closing a space merged two tokens into one. That is the rule
 working, and the discard is recorded.
 
-### 4.10 publisher — FLOW-6, sonnet
+### 4.10 publisher — FLOW-6, haiku
 
 **Receives:** the Bible, the outline and the chapter summaries — **not the
 chapters**. A synopsis is written from canon.

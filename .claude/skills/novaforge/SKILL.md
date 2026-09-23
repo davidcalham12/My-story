@@ -649,8 +649,9 @@ tool reports `subagent_tokens` in its result, and a task notification repeats it
 take the figure from there and write it down.
 
 `model` is the **full model id**, not the family word. The agent files say
-`model: opus` because Claude Code resolves that to whichever Opus is current;
-`config/pricing.json` is keyed by `claude-opus-5` and `claude-sonnet-5`. Four
+`model: haiku` (SPEC-011) because Claude Code resolves that to whichever Haiku is
+current; `config/pricing.json` is keyed by `claude-haiku-4-5` (and `claude-opus-5`,
+`claude-sonnet-5` for the runs before it). Four
 runs wrote `opus` and `sonnet`, no key matched, and every one of them showed no
 cost at all — which reads as "this run was free" rather than "the name did not
 match the price list". The panel now folds the family word in, but it can only do

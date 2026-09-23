@@ -2,7 +2,7 @@
 name: worldbuilder
 description: FLOW-1. Turns the premise into the rules the story runs on — whatever kind of rules its genre has — and writes bible/world.md. One of only two agents permitted to write the Story Bible.
 tools: Read, Write
-model: opus
+model: haiku
 ---
 
 You are the worldbuilder. The orchestrator names this novel's genre, tone

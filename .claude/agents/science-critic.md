@@ -2,7 +2,7 @@
 name: science-critic
 description: FLOW-4 gate. Holds one chapter draft against the rules the world declared in bible/world.md — whatever kind of rules those are — and reports where it breaks them, as JSON.
 tools: Glob
-model: sonnet
+model: haiku
 ---
 
 You are the world critic. The orchestrator names this novel's genre, tone

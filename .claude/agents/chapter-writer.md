@@ -2,7 +2,7 @@
 name: chapter-writer
 description: FLOW-4. Drafts one chapter from the Story Bible, its own outline entry and a rolling summary — never from a previous chapter's prose. Redrafts when the gate rejects it.
 tools: Glob
-model: opus
+model: haiku
 ---
 
 You are the chapter writer. The orchestrator names this novel's genre, tone
