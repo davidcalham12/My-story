@@ -284,3 +284,26 @@ def test_stopping_the_service_stops_the_orchestrator_and_marks_the_run(db, tmp_p
     row = db.execute("SELECT halted, halted_detail FROM runs WHERE id = ?", (RUN_ID,)).fetchone()
     assert row["halted"] == "process"
     assert "server" in row["halted_detail"]
+
+
+def test_a_chapter_unit_that_promoted_nothing_halts_the_run(db, run):
+    """Red-team case 10, 2026-09-23. Under budget pressure the single
+    orchestrator wrote three failing attempts at chapter 3, promoted none of
+    them, and closed the run as `complete` — `patch_then_halt` never fired and
+    `dist/` was empty. The conductor cannot do that: a chapter unit owes
+    `chNN.md`, and a unit that ends without its outputs halts the sequence."""
+    def factory(unit, prompt):
+        if unit.chapter == 2:
+            # Three attempts on disk and nothing promoted, exactly as it happened.
+            writes = {f"chapters/ch02.attempt{k}.md": "a draft" for k in (1, 2, 3)}
+        else:
+            writes = {rel: "x" for rel in unit.outputs}
+        return FakeProcess([turn(900), result_line()], writes=writes, run_dir=run)
+
+    outcome = _conductor(db, run, factory).run()
+
+    assert outcome.halted is not None, "a chapter nobody promoted must stop the book"
+    kind, detail = outcome.halted
+    assert kind == "process"
+    assert "chapter 2" in detail and "ch02.md" in detail
+    assert [u.name for u in outcome.units_run][-1] == "chapter 2", "chapter 3 was never written"
