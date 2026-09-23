@@ -30,6 +30,7 @@ expensive to get any other way:
 
 from __future__ import annotations
 
+import json
 import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -155,12 +156,50 @@ class Conductor:
     def _spawn(self, unit: Unit) -> object:
         return self.process_factory(unit, prompt_for(unit, slug=self.slug, run_dir=self.run_dir))
 
+    def prepare(self) -> None:
+        """Make the workspace the units are told to write into.
+
+        Under one orchestrator this was §0 of the skill. The conductor took §0
+        over (SPEC-EXAM-003 §2) and the first real run found the half that had
+        been dropped: unit U1 stopped without writing a word and said so —
+        *"the run directory named in my prompt does not exist"* — which is
+        exactly right. A unit is told where to write; somebody has to have made
+        the place.
+
+        Idempotent, because resume calls it again. In particular the snapshot
+        is written **once**: U1 records the genre it chose in there, and
+        rewriting it from the unmerged config would throw that away (nothing
+        carries between units but disk).
+        """
+        self.run_dir.mkdir(parents=True, exist_ok=True)
+        for sub in ("bible", "chapters", "critiques", "logs", "dist"):
+            (self.run_dir / sub).mkdir(exist_ok=True)
+
+        snapshot = self.run_dir / "config.snapshot.json"
+        if not snapshot.is_file():
+            snapshot.write_text(
+                json.dumps(self.cfg, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8")
+
+        state = self.run_dir / "state.json"
+        if not state.is_file():
+            state.write_text(
+                json.dumps({
+                    "slug": self.slug,
+                    "stage": "FLOW-1",
+                    "chapters": [],
+                    "_comment": "written by the conductor before the first unit; "
+                                "the units keep it current",
+                }, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8")
+
     def run(self) -> Outcome:
         if self.process is not None:
             # Two orchestrators of one run is how three processes billed for
             # half an hour on 2026-09-23 after their servers were killed
             # (red-team case 9). One child, owned, at a time.
             raise RuntimeError("a unit of this run is already in flight")
+        self.prepare()
         outcome = Outcome()
         ceiling = int(self.cfg["context"]["max_concurrent_tokens"])
 

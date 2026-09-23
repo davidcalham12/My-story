@@ -307,3 +307,50 @@ def test_a_chapter_unit_that_promoted_nothing_halts_the_run(db, run):
     assert kind == "process"
     assert "chapter 2" in detail and "ch02.md" in detail
     assert [u.name for u in outcome.units_run][-1] == "chapter 2", "chapter 3 was never written"
+
+
+def test_the_conductor_prepares_the_workspace_before_the_first_unit(db, tmp_path):
+    """The first real conductor run halted here, and the unit was right to stop:
+    "I stopped before doing anything, because the unit's inputs are not on disk.
+    The run directory named in my prompt does not exist."
+
+    Under one orchestrator, §0 of the skill made the workspace. The conductor
+    took §0 over (SPEC-EXAM-003 §2) and did not do this half of it. A unit is
+    told to write into a directory; somebody has to have made it.
+    """
+    repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot=loader.resolve("tiny"))
+    run_dir = tmp_path / SLUG                      # deliberately absent
+    maestro = C.Conductor(conn=db, run_id=RUN_ID, slug=SLUG, run_dir=run_dir,
+                          cfg=loader.resolve("tiny"),
+                          process_factory=lambda unit, prompt: FakeProcess([], run_dir=run_dir))
+
+    maestro.prepare()
+
+    assert run_dir.is_dir()
+    for sub in ("bible", "chapters", "critiques", "logs", "dist"):
+        assert (run_dir / sub).is_dir(), f"{sub}/ is where a unit is told to write"
+    snapshot = json.loads((run_dir / "config.snapshot.json").read_text(encoding="utf-8"))
+    assert snapshot["novel"]["chapters"] == 3
+    state = json.loads((run_dir / "state.json").read_text(encoding="utf-8"))
+    assert state["slug"] == SLUG and state["stage"] == "FLOW-1"
+
+
+def test_preparing_twice_does_not_overwrite_what_a_unit_wrote(db, tmp_path):
+    """Resume calls it again: a snapshot rewritten from the unmerged config
+    would throw away the genre unit U1 wrote into it (B1's report, item 3)."""
+    repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot=loader.resolve("tiny"))
+    run_dir = tmp_path / SLUG
+    maestro = C.Conductor(conn=db, run_id=RUN_ID, slug=SLUG, run_dir=run_dir,
+                          cfg=loader.resolve("tiny"),
+                          process_factory=lambda unit, prompt: FakeProcess([], run_dir=run_dir))
+    maestro.prepare()
+    edited = json.loads((run_dir / "config.snapshot.json").read_text(encoding="utf-8"))
+    edited["novel"]["tone"] = "warm and funny"
+    (run_dir / "config.snapshot.json").write_text(json.dumps(edited), encoding="utf-8")
+
+    maestro.prepare()
+
+    again = json.loads((run_dir / "config.snapshot.json").read_text(encoding="utf-8"))
+    assert again["novel"]["tone"] == "warm and funny"
