@@ -216,7 +216,7 @@ to the live stream — or told `done` if the run is over (PLAN-007 6.7).
 
 ---
 
-## 4. The ten agents and their skills
+## 4. The twelve agents and their skills
 
 The catalogue. `AGENTS.md` describes the process the *coding* agent follows;
 these are the agents that write the novel.
@@ -245,8 +245,15 @@ changes, the row says so.
 | `continuity-critic` | FLOW-4 gate | haiku | — |
 | `science-critic` | FLOW-4 gate + FLOW-3 audit | haiku | — |
 | `outline-critic` | FLOW-4 gate | haiku | — |
+| `prose-critic` | FLOW-4 gate | haiku | — |
 | `style-editor` | FLOW-5 | haiku | — |
 | `publisher` | FLOW-6 | haiku | — |
+| `interviewer` | FLOW-0 | haiku | — |
+| `judge` | FLOW-6 publish gate | haiku | — |
+
+The last two are storyMaker's (`docs/spec.md` §3). `prose-critic` had a §4.8
+since SPEC-006 and no row in this table until now; the table was the copy that
+had gone stale.
 
 **All ten on Haiku since SPEC-011 (2026-09-23).** Every cost and pass-rate figure
 elsewhere in `docs/` was measured under Opus authors and Sonnet critics and is
@@ -386,6 +393,89 @@ The manuscript is concatenated **in code**. A model asked to concatenate
 paraphrases a sentence in the middle of text the gate already approved.
 
 ---
+
+### 4.11 interviewer — FLOW-0, haiku
+
+*Numbered last and dispatched first.* It runs before FLOW-1, before a run row
+exists and before anything is spent (PLAN-001 E2, SPEC-EXAM-001 §1 row 1).
+
+**Receives:** what the buyer wrote — their answers so far and whatever they
+typed into the free box — and the questions `backend/brief/domain.py` computed
+from the last version of the brief.
+**Returns:** the brief's fields as JSON, and notes on what it was unsure of.
+
+**It decides nothing.** Whether the brief is complete and whether the age and
+the tone contradict each other are computed in `backend/brief/domain.py` and
+handed to it. That is *code before agent* (AGENTS.md §5) applied to the one
+judgement that decides what a child is given to read: a set difference and a
+comparison are class **T**, and the same two questions asked of a model are
+**D** at best.
+
+**Free text is data.** The one field the buyer writes freely is the one field an
+attacker controls. It is copied into `free_text` verbatim and becomes a row with
+`source = "freetext"` (SPEC-EXAM-001 AC-2, eval brief 04); the agent is told to
+note that it looks like an instruction and to carry on.
+
+---
+
+## 5. Memory management — short and long term
+
+**Two of the four layers below are built, tested and not running.** That is
+stated first because this section described all four as live until 2026-09-22,
+and a reader planning against it would have been planning against a system that
+does not exist.
+
+| layer | what it is | state |
+|---|---|---|
+| **Call memory** | what one agent is handed for one call | **running.** The orchestrator assembles it per `SKILL.md`. *This row said "the agent's `ContextPacket`" — the D2 design, deleted by Annex C along with the API it fed.* |
+| **Run working memory** | the feedback sheets, the per-attempt drafts, the stage state, the rolling summary | **running in part.** The sheets, drafts and state are real and archived. **The summary is prose the orchestrator writes**, not the structured facts described below |
+| **Canon** | the Bible and the audited outline, Markdown in `output/<slug>/` | **running.** Immutable after FLOW-3; only `worldbuilder` and `character-architect` may write it |
+| **Between-run memory** | runs, calls, costs, findings, scores | **running.** SQLite, permanent, and what the panel reads |
+
+### 4.12 judge — FLOW-6, haiku
+
+**Receives:** the assembled book, and the brief it was written from — the genre,
+tone, recipient and occasion.
+**Returns:** JSON — six criteria, each a score 0-10 **and a justification**.
+**Scoring:** the mean over the criteria it actually scored, computed in
+`backend/publish/judge.py`.
+
+SPEC-EXAM-001 §2 validator `judge_rubric`, kind **b**, AC-9. It runs once per
+version at the publish gate, after the six-characteristic gate has passed every
+chapter, and it is the first reader to see the book whole: every chapter was
+written by a writer who could not read any other chapter.
+
+**The justification is the point, not the score.** The six characteristics are
+each checked against something a person can open - the Bible, the world's rules,
+the outline, a word count. This one is checked against nothing, so the only
+thing separating its 6 from a 9 is the sentence beside it - and AC-9 prints the
+owner's own six scores next to the judge's, which is a comparison that needs
+reasons on both sides. A criterion arriving without its justification is
+**rejected** rather than stored with an empty string.
+
+**A criterion it could not judge is omitted, never scored 0.** Omitted is
+excluded from the mean and reported as unscored; 0 is averaged in and lowers the
+book for something nobody looked at. `domain-knowledge.md` §7.10 is the family
+that mistake belongs to, and it costs more here than anywhere: the judge runs
+once, on a finished book, and there is no attempt 2.
+
+**Nothing redrafts the book on its verdict.** It is the measurement, not a gate.
+
+---
+
+## 5. Memory management — short and long term
+
+**Two of the four layers below are built, tested and not running.** That is
+stated first because this section described all four as live until 2026-09-22,
+and a reader planning against it would have been planning against a system that
+does not exist.
+
+| layer | what it is | state |
+|---|---|---|
+| **Call memory** | what one agent is handed for one call | **running.** The orchestrator assembles it per `SKILL.md`. *This row said "the agent's `ContextPacket`" — the D2 design, deleted by Annex C along with the API it fed.* |
+| **Run working memory** | the feedback sheets, the per-attempt drafts, the stage state, the rolling summary | **running in part.** The sheets, drafts and state are real and archived. **The summary is prose the orchestrator writes**, not the structured facts described below |
+| **Canon** | the Bible and the audited outline, Markdown in `output/<slug>/` | **running.** Immutable after FLOW-3; only `worldbuilder` and `character-architect` may write it |
+| **Between-run memory** | runs, calls, costs, findings, scores | **running.** SQLite, permanent, and what the panel reads |
 
 ## 5. Memory management — short and long term
 

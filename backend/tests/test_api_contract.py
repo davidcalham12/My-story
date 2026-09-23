@@ -175,8 +175,20 @@ def test_no_route_takes_a_path_and_reads_a_file():
     ours = set(app.openapi()["paths"])
     assert ours == {
         "/api/health",
+        "/api/briefs",
+        "/api/briefs/check",
+        "/api/briefs/examples",
         "/api/runs",
         "/api/runs/{run_id}",
+        "/api/runs/{run_id}/bible/characters",
+        "/api/runs/{run_id}/bible/places",
+        "/api/runs/{run_id}/changes",
+        "/api/runs/{run_id}/facts",
+        "/api/runs/{run_id}/facts/{fact_id}/impact",
+        "/api/runs/{run_id}/versions",
+        "/api/runs/{run_id}/versions/{n}/judge",
+        "/api/runs/{run_id}/versions/{n}/pdf",
+        "/api/runs/{run_id}/versions/{n}/validations",
         "/api/runs/{run_id}/events",
         "/api/runs/{run_id}/halt",
     }, sorted(ours)

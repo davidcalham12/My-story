@@ -37,6 +37,13 @@ EXPECTED = {
     "prose-critic": {"Glob"},
     "style-editor": {"Glob"},
     "publisher": {"Glob"},
+    # SPEC-EXAM-001 §3. FLOW-0: it extracts what the buyer said and asks for what
+    # is missing. Every decision — missing field, contradiction — is code's
+    # (`backend/brief/domain.py`), which is why it needs no tool but `Glob`.
+    "interviewer": {"Glob"},
+    # SPEC-EXAM-001 §2. The publish gate's rubric: it reads the assembled book
+    # and nothing else, so it holds what the critics hold.
+    "judge": {"Glob"},
 }
 
 # Anything that can return a file's CONTENTS. The writer may hold none of them.

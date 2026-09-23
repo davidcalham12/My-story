@@ -7,6 +7,9 @@ from fastapi import Depends, FastAPI
 from backend.commons.config.settings import load_settings
 from backend.commons.db.connection import connect
 from backend.commons.db.migrate import migrate
+from backend.bible import router as bible_router
+from backend.brief import router as brief_router
+from backend.publish import router_judge, router_versions
 from backend.runs import router as runs_router
 from backend.runs.service import RunService
 
@@ -36,6 +39,12 @@ def get_service() -> RunService:
 
 app.dependency_overrides[runs_router.get_service] = get_service
 app.include_router(runs_router.router, prefix="/api/runs", tags=["runs"])
+# storyMaker's phases. Each router depends on `runs_router.get_service`, which
+# the override above already covers, so there is one connection for the app.
+app.include_router(brief_router.router, prefix="/api/briefs", tags=["briefs"])
+app.include_router(bible_router.router, prefix="/api/runs", tags=["bible"])
+app.include_router(router_judge.router, prefix="/api/runs", tags=["validations"])
+app.include_router(router_versions.router, prefix="/api/runs", tags=["versions"])
 
 
 @app.get("/api/health")

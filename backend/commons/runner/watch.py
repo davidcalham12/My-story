@@ -28,6 +28,9 @@ AGENTS = {
     "worldbuilder", "character-architect", "plot-architect", "chapter-writer",
     "continuity-critic", "science-critic", "outline-critic", "prose-critic",
     "style-editor", "publisher",
+    # storyMaker (SPEC-EXAM-001 §3): the interviewer at FLOW-0 and the judge at
+    # the publish gate. Neither writes canon; both hold `Glob`.
+    "interviewer", "judge",
 }
 
 
