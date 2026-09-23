@@ -121,8 +121,13 @@ ReaderChange ==
   /\ state' = "Writing"
   /\ UNCHANGED <<versions, crashes>>
 
+\* A finished run stays finished. Explicit, so that TLC's deadlock check keeps
+\* looking for real deadlocks instead of reporting the terminal states
+\* (first counterexample, 2026-09-23: BriefRejected -> Halted, no successor).
+Done == state \in {"Published", "Halted"} /\ UNCHANGED vars
+
 Next == BriefAccepted \/ BriefRejected \/ Plan \/ Draft \/ Pass \/ Retry
-        \/ HaltAtGate \/ Crash \/ Resume \/ ReaderChange
+        \/ HaltAtGate \/ Crash \/ Resume \/ ReaderChange \/ Done
 
 Spec == Init /\ [][Next]_vars /\ WF_vars(Next)
 

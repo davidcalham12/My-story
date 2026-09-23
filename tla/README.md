@@ -15,7 +15,11 @@
 ```
 java -cp tla2tools.jar tlc2.TLC -config Harness.cfg Harness.tla
 ```
-TLC needs a JDK. **Status:** not run yet on the build machine — no JDK installed and installing one needs the owner's approval; the specification is written and reviewed. Result and any counterexample are recorded in `docs/iterations.md` when it runs.
+TLC needs a JDK (a portable Temurin 21 in the owner's user folder, no administrator rights).
+
+**Result, 2026-09-23 20:24 UTC:** model checking completed, no error found. 44,145 states generated, **18,253 distinct**, graph depth 38, all four safety properties and the liveness property hold on 5 chapters, 2 retries, 1 reader change, 1 crash.
+
+**Counterexample found on the way:** the first run reported a deadlock in 4 states: `BriefRejected` leads to `Halted`, which had no successor. Not a defect of the harness — a finished run has nothing left to do — but it hid everything else, because TLC stops at the first error. Fixed by an explicit `Done` action (a finished run stays finished), which keeps the deadlock check on for real deadlocks. Recorded in `docs/iterations.md`.
 
 ## Specification ↔ code
 Each action corresponds to a state or transition of the per-stage conductor (SPEC-EXAM-003).
