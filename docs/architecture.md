@@ -651,7 +651,7 @@ before the code exists.
 | 5 — retrieval | `sqlite-vec` with the dimension pinned and the limits tested |
 | 6 — the outline audit | at FLOW-3, with its own tests, and it earned its place on the first real run |
 
-**506 backend tests and 19 frontend tests** (2026-09-22, after PLAN-007), seconds, no network and no
+**509 backend tests and 19 frontend tests** (2026-09-22, after PLAN-007), seconds, no network and no
 credential.
 
 **The first real run happened.** `lighthouse-keeper-ledger` — three chapters,

@@ -234,3 +234,25 @@ def test_the_cli_skips_runs_already_in_the_database(tmp_path):
     assert main(["--output", str(OUTPUT), "--db", str(db_path), *V1_RUNS]) == 0
     after = connect(db_path).execute("SELECT COUNT(*) AS n FROM runs").fetchone()["n"]
     assert after == before, "importing twice does not duplicate"
+
+
+# ------------------------------------------------------- SPEC-008 / PLAN-008
+
+
+def test_a_fresh_database_import_skips_v2_runs_by_their_marker(db, tmp_path):
+    """SPEC-008 AC-1. `conformance.json` is written by v2 and only by v2; a
+    directory that has one is not history, whatever its state.json says."""
+    import json
+    from backend.commons.db.import_v1 import import_all_with_skipped
+
+    out = tmp_path / "output"
+    for name, v2 in (("old-v1-run", False), ("new-v2-run", True)):
+        d = out / name
+        d.mkdir(parents=True)
+        (d / "state.json").write_text(json.dumps({"premise": "p", "profile": "tiny", "chapters": []}), encoding="utf-8")
+        if v2:
+            (d / "conformance.json").write_text("{}", encoding="utf-8")
+    reports, skipped = import_all_with_skipped(db, out)
+    assert [r.slug for r in reports] == ["old-v1-run"]
+    assert skipped == ["new-v2-run"]
+    assert db.execute("SELECT COUNT(*) AS n FROM runs WHERE slug = 'new-v2-run'").fetchone()["n"] == 0

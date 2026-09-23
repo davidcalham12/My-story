@@ -351,3 +351,37 @@ def test_a_missing_fingerprint_is_absent_not_unchanged(db):
     ).fetchone()
     assert row["skill_sha_at_start"] is None
     assert row["skill_sha_at_end"] is None
+
+
+# ------------------------------------------------------- SPEC-008 / PLAN-008
+
+
+def _run_dir_with(tmp_path, extra_files: dict[str, str]):
+    import json, shutil
+    src = ROOT / "output" / "lighthouse-keeper-ledger"
+    dst = tmp_path / "lighthouse-keeper-ledger"
+    shutil.copytree(src, dst, ignore=shutil.ignore_patterns("dist"))
+    for name, body in extra_files.items():
+        (dst / "critiques" / name).write_text(body, encoding="utf-8")
+    return dst
+
+
+def _archive(db, run_dir):
+    repository.create_run(db, run_id="spec8", slug=run_dir.name, premise="a premise",
+                          profile="tiny", tone=None, snapshot="{}")
+    return archive_run(db, "spec8", run_dir, sheets_dir=SHEETS)
+
+
+def test_the_prose_check_file_is_known_and_not_warned_about(db, tmp_path):
+    """SPEC-008 AC-3: `check_prose` writes chNN.prose_check.json beside the
+    critiques on purpose; three warnings per run about it were noise."""
+    run_dir = _run_dir_with(tmp_path, {"ch01.prose_check.json": "{\"mechanical\": 0}"})
+    report = _archive(db, run_dir)
+    assert not [n for n in report.notes if "prose_check" in n and "not a chapter critique" in n], report.notes
+
+
+def test_a_genuinely_unknown_critique_file_is_still_noted(db, tmp_path):
+    """SPEC-008 AC-4: the note exists for a reason; only the known companion is exempt."""
+    run_dir = _run_dir_with(tmp_path, {"ch01.mystery.json": "{\"what\": \"is this\"}"})
+    report = _archive(db, run_dir)
+    assert any("ch01.mystery.json" in n and "not a chapter critique" in n for n in report.notes), report.notes

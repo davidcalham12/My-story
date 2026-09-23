@@ -70,8 +70,14 @@ def _read_critiques(run_dir: Path, report: ArchiveReport) -> dict[int, dict]:
     is worth a note rather than a silent merge.
     """
     out: dict[int, dict[str, dict[int, dict]]] = {}
+    companions = 0
     for path in sorted((run_dir / "critiques").glob("ch*.json")):
         if path.name.startswith("outline.audit"):
+            continue
+        if path.name.endswith(".prose_check.json"):
+            # `check_prose` writes its output here on purpose (SPEC-008 W2).
+            # Known, not a critique, and not worth a warning per file.
+            companions += 1
             continue
         raw = json.loads(path.read_text(encoding="utf-8"))
         critic, chapter = raw.get("critic"), raw.get("chapter")

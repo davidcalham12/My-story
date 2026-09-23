@@ -894,5 +894,5 @@ unproven.
 Three warnings per run: `chNN.prose_check.json: not a chapter critique, skipped`.
 That file is `check_prose`'s output, written beside the critiques by design; the
 archiver does not know the name and says so every time. Harmless, and noise —
-a warning that fires on every run stops being read. The next spec that touches
-the archive gives it the name.
+a warning that fires on every run stops being read. **SPEC-008 gave the archive
+the name** the next morning; the two real runs above were the last to carry it.

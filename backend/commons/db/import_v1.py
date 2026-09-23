@@ -319,11 +319,24 @@ def _import_calls(conn, slug: str, calls: list[dict]) -> None:
         )
 
 
+#: Written by v2's backend at the end of every run, and by nothing in v1. The
+#: one file that says "this directory is not history" (SPEC-008 W1).
+V2_MARKER = "conformance.json"
+
+
 def import_all(
     conn: sqlite3.Connection,
     output_dir: Path,
     slugs: Iterable[str] | None = None,
 ) -> list[ImportReport]:
+    return import_all_with_skipped(conn, output_dir, slugs)[0]
+
+
+def import_all_with_skipped(
+    conn: sqlite3.Connection,
+    output_dir: Path,
+    slugs: Iterable[str] | None = None,
+) -> tuple[list[ImportReport], list[str]]:
     """Import the v1 runs under `output_dir`.
 
     **v2 writes its runs into the same directory, on purpose** — the layout is
@@ -353,6 +366,7 @@ def import_all(
         }
 
     reports = []
+    skipped: list[str] = []
     for run_dir in sorted(p for p in output_dir.iterdir() if p.is_dir()):
         if not (run_dir / "state.json").exists():
             continue
@@ -361,8 +375,14 @@ def import_all(
                 continue
         elif run_dir.name in known:
             continue
+        elif (run_dir / V2_MARKER).exists():
+            # A v2 run on a fresh database. It has a state.json like any v1 run
+            # and is not history; on a fresh database two came in as such
+            # (verification.md §3.20). Named slugs still import it on purpose.
+            skipped.append(run_dir.name)
+            continue
         reports.append(import_run(conn, run_dir))
-    return reports
+    return reports, skipped
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -390,7 +410,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.slugs and not wanted:
         print("nothing to import: every named run is already in the database", file=sys.stderr)
         return 0
-    reports = import_all(conn, args.output, slugs=wanted)
+    reports, skipped = import_all_with_skipped(conn, args.output, slugs=wanted)
+    for name in skipped:
+        print(f"{name}: skipped — a v2 run ({V2_MARKER} present), not history", file=sys.stderr)
     for r in reports:
         missing = ", ".join(sorted(r.missing)) or "nothing"
         print(f"{r.slug}: {r.chapters} chapters, {r.attempts} attempts, {r.calls} calls, "

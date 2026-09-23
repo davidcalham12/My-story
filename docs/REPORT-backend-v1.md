@@ -96,11 +96,21 @@ corrected; the import CLI on a fresh database takes v2 runs for history. One
 of the plan's round-1 findings was false (two writes "without an encoding" had
 one on the next line) and the plan says so where it said the opposite.
 
+## 6a. The morning after: SPEC-008
+
+Two of the findings above were fixes, not designs, and `AGENTS.md` §5 wants even
+a fix to come through a short spec. `specs/SPEC-008-leftovers.md` and
+`PLAN-008` did that on 2026-09-23: the import CLI on a fresh database skips v2
+runs by the one file only v2 writes (`conformance.json`), and the archive knows
+`prose_check.json`, so a run archives without noise. Four tests, all seen red
+first. The search wiring stays out of scope, declared at `verification.md`
+§3.15, with the reason.
+
 ## 7. What is still not verified
 
-`verification.md` §3 has twenty rows and §9 has eight. The ones that this work
+`verification.md` §3 has twenty-one rows and §9 has eight. The ones that this work
 opened or left: §3.15 (search built and unwired — a spec of its own), §3.19 (no
-log file), §3.20 (the import default), and AC-6's ceiling being testable only on
+log file), §3.21 (whether the budget flag binds), and AC-6's ceiling being testable only on
 an injected packet because real streams report zero for the one quantity it is
 about. The outline audit stays a model, class D, on purpose.
 
