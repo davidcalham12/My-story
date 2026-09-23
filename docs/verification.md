@@ -113,7 +113,7 @@ Two levels were moved from Annex D's assignment, in writing:
 - **G16 kept incidental**, as assigned, despite being Inspection. A bare range in
   a prompt produces a worse novel, not a false claim.
 
-Status, 2026-09-22 (after PLAN-007): **488 backend tests and 19 frontend tests, on a
+Status, 2026-09-22 (after PLAN-007): **506 backend tests and 19 frontend tests, on a
 recorded stream, in CI, at $0.** The suite that carries these:
 
 | file | holds |
@@ -1231,7 +1231,7 @@ planned — and which it does not, with why.
 | static analysis / SAST | no | no `ruff`, no `bandit` configured. The spec-side document said both were in use; neither was |
 | symbolic execution | no | disproportionate |
 | formal verification | no | disproportionate |
-| unit and integration testing | yes | 488 backend tests and 19 frontend (2026-09-22, after PLAN-007), over a recorded stream, at $0, on every push |
+| unit and integration testing | yes | 506 backend tests and 19 frontend (2026-09-22, after PLAN-007), over a recorded stream, at $0, on every push |
 | property-based testing | **no library** | where the space is small it is enumerated instead: every aggregate at every attempt for `decide` (63 cases), every coefficient combination for the prose formula (64) |
 | mutation testing | no | not yet |
 | contract testing | yes | `test_api_contract.py` (backend payload ↔ panel types), `test_skill_contract.py` (procedure ↔ contract), `test_formulas_agree.py` (formula ↔ code) |
@@ -1255,7 +1255,7 @@ planned — and which it does not, with why.
 
 | version | date | what changed |
 |---|---|---|
-| 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19, §3.20 and §3.21 opened. **No letter was raised without a test named beside it.** Tests 449 → 488. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
+| 3 | 2026-09-22 | **After PLAN-007 6.1–6.12** (SPEC-007 approved, built on `backend-v1`). G19 raised to **T for the stream** on the evidence of `test_events.py` and the SSE tests; G22 and G23 added; §3.14 narrowed (the restart case is closed, the mid-flight archive is not); G21's note closed (the Node instruments carry six); §3.19, §3.20 and §3.21 opened. **No letter was raised without a test named beside it.** Tests 449 → 506. What the two real runs of Paso 10 showed is in §3.19's neighbour rows and in `domain-knowledge.md` §8. |
 | 2 | 2026-09-22 | **Merged.** The spec-side v1 (18 guarantees, 10 gaps, 20 failure modes) unioned with the build-side document (17 guarantees, 16 gaps). Added G18–G21, §3.17, §3.18, §6 failure modes, §7 catalogue, this header. **No letter was raised.** Kept lower where the two disagreed: v1 G4 "T" → **D for obedience** (disobeyed twice on a real run); v1 G9 "T" → **A** (the byte-for-byte fixture test does not exist); v1 G10 "T" → **D** (the `outline_audit` CLI was never built; the audit is a model); v1 G18 "T" → **split** (no `events` table; the gate record is archived at the end); v1 G16's path property test → **not applicable** (no file-backed endpoints). §7 rewritten to what runs: no `mypy`, `ruff`, `bandit` or `hypothesis`. **Candidates for a person to raise**, with their evidence: G1 and G9 also have tests (`test_agents_frontmatter.py`); G17's argv half has one (`test_runner.py`). |
 | 1 | 2026-09-22 | the spec-side draft: 18 guarantees, 10 gaps, 20 failure modes, catalogue mapping; and, separately, the build-side document that grew with SPEC-001…006 and two real runs |
 
