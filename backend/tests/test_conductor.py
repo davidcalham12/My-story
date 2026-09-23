@@ -354,3 +354,51 @@ def test_preparing_twice_does_not_overwrite_what_a_unit_wrote(db, tmp_path):
 
     again = json.loads((run_dir / "config.snapshot.json").read_text(encoding="utf-8"))
     assert again["novel"]["tone"] == "warm and funny"
+
+
+# --------------------------------------------------------------- resuming it
+
+
+def test_resuming_continues_the_same_run_in_the_same_directory(db, tmp_path):
+    """The first real conductor run halted at `cast` and its outputs were on
+    disk. Relaunching started a *new* run — `unique_slug` gave it `-2`, so the
+    directory was empty and the work was done again. Resume has to mean the run
+    that stopped, not a new one that looks like it."""
+    from backend.commons.config.settings import Settings
+    from backend.runs.service import RunService
+
+    cfg = loader.resolve("tiny")
+    repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot=cfg)
+    repo.halt(db, RUN_ID, "context", "cast: a turn carried 100,669 tokens")
+    run_dir = tmp_path / SLUG
+    (run_dir / "bible").mkdir(parents=True)
+    for name in ("world", "characters", "timeline", "mysteries"):
+        (run_dir / "bible" / f"{name}.md").write_text("x", encoding="utf-8")
+
+    svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
+                                  use_recorded_stream=False))
+    started: list = []
+    svc._conductor_factory = lambda unit, prompt: started.append(unit.name) or FakeProcess(
+        [turn(900), result_line()], writes={rel: "x" for rel in unit.outputs}, run_dir=run_dir)
+
+    svc.resume(RUN_ID, _wait=True)
+
+    assert started[0] == "outline", f"world and cast were done; it began at {started[0]}"
+    assert "world" not in started and "cast" not in started
+    row = db.execute("SELECT halted, stage FROM runs WHERE id = ?", (RUN_ID,)).fetchone()
+    assert row["halted"] is None, "the halt that was resumed past is cleared"
+
+
+def test_resuming_a_finished_run_is_refused(db, tmp_path):
+    from backend.commons.config.settings import Settings
+    from backend.runs.service import NotLive, RunService
+
+    repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot=loader.resolve("tiny"))
+    repo.finish(db, RUN_ID)
+    svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
+                                  use_recorded_stream=False))
+
+    with pytest.raises(NotLive):
+        svc.resume(RUN_ID, _wait=True)

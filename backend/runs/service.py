@@ -173,10 +173,52 @@ class RunService:
             # is also the fallback, and `test_conductor.py` tests the other.
             return self._execute_single(live, premise, profile, tone, cfg)
 
+        self._conduct(live, cfg, self.get(live.run_id)["slug"])
+
+    def resume(self, run_id: str, *, _wait: bool = False) -> dict:
+        """Continue a run that stopped, in the directory it stopped in.
+
+        The first real conductor run halted at `cast` with its four Bible files
+        already on disk. Relaunching seemed like the way to continue and was
+        not: `POST /api/runs` makes a **new** run, `unique_slug` gave it a `-2`,
+        and the conductor looked into an empty directory and did the work again.
+        Resume has to name the run that stopped.
+
+        What makes this cheap is that nothing has to be remembered. The
+        conductor asks the filesystem which units are done, so a resumed run is
+        an ordinary run whose first units are already finished.
+        """
+        run = self.get(run_id)
+        if run.get("stage") == "complete":
+            raise NotLive(f"run {run_id} is complete; there is nothing to resume")
+        with self._lock:
+            if self._live and not self._live.done:
+                raise AlreadyRunning("a run is already in flight; the queue is one")
+            cfg = json.loads(self.conn.execute(
+                "SELECT config_snapshot FROM runs WHERE id = ?", (run_id,)
+            ).fetchone()["config_snapshot"])
+            # The halt that is being resumed past stops being the run's state.
+            # It stays in `events` and in the warnings; the row says running.
+            with self.conn:
+                self.conn.execute(
+                    "UPDATE runs SET halted = NULL, halted_detail = NULL, "
+                    "finished_at = NULL WHERE id = ?", (run_id,))
+            live = Live(run_id=run_id)
+            self._live = live
+
+        args = (live, cfg, run["slug"])
+        if _wait:
+            self._conduct(*args)
+        else:
+            threading.Thread(target=self._conduct, args=args, daemon=True).start()
+        return {"id": run_id, "slug": run["slug"], "resumed": True}
+
+    def _conduct(self, live: Live, cfg: dict, slug: str) -> None:
+        """Drive the units of one run. Shared by `start` and `resume`."""
         budget = self._budget_watcher(cfg)
         state = State()
         halted: tuple[str, str] | None = None
-        run_dir = Path(self.settings.output_dir) / self.get(live.run_id)["slug"]
+        run_dir = Path(self.settings.output_dir) / slug
 
         def on_event(item: dict) -> None:
             nonlocal state
@@ -185,13 +227,15 @@ class RunService:
             budget.observe(state)          # may raise; the conductor catches it
             live.events.put(item)
 
+        factory = getattr(self, "_conductor_factory", None) or conductor.real_process(
+            run_dir, cwd=Path(self.settings.repo_root),
+            max_budget_usd=self.ceiling_for(cfg),
+            model=(cfg.get("models") or {}).get("orchestrator"))
+
         maestro = conductor.Conductor(
-            conn=self.conn, run_id=live.run_id, slug=run_dir.name, run_dir=run_dir,
-            cfg=cfg, on_event=on_event,
-            process_factory=conductor.real_process(
-                run_dir, cwd=Path(self.settings.repo_root),
-                max_budget_usd=self.ceiling_for(cfg),
-                model=(cfg.get("models") or {}).get("orchestrator")),
+            conn=self.conn, run_id=live.run_id, slug=slug, run_dir=run_dir,
+            cfg=cfg, on_event=on_event, process_factory=factory,
+            seq=self._last_seq(live.run_id),
         )
         live.process = maestro             # `halt` stops the unit in flight
         try:
@@ -205,6 +249,16 @@ class RunService:
             halted = ("interrupted", str(exc)[:500])
         finally:
             self._finish(live, state, halted)
+
+    def _last_seq(self, run_id: str) -> int:
+        """Where this run's stream got to, so a resumed one carries on counting.
+
+        `seq` is what `Last-Event-ID` resumes from, so it is dense across the
+        whole run — including the units a previous process wrote.
+        """
+        row = self.conn.execute(
+            "SELECT MAX(seq) AS s FROM events WHERE run_id = ?", (run_id,)).fetchone()
+        return int(row["s"] or 0)
 
     def _execute_single(self, live: Live, premise: str, profile: str, tone: str,
                         cfg: dict) -> None:

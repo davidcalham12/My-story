@@ -51,6 +51,19 @@ def halt(run_id: str, svc: RunService = Depends(get_service)) -> dict:
     return {"id": run_id, "halted": "user"}
 
 
+@router.post("/{run_id}/resume", status_code=status.HTTP_200_OK)
+def resume(run_id: str, svc: RunService = Depends(get_service)) -> dict:
+    """Continue a run that stopped, in the directory it stopped in."""
+    try:
+        return svc.resume(run_id)
+    except NotFound as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except NotLive as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+    except AlreadyRunning as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+
+
 @router.get("/{run_id}/events")
 def events(run_id: str, request: Request,
            svc: RunService = Depends(get_service)) -> StreamingResponse:

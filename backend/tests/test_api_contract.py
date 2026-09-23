@@ -194,6 +194,7 @@ def test_no_route_takes_a_path_and_reads_a_file():
         "/api/runs/{run_id}/versions/{n}/validations",
         "/api/runs/{run_id}/events",
         "/api/runs/{run_id}/halt",
+        "/api/runs/{run_id}/resume",
     }, sorted(ours)
     for path in ours:
         assert "{path" not in path and "{name" not in path and "{section" not in path
