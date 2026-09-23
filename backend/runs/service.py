@@ -451,6 +451,17 @@ class RunService:
                             "found running at startup; the process is gone")
         return swept
 
+    def _result_of(self, run_id: str) -> str:
+        """What a run that is not live ended as, read from its row."""
+        run = self.get(run_id)
+        if run.get("halted"):
+            return f"halted: {run['halted']}"
+        if run.get("stage") == "complete":
+            return "complete"
+        # Neither: created and never swept. Only reachable between a start
+        # and the next startup sweep; the old word, with the detail beside it.
+        return "not live"
+
     # ----------------------------------------------------------- following
 
     def follow(self, run_id: str, after_seq: int | None = None) -> Iterator[dict]:
@@ -469,7 +480,11 @@ class RunService:
 
         live = self._live
         if not live or live.run_id != run_id:
-            yield {"event": "done", "data": {"result": "not live"}}
+            # Not the run in flight: finished, halted, or swept. The panel does
+            # setDetail() with this frame, so it carries the whole detail — the
+            # two words alone broke the Run page on every finished run
+            # (SPEC-010 W1).
+            yield {"event": "done", "data": {"result": self._result_of(run_id), **self.detail(run_id)}}
             return
         if live.done:
             # A follower arriving after the end. The queue's sentinel was

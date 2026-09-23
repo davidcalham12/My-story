@@ -412,3 +412,45 @@ def test_health_reports_sqlite_vec_and_model_availability_without_loading_the_mo
     assert isinstance(body["sqlite_vec"], bool)
     assert body["embeddings_model"] in ("present", "absent", "unchecked")
     assert "sentence_transformers" not in sys.modules, "health must not import the model library"
+
+
+# ------------------------------------------------------- PLAN-010 10.1 (SPEC-010 W1)
+
+
+def _reopened(db, settings):
+    """A client whose service never saw the run live — a server restarted, or a
+    second follower after the live one is gone. `follow()` takes its not-live
+    branch, which is the one the panel hits on every finished run."""
+    fresh = RunService(db, settings)
+    app.dependency_overrides[runs_router.get_service] = lambda: fresh
+    return TestClient(app)
+
+
+def test_a_finished_run_stream_ends_with_its_detail_not_two_words(client, db, tmp_path):
+    """SPEC-010 W1 / AC-1. The not-live branch used to end with
+    {"result": "not live"} and nothing else; useRun did setDetail() with it and
+    the Run page broke on every finished run."""
+    from backend.tests.test_api_contract import interface
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=True)
+    with _reopened(db, settings) as again:
+        frames = _frames(again, run_id)
+    kind, data = frames[-1][1], frames[-1][2]
+    assert kind == "done"
+    assert data["result"] == "complete"
+    required, _ = interface("RunDetail")
+    assert required <= set(data), f"done lacks: {required - set(data)}"
+
+
+def test_a_halted_run_stream_reports_the_halt_as_its_result(client_for, db, tmp_path):
+    lines = [l for l in FIXTURE_LINES if '"type": "result"' not in l]
+    with client_for(lines) as client:
+        run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+        _wait(client, run_id)
+    settings = Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=True)
+    with _reopened(db, settings) as again:
+        frames = _frames(again, run_id)
+    data = frames[-1][2]
+    assert frames[-1][1] == "done" and data["result"] == "halted: process"
+    assert "run" in data and data["run"]["halted"] == "process"

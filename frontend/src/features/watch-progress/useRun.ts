@@ -43,7 +43,11 @@ export function useRun(runId: string | null) {
     source.addEventListener('done', (event) => {
       if (!alive) return
       // The stream is a view. What it ends with is confirmed against the record.
-      setDetail(JSON.parse((event as MessageEvent).data) as RunDetail)
+      // A `done` without `run` is not a detail (SPEC-010 W1): keep the snapshot
+      // already held rather than replace it with two words.
+      const final = JSON.parse((event as MessageEvent).data) as Partial<RunDetail>
+      if (final.run) setDetail(final as RunDetail)
+      else console.warn('done frame without run detail; keeping the snapshot', final)
       setLive(false)
       source.close()
     })
