@@ -236,3 +236,51 @@ def test_every_stream_line_lands_in_events_with_the_unit_that_produced_it(db, ru
     assert rows[0]["unit"] == "world" and rows[-1]["unit"] == "finish"
     assert {r["unit"] for r in rows} == {"world", "cast", "outline",
                                          "chapter 1", "chapter 2", "chapter 3", "finish"}
+
+
+# ------------------------------------------------------------ B4: orphans
+
+
+def test_the_conductor_refuses_to_launch_while_its_child_is_alive(db, run):
+    """§2, and red-team case 9. Two orchestrators of one run is how three
+    processes billed for half an hour on 2026-09-23 after their servers died."""
+    maestro = _conductor(db, run, lambda unit, prompt: FakeProcess([], run_dir=run))
+    maestro.process = FakeProcess([], run_dir=run)      # one already in flight
+    maestro.process.started = True
+
+    with pytest.raises(RuntimeError, match="already"):
+        maestro.run()
+
+
+def test_stopping_the_conductor_stops_the_unit_in_flight(db, run):
+    live = FakeProcess([turn(100)], run_dir=run)
+    maestro = _conductor(db, run, lambda unit, prompt: live)
+    maestro.process = live
+    live.started = True
+
+    maestro.stop()
+
+    assert live.stopped is True
+
+
+def test_stopping_the_service_stops_the_orchestrator_and_marks_the_run(db, tmp_path):
+    """AC-4. A server that is killed used to leave its `claude -p` running and
+    spending, while the startup sweep wrote `halted: process` in the database —
+    the row said over while the process billed."""
+    from backend.commons.config.settings import Settings
+    from backend.runs.service import Live, RunService
+
+    repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot=loader.resolve("tiny"))
+    svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
+                                  use_recorded_stream=True))
+    child = FakeProcess([], run_dir=tmp_path)
+    child.started = True
+    svc._live = Live(run_id=RUN_ID, process=child)
+
+    svc.shutdown()
+
+    assert child.stopped is True
+    row = db.execute("SELECT halted, halted_detail FROM runs WHERE id = ?", (RUN_ID,)).fetchone()
+    assert row["halted"] == "process"
+    assert "server" in row["halted_detail"]

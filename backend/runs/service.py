@@ -381,6 +381,28 @@ class RunService:
             live.done = True
             live.events.put(None)
 
+    def shutdown(self) -> None:
+        """Stop the orchestrator this server owns, before the server goes.
+
+        A server that is killed used to leave its `claude -p` running and
+        spending, while the startup sweep wrote `halted: process` in the
+        database — the row said the run was over while the process billed
+        (verification.md §3.23, red-team case 9). Closing that hole is a
+        hook, not a clever idea: whoever owns the child stops it.
+        """
+        live = self._live
+        if live is None or live.done:
+            return
+        process = live.process
+        if process is not None:
+            process.stop()
+        live.done = True
+        try:
+            write_repo.halt(self.conn, live.run_id, "process",
+                            "the server stopped; its orchestrator was stopped with it")
+        finally:
+            live.events.put(None)
+
     def _skill_sha(self) -> str | None:
         """A fingerprint of the procedure, taken at the start and at the end.
 

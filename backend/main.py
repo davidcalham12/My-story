@@ -47,6 +47,13 @@ app.include_router(router_judge.router, prefix="/api/runs", tags=["validations"]
 app.include_router(router_versions.router, prefix="/api/runs", tags=["versions"])
 
 
+@app.on_event("shutdown")
+def stop_the_orchestrator() -> None:
+    """The server owns the `claude -p` it launched; it does not outlive it."""
+    if _service is not None:
+        _service.shutdown()
+
+
 @app.get("/api/health")
 def health(svc: RunService = Depends(runs_router.get_service)) -> dict:
     """FR-HLT-1: what this machine can do, without doing any of it.

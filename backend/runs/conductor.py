@@ -156,6 +156,11 @@ class Conductor:
         return self.process_factory(unit, prompt_for(unit, slug=self.slug, run_dir=self.run_dir))
 
     def run(self) -> Outcome:
+        if self.process is not None:
+            # Two orchestrators of one run is how three processes billed for
+            # half an hour on 2026-09-23 after their servers were killed
+            # (red-team case 9). One child, owned, at a time.
+            raise RuntimeError("a unit of this run is already in flight")
         outcome = Outcome()
         ceiling = int(self.cfg["context"]["max_concurrent_tokens"])
 
