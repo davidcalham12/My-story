@@ -1,0 +1,64 @@
+{
+  "_comment": "The eval profile: the exam pipeline at a price a table of four briefs can afford. Three chapters and a short word band, so every stage, every critic and the whole gate run exactly as they do for the exam novel - the only things made smaller are the number of chapters and their length. A profile is partial: it states what it changes and nothing else.",
+  "_comment_why_not_tiny": "Because `tiny` also shrinks the Story Bible to a cast of three, and an eval that scores continuity against a cast of three is not measuring what the exam novel does. The bible counts here are the exam's, unchanged - a brief that plants four mysteries has to have four mysteries to plant.",
+  "novel": {
+    "chapters": 3,
+    "words_per_chapter": {
+      "min": 300,
+      "target": 420,
+      "max": 550
+    },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": {
+      "min": 5,
+      "max": 24
+    },
+    "sentences_per_paragraph": {
+      "min": 1,
+      "max": 5
+    },
+    "lines_per_chapter": {
+      "min": 25,
+      "max": 95
+    },
+    "chars_per_line": {
+      "max": 64
+    }
+  },
+  "context": {
+    "max_summary_words": 120
+  },
+  "_comment_budget": "25.0, and the figure has a reason rather than a feeling behind it. The exam profile is 60.0 for ten chapters of 1,250 words; this is three chapters of 420, which is about a seventh of the prose - but the floor does not shrink with the book. Every unit still pays its ~48,800-token arrival (novaforge-v2 domain-knowledge 8.8), the Bible is the same size, and each chapter still faces six characteristics and up to three attempts. So a fifth of the exam's ceiling rather than a seventh, and four briefs at this figure is the outer bound the table was priced at.",
+  "budget": {
+    "max_cost_usd": 25.0,
+    "max_calls": 200
+  },
+  "bible": {
+    "world_min_words": 500,
+    "world_max_words": 900,
+    "technology_entries": {
+      "min": 4,
+      "max": 6
+    },
+    "factions": {
+      "min": 3,
+      "max": 4
+    },
+    "world_rules": {
+      "min": 5,
+      "max": 8
+    },
+    "characters": {
+      "min": 5,
+      "max": 7
+    },
+    "timeline_rows": {
+      "min": 10,
+      "max": 14
+    },
+    "mysteries": {
+      "min": 4,
+      "max": 5
+    }
+  }
+}
