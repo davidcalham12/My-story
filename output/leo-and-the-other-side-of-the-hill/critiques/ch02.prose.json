@@ -1,0 +1,16 @@
+{"critic": "prose", "chapter": 2, "kind": "model+arithmetic", "agent": "prose-critic", "drafts": 1,
+ "formula": "prose = 10 - 3*mechanical - 2*major - 1*minor, floored at 0, computed by backend.chapters.score_prose",
+ "iterations": [
+   {"iteration": 1, "score": 9, "major": 0, "minor": 1, "mechanical": 0, "why": "10 - 3x0 - 2x0 - 1x1 = 9",
+    "findings": [
+      {"kind": "minor", "severity": "low",
+       "quote": "When Bruno woke, he woke suddenly, stood up, shook, and trotted toward the hill with such determination that Leo had to hurry to keep up.",
+       "claim": "'woke' twice in one sentence; the read-aloud stumbles and a listener wonders why it is said twice.",
+       "fix": "Tighten to one 'woke'.",
+       "reference": "the read-aloud rhythm this book is written to"}],
+    "notes": "Critic: 0 major, 1 minor. It singled out the dark-kitchen scene for taking Leo's fear seriously while showing what frightens him rather than naming the feeling, and the beetle with 'a lot of important purpose and very little speed' as the humour landing without condescension. Score 9 clears the threshold, so the minor was not sent back — at 9 the only thing a redraft could buy is the risk of losing something that already works."}],
+ "mechanical_check": {
+   "command": "python -m backend.chapters.check_prose output/leo-and-the-other-side-of-the-hill/chapters/ch02.attempt1.md",
+   "verdict": "clean", "defects": [],
+   "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"],
+   "not_checked": ["whether a fact stated here contradicts one stated elsewhere", "voice, pacing, dialogue, originality", "whether any sentence earns its place"]}}

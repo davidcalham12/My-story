@@ -1,0 +1,6 @@
+{"critic": "science", "chapter": 1, "kind": "model", "agent": "science-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [], "provenance": "measured",
+    "notes": "All six rules checked. The chapter is daylight throughout, at home and in the garden. R1 never engaged - Leo does not leave. R2 and R5 not triggered: no Mr. Pike, no gate, no village children. R3 and R6 cannot apply: the torch is not found until Chapter 2, and the cardboard observatory takes greenish light through its slots, so it is not a space dark enough that Leo cannot see his own feet. R4 not triggered: Bruno crosses no fence. No rule broken silently."},
+   {"iteration": 2, "score": 10, "findings": [], "provenance": "reconstructed",
+    "notes": "NOT RE-SCORED. Carried forward from iteration 1 and marked reconstructed rather than measured. The diff between the two drafts is four lines - the two passages the sheet quoted, verified with `diff` - and neither engages a rule: no torch, no gate, no dusk, no fence appears in either. The score could not move, but it was not taken again, and saying so is the point. See logs/deviations.md D1."}]}

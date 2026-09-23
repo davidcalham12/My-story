@@ -1,0 +1,13 @@
+{
+  "slug": "leo-and-bruno-cross-the-hill",
+  "profile": "exam",
+  "premise": "Leo and Bruno cross the hill. A warm, funny children's adventure for Leo, ten years old today: curious, a collector of smooth stones, afraid of the dark though he will not admit it. Bruno is his scruffy terrier; the fossil he found on the beach at Cadaques he named Captain Crunch; the cardboard observatory he built with his grandfather still stands in the garden. Leo has always asked what is on the other side of the hill. This is the summer he goes and finds out.",
+  "tone": "a warm, funny children's adventure — one real summer, told at a ten-year-old's eye level, with a dog in it; the wonder comes from the actual world (fossils, stars, weather, the far side of a hill) and never from magic",
+  "chapters_planned": 10,
+  "stage": "FLOW-1",
+  "units_done": ["world"],
+  "started_utc": "2026-09-23T20:35:00Z",
+  "chapters": [],
+  "_comment": "written by the conductor before the first unit; the units keep it current",
+  "_comment_premise": "U1 recovered the premise from the runs table of novaforge.db: the conductor's unit prompt (backend/runs/conductor.py prompt_for) names no brief and writes none into the run directory, so FLOW-1 had no premise among the files it was given. It is recorded here so U2-U5 read it off disk rather than repeating the recovery."
+}

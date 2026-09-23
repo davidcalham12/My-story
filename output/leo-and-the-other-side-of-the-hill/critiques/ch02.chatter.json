@@ -1,0 +1,3 @@
+{"critic": "chatter", "chapter": 2, "kind": "arithmetic", "agent": "orchestrator", "drafts": 1,
+ "iterations": [{"iteration": 1, "score": 10, "first_line": "# Chapter 2 — The Torch", "findings": [],
+   "notes": "Opens with the required `# Chapter` heading; no preamble, no commentary, no closing note."}]}

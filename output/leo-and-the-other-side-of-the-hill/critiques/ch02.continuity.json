@@ -1,0 +1,9 @@
+{"critic": "continuity", "chapter": 2, "kind": "model", "agent": "continuity-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 8, "findings": [
+     {"kind": "new-canon-invented", "severity": "medium",
+      "quote": "Bruno—his brown terrier with the crooked ear—decided",
+      "claim": "Two permanent physical details about Bruno that the Bible does not contain. They become canon for the remaining chapters, and no later writer will have seen this chapter's prose to inherit them.",
+      "fix": "Either keep them deliberately and add them to bible/characters.md, or use only 'terrier' as the Bible does.",
+      "reference": "bible/characters.md, the Bruno bullet"}],
+    "notes": "Score 8, which clears the threshold on its own, so the chapter was not sent back. Orchestrator arbitration: UPHELD as a finding but NOT patched. It is not a contradiction — the premise says scruffy terrier and nothing about colour or ears — and a patch would have been a rewrite of a passing characteristic for a matter the Bible never settled. Recorded instead as a known drift: chapter 1 called Bruno 'the color of rust' and chapter 2 calls him brown. No critic can see both, because no critic is ever given two chapters. This is exactly the class of defect the bounded-context architecture accepts by design, and it is written down rather than discovered by a reader."}]}

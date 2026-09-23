@@ -1,0 +1,10 @@
+{"critic": "continuity", "chapter": 1, "kind": "model", "agent": "continuity-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 7, "findings": [
+     {"kind": "timeline-math", "severity": "high",
+      "quote": "Samuel had given it to him at Cadaques two summers ago, and Leo had named it right then",
+      "claim": "Two facts contradict canon in one sentence: the fossil was not a gift from Samuel — Leo found it himself among the rocks — and it was found one summer before the story, not two. Two summers before is the observatory's row.",
+      "fix": "Leo finds the fossil himself at Cadaques, one summer ago; keep the naming, which is canon; keep Samuel out of the sentence.",
+      "reference": "bible/timeline.md, the Cadaques row"}]},
+   {"iteration": 2, "score": 10, "findings": [],
+    "notes": "Re-scored by the same critic on the patched draft. The substituted sentence corrects the error completely: Leo now finds the fossil himself one summer prior, as canon requires, and nothing else in the chapter became inconsistent because of it. No late findings raised."}]}

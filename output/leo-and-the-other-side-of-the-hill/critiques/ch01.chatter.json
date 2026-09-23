@@ -1,0 +1,6 @@
+{"critic": "chatter", "chapter": 1, "kind": "arithmetic", "agent": "orchestrator", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "first_line": "# Chapter 1 — The Question", "findings": [],
+    "notes": "Draft opens with the required `# Chapter` heading; no preamble, no commentary, no closing note."},
+   {"iteration": 2, "score": 10, "first_line": "# Chapter 1 — The Question", "findings": [],
+    "notes": "Unchanged by the patch; the first line is byte-identical."}]}

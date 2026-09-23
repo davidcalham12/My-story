@@ -1,0 +1,9 @@
+{
+  "_comment": "Recomputed from this run's own record: what the gate decided, against the rule it was supposed to follow. `breached` means a chapter entered this book that should not have.",
+  "attempts_checked": 3,
+  "unjudgeable": 3,
+  "breaches": [
+    "ch03 attempt 3: failed without halting \u2014 no attempt reached the threshold, nothing was promoted, and the run did not halt"
+  ],
+  "verdict": "breached"
+}

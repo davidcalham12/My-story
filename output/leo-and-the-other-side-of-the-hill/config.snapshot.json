@@ -1,0 +1,136 @@
+{
+  "_comment": "Merged configuration for this run: config/novel.config.json overlaid key by key with config/profiles/exam.json. novel.tone was null and was decided by the orchestrator from the premise, as CFG-1a requires, and written here so the choice is recorded rather than assumed.",
+  "profile": "exam",
+  "slug": "leo-and-the-other-side-of-the-hill",
+  "premise": "A warm, funny children's adventure for Leo, ten years old today: curious, a collector of smooth stones, afraid of the dark though he will not admit it. Leo's scruffy terrier Bruno sleeps at the foot of his bed; the fossil he found on the beach at Cadaques he named Captain Crunch; and the cardboard observatory he built with his grandfather still stands in the garden. Leo has always asked what is on the other side of the hill. This is the summer he goes and finds out.",
+  "novel": {
+    "chapters": 10,
+    "tone": "a warm, funny children's adventure — a ten-year-old's summer quest told close to the ground, comic and kind, the kind of book read aloud a chapter a night; small real wonders rather than magic, a dog who is a character, and a fear of the dark taken seriously and gently",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": {
+      "min": 1000,
+      "target": 1250,
+      "max": 1500
+    },
+    "tolerance_pct": 10,
+    "paragraphs_per_chapter": {
+      "min": 8,
+      "max": 50
+    },
+    "sentences_per_paragraph": {
+      "min": 1,
+      "max": 6
+    },
+    "lines_per_chapter": {
+      "min": 60,
+      "max": 190
+    },
+    "chars_per_line": {
+      "max": 84
+    },
+    "beats_per_chapter": {
+      "min": 3,
+      "max": 5
+    },
+    "promises": {
+      "min": 3,
+      "max": 5
+    }
+  },
+  "bible": {
+    "world_min_words": 500,
+    "world_max_words": 900,
+    "technology_entries": {
+      "min": 4,
+      "max": 6
+    },
+    "factions": {
+      "min": 3,
+      "max": 4
+    },
+    "world_rules": {
+      "min": 5,
+      "max": 8
+    },
+    "characters": {
+      "min": 5,
+      "max": 7
+    },
+    "timeline_rows": {
+      "min": 10,
+      "max": 14
+    },
+    "mysteries": {
+      "min": 4,
+      "max": 5
+    }
+  },
+  "context": {
+    "max_summary_words": 260,
+    "forbid_prior_chapter_prose": true,
+    "max_concurrent_tokens": 100000,
+    "max_summary_facts": 40
+  },
+  "quality_gate": {
+    "critics": [
+      "continuity",
+      "science",
+      "outline",
+      "length",
+      "chatter",
+      "prose"
+    ],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "patch_then_halt"
+  },
+  "feedback": {
+    "sheet_template": "specs/loops/LOOP-003/sheet_template/v01.md",
+    "validate_before_sending": true,
+    "escalate_to_literal_at_attempt": 3,
+    "keep_attempt_drafts": true,
+    "late_finding_blocks": false
+  },
+  "style": {
+    "word_count_tolerance_pct": 0
+  },
+  "models": {
+    "orchestrator": null,
+    "_comment": "The orchestrator runs on the session model (claude-opus-5[1m]); every subagent declares model: haiku in .claude/agents/*.md, which resolves to claude-haiku-4-5."
+  },
+  "budget": {
+    "max_cost_usd": 15.0,
+    "max_calls": 500
+  },
+  "outputs": {
+    "formats": [
+      "markdown"
+    ],
+    "synopsis": {
+      "words": {
+        "min": 150,
+        "max": 250
+      },
+      "comparables": {
+        "min": 2,
+        "max": 3
+      }
+    },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  },
+  "_derived": {
+    "word_band_with_tolerance": {
+      "min": 900,
+      "max": 1650
+    },
+    "started_utc": "2026-09-23T19:39:42Z"
+  }
+}

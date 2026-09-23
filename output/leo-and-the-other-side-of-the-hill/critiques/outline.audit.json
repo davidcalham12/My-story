@@ -1,0 +1,57 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-23T19:48:08Z",
+  "verdict": "defects",
+  "violations": [
+    {
+      "chapter": 9,
+      "beat": 2,
+      "rule": "R3",
+      "clause": "he must light the torch AND name aloud one thing he has found or noticed in the world",
+      "severity": "medium",
+      "claim": "Leo lights the torch and enters the stone shelter in full darkness but never names anything aloud. He performs the ritual's first half and not its second.",
+      "fix": "Amend the beat so Leo names aloud, before entering, something he noticed in the meadow in beat 1 — different from the stone he names in Chapter 8.",
+      "arbitration": "UPHELD — the rule has two clauses and the beat satisfies one. A chapter written from this commission cannot pass the science characteristic and cannot be redrafted into passing, because its own outline entry told it to break the rule. plot-architect was dispatched for the Chapter 9 entry alone; beat 2 now has Leo name the roar of the stream at the shelter's entrance. Beats 1, 3 and 4 are byte-identical."
+    }
+  ],
+  "ambiguities": [
+    {
+      "rule": "R1",
+      "clause": "Leo must be home before dusk falls; this is the boundary between the village day and the village night.",
+      "reading_a": "Dusk is a specific moment; being out after it is forbidden.",
+      "reading_b": "Dusk is a gradual period; being out during it is permissible and only full darkness is forbidden.",
+      "outline_assumes": "b",
+      "arbitration": "UPHELD — and this one had to be settled, because chapters 8, 9 and 10 all put Leo out after the light has gone and the whole climax is that rule knowingly broken. Left as written, the science critic could read it either way and no chapter from 8 onward could be arbitrated.",
+      "applied": "worldbuilder rewrote R1: dusk is the moment the light leaves the sky entirely, Leo is expected home by then, and coming home after it gets him grounded the next day. A rule he can knowingly break, with a consequence — which is what the story needs it to be."
+    },
+    {
+      "rule": "R2",
+      "clause": "The path to the other side of the hill crosses the farmer's land. His gate stands at the boundary, and he does not allow trespassers.",
+      "reading_a": "Leo may not cross the farmer's land anywhere, gate or fence.",
+      "reading_b": "The gate is the guarded crossing; an unwatched gap in the fence can be crossed, and it is still trespassing.",
+      "outline_assumes": "b",
+      "arbitration": "UPHELD, and the most dangerous of the four. Reading A forbids what the Story Bible's own mysteries.md commits chapters 5 through 9 to doing — 'Leo finds a way around the boundary and discovers the farmer does not pursue' is canon written before this rule was read. Two defensible readings of R2 would have deadlocked every chapter from 5 on.",
+      "applied": "worldbuilder rewrote R2: Mr. Pike guards the gate and the gate alone; the fence has fallen gaps to the north and south; crossing at a gap is possible, is trespassing, and Leo knows it when he does it."
+    },
+    {
+      "rule": "R3",
+      "clause": "Before Leo enters a dark space—a barn, a shed, the dusk under the hill—he must light the torch and name aloud one thing he has found or noticed in the world.",
+      "reading_a": "Required before crossing the threshold, and only for the three listed kinds of place.",
+      "reading_b": "Performed as part of entering, and for any dark space at all.",
+      "outline_assumes": "b",
+      "arbitration": "UPHELD. The list of examples read as exhaustive under A, which would have excused every scene in open country after dark — and open country after dark is where this book's last three chapters happen.",
+      "applied": "worldbuilder rewrote R3: every time, any space dark enough that Leo cannot see his own feet, indoors or out, the thing named must be something he found or noticed himself, said aloud before he goes in."
+    },
+    {
+      "rule": "R6",
+      "clause": "The torch grows dimmer each night it is used; Leo does not know when it will fail entirely.",
+      "reading_a": "Dims once per night of use.",
+      "reading_b": "Dims once per calendar night regardless of use.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD, though the least consequential of the four. Under A a critic counting nights would have arithmetic to do, which is precisely the kind of rule the worldbuilder is told not to write.",
+      "applied": "worldbuilder rewrote R6: the torch dims with every minute it is lit, never brightens, is never replaced, and nobody in the book may measure how much is left — so there is nothing to count."
+    }
+  ],
+  "note": "Run against the commission, before any chapter existed. One violation and four ambiguities; all five were fixed in the Bible or the outline rather than left for the gate. The R2 ambiguity in particular was a rule that contradicted canon the same Bible had already written, and it would have failed as a disagreement rather than as a defect."
+}

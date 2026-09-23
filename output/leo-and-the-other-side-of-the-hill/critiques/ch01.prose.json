@@ -1,0 +1,21 @@
+{"critic": "prose", "chapter": 1, "kind": "model+arithmetic", "agent": "prose-critic", "drafts": 2,
+ "formula": "prose = 10 - 3*mechanical - 2*major - 1*minor, floored at 0, computed by backend.chapters.score_prose",
+ "iterations": [
+   {"iteration": 1, "score": 9, "major": 0, "minor": 1, "mechanical": 0, "why": "10 - 3x0 - 2x0 - 1x1 = 9",
+    "findings": [
+      {"kind": "minor", "severity": "low",
+       "quote": "There was one the color of the sea, even though it had come from the road. There was one that was so heavy it pulled his pocket down when he carried it. There were others arranged by color, by the size of them, by the path he had walked when he found them.",
+       "claim": "Three consecutive sentences open with There was / There was / There were. Read aloud the pattern starts to tick and a young listener hears the pattern instead of the stones.",
+       "fix": "Same three stones, same order, second and third sentences opening some other way.",
+       "reference": "the tone this book is written to: read-aloud rhythm, concrete nouns"}],
+    "notes": "Critic reported 0 major, 1 minor, and said the register should be maintained: concrete sensory detail, character through action, Bruno's personality arriving entirely through behaviour."},
+   {"iteration": 2, "score": 10, "major": 0, "minor": 0, "mechanical": 0, "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+    "findings": [],
+    "notes": "Re-scored by the same critic on the patched draft. The minor is resolved and the continuity substitution improved the prose rather than costing it. No late findings raised."}],
+ "mechanical_check": {
+   "_comment": "backend.chapters.check_prose on the accepted draft. It does not gate and is not a seventh characteristic; its count feeds `prose`, which does. Written here rather than in a separate file so the characteristic and the evidence its arithmetic consumed sit together.",
+   "command": "python -m backend.chapters.check_prose output/leo-and-the-other-side-of-the-hill/chapters/ch01.attempt2.md",
+   "verdict": "clean",
+   "defects": [],
+   "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"],
+   "not_checked": ["whether a fact stated here contradicts one stated elsewhere", "voice, pacing, dialogue, originality", "whether any sentence earns its place", "canonical names - no characters.md was given to compare against"]}}

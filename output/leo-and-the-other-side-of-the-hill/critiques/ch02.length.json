@@ -1,0 +1,3 @@
+{"critic": "length", "chapter": 2, "kind": "arithmetic", "agent": "orchestrator", "drafts": 1,
+ "band": {"min": 900, "max": 1650, "source": "words_per_chapter 1000-1500 widened by tolerance_pct 10"},
+ "iterations": [{"iteration": 1, "score": 10, "words": 1324, "command": "wc -w chapters/ch02.attempt1.md", "findings": []}]}

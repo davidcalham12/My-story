@@ -10,3 +10,6 @@ node_modules/
 # drafts, the critiques and the feedback sheets, and threw away the book.
 frontend/dist/
 .pytest_cache/
+
+# TLC's working directory: model-checking output, not source.
+tla/states/

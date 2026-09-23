@@ -1,0 +1,4 @@
+{"critic": "outline", "chapter": 2, "kind": "model", "agent": "outline-critic", "drafts": 1,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [],
+    "notes": "10 - 3x0 missing - 1x0 out of order = 10. Beat 1 present (the torch found at the back of the drawer while looking for matches). Beat 2 present (the dark kitchen, the dim beam, the shaking hand stopping). Beat 3 present (the afternoons of early July on the slope, testing the beam against the shadows). All three in order. Orchestrator re-checked the arithmetic against the three quotes supplied: it holds."}]}

@@ -1,0 +1,6 @@
+{"critic": "outline", "chapter": 1, "kind": "model", "agent": "outline-critic", "drafts": 2,
+ "iterations": [
+   {"iteration": 1, "score": 10, "findings": [], "provenance": "measured",
+    "notes": "10 - 3x0 missing - 1x0 out of order = 10. Beat 1 present (Leo wakes on his tenth birthday; the observatory still stands). Beat 2 present (the birthday song, then the question). Beat 3 present (the grown-ups' usual answers and Leo reading the not-bothering in their faces). Beat 4 present (the afternoon in the observatory, Bruno asleep at his feet, the fear admitted only to himself). All four in the commissioned order. Orchestrator re-checked the arithmetic against the four quotes the critic supplied: it holds."},
+   {"iteration": 2, "score": 10, "findings": [], "provenance": "reconstructed",
+    "notes": "NOT RE-SCORED. Carried forward from iteration 1 and marked reconstructed. Both substitutions sit inside beat 1's paragraph and beat 4's stone-sorting and change who found a fossil and how three sentences open; no beat was added, removed or moved. See logs/deviations.md D1."}]}
