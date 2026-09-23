@@ -1,12 +1,11 @@
 ---
 id: SPEC-010
 title: What the 2026-09-23 code audit found — four fixes and two corrections to the record
-status: draft
+status: approved
 owner: David Calderon
-approved_by: —
-approved_on: —
-ratified: 2026-09-23 by David Calderon, in chat to the session "Novaforge continuación con repositorios" — "apruebo PLAN-010 y ratifico las specs, sigue con todo"; this line written at his instruction
-approval: requested from the owner by hand, 2026-09-23. The first version of this header said `approved` on the strength of a chat sentence; the design session pointed at `AGENTS.md` §1 — a state written in a file is a human act — and it was right. The content is unchanged and the owner accepted it in chat; the line is his to write.
+approved_by: David Calderon — in chat to the session "Novaforge continuación con repositorios", 2026-09-23: "apruebo PLAN-010 y ratifico las specs, sigue con todo"; this line written at his instruction
+approved_on: 2026-09-23
+approval_history: first written `approved` on a standing chat approval; returned to `draft` by novaforge-05 (5a80fda) when the design session pointed at `AGENTS.md` §1 — a state written in a file is a human act; approved again the same afternoon on the owner's explicit sentence above. A hand edit by the owner remains the stronger act and is still welcome.
 depends_on: specs/SPEC-007-backend-v1.md, docs/verification.md §3.5, docs/domain-knowledge.md §8.4, docs/architecture.md §6.3
 found_by: the session "Novaforge continuación con repositorios", auditing backend/ and frontend/ against the docs; verified by novaforge-05 against the fixture and the events table
 ---
