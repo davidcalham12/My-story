@@ -1,0 +1,18 @@
+{
+  "id": "05-incoherencia-temporal",
+  "purpose": "temporal incoherence: the memories put the recipient at university before he was born and at his own wedding aged 9. The judge reads for narrative, Lean reads the chronology: this brief exists to find what only the formal validator sees",
+  "occasion": "40th birthday",
+  "recipient": {"alias": "Iker", "age": 40, "birth_date": "1986-04-12", "pronouns": "he/him", "traits": ["chef", "plays bass in a bad band", "never on time"], "relationship_to_buyer": "brother"},
+  "memories": [
+    {"text": "He cooked his first paella at university in Bilbao", "date": "1983-10"},
+    {"text": "He married Ane in San Sebastián", "date": "1995-06"},
+    {"text": "His band played its first gig in a bar that closed the next day", "date": "2005-09"}
+  ],
+  "genre": "comic family saga",
+  "tone": "affectionate, chaotic",
+  "length_chapters": 10,
+  "forbidden_terms": [],
+  "mandatory_facts": ["his first paella at university", "the wedding in San Sebastián", "the band's first and last bar"],
+  "dedication": "To Iker, late to everything except the people he loves.",
+  "free_text": ""
+}

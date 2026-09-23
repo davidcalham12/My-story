@@ -1,0 +1,14 @@
+{
+  "id": "03-faltan-datos",
+  "purpose": "missing data + contradiction: no memories, no tone; age 8 with an adult noir genre. The interviewer must return incomplete with questions and flag the age/genre contradiction before anything is spent",
+  "occasion": "birthday",
+  "recipient": {"alias": "Nora", "age": 8, "pronouns": "she/her", "traits": [], "relationship_to_buyer": "niece"},
+  "memories": [],
+  "genre": "adult noir thriller",
+  "tone": null,
+  "length_chapters": 10,
+  "forbidden_terms": [],
+  "mandatory_facts": [],
+  "dedication": null,
+  "free_text": ""
+}

@@ -1,0 +1,18 @@
+{
+  "id": "02-pareja",
+  "purpose": "normal: an anniversary for a couple; different tone, two protagonists, adult recipient",
+  "occasion": "25th wedding anniversary",
+  "recipient": {"alias": "Marta", "age": 52, "pronouns": "she/her", "traits": ["architect", "sings while cooking", "stubborn in the best way"], "relationship_to_buyer": "wife"},
+  "memories": [
+    {"text": "They met in a delayed train from Zaragoza and shared a sandwich", "date": "1999-03"},
+    {"text": "Their first flat had a balcony so small only one chair fitted"},
+    {"text": "They adopted a grey cat called Pepa in 2010", "date": "2010-05"}
+  ],
+  "genre": "romantic comedy",
+  "tone": "tender, witty, nostalgic",
+  "length_chapters": 10,
+  "forbidden_terms": ["divorce", "Javier"],
+  "mandatory_facts": ["they met on a delayed train from Zaragoza", "the cat is called Pepa", "the balcony with one chair"],
+  "dedication": "To Marta: twenty-five years and still one chair short.",
+  "free_text": "She always says the train was the best delay of her life."
+}

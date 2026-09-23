@@ -1,0 +1,18 @@
+{
+  "id": "01-hijo",
+  "purpose": "happy path: a birthday gift to a son; the README's example brief and the example novel",
+  "occasion": "10th birthday",
+  "recipient": {"alias": "Leo", "age": 10, "pronouns": "he/him", "traits": ["curious", "collects smooth stones", "afraid of the dark but will not admit it"], "relationship_to_buyer": "son"},
+  "memories": [
+    {"text": "The summer he found a fossil on the beach at Cadaqués and named it Captain Crunch", "date": "2024-07"},
+    {"text": "His dog, a scruffy terrier called Bruno, sleeps at the foot of his bed"},
+    {"text": "He built a cardboard observatory in the garden with his grandfather"}
+  ],
+  "genre": "children's adventure",
+  "tone": "warm, funny, a little brave",
+  "length_chapters": 10,
+  "forbidden_terms": ["death", "monster"],
+  "mandatory_facts": ["Leo's dog is called Bruno", "Leo found a fossil named Captain Crunch", "the cardboard observatory"],
+  "dedication": "For Leo, who is braver than he thinks.",
+  "free_text": "Leo loves maps and always asks what is on the other side of the hill."
+}
