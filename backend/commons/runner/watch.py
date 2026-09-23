@@ -297,6 +297,9 @@ class ContextWatcher:
     packets_measured: int = 0
     largest_orchestrator_turn: int = 0
     orchestrator_turns: int = 0
+    #: Turns above the ceiling. Counted, reported, and never a reason to
+    #: halt: the ceiling is about the agents' packets, not this (docs/spec.md §8).
+    turns_over_ceiling: int = 0
     # Per agent, so "chapter 34 weighs what chapter 1 weighed" can be drawn the
     # day the figures arrive.
     by_agent: dict[str, int] = field(default_factory=dict)
@@ -325,6 +328,8 @@ class ContextWatcher:
         # The orchestrator's own turn. Recorded, never fatal.
         self.orchestrator_turns += 1
         self.largest_orchestrator_turn = max(self.largest_orchestrator_turn, size)
+        if size > self.ceiling:
+            self.turns_over_ceiling += 1
 
     @property
     def packet_series_provenance(self) -> str:

@@ -125,4 +125,18 @@ export interface RunDetail {
   conformance: Conformance
   /** What an imported run did NOT carry. A gap reads as a gap, never a zero. */
   completeness: Gap[]
+  /** The orchestrator's own turns against the 100,000 ceiling: measured,
+   *  shown, and never halted on — the ceiling is about the agents' packets
+   *  (docs/spec.md §8). `provenance: 'absent'` means nobody watched this run;
+   *  `turnsOverCeiling: 0` would mean somebody did and it never crossed. */
+  orchestrator_context: OrchestratorContext
+}
+
+export interface OrchestratorContext {
+  turns: number | null
+  largest_turn_tokens: number | null
+  turns_over_ceiling: number | null
+  ceiling: number
+  provenance: Provenance
+  note: string
 }

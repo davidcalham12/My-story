@@ -112,6 +112,28 @@ def cost(conn: sqlite3.Connection, run_id: str) -> dict:
     }
 
 
+def orchestrator_context(conn: sqlite3.Connection, run_id: str, ceiling: int = 100_000) -> dict:
+    """What the orchestrator's own turns measured — or that nobody measured.
+
+    `provenance` is the field that matters: `absent` says no watcher ever saw
+    this run, and 0 turns over the ceiling would say the opposite.
+    """
+    row = conn.execute(
+        "SELECT orchestrator_turns, largest_orchestrator_turn, "
+        "orchestrator_turns_over_ceiling FROM runs WHERE id = ?", (run_id,)
+    ).fetchone()
+    turns = row["orchestrator_turns"] if row else None
+    return {
+        "turns": turns,
+        "largest_turn_tokens": row["largest_orchestrator_turn"] if row else None,
+        "turns_over_ceiling": row["orchestrator_turns_over_ceiling"] if row else None,
+        "ceiling": ceiling,
+        "provenance": "measured" if turns is not None else "absent",
+        "note": "the ceiling is about the packets the agents receive; an "
+                "orchestrator turn above it is reported and never halted",
+    }
+
+
 def warnings(conn: sqlite3.Connection, run_id: str) -> list[dict]:
     return [dict(r) for r in conn.execute(
         "SELECT kind, detail, chapter, ts FROM run_warnings WHERE run_id = ? "

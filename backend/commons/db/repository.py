@@ -132,6 +132,38 @@ def events_after(conn, run_id: str, seq: int) -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def save_orchestrator_context(conn, run_id: str, *, turns: int, largest: int,
+                              over_ceiling: int) -> None:
+    """What the orchestrator's own turns measured, written once at the end."""
+    with tx(conn):
+        conn.execute(
+            "UPDATE runs SET orchestrator_turns = ?, largest_orchestrator_turn = ?, "
+            "orchestrator_turns_over_ceiling = ? WHERE id = ?",
+            (turns, largest, over_ceiling, run_id),
+        )
+
+
+def warn_orchestrator_context(conn, run_id: str, *, turn_tokens: int, ceiling: int) -> None:
+    """The FIRST crossing, once per run.
+
+    A warning per turn would be sixty warnings on a run that is behaving
+    exactly as designed, and a warning nobody reads is worse than none
+    (`domain-knowledge.md` §8.6). One row, with the figure that crossed.
+    """
+    with tx(conn):
+        conn.execute(
+            "INSERT INTO run_warnings (run_id, kind, detail, chapter, ts) "
+            "SELECT ?, 'orchestrator-context', ?, NULL, ? "
+            "WHERE NOT EXISTS (SELECT 1 FROM run_warnings "
+            "                  WHERE run_id = ? AND kind = 'orchestrator-context')",
+            (run_id,
+             f"an orchestrator turn carried {turn_tokens:,} tokens against a ceiling "
+             f"of {ceiling:,}. Recorded, not halted: the ceiling is about the packets "
+             f"the agents receive, and this run is free to continue.",
+             now(), run_id),
+        )
+
+
 def warn(conn, run_id: str, kind: str, detail: str, chapter: int | None = None) -> None:
     with tx(conn):
         conn.execute(

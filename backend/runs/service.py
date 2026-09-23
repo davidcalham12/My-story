@@ -94,6 +94,8 @@ class Live:
     # Set by halt(): the user's reason wins over what the loop would otherwise
     # conclude from a stream that simply ended.
     halt_requested: tuple[str, str] | None = None
+    #: The context watcher, so `_finish` can write down what it measured.
+    context: object | None = None
 
 
 class RunService:
@@ -121,6 +123,8 @@ class RunService:
             "cost": read_repo.cost(self.conn, run_id),
             "warnings": read_repo.warnings(self.conn, run_id),
             "completeness": read_repo.completeness(self.conn, run_id),
+            # Measured, shown, never halted on (docs/spec.md §8).
+            "orchestrator_context": read_repo.orchestrator_context(self.conn, run_id),
             # Did the run obey its own gate? Computed from the archive rather
             # than trusted, because the orchestrator writes both the record and
             # the decisions in it.
@@ -157,6 +161,7 @@ class RunService:
         state = State()
         budget = self._budget_watcher(cfg)
         context = ContextWatcher(ceiling=cfg["context"]["max_concurrent_tokens"])
+        live.context = context
         halted: tuple[str, str] | None = None
 
         try:
@@ -179,7 +184,13 @@ class RunService:
                     "seq": live.seq,  # the SSE `id:` — which line produced this
                 })
                 try:
+                    before = context.turns_over_ceiling
                     context.observe_event(event)
+                    if context.turns_over_ceiling > before == 0:
+                        write_repo.warn_orchestrator_context(
+                            self.conn, live.run_id,
+                            turn_tokens=context.largest_orchestrator_turn,
+                            ceiling=context.ceiling)
                     budget.observe(state)
                 except WatchTripped as trip:
                     halted = (trip.kind, trip.detail)
@@ -300,6 +311,13 @@ class RunService:
             # backend writes no log file, so the database is the log (P-8).
             for raw in getattr(live.process, "skipped", None) or []:
                 write_repo.warn(self.conn, live.run_id, "malformed_line", raw)
+
+            if live.context is not None:
+                write_repo.save_orchestrator_context(
+                    self.conn, live.run_id,
+                    turns=live.context.orchestrator_turns,
+                    largest=live.context.largest_orchestrator_turn,
+                    over_ceiling=live.context.turns_over_ceiling)
 
             self._check_procedure_held(live)
             self._archive(live, state)

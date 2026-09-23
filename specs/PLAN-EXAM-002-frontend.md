@@ -1,9 +1,10 @@
 # PLAN-EXAM-002 — the storyMaker frontend, technically
 
-status: draft
+status: approved
 date: 2026-09-23
 implements: SPEC-EXAM-002 (approved 2026-09-23)
-approved_by: —
+approved_by: David Calderon — in chat, 2026-09-23: "sí sí hazlo", ordering the three new screens;
+  written at his instruction by the building session
 executes: novaforge-05 · reviews: the coordinating session · decides: the owner
 
 SPEC-EXAM-002 describes the frontend in plain language and, by the owner's
