@@ -1,3 +1,24 @@
+# storyMaker (repo `My-story`) — novelas personalizadas para regalar
+
+**Estado a 2026-09-23.** Este es el repositorio del **examen final** de *Harness
+Engineering*. Aquí se construye storyMaker sobre lo aprendido en NovaForge.
+Empieza por:
+
+| quieres | lee |
+|---|---|
+| qué se ha hecho, qué fue lo último, quién es quién | [`docs/HANDBOOK.md`](docs/HANDBOOK.md) |
+| **el orden de trabajo del examen, paso a paso** | [`docs/EXAM-RUNBOOK.md`](docs/EXAM-RUNBOOK.md) |
+| el enunciado decodificado: qué aprueba, qué se reutiliza, qué es nuevo | [`docs/EXAM-PLAN.md`](docs/EXAM-PLAN.md) |
+| el harness vivo del que parte todo | https://github.com/davidcalham12/novaforge-v2 (rama `backend-v1`) |
+| el traspaso completo de la sesión de diseño | https://github.com/davidcalham12/nova-repo (`00-HANDOFF.md`) |
+| skills, herramientas y todos los enlaces del curso | https://github.com/davidcalham12/my-factory |
+
+Lo que sigue debajo es el README original del 15 de septiembre — describe la
+**v1** (motor `mock`, tres críticos, PDF). Se conserva como histórico; **no
+describe el estado actual**.
+
+---
+
 # NovaForge
 
 A multi-agent harness that writes short science-fiction novels.
