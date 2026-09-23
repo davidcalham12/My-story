@@ -233,6 +233,10 @@ class RunService:
             raw = event.get("usage")
             usage = raw if isinstance(raw, dict) else {}
             size = context_size(usage)
+            # `task_progress` reports the subagent's `total_tokens` — input and
+            # output together, the only per-subagent figure the CLI emits — not
+            # the three input fields an orchestrator turn carries (SPEC-010 W2).
+            from_total = size > 0 and "total_tokens" in usage and "input_tokens" not in usage
             write_call(self.conn, CallRow(
                 run_id=run_id, stage=state.stage or "unknown",
                 agent=str(event.get("subagent_type") or "unknown"),
@@ -240,12 +244,14 @@ class RunService:
                 # Claude Code session, and naming a model would be inventing one.
                 model="claude-code-session",
                 ts=_now(), chapter=state.chapter, attempt=state.attempt,
-                # `absent` rather than zero. The stream has a slot for these and
-                # in the recordings it reads empty; a zero would say the packet
-                # was tiny, which is a different claim from "not reported".
+                # `absent` rather than zero: a zero would say the packet was
+                # tiny, which is a different claim from "not reported".
                 input_tokens=size or None,
                 output_tokens=int(usage.get("output_tokens") or 0) or None,
                 provenance="measured" if size else "absent",
+                note=("total_tokens: the subagent's whole usage, input and output "
+                      "together, as the CLI reports it; an upper bound on the packet")
+                     if from_total else None,
             ))
 
     def _finish(self, live: Live, state: State, halted: tuple[str, str] | None) -> None:

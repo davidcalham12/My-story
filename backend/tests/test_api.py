@@ -454,3 +454,23 @@ def test_a_halted_run_stream_reports_the_halt_as_its_result(client_for, db, tmp_
     data = frames[-1][2]
     assert frames[-1][1] == "done" and data["result"] == "halted: process"
     assert "run" in data and data["run"]["halted"] == "process"
+
+
+# ------------------------------------------------------- PLAN-010 10.2 (SPEC-010 W2)
+
+
+def test_a_task_progress_call_row_carries_the_subagent_total_with_a_note(client, db):
+    """AC-2: the `calls` row for the fixture's one packet carries the figure,
+    says it is measured, leaves output NULL (the CLI does not split it) and
+    says in `note` that the number is the subagent's total, input and output
+    together — an upper bound on the packet, not the packet."""
+    run_id = client.post("/api/runs", json={"premise": PREMISE}).json()["id"]
+    _wait(client, run_id)
+    rows = db.execute("SELECT agent, input_tokens, output_tokens, provenance, note FROM calls "
+                      "WHERE run_id = ? AND agent = 'worldbuilder'", (run_id,)).fetchall()
+    assert len(rows) == 1, [dict(r) for r in rows]
+    row = rows[0]
+    assert row["input_tokens"] == 13921
+    assert row["output_tokens"] is None
+    assert row["provenance"] == "measured"
+    assert row["note"] and "total_tokens" in row["note"] and "input and output" in row["note"]

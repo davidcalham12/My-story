@@ -161,14 +161,43 @@ def test_an_oversized_subagent_packet_halts_the_run():
     assert "chapter-writer" in trip.value.detail
 
 
-def test_unreported_packets_are_absent_rather_than_zero():
-    """In both recordings `task_progress.usage` reads empty. Zero would claim
-    every packet was tiny, which is a different statement from 'not reported'."""
+def test_context_size_reads_total_tokens_when_the_input_fields_are_absent():
+    """SPEC-010 W2. Every `task_progress` event carries
+    `usage: {total_tokens, tool_uses, duration_ms}` — none of the three input
+    fields `context_size` summed. Three real runs were read as "no packet data"
+    because of a key name."""
+    assert context_size({"total_tokens": 13921, "tool_uses": 1, "duration_ms": 93451}) == 13921
+
+
+def test_context_size_prefers_the_input_fields_when_they_exist():
+    """The orchestrator's own turns carry the three fields; their sum is the
+    context, and `total_tokens` (if present) would double-count output."""
+    usage = {"input_tokens": 2, "cache_creation_input_tokens": 45_839,
+             "cache_read_input_tokens": 0, "output_tokens": 1, "total_tokens": 99_999}
+    assert context_size(usage) == 45_841
+
+
+def test_the_fixture_packet_is_measured_not_absent():
+    """Replaces `test_unreported_packets_are_absent_rather_than_zero`, whose
+    claim — that the recording's packets read empty — was the key-name mistake
+    itself. The fixture carries one packet, worldbuilder's, 13,921 tokens."""
     process = ReplayProcess(fixture=FIXTURE)
     process.start()
     watcher = ContextWatcher(ceiling=100_000)
     for event in process.events():
         watcher.observe_event(event)
+    assert watcher.packets_measured == 1
+    assert watcher.largest_packet == 13921
+    assert watcher.by_agent["worldbuilder"] == 13921
+    assert watcher.packet_series_provenance == "measured"
+
+
+def test_an_empty_usage_is_still_absent_never_zero():
+    """The old test's real point, kept for the case it was about: a
+    `task_progress` whose `usage` is empty reports nothing, not a tiny packet."""
+    watcher = ContextWatcher(ceiling=100_000)
+    watcher.observe_event({"type": "system", "subtype": "task_progress",
+                           "subagent_type": "chapter-writer", "usage": {}})
     assert watcher.packets_measured == 0
     assert watcher.packet_series_provenance == "absent"
 

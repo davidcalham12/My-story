@@ -100,12 +100,22 @@ def context_size(usage: dict) -> int:
     Reading only `input_tokens` gives a watcher that reports two-token calls and
     never trips - a ceiling that cannot be exceeded because it is measuring the
     wrong thing. This was found by replaying a real run, not by reading the docs.
+
+    **And a subagent's `task_progress` carries none of those three.** It carries
+    `usage: {total_tokens, tool_uses, duration_ms}` — the subagent's whole usage,
+    input and output together. For a day this function summed three absent keys,
+    reported 0, and three real runs were read as "no packet data" (SPEC-010 W2).
+    When the three input fields are absent, `total_tokens` is the figure: an
+    upper bound on the packet, labelled as such by the caller.
     """
-    return (
-        int(usage.get("input_tokens") or 0)
-        + int(usage.get("cache_creation_input_tokens") or 0)
-        + int(usage.get("cache_read_input_tokens") or 0)
-    )
+    if any(k in usage for k in ("input_tokens", "cache_creation_input_tokens",
+                                "cache_read_input_tokens")):
+        return (
+            int(usage.get("input_tokens") or 0)
+            + int(usage.get("cache_creation_input_tokens") or 0)
+            + int(usage.get("cache_read_input_tokens") or 0)
+        )
+    return int(usage.get("total_tokens") or 0)
 
 
 def _blocks(event: dict) -> list[dict]:
