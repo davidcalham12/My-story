@@ -89,9 +89,18 @@ class Critique(BaseModel):
 
 
 class Audit(BaseModel):
-    """`critiques/outline.audit.json`: one score and its findings, no iterations."""
+    """`critiques/outline.audit.json`: the FLOW-3 audit of the commission.
+
+    Written against the ten audit files in `output/`, not against an idea of
+    them. Nine say `verdict` and `violations`; the tenth, the oldest, says
+    `score` and `findings`. Both are admitted and everything else is extra,
+    because this file has never had a schema and refusing the shapes that
+    exist would report every run in the repository as malformed.
+    """
     model_config = ConfigDict(extra="allow")
-    score: int | None = Field(ge=0, le=10)
+    verdict: str | None = None
+    violations: list = []
+    score: int | None = Field(default=None, ge=0, le=10)
     findings: list[Finding] = []
 
 
@@ -108,10 +117,10 @@ def validate_critique(raw: object) -> str | None:
         if isinstance(raw, dict):
             if "iterations" in raw:
                 Critique.model_validate(raw)
-            elif "score" in raw:
+            elif "verdict" in raw or "violations" in raw or "score" in raw:
                 Audit.model_validate(raw)
             else:
-                return ("neither an `iterations` list nor a bare `score` — "
+                return ("no `iterations`, no `verdict`, no `score` — "
                         "no shape this reader knows")
             return None
         return f"a critique must be an object or an array, not {type(raw).__name__}"
