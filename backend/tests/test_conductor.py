@@ -211,9 +211,10 @@ def test_a_run_killed_after_chapter_three_resumes_at_chapter_four(tmp_path):
 # ------------------------------------------------------------- driving them
 
 
-def _conductor(db, run_dir, factory):
+def _conductor(db, run_dir, factory, max_budget_usd=None):
     return C.Conductor(conn=db, run_id=RUN_ID, slug=SLUG, run_dir=run_dir,
-                       cfg=loader.resolve("tiny"), process_factory=factory)
+                       cfg=loader.resolve("tiny"), process_factory=factory,
+                       max_budget_usd=max_budget_usd)
 
 
 def test_each_unit_gets_its_own_process_and_none_overlaps(db, run):
@@ -221,7 +222,7 @@ def test_each_unit_gets_its_own_process_and_none_overlaps(db, run):
     process — a reused process is the accumulating context, back again."""
     made: list[FakeProcess] = []
 
-    def factory(unit, prompt):
+    def factory(unit, prompt, budget_left=None):
         alive = [p for p in made if p.started and not p.stopped]
         assert not alive, f"{unit.name} started while {len(alive)} were still alive"
         writes = {rel: "x" for rel in unit.outputs}
@@ -240,7 +241,7 @@ def test_a_units_halt_stops_the_sequence_and_names_the_unit(db, run):
     """A halt in unit three must not silently write chapters four to ten."""
     made = []
 
-    def factory(unit, prompt):
+    def factory(unit, prompt, budget_left=None):
         writes = {rel: "x" for rel in unit.outputs}
         lines = [turn(1000), result_line()]
         if unit.key == "outline-write":
@@ -262,7 +263,7 @@ def test_a_units_halt_stops_the_sequence_and_names_the_unit(db, run):
 
 
 def test_a_unit_that_ends_without_its_outputs_halts_rather_than_carrying_on(db, run):
-    def factory(unit, prompt):
+    def factory(unit, prompt, budget_left=None):
         return FakeProcess([turn(500), result_line()], writes={}, run_dir=run)
 
     outcome = _conductor(db, run, factory).run()
@@ -276,7 +277,7 @@ def test_a_unit_that_ends_without_its_outputs_halts_rather_than_carrying_on(db, 
 
 
 def test_every_stream_line_lands_in_events_with_the_unit_that_produced_it(db, run):
-    def factory(unit, prompt):
+    def factory(unit, prompt, budget_left=None):
         return FakeProcess([turn(900), result_line()],
                            writes={rel: "x" for rel in unit.outputs}, run_dir=run)
 
@@ -299,7 +300,7 @@ def test_every_stream_line_lands_in_events_with_the_unit_that_produced_it(db, ru
 def test_the_conductor_refuses_to_launch_while_its_child_is_alive(db, run):
     """§2, and red-team case 9. Two orchestrators of one run is how three
     processes billed for half an hour on 2026-09-23 after their servers died."""
-    maestro = _conductor(db, run, lambda unit, prompt: FakeProcess([], run_dir=run))
+    maestro = _conductor(db, run, lambda unit, prompt, budget_left=None: FakeProcess([], run_dir=run))
     maestro.process = FakeProcess([], run_dir=run)      # one already in flight
     maestro.process.started = True
 
@@ -309,7 +310,7 @@ def test_the_conductor_refuses_to_launch_while_its_child_is_alive(db, run):
 
 def test_stopping_the_conductor_stops_the_unit_in_flight(db, run):
     live = FakeProcess([turn(100)], run_dir=run)
-    maestro = _conductor(db, run, lambda unit, prompt: live)
+    maestro = _conductor(db, run, lambda unit, prompt, budget_left=None: live)
     maestro.process = live
     live.started = True
 
@@ -347,7 +348,7 @@ def test_a_chapter_unit_that_promoted_nothing_halts_the_run(db, run):
     them, and closed the run as `complete` — `patch_then_halt` never fired and
     `dist/` was empty. The conductor cannot do that: a chapter unit owes
     `chNN.md`, and a unit that ends without its outputs halts the sequence."""
-    def factory(unit, prompt):
+    def factory(unit, prompt, budget_left=None):
         if unit.chapter == 2:
             # Three attempts on disk and nothing promoted, exactly as it happened.
             writes = {f"chapters/ch02.attempt{k}.md": "a draft" for k in (1, 2, 3)}
@@ -378,7 +379,7 @@ def test_the_conductor_prepares_the_workspace_before_the_first_unit(db, tmp_path
     run_dir = tmp_path / SLUG                      # deliberately absent
     maestro = C.Conductor(conn=db, run_id=RUN_ID, slug=SLUG, run_dir=run_dir,
                           cfg=loader.resolve("tiny"),
-                          process_factory=lambda unit, prompt: FakeProcess([], run_dir=run_dir))
+                          process_factory=lambda unit, prompt, budget_left=None: FakeProcess([], run_dir=run_dir))
 
     maestro.prepare()
 
@@ -399,7 +400,7 @@ def test_preparing_twice_does_not_overwrite_what_a_unit_wrote(db, tmp_path):
     run_dir = tmp_path / SLUG
     maestro = C.Conductor(conn=db, run_id=RUN_ID, slug=SLUG, run_dir=run_dir,
                           cfg=loader.resolve("tiny"),
-                          process_factory=lambda unit, prompt: FakeProcess([], run_dir=run_dir))
+                          process_factory=lambda unit, prompt, budget_left=None: FakeProcess([], run_dir=run_dir))
     maestro.prepare()
     edited = json.loads((run_dir / "config.snapshot.json").read_text(encoding="utf-8"))
     edited["novel"]["tone"] = "warm and funny"
@@ -435,7 +436,7 @@ def test_resuming_continues_the_same_run_in_the_same_directory(db, tmp_path):
     svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
                                   use_recorded_stream=False))
     started: list = []
-    svc._conductor_factory = lambda unit, prompt: started.append(unit.name) or FakeProcess(
+    svc._conductor_factory = lambda unit, prompt, budget_left=None: started.append(unit.name) or FakeProcess(
         [turn(900), result_line()], writes={rel: "x" for rel in unit.outputs}, run_dir=run_dir)
 
     svc.resume(RUN_ID, _wait=True)
@@ -500,3 +501,93 @@ def test_the_ingest_leaves_the_receipt_the_contract_asks_for(db, tmp_path):
     receipt = json.loads((run_dir / "bible" / ".ingest.json").read_text(encoding="utf-8"))
     assert receipt["run_id"] == "r9"
     assert receipt["facts"] >= 1 and "ts" in receipt
+
+
+# ------------------------------------------------- the ceiling is the run's
+
+
+def test_a_runs_cost_is_the_sum_of_its_units_and_not_the_last_ones():
+    """Under one orchestrator there was one `result` and this was free.
+
+    The conductor emits one per unit, each carrying only its own unit's bill.
+    Replacing meant the run's total was whatever the last unit cost, and the
+    budget watcher read exactly that number -- so a thirteen-unit run had
+    thirteen ceilings and nobody was told.
+    """
+    from backend.commons.runner.watch import State, apply
+
+    state = State()
+    for cost in (0.40, 1.00, 0.60):
+        apply(state, {"type": "result", "total_cost_usd": cost,
+                      "num_turns": 3, "duration_ms": 1000})
+
+    assert state.total_cost_usd == pytest.approx(2.00)
+    assert state.turns == 9
+    assert state.duration_ms == 3000
+
+
+def test_a_unit_that_reported_no_cost_does_not_turn_the_total_into_a_zero():
+    """Zero, empty and absent are three different claims, and a sum is where
+    that rule is easiest to break."""
+    from backend.commons.runner.watch import State, apply
+
+    state = State()
+    apply(state, {"type": "result"})
+    assert state.total_cost_usd is None, "nothing reported is not nothing spent"
+
+    apply(state, {"type": "result", "total_cost_usd": 0.4})
+    apply(state, {"type": "result"})
+    assert state.total_cost_usd == pytest.approx(0.4), "and it does not erase a figure"
+
+
+def test_each_unit_is_launched_with_only_what_the_run_has_left(db, run):
+    """`--max-budget-usd` is a per-process flag.
+
+    Handing every unit the run's whole ceiling hands an N-unit run N ceilings.
+    Each child is launched with the remainder instead, so the CLI's own halt
+    agrees with the stream watcher rather than contradicting it N times over.
+    """
+    handed: list = []
+
+    def factory(unit, prompt, budget_left=None):
+        handed.append(budget_left)
+        return FakeProcess([turn(1000), result_line()],
+                           writes={rel: "x" for rel in unit.outputs}, run_dir=run)
+
+    outcome = _conductor(db, run, factory, max_budget_usd=10.0).run()
+
+    assert outcome.halted is None
+    assert handed[0] == pytest.approx(10.0), "the first unit may spend it all"
+    # `result_line()` bills $0.40 a unit, so the remainder falls by that much.
+    assert handed[1] == pytest.approx(9.60)
+    assert handed[2] == pytest.approx(9.20)
+    assert handed[-1] < handed[0], "it never goes back up"
+
+
+def test_a_run_with_no_ceiling_hands_its_units_no_ceiling(db, run):
+    handed: list = []
+
+    def factory(unit, prompt, budget_left=None):
+        handed.append(budget_left)
+        return FakeProcess([turn(1000), result_line()],
+                           writes={rel: "x" for rel in unit.outputs}, run_dir=run)
+
+    _conductor(db, run, factory, max_budget_usd=None).run()
+
+    assert handed and all(h is None for h in handed)
+
+
+def test_the_run_stops_rather_than_launching_a_unit_with_nothing_left(db, run):
+    """A child launched with $0 of budget is a process that cannot do its unit
+    and bills for finding that out. The run halts on the boundary instead."""
+    def factory(unit, prompt, budget_left=None):
+        return FakeProcess([turn(1000), result_line()],
+                           writes={rel: "x" for rel in unit.outputs}, run_dir=run)
+
+    outcome = _conductor(db, run, factory, max_budget_usd=0.80).run()
+
+    assert outcome.halted is not None
+    kind, detail = outcome.halted
+    assert kind == "budget"
+    assert "$0.80" in detail
+    assert len(outcome.units_run) == 2, "two units at $0.40, and then the boundary"

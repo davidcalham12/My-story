@@ -235,6 +235,7 @@ class RunService:
         maestro = conductor.Conductor(
             conn=self.conn, run_id=live.run_id, slug=slug, run_dir=run_dir,
             cfg=cfg, on_event=on_event, process_factory=factory,
+            max_budget_usd=self.ceiling_for(cfg),
             seq=self._last_seq(live.run_id),
         )
         live.process = maestro             # `halt` stops the unit in flight

@@ -53,9 +53,15 @@ class State:
     output_tokens: int = 0
     calls: int = 0
 
-    # From the final `result`, which covers the WHOLE run including the
-    # orchestrator's own turns. This is the figure v1 could not see, and its
-    # absence is why a $6.21 estimate stood in for $49.33.
+    # From the `result` events, which cover the orchestrators' own turns too.
+    # This is the figure v1 could not see, and its absence is why a $6.21
+    # estimate stood in for $49.33.
+    #
+    # **Summed, not replaced.** Under one orchestrator there was one `result`
+    # and the distinction did not exist. The conductor emits one per unit,
+    # each carrying only its own unit's bill, so replacing meant the run's
+    # total was whatever the last unit cost — and the budget ceiling read that
+    # number. A thirteen-unit run had thirteen ceilings and nobody was told.
     total_cost_usd: float | None = None
     turns: int | None = None
     duration_ms: int | None = None
@@ -130,6 +136,18 @@ def _text(event: dict) -> str:
     return " ".join(b.get("text", "") for b in _blocks(event) if b.get("type") == "text")
 
 
+def _add(running, reported):
+    """Sum across units, and keep absent absent.
+
+    A unit that reported no cost must not turn the run's total into a zero:
+    zero, empty and absent are three different claims. `None + None` stays
+    `None`, and a figure that arrives after nothing starts the sum.
+    """
+    if reported is None:
+        return running
+    return type(reported)(reported if running is None else running + reported)
+
+
 def apply(state: State, event: dict) -> State:
     """Fold one event into the state. Never raises on an unfamiliar shape."""
     kind = event.get("type")
@@ -140,9 +158,9 @@ def apply(state: State, event: dict) -> State:
 
     if kind == "result":
         state.finished = True
-        state.total_cost_usd = event.get("total_cost_usd")
-        state.turns = event.get("num_turns")
-        state.duration_ms = event.get("duration_ms")
+        state.total_cost_usd = _add(state.total_cost_usd, event.get("total_cost_usd"))
+        state.turns = _add(state.turns, event.get("num_turns"))
+        state.duration_ms = _add(state.duration_ms, event.get("duration_ms"))
         if event.get("is_error"):
             state.error = str(event.get("result") or "the run reported an error")
         state.headline = "finished" if not state.error else "the run reported an error"

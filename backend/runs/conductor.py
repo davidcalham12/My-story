@@ -160,7 +160,10 @@ class Outcome:
     largest_turn: dict[str, int] = field(default_factory=dict)
 
 
-ProcessFactory = Callable[[Unit, str], object]
+#: `(unit, prompt, budget_left)`. The third argument is what the **run** has
+#: left to spend, not what the unit may have: a factory that makes a child has
+#: to know what the child may spend, so the signature says so.
+ProcessFactory = Callable[[Unit, str, "float | None"], object]
 
 
 @dataclass
@@ -173,14 +176,35 @@ class Conductor:
     run_dir: Path
     cfg: dict
     process_factory: ProcessFactory
+    #: The whole run's cost ceiling, shared out across the units rather than
+    #: handed to each of them. `None` when the run has no ceiling.
+    max_budget_usd: float | None = None
     #: Called with each derived state so a caller can relay progress.
     on_event: Callable[[dict], None] | None = None
     #: Set by `run()` so whoever owns the conductor can stop the live child.
     process: object | None = None
     seq: int = 0
 
-    def _spawn(self, unit: Unit) -> object:
-        return self.process_factory(unit, prompt_for(unit, slug=self.slug, run_dir=self.run_dir))
+    def _spawn(self, unit: Unit, budget_left: float | None) -> object:
+        return self.process_factory(
+            unit, prompt_for(unit, slug=self.slug, run_dir=self.run_dir), budget_left)
+
+    def budget_left(self, spent: float | None) -> float | None:
+        """What this run may still spend, for the child about to be launched.
+
+        `--max-budget-usd` is a **per-process** flag: the CLI halts itself when
+        its own bill crosses the figure on its own argv. Handing every unit the
+        run's whole ceiling therefore handed a thirteen-unit run thirteen
+        ceilings, which is not what the owner agreed to when they wrote one.
+
+        So each child is launched with the remainder. The stream-side
+        `BudgetWatcher` is still the line that binds — it stops mid-unit — and
+        this makes the CLI's own halt agree with it instead of contradicting it
+        twelve times over.
+        """
+        if self.max_budget_usd is None:
+            return None
+        return max(0.0, self.max_budget_usd - (spent or 0.0))
 
     def prepare(self) -> None:
         """Make the workspace the units are told to write into.
@@ -237,8 +261,14 @@ class Conductor:
             # The ceiling binds here, and only here: a unit's context is
             # bounded by its unit, so a turn above 100,000 is a defect
             # rather than the ordinary weight of a long book.
+            left = self.budget_left(outcome.state.total_cost_usd)
+            if left is not None and left <= 0:
+                outcome.halted = ("budget", f"{unit.name}: the run's ceiling of "
+                                            f"${self.max_budget_usd:.2f} is spent")
+                return outcome
+
             watcher = ContextWatcher(ceiling=ceiling, halt_on_orchestrator_turn=True)
-            process = self._spawn(unit)
+            process = self._spawn(unit, left)
             self.process = process
             outcome.units_run.append(unit)
             halted: tuple[str, str] | None = None
@@ -302,8 +332,12 @@ def real_process(run_dir: Path, *, cwd: Path, max_budget_usd: float | None,
                  model: str | None) -> ProcessFactory:
     """The factory the service uses: a real `claude -p` per unit."""
 
-    def make(unit: Unit, prompt: str) -> RunProcess:
+    def make(unit: Unit, prompt: str, budget_left: float | None = None) -> RunProcess:
+        # The remainder when the conductor knows it; the run's whole ceiling
+        # only when there is nothing better, which is the old behaviour and is
+        # wrong by exactly the amount the earlier units already spent.
+        figure = max_budget_usd if budget_left is None else budget_left
         return RunProcess.for_prompt(prompt=prompt, cwd=cwd,
-                                     max_budget_usd=max_budget_usd, model=model)
+                                     max_budget_usd=figure, model=model)
 
     return make
