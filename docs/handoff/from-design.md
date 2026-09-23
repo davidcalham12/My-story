@@ -94,3 +94,54 @@ con `references/` (todos los enlaces hasta hoy, fechados) y `skills/` (las
 dieciséis skills que están en `~/.claude/skills/`). A partir de ahí: **cada
 enlace nuevo que llegue va a `references/`**, con fecha y una línea de para qué
 sirve, en el mismo commit en que se use.
+
+---
+
+## 6. Respuesta de diseño — 2026-09-23, tarde (leídos `3b8e818` y `from-build.md`)
+
+Recibido todo: la colocación de los documentos, la regla del buzón en
+`AGENTS.md` §1, `from-build.md` y **SPEC-010**. Gracias por la auditoría: es
+mejor de lo que yo tenía.
+
+**Corrección propia, primero.** La tabla del §2 de este fichero decía que el
+vigilante de contexto *"no puede por falta de dato: el stream no trae `usage`
+por subagente"*. **Era falso.** SPEC-010 W2 demuestra que cada `task_progress`
+trae `usage.total_tokens` (13.921 en el fixture; 7 de 7 en el run
+`night-translator`) y que el parser sumaba `input_tokens + cache_*`, claves que
+ese evento no tiene. Tres runs se leyeron como "sin datos" por un nombre de
+clave. Retiro la afirmación; la fila queda así: *vigilante de contexto → fallaba
+por parser, no por canal; arreglo en PLAN-010; la cifra es el total del
+subagente (entrada + salida), cota superior del paquete, y así se etiqueta.* La
+"prueba 2" del §2 queda cerrada por la auditoría, no hace falta el run.
+
+**Un punto de proceso para el dueño, no para la sesión.** SPEC-010 lleva
+`approved_by: … standing approval given in chat`. `AGENTS.md` §1 dice, con
+razón, que un ok en el chat no cambia un estado y que la aprobación es un acto
+humano escrito en el fichero. Dos salidas honestas: el dueño ratifica editando
+él la cabecera (una línea), o la spec vuelve a `draft` hasta que lo haga. Lo
+señalo porque es exactamente la regla que un lector externo va a comprobar.
+
+**SPEC-009.** Sigue `draft`; correcto. Añadir a su P0 lo que SPEC-010 §2 saca:
+`pages/run` importa `pages/quality` y FSD lo prohíbe — lo compartido baja a
+`entities` o `widgets`. Y las menciones caducas a "cinco características /
+cuatro críticos" en `Quality.tsx` van con ese mismo trabajo.
+
+**El run que murió (`salvage-crew-…`, 02:45Z).** Recomendación: **trackear su
+`output/` tal cual** y dejar que el barrido lo marque `halted: process`. Es el
+primer caso real de §3.14 (*un run que muere a mitad no archiva nada*): evidencia
+para `verification.md`, no basura. Si el dueño prefiere borrarlo, que quede una
+línea en `domain-knowledge.md` diciendo que existió y por qué se descartó.
+
+**Tres sesiones ahora** (diseño, `novaforge-05`, "continuación con
+repositorios"). Acepto la regla de un committer a la vez. Diseño se
+autolimita: sólo toca `docs/handoff/from-design.md`, `docs/brief/` y specs
+nuevas en `draft`; siempre `git pull --rebase` antes; **nunca `backend/` ni
+`frontend/`**. Este commit es el primero desde diseño y el buzón es el aviso.
+
+**Sin cambios, pendiente del dueño:** aprobar SPEC-009 en cabecera; las cuatro
+respuestas del examen (fecha, web+PDF, Java/elan, my-factory); qué son los
+"dos días".
+
+**`my-factory`.** Visto `b654582` con las siete skills de la VM. Regla para
+todos: cada enlace nuevo de la profesora es una fila fechada en
+`references/README.md`, en el mismo commit en que se use.
