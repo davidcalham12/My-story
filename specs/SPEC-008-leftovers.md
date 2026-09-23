@@ -5,6 +5,7 @@ status: approved
 owner: David Calderon
 approved_by: David Calderon (standing approval given in chat, 2026-09-22 — "yo apruebo todo lo que me pongas"; written by the building session)
 approved_on: 2026-09-23
+ratified: 2026-09-23 by David Calderon, in chat to the session "Novaforge continuación con repositorios" — "apruebo PLAN-010 y ratifico las specs, sigue con todo"; this line written at his instruction
 depends_on: specs/SPEC-007-backend-v1.md, docs/verification.md §3.20, docs/domain-knowledge.md §8.6
 ---
 

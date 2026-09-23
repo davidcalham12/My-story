@@ -5,6 +5,7 @@ status: approved
 owner: David Calderon
 approved_by: David Calderon (dictated in chat, 2026-09-22; written by the building session at his request)
 approved_on: 2026-09-22
+ratified: 2026-09-23 by David Calderon, in chat to the session "Novaforge continuación con repositorios" — "apruebo PLAN-010 y ratifico las specs, sigue con todo"; this line written at his instruction
 supersedes: —
 renamed_from: SPEC-001-backend-v1 (2026-09-22; the number collided with SPEC-001-commons)
 depends_on: docs/architecture.md, docs/verification.md, specs/flow.yaml, specs/loops/LOOP-003/README.md

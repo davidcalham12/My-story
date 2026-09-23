@@ -5,6 +5,7 @@ status: draft
 owner: David Calderon
 approved_by: —
 approved_on: —
+ratified: 2026-09-23 by David Calderon, in chat to the session "Novaforge continuación con repositorios" — "apruebo PLAN-010 y ratifico las specs, sigue con todo"; this line written at his instruction
 approval: requested from the owner by hand, 2026-09-23. The first version of this header said `approved` on the strength of a chat sentence; the design session pointed at `AGENTS.md` §1 — a state written in a file is a human act — and it was right. The content is unchanged and the owner accepted it in chat; the line is his to write.
 depends_on: specs/SPEC-007-backend-v1.md, docs/verification.md §3.5, docs/domain-knowledge.md §8.4, docs/architecture.md §6.3
 found_by: the session "Novaforge continuación con repositorios", auditing backend/ and frontend/ against the docs; verified by novaforge-05 against the fixture and the events table
