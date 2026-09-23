@@ -29,14 +29,27 @@ was written. Where this file and the spec disagree, the spec wins and you say so
 | unit | file | stages | writes |
 |---|---|---|---|
 | U1 world | `units/world.md` | FLOW-1 | `bible/world.md` |
-| U2 cast | `units/cast.md` | FLOW-2 + the story-bible ingest | `bible/characters.md`, `timeline.md`, `mysteries.md`; the `facts` rows |
-| U3 outline | `units/outline.md` | FLOW-3 + the commission audit | `outline.md`, `critiques/outline.audit.json` |
+| U2a cast-characters | `units/cast-characters.md` | FLOW-2, the people | `bible/characters.md` |
+| U2b cast-chronology | `units/cast-chronology.md` | FLOW-2, the rest + the story-bible ingest | `bible/timeline.md`, `mysteries.md`; the `facts` rows; `bible/.ingest.json` |
+| U3a outline-write | `units/outline-write.md` | FLOW-3, the plan | `outline.md` |
+| U3b outline-audit | `units/outline-audit.md` | FLOW-3, the commission audit | `critiques/outline.audit.json` |
 | U4.n chapter | `units/chapter.md` | FLOW-4 for **one** chapter | `chNN.md`, its attempts, its critiques, its summary |
 | U5 finish | `units/finish.md` | FLOW-5 + FLOW-6 | `chNN.final.md`, `synopsis.md`, `dist/book.md`, the validations |
 
 Read **your** unit file and this one. Reading another unit's file tells you
 about work that is not yours and costs you the context this design exists to
 protect.
+
+**U2 and U3 used to be one unit each.** The first conductor run measured what a
+fresh orchestrator carries before it reads anything: about 48,800 tokens, three
+times over. Against the 100,000 ceiling that leaves a unit roughly 51,000 to
+work in, and the single `cast` ended at 100,669 and the single `outline` at
+109,722 — both over. Three probes with fifteen, five and two tools all started
+at the same place, so the floor is not the tool list and a leaner prompt cannot
+buy the room back; only a smaller unit can. Each half re-pays the floor, which
+is the price, and it is paid only where a unit did not fit — `world` finished at
+82,686 and stays whole. The figures are in `novaforge-v2` domain-knowledge §8.8
+and the gap is verification §3.24.
 
 ## 0. What the conductor has already done
 

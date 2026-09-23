@@ -69,16 +69,20 @@ class Unit:
         """
         if self.key == "world":
             return ("bible/world.md",)
-        if self.key == "cast":
-            # The receipt is the unit's other half. The first resumed run
-            # skipped `cast` on the strength of these three files while the
+        if self.key == "cast-characters":
+            return ("bible/characters.md",)
+        if self.key == "cast-chronology":
+            # The receipt is this unit's other half. The first resumed run
+            # skipped the whole cast on the strength of its Markdown while the
             # ingest into SQLite had never run, and the story bible — with
             # fact_usage, mandatory_facts and the Lean export on top of it —
-            # was empty. A unit's contract is what it left behind, all of it.
-            return ("bible/characters.md", "bible/timeline.md", "bible/mysteries.md",
-                    "bible/.ingest.json")
-        if self.key == "outline":
-            return ("outline.md", "critiques/outline.audit.json")
+            # was empty. A unit's contract is what it left behind, all of it,
+            # and the ingest runs last, so the receipt belongs here.
+            return ("bible/timeline.md", "bible/mysteries.md", "bible/.ingest.json")
+        if self.key == "outline-write":
+            return ("outline.md",)
+        if self.key == "outline-audit":
+            return ("critiques/outline.audit.json",)
         if self.key == "chapter":
             return (f"chapters/ch{self.chapter:02d}.md",
                     f"chapters/ch{self.chapter:02d}.summary.md")
@@ -90,9 +94,25 @@ def units_for(cfg: dict) -> list[Unit]:
 
     The chapter count comes from the resolved config and never from a literal
     here: a number written in two places disagrees within a month.
+
+    **Why FLOW-2 and FLOW-3 are two processes each.** The first conductor run
+    measured what a fresh orchestrator carries before it reads anything:
+    ~48,800 tokens, three times over (`novaforge-v2` domain-knowledge §8.8).
+    Against a 100,000 ceiling that leaves a unit about 51,000 to work in, and
+    `cast` ended at 100,669 and `outline` at 109,722. Three probes with
+    fifteen, five and two tools all started at ~50,600, so the floor is not
+    the tool list and a leaner prompt cannot buy the room back.
+
+    The only lever left is a smaller unit, and its price is honest: each half
+    re-pays the floor, so the split costs one more ~48,800-token arrival per
+    stage and buys each half its own 51,000 to work in. It is worth paying
+    exactly where a unit did not fit — which is these two, and not `world`,
+    which finished at 82,686.
     """
     chapters = int(cfg["novel"]["chapters"])
-    return [Unit("world"), Unit("cast"), Unit("outline"),
+    return [Unit("world"),
+            Unit("cast-characters"), Unit("cast-chronology"),
+            Unit("outline-write"), Unit("outline-audit"),
             *(Unit("chapter", n) for n in range(1, chapters + 1)),
             Unit("finish")]
 

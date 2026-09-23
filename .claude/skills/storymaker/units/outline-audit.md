@@ -1,48 +1,19 @@
-# U3 — outline (FLOW-3, and the audit of the commission)
+# U3b — outline, the audit of the commission (FLOW-3, second half)
 
-One unit: the whole book is planned, and the plan is checked against canon
-before a word of it is written. Read `.claude/skills/storymaker/SKILL.md` first
-— the agents' tool boundary, the logging duties and the ceiling are there and
-are not repeated here.
+One unit: the plan is checked against canon before a word of it is written. Read
+`.claude/skills/storymaker/SKILL.md` first — the agents' tool boundary, the
+logging duties and the ceiling are there and are not repeated here.
 
-`plot-architect` is the last agent that sees the whole book at once. After this
-unit every chapter is written by a writer that sees one entry.
+**Why this is half a unit.** FLOW-3 used to be one process and ended at 109,722
+tokens against a ceiling of 100,000. See `units/outline-write.md` for the
+arithmetic. What matters here is that `outline.md` is already on disk and you
+read it from there, because nothing carries between units but disk.
 
-## 1. Dispatch `plot-architect`
+**Your unit ends when `critiques/outline.audit.json` exists.** You may correct
+`outline.md` — that is the point of auditing before anyone writes from it — but
+the audit file is what you owe.
 
-Its prompt carries all four Bible files quoted **in full** — it has `Glob` and
-cannot open one — the chapter count, the canonical names from
-`bible/characters.md`, and `novel.promises` and `novel.beats_per_chapter`.
-
-It returns the outline as text. **You** write it to `outline.md`.
-
-## 2. Run the stage's checks
-
-```bash
-python -m backend.checks FLOW-3 <run_dir>
-```
-
-Two of them matter here for reasons worth stating.
-
-**`promises are reachable`.** A promise planted and never paid is the
-foreshadowing failure the ontology names, and it is **the one literary defect a
-script can reach** — but only because `bible/mysteries.md` names chapters. If it
-reports a landing past the last chapter, the outline owes an answer the book will
-not reach, and that is cheaper to fix now than at chapter eight. It reads the
-*commitment*, not the chapter: an outline entry that says nothing about the
-mystery it was supposed to land passes this and fails a reader.
-
-**`rules resolve`.** The critics and the audit below refer to rules by number.
-If `bible/world.md` writes them as unnumbered bullets, those numbers are the
-critic counting bullets and inventing an identifier, and the arbitration record
-decays without anyone noticing. Send `worldbuilder` back to number them; do not
-renumber them yourself.
-
-A Bible corrected here is a Bible whose rows are stale, so re-run
-`python -m backend.bible.ingest <run_dir>` after any such correction — it is
-idempotent and re-reads what changed.
-
-## 3. Audit the commission before anyone writes it
+## 1. Audit the commission before anyone writes it
 
 Dispatch `science-critic` with the outline entries and `bible/world.md`, asking
 whether every beat can happen **without breaking a rule**. There is no draft; it
@@ -75,7 +46,13 @@ contradicts canon for U4 to discover.** A chapter cannot be redrafted into
 obeying a rule its own outline told it to break, and by then the run is spending
 three attempts and a patch per chapter to find that out.
 
-## 4. Write the audit down in this exact shape
+A rule corrected in `bible/world.md` is a Bible whose rows are stale, so re-run
+`python -m backend.bible.ingest <run_dir>` after any such correction — it is
+idempotent. An outline rewritten here is still an outline U4 must be able to
+split: re-check that it yields `novel.chapters` entries on
+`### Chapter N — Title` before you finish.
+
+## 2. Write the audit down in this exact shape
 
 `critiques/outline.audit.json`, and **these keys, spelled this way**:
 
@@ -97,18 +74,11 @@ find something" cannot, because the question has two spellings. v1 wrote its
 critiques in three shapes for the same reason: nobody said which. **A contract
 nobody stated cannot be enforced, and this is the statement.**
 
-## 5. Leave the outline splittable
+## 3. Record and finish
 
-U4.n is handed one entry, and it is split on `### Chapter N — Title`. Check the
-split yourself: if it yields fewer entries than `novel.chapters`, the outline is
-malformed — dispatch again rather than letting a chapter unit be launched with
-nothing. Anything other than that exact heading shape, `**Chapter 1: Title**`
-most often, breaks the split.
-
-## 6. Record and finish
-
-`outline.md` and `critiques/outline.audit.json` are on disk, and `state.json`
-and `logs/agents.jsonl` carry what happened (SKILL.md §6).
+`critiques/outline.audit.json` is on disk with both arrays present, `outline.md`
+still splits into `novel.chapters` entries, and `state.json` and
+`logs/agents.jsonl` carry what happened (SKILL.md §6).
 
 ---
 

@@ -87,14 +87,64 @@ def run(db, tmp_path):
 
 
 def test_the_units_are_the_flow_in_order_with_one_per_chapter():
-    """AC-1. Three chapters in `tiny`, so five stages become seven processes."""
+    """AC-1. Three chapters in `tiny`, so five stages become nine processes.
+
+    Seven until the floor was measured: a fresh orchestrator arrives carrying
+    ~48,800 tokens, so the 100,000 ceiling leaves a unit about 51,000 to work
+    in, and `cast` finished at 100,669 and `outline` at 109,722 -- over it
+    (novaforge-v2 domain-knowledge Section 8.8). Trimming the prompt cannot
+    buy that back; only a smaller unit can, which is why these two are two
+    each.
+    """
     units = C.units_for(loader.resolve("tiny"))
 
-    assert [u.key for u in units] == ["world", "cast", "outline",
-                                      "chapter", "chapter", "chapter", "finish"]
-    assert [u.chapter for u in units] == [None, None, None, 1, 2, 3, None]
-    assert [u.name for u in units][:5] == ["world", "cast", "outline",
-                                           "chapter 1", "chapter 2"]
+    assert [u.key for u in units] == [
+        "world", "cast-characters", "cast-chronology",
+        "outline-write", "outline-audit",
+        "chapter", "chapter", "chapter", "finish"]
+    assert [u.chapter for u in units] == [None] * 5 + [1, 2, 3, None]
+    assert [u.name for u in units][:6] == [
+        "world", "cast-characters", "cast-chronology",
+        "outline-write", "outline-audit", "chapter 1"]
+
+
+def test_each_split_unit_owns_a_disjoint_half_of_what_one_unit_owed():
+    """A split that drops a file, or writes one twice, is worse than no split.
+
+    The two halves together must still owe exactly what the single unit owed:
+    the four Bible files plus the ingest receipt, and the outline plus its
+    audit. Nothing owned twice, because two units racing for one file is a
+    resume that can never settle.
+    """
+    by_key = {u.key: u for u in C.units_for(loader.resolve("tiny"))}
+
+    cast = by_key["cast-characters"].outputs + by_key["cast-chronology"].outputs
+    assert sorted(cast) == ["bible/.ingest.json", "bible/characters.md",
+                            "bible/mysteries.md", "bible/timeline.md"]
+
+    outline = by_key["outline-write"].outputs + by_key["outline-audit"].outputs
+    assert sorted(outline) == ["critiques/outline.audit.json", "outline.md"]
+
+    seen: set[str] = set()
+    for unit in C.units_for(loader.resolve("tiny")):
+        clash = seen & set(unit.outputs)
+        assert not clash, f"{unit.name} claims a file another unit owns: {clash}"
+        seen |= set(unit.outputs)
+
+
+def test_the_second_half_of_a_split_reads_what_the_first_half_wrote():
+    """The halves are ordered, and the order is the dependency.
+
+    `cast-chronology` writes a timeline for people who exist; `outline-audit`
+    judges an outline that has been written. Nothing carries between units but
+    disk, so the earlier half's outputs have to be on disk first -- which is
+    exactly what the run order guarantees and what a reordering would break.
+    """
+    order = [u.key for u in C.units_for(loader.resolve("tiny"))]
+
+    assert order.index("cast-characters") < order.index("cast-chronology")
+    assert order.index("outline-write") < order.index("outline-audit")
+    assert order.index("cast-chronology") < order.index("outline-write")
 
 
 def test_the_chapter_count_comes_from_the_profile_and_never_from_a_literal():
@@ -182,7 +232,7 @@ def test_each_unit_gets_its_own_process_and_none_overlaps(db, run):
     outcome = _conductor(db, run, factory).run()
 
     assert outcome.halted is None
-    assert len(made) == 7 and all(p.started for p in made)
+    assert len(made) == 9 and all(p.started for p in made)
     assert [u.name for u in outcome.units_run] == [u.name for u in C.units_for(loader.resolve("tiny"))]
 
 
@@ -193,7 +243,7 @@ def test_a_units_halt_stops_the_sequence_and_names_the_unit(db, run):
     def factory(unit, prompt):
         writes = {rel: "x" for rel in unit.outputs}
         lines = [turn(1000), result_line()]
-        if unit.key == "outline":
+        if unit.key == "outline-write":
             lines = [turn(400_000)]        # over the ceiling, and no result
             writes = {}
         p = FakeProcess(lines, writes=writes, run_dir=run)
@@ -205,8 +255,9 @@ def test_a_units_halt_stops_the_sequence_and_names_the_unit(db, run):
     assert outcome.halted is not None
     kind, detail = outcome.halted
     assert kind == "context"
-    assert "outline" in detail
-    assert len(made) == 3, "world, cast, outline — and then it stopped"
+    assert "outline-write" in detail
+    assert len(made) == 4, ("world, the two halves of the cast, outline-write "
+                            "and then it stopped")
     assert made[-1].stopped is True
 
 
@@ -233,11 +284,13 @@ def test_every_stream_line_lands_in_events_with_the_unit_that_produced_it(db, ru
 
     rows = db.execute("SELECT seq, unit FROM events WHERE run_id = ? ORDER BY seq",
                       (RUN_ID,)).fetchall()
-    assert len(rows) == 14, "two lines per unit, seven units"
-    assert [r["seq"] for r in rows] == list(range(1, 15)), "dense across units"
+    assert len(rows) == 18, "two lines per unit, nine units"
+    assert [r["seq"] for r in rows] == list(range(1, 19)), "dense across units"
     assert rows[0]["unit"] == "world" and rows[-1]["unit"] == "finish"
-    assert {r["unit"] for r in rows} == {"world", "cast", "outline",
-                                         "chapter 1", "chapter 2", "chapter 3", "finish"}
+    assert {r["unit"] for r in rows} == {
+        "world", "cast-characters", "cast-chronology",
+        "outline-write", "outline-audit",
+        "chapter 1", "chapter 2", "chapter 3", "finish"}
 
 
 # ------------------------------------------------------------ B4: orphans
@@ -387,8 +440,9 @@ def test_resuming_continues_the_same_run_in_the_same_directory(db, tmp_path):
 
     svc.resume(RUN_ID, _wait=True)
 
-    assert started[0] == "outline", f"world and cast were done; it began at {started[0]}"
-    assert "world" not in started and "cast" not in started
+    assert started[0] == "outline-write", \
+        f"world and both halves of the cast were done; it began at {started[0]}"
+    assert not {"world", "cast-characters", "cast-chronology"} & set(started)
     row = db.execute("SELECT halted, stage FROM runs WHERE id = ?", (RUN_ID,)).fetchone()
     assert row["halted"] is None, "the halt that was resumed past is cleared"
 
@@ -412,17 +466,21 @@ def test_the_cast_unit_owes_the_ingest_receipt_not_only_the_bible_files(db, run)
     were on disk — and the ingest into SQLite, which happens after them, had
     never run. The story bible was empty, and with it fact_usage,
     mandatory_facts and the Lean export. Files are not the whole unit."""
-    cast = [u for u in C.units_for(loader.resolve("tiny")) if u.key == "cast"][0]
+    by_key = {u.key: u for u in C.units_for(loader.resolve("tiny"))}
+    chronology = by_key["cast-chronology"]
 
-    assert "bible/.ingest.json" in cast.outputs
+    assert "bible/.ingest.json" in chronology.outputs
+    assert ".ingest.json" not in " ".join(by_key["cast-characters"].outputs), \
+        "the ingest runs last, so the receipt belongs to the half that runs it"
 
     (run / "bible").mkdir(exist_ok=True)
     for name in ("characters", "timeline", "mysteries"):
         (run / "bible" / f"{name}.md").write_text("x", encoding="utf-8")
-    assert C.is_done(cast, run) is False, "the four files alone must not count as done"
+    assert C.is_done(chronology, run) is False, \
+        "the Markdown alone must not count as done"
 
     (run / "bible" / ".ingest.json").write_text('{"facts": 33}', encoding="utf-8")
-    assert C.is_done(cast, run) is True
+    assert C.is_done(chronology, run) is True
 
 
 def test_the_ingest_leaves_the_receipt_the_contract_asks_for(db, tmp_path):
