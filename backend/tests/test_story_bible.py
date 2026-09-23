@@ -308,3 +308,29 @@ def test_the_sheet_lists_characters_and_places_with_their_first_chapter(client):
 def test_an_unknown_run_is_404_everywhere(client):
     for path in ("facts", "bible/characters", "bible/places"):
         assert client.get(f"/api/runs/no-such-run/{path}").status_code == 404
+
+
+def test_ingest_finds_a_v2_run_by_its_slug_not_only_by_its_id(db, tmp_path):
+    """`run_dir.name` is a run's id only for the v1 runs that were imported
+    under it. A v2 run has a hex id and a slug, and the directory is named after
+    the slug — so the first conductor novel ingested nothing and the whole story
+    bible chain (fact_usage, mandatory_facts, Lean) had no rows to stand on.
+    """
+    from backend.bible import ingest
+    from backend.commons.db import repository as repo
+
+    repo.create_run(db, run_id="db2fed5bd97a", slug="leo-and-bruno-cross-the-hill",
+                    premise="a premise long enough", profile="exam", tone=None, snapshot={})
+    run_dir = tmp_path / "leo-and-bruno-cross-the-hill"
+    (run_dir / "bible").mkdir(parents=True)
+    (run_dir / "bible" / "world.md").write_text(
+        "# The world\n\n## Rules\n\n- The hill hides a station.\n", encoding="utf-8")
+    (run_dir / "bible" / "characters.md").write_text(
+        "## Leo\n\n**Role:** the boy who asks\n", encoding="utf-8")
+    (run_dir / "bible" / "timeline.md").write_text("# Timeline\n", encoding="utf-8")
+    (run_dir / "bible" / "mysteries.md").write_text("# Mysteries\n", encoding="utf-8")
+
+    ingest.ingest(db, run_dir)
+
+    rows = db.execute("SELECT COUNT(*) FROM facts WHERE run_id = 'db2fed5bd97a'").fetchone()[0]
+    assert rows > 0, "the facts belong to the run's id, which is not its directory name"

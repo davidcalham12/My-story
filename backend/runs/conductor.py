@@ -70,7 +70,13 @@ class Unit:
         if self.key == "world":
             return ("bible/world.md",)
         if self.key == "cast":
-            return ("bible/characters.md", "bible/timeline.md", "bible/mysteries.md")
+            # The receipt is the unit's other half. The first resumed run
+            # skipped `cast` on the strength of these three files while the
+            # ingest into SQLite had never run, and the story bible — with
+            # fact_usage, mandatory_facts and the Lean export on top of it —
+            # was empty. A unit's contract is what it left behind, all of it.
+            return ("bible/characters.md", "bible/timeline.md", "bible/mysteries.md",
+                    "bible/.ingest.json")
         if self.key == "outline":
             return ("outline.md", "critiques/outline.audit.json")
         if self.key == "chapter":

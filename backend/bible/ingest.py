@@ -21,10 +21,12 @@ changes nothing but the rows it re-reads.
 
 from __future__ import annotations
 
+import json
 import re
 import sqlite3
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from backend.bible.domain import rules_bullets
@@ -204,7 +206,14 @@ def timeline_in(timeline_md: str) -> list[tuple[str, str, int | None, str]]:
 
 
 def ingest(conn: sqlite3.Connection, run_dir: Path) -> IngestReport:
+    # The directory is named after the run's SLUG. For the v1 runs, imported
+    # under their slug, that is also the id; for a v2 run it is not, and the
+    # first conductor novel ingested nothing because of it.
     run_id = run_dir.name
+    if not conn.execute("SELECT 1 FROM runs WHERE id = ?", (run_id,)).fetchone():
+        by_slug = conn.execute("SELECT id FROM runs WHERE slug = ?", (run_dir.name,)).fetchone()
+        if by_slug:
+            run_id = by_slug[0]
     if not conn.execute("SELECT 1 FROM runs WHERE id = ?", (run_id,)).fetchone():
         raise UnknownRun(
             f"no run {run_id!r} in this database; import or start the run "
@@ -277,13 +286,36 @@ def ingest(conn: sqlite3.Connection, run_dir: Path) -> IngestReport:
                         (cursor.lastrowid, name))
                     participants += 1
 
-    return IngestReport(
+    report = IngestReport(
         run_id=run_id,
         facts=conn.execute("SELECT COUNT(*) FROM facts WHERE run_id = ?",
                            (run_id,)).fetchone()[0],
         characters=len(people), places=len(places), chronology=len(events),
         participants=participants,
     )
+
+    # A receipt, on disk, because that is where the conductor looks.
+    #
+    # The `cast` unit writes three Markdown files and then ingests them. The
+    # first resumed run found the three files, decided the unit was done, and
+    # skipped an ingest that had never happened — leaving the story bible
+    # empty and fact_usage, mandatory_facts and the Lean export with nothing
+    # to stand on. The unit's contract now includes this file, so "done" means
+    # the whole unit rather than its visible half.
+    receipt = run_dir / "bible" / ".ingest.json"
+    receipt.parent.mkdir(parents=True, exist_ok=True)
+    receipt.write_text(
+        json.dumps({
+            "run_id": report.run_id,
+            "facts": report.facts,
+            "characters": report.characters,
+            "places": report.places,
+            "chronology": report.chronology,
+            "participants": report.participants,
+            "ts": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        }, indent=2) + "\n",
+        encoding="utf-8")
+    return report
 
 
 def main(argv: list[str]) -> int:

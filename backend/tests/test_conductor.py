@@ -142,6 +142,8 @@ def test_a_run_killed_after_chapter_three_resumes_at_chapter_four(tmp_path):
     (run_dir / "bible").mkdir()
     for name in ("world", "characters", "timeline", "mysteries"):
         (run_dir / "bible" / f"{name}.md").write_text("x", encoding="utf-8")
+    # `cast` is not done until its ingest has run; the receipt says it did.
+    (run_dir / "bible" / ".ingest.json").write_text('{"facts": 12}', encoding="utf-8")
     (run_dir / "outline.md").write_text("x", encoding="utf-8")
     (run_dir / "critiques").mkdir()
     (run_dir / "critiques" / "outline.audit.json").write_text("{}", encoding="utf-8")
@@ -375,6 +377,7 @@ def test_resuming_continues_the_same_run_in_the_same_directory(db, tmp_path):
     (run_dir / "bible").mkdir(parents=True)
     for name in ("world", "characters", "timeline", "mysteries"):
         (run_dir / "bible" / f"{name}.md").write_text("x", encoding="utf-8")
+    (run_dir / "bible" / ".ingest.json").write_text('{"facts": 12}', encoding="utf-8")
 
     svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
                                   use_recorded_stream=False))
@@ -402,3 +405,40 @@ def test_resuming_a_finished_run_is_refused(db, tmp_path):
 
     with pytest.raises(NotLive):
         svc.resume(RUN_ID, _wait=True)
+
+
+def test_the_cast_unit_owes_the_ingest_receipt_not_only_the_bible_files(db, run):
+    """The first resumed run skipped `cast` because its four Markdown files
+    were on disk — and the ingest into SQLite, which happens after them, had
+    never run. The story bible was empty, and with it fact_usage,
+    mandatory_facts and the Lean export. Files are not the whole unit."""
+    cast = [u for u in C.units_for(loader.resolve("tiny")) if u.key == "cast"][0]
+
+    assert "bible/.ingest.json" in cast.outputs
+
+    (run / "bible").mkdir(exist_ok=True)
+    for name in ("characters", "timeline", "mysteries"):
+        (run / "bible" / f"{name}.md").write_text("x", encoding="utf-8")
+    assert C.is_done(cast, run) is False, "the four files alone must not count as done"
+
+    (run / "bible" / ".ingest.json").write_text('{"facts": 33}', encoding="utf-8")
+    assert C.is_done(cast, run) is True
+
+
+def test_the_ingest_leaves_the_receipt_the_contract_asks_for(db, tmp_path):
+    from backend.bible import ingest
+
+    repo.create_run(db, run_id="r9", slug="s9", premise="a premise long enough",
+                    profile="tiny", tone=None, snapshot={})
+    run_dir = tmp_path / "s9"
+    (run_dir / "bible").mkdir(parents=True)
+    (run_dir / "bible" / "world.md").write_text(
+        "# The world\n\n## Rules\n\n- One rule.\n", encoding="utf-8")
+    for name in ("characters", "timeline", "mysteries"):
+        (run_dir / "bible" / f"{name}.md").write_text(f"# {name}\n", encoding="utf-8")
+
+    ingest.ingest(db, run_dir)
+
+    receipt = json.loads((run_dir / "bible" / ".ingest.json").read_text(encoding="utf-8"))
+    assert receipt["run_id"] == "r9"
+    assert receipt["facts"] >= 1 and "ts" in receipt
