@@ -1,0 +1,131 @@
+{
+  "profile": "tiny",
+  "novel": {
+    "chapters": 3,
+    "tone": "quiet space-horror on a working salvage ship: blue-collar literary science fiction, close and claustrophobic, where the dread is recognition rather than monsters; tired, tender, exact about the work, and unsettled by a thing that knows the crew by name",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": {
+      "min": 300,
+      "target": 420,
+      "max": 550
+    },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": {
+      "min": 5,
+      "max": 24
+    },
+    "sentences_per_paragraph": {
+      "min": 1,
+      "max": 5
+    },
+    "lines_per_chapter": {
+      "min": 25,
+      "max": 95
+    },
+    "chars_per_line": {
+      "max": 64
+    },
+    "beats_per_chapter": {
+      "min": 3,
+      "max": 5
+    },
+    "promises": {
+      "min": 3,
+      "max": 5
+    }
+  },
+  "bible": {
+    "world_min_words": 250,
+    "world_max_words": 450,
+    "technology_entries": {
+      "min": 2,
+      "max": 3
+    },
+    "factions": {
+      "min": 2,
+      "max": 2
+    },
+    "world_rules": {
+      "min": 4,
+      "max": 5
+    },
+    "characters": {
+      "min": 3,
+      "max": 4
+    },
+    "timeline_rows": {
+      "min": 4,
+      "max": 6
+    },
+    "mysteries": {
+      "min": 2,
+      "max": 3
+    }
+  },
+  "context": {
+    "max_summary_words": 120,
+    "forbid_prior_chapter_prose": true,
+    "max_concurrent_tokens": 100000,
+    "max_summary_facts": 40
+  },
+  "quality_gate": {
+    "critics": [
+      "continuity",
+      "science",
+      "outline",
+      "length",
+      "chatter",
+      "prose"
+    ],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "patch_then_halt"
+  },
+  "feedback": {
+    "sheet_template": "specs/loops/LOOP-003/sheet_template/v01.md",
+    "validate_before_sending": true,
+    "escalate_to_literal_at_attempt": 3,
+    "keep_attempt_drafts": true,
+    "late_finding_blocks": false
+  },
+  "style": {
+    "word_count_tolerance_pct": 0
+  },
+  "budget": {
+    "max_cost_usd": 25.0,
+    "max_calls": 120
+  },
+  "outputs": {
+    "formats": [
+      "markdown"
+    ],
+    "synopsis": {
+      "words": {
+        "min": 150,
+        "max": 250
+      },
+      "comparables": {
+        "min": 2,
+        "max": 3
+      }
+    },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  },
+  "premise": "A deep-space salvage crew finds a derelict that remembers them",
+  "slug": "salvage-crew-derelict-remembers-them",
+  "_provenance": {
+    "base": "config/novel.config.json",
+    "profile": "config/profiles/tiny.json",
+    "overlay": "key by key; the profile replaces the whole `bible` block (SKILL.md \u00a70.1)",
+    "tone_decided_by": "orchestrator, read off the premise (CFG-1a)",
+    "ts": "2026-09-23T02:23:21Z"
+  }
+}

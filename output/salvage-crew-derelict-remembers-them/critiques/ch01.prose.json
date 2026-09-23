@@ -1,0 +1,45 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "why": "10 − 3×0 − 2×0 − 1×2 = 8",
+      "mechanical": 0,
+      "major": 0,
+      "minor": 2,
+      "mechanical_defects": [],
+      "findings": [
+        {
+          "quote": "Priya was certain of it, the way you are certain of a thing you will go over later and still be certain of.",
+          "claim": "The doubled 'certain' and the generalized second-person aside step outside Priya's close, sensory register right at a tense beat, so the reader's attention snags on the construction instead of the dread of the silence.",
+          "fix": "Collapse to a single, plain assertion of her certainty rooted in the scene — anchored to what she can point to (the quiet, the others' faces) rather than a general truth about how certainty works.",
+          "reference": "bible/characters.md, Priya Sen — Speaks: fast, concrete, testing",
+          "severity": "medium",
+          "kind": "prose-minor",
+          "characteristic": "prose"
+        },
+        {
+          "quote": "and that was fine, that was ordinary, ships came in patterns.",
+          "claim": "The repeated root word 'pattern/patterns' right after 'somebody built these to a pattern' draws the eye to the word itself rather than to the unease the repetition is meant to build.",
+          "fix": "Drop the second 'pattern' and let 'that was fine, that was ordinary' close the thought on its own, or replace 'ships came in patterns' with a different, non-repeating image of ordinariness.",
+          "reference": "prose-critic minor: word repeated inside a paragraph",
+          "severity": "medium",
+          "kind": "prose-minor",
+          "characteristic": "prose"
+        }
+      ],
+      "not_counted": [],
+      "critic_notes": "0 major, 2 minor. Register holds; distinct voices; closing image lands. No continuity, science, or outline concerns raised.",
+      "agent_id": "a69589a9c1b257ae8",
+      "tokens": 14106,
+      "duration_ms": 49396,
+      "ts_dispatch": "2026-09-23T02:37:27Z"
+    }
+  ],
+  "ts": "2026-09-23T02:40:09Z"
+}

@@ -1,0 +1,17 @@
+{
+  "premise": "A deep-space salvage crew finds a derelict that remembers them",
+  "profile": "tiny",
+  "slug": "salvage-crew-derelict-remembers-them",
+  "tone": "quiet space-horror on a working salvage ship: blue-collar literary science fiction, close and claustrophobic, where the dread is recognition rather than monsters; tired, tender, exact about the work, and unsettled by a thing that knows the crew by name",
+  "stage": "FLOW-4",
+  "canonical_names": ["Nell Varga", "Abe Whitlock", "Priya Sen", "Corey Dunn"],
+  "chapters": [
+    {"n": 1, "title": "Right Berths", "accepted_attempt": 1, "attempts": 1, "verdict": "accept", "aggregate": 8, "words": 457, "promoted": true,
+     "scores": {"length": 10, "chatter": 10, "continuity": 10, "science": 10, "outline": 10, "prose": 8},
+     "note": "prose 8: two minor findings recorded, not actioned; passed on the first draft"}
+  ],
+  "bible_written": true,
+  "world_md_words": 449,
+  "outline_audit": {"verdict": "defects", "violations": 0, "ambiguities": 3, "all_upheld": true, "rules_amended": ["R1", "R2"], "ts": "2026-09-23T02:33:47Z"},
+  "started_ts": "2026-09-23T02:22:22Z"
+}

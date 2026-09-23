@@ -115,6 +115,29 @@ def test_the_character_architect_is_told_the_shape():
     assert "Lands: Chapter" in prompt
 
 
+def unfinished_reason(run_dir: Path) -> str | None:
+    """Why a run directory cannot be held to the promises property, or None.
+
+    A run that died in FLOW-4 has promises landing past its last written
+    chapter; that is not a defect of the run, it is what dying mid-book looks
+    like (SPEC-010 W4). `dist/book.md` is what only a finished run has.
+    """
+    if not (run_dir / "dist" / "book.md").is_file():
+        return f"{run_dir.name}: no dist/book.md — a run that did not finish cannot keep promises it never reached"
+    return None
+
+
+def test_an_unfinished_run_is_skipped_with_its_reason(tmp_path):
+    dead = tmp_path / "died-in-flow-4"
+    (dead / "bible").mkdir(parents=True)
+    (dead / "bible" / "mysteries.md").write_text("# Mysteries\n", encoding="utf-8")
+    reason = unfinished_reason(dead)
+    assert reason and "did not finish" in reason and "died-in-flow-4" in reason
+    (dead / "dist").mkdir()
+    (dead / "dist" / "book.md").write_text("# Book\n", encoding="utf-8")
+    assert unfinished_reason(dead) is None
+
+
 @pytest.mark.parametrize("slug", sorted(
     p.parent.parent.name for p in OUTPUT.glob("*/bible/mysteries.md")))
 def test_no_existing_run_has_an_incoherent_promise(slug):
@@ -123,6 +146,13 @@ def test_no_existing_run_has_an_incoherent_promise(slug):
     None is incoherent: no run promises a landing in a chapter that was never
     written. That is worth knowing, and it is a weaker statement than it looks —
     ten of them state no chapters at all, so there was nothing to contradict.
+
+    A run that did not finish is skipped, with its reason in the output: the
+    first such run (`salvage-crew-…`, 2026-09-23, died with its server in
+    FLOW-4) is tracked under `output/` as evidence of `verification.md` §3.14.
     """
+    reason = unfinished_reason(OUTPUT / slug)
+    if reason:
+        pytest.skip(reason)
     out = json.loads(run(OUTPUT / slug).stdout)
     assert out["status"] in {"coherent", "unstated"}, out["problems"]

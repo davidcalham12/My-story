@@ -1,0 +1,26 @@
+{
+  "critic": "length",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": "orchestrator",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 457,
+      "band": {
+        "min": 300,
+        "max": 550,
+        "tolerance_pct": 25,
+        "widened": [
+          225,
+          688
+        ]
+      },
+      "method": "python str.split() word count (wc -w equivalent)",
+      "findings": []
+    }
+  ],
+  "ts": "2026-09-23T02:40:09Z"
+}
