@@ -591,3 +591,35 @@ def test_the_run_stops_rather_than_launching_a_unit_with_nothing_left(db, run):
     assert kind == "budget"
     assert "$0.80" in detail
     assert len(outcome.units_run) == 2, "two units at $0.40, and then the boundary"
+
+
+def test_a_bill_with_a_unit_missing_from_it_is_not_called_measured(db, tmp_path):
+    """Provenance is a claim, and `measured` is the strongest one there is.
+
+    Under the conductor a unit stopped mid-turn sends no `result`, so the sum
+    is every unit that finished and nothing for the one that did not. That is a
+    real figure with a unit-shaped hole in it, and the record says how big the
+    hole is instead of presenting a total that looks whole.
+    """
+    import json
+    from backend.commons.config.settings import Settings
+    from backend.commons.runner.watch import State
+    from backend.runs.service import RunService
+
+    svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
+                                  use_recorded_stream=False))
+
+    whole = State(slug="all-of-it", total_cost_usd=6.0, results=5)
+    svc._write_cost(whole, units=5)
+    on_disk = json.loads((tmp_path / "all-of-it" / "cost.json").read_text(encoding="utf-8"))
+    assert on_disk["provenance"] == "measured"
+    assert on_disk["units_stopped_before_reporting"] == 0
+
+    holed = State(slug="one-short", total_cost_usd=6.0, results=4)
+    svc._write_cost(holed, units=5)
+    on_disk = json.loads((tmp_path / "one-short" / "cost.json").read_text(encoding="utf-8"))
+    assert on_disk["provenance"] == "reconstructed",         "four units billed and a fifth said nothing is not a measured total"
+    assert on_disk["units_stopped_before_reporting"] == 1
+    assert on_disk["units_that_reported"] == 4
+    assert "lower bound" in on_disk["_comment_provenance"]
+

@@ -65,6 +65,10 @@ class State:
     total_cost_usd: float | None = None
     turns: int | None = None
     duration_ms: int | None = None
+    #: How many `result` events arrived. Under the conductor a unit stopped
+    #: mid-turn never sends one, so this is how a reader tells a complete bill
+    #: from a bill with a unit-shaped hole in it.
+    results: int = 0
     finished: bool = False
     error: str | None = None
 
@@ -158,6 +162,7 @@ def apply(state: State, event: dict) -> State:
 
     if kind == "result":
         state.finished = True
+        state.results += 1
         state.total_cost_usd = _add(state.total_cost_usd, event.get("total_cost_usd"))
         state.turns = _add(state.turns, event.get("num_turns"))
         state.duration_ms = _add(state.duration_ms, event.get("duration_ms"))
@@ -248,19 +253,25 @@ class BudgetWatcher:
     spent_usd: float = 0.0
 
     def observe(self, state: State) -> None:
-        if state.total_cost_usd is not None:
-            self.spent_usd = state.total_cost_usd
-        else:
-            # Between `result` events the only figure available is the token
-            # count. Priced at the most expensive rate on file, because a
-            # ceiling that under-estimates is not a ceiling.
-            # Tokens here are the orchestrator's, which is the right basis:
-            # the run's bill includes them and v1's estimate did not.
-            worst = max(
-                (m["output_per_mtok"] for m in self.pricing.get("models", {}).values()),
-                default=0.0,
-            ) / 1_000_000
-            self.spent_usd = (state.input_tokens + state.output_tokens) * worst
+        # The token count, priced at the most expensive rate on file, because a
+        # ceiling that under-estimates is not a ceiling. Tokens here are the
+        # orchestrator's, which is the right basis: the run's bill includes
+        # them and v1's estimate did not.
+        worst = max(
+            (m["output_per_mtok"] for m in self.pricing.get("models", {}).values()),
+            default=0.0,
+        ) / 1_000_000
+        from_tokens = (state.input_tokens + state.output_tokens) * worst
+
+        # **The larger of the two, never just the reported sum.** A unit the
+        # context watcher stops mid-turn is killed before it sends a `result`,
+        # so its cost is reported by nobody — and a ceiling that read only the
+        # reported total would forget that unit's spending for the rest of the
+        # run. The token estimate still carries it, so taking the maximum keeps
+        # the halted unit inside the ceiling while leaving the reported figure
+        # in charge whenever it is the bigger of the two, which it usually is
+        # (it includes the subagents; these tokens are the orchestrator's).
+        self.spent_usd = max(from_tokens, state.total_cost_usd or 0.0)
 
         if self.spent_usd > self.ceiling_usd:
             raise WatchTripped(

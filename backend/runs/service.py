@@ -414,7 +414,7 @@ class RunService:
                 live.result = "complete"
 
             if state.total_cost_usd is not None:
-                self._write_cost(state)
+                self._write_cost(state, units=len(getattr(live, "units", []) or []))
 
             # The parser skips a line it cannot read; the record says so. The
             # backend writes no log file, so the database is the log (P-8).
@@ -569,25 +569,43 @@ class RunService:
                 # be written is still better than a follower that never returns.
                 pass
 
-    def _write_cost(self, state: State) -> None:
+    def _write_cost(self, state: State, *, units: int = 0) -> None:
         """The whole run's cost, orchestrator included, straight from Claude Code.
 
         This is the figure v1 could not see. Its absence is why a $6.21 estimate
         stood in for $49.33, and having it turns that gap from a hole into a
         datum — measured, not modelled.
+
+        **Unless a unit is missing from it.** Under the conductor each unit
+        sends its own `result`, and a unit the context or budget watcher stops
+        is killed mid-turn and sends none. The sum is then every unit that
+        finished and nothing for the one that did not, which is a real figure
+        with a unit-shaped hole in it. That is `reconstructed`, not `measured`,
+        and the count of silent units is written beside it so a reader can see
+        how big the hole is rather than trusting a total that looks whole.
         """
         if not state.slug:
             return
+        silent = max(0, units - state.results)
         path = Path(self.settings.output_dir) / state.slug / "cost.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({
-            "_comment": "From Claude Code's own result event. The WHOLE run, "
-                        "orchestrator turns included — which is most of it.",
+            "_comment": "From Claude Code's own result events, summed over the "
+                        "run's units. The orchestrator turns are included — "
+                        "which is most of it.",
             "total_cost_usd": state.total_cost_usd,
             "turns": state.turns,
             "duration_ms": state.duration_ms,
             "subagent_dispatches": len(state.dispatched),
-            "provenance": "measured",
+            "units_run": units or None,
+            "units_that_reported": state.results,
+            "units_stopped_before_reporting": silent,
+            "provenance": "measured" if not silent else "reconstructed",
+            "_comment_provenance": None if not silent else (
+                f"{silent} unit(s) were stopped mid-turn and sent no result, so "
+                "their cost is in no record. This total is every unit that "
+                "finished and nothing for the ones that did not — a lower bound, "
+                "not the bill."),
         }, indent=2) + "\n", encoding="utf-8")
 
     # ------------------------------------------------------------- halting

@@ -222,6 +222,37 @@ def test_the_budget_prices_tokens_at_the_worst_rate_on_file():
     assert watcher.spent_usd == pytest.approx(25.0)
 
 
+def test_a_unit_stopped_before_it_reported_still_counts_against_the_ceiling():
+    """The hole the conductor opened, and the reason the ceiling takes a max.
+
+    A unit the context watcher stops is killed mid-turn and sends no `result`,
+    so nobody reports its cost. A ceiling reading only the reported sum would
+    forget that unit's spending for the rest of the run. The token estimate
+    still carries it, so the larger of the two wins.
+    """
+    pricing = {"models": {"a": {"input_per_mtok": 1, "output_per_mtok": 30}}}
+    watcher = BudgetWatcher(ceiling_usd=1000.0, pricing=pricing)
+
+    # One unit finished and billed $2; a second burned two million tokens and
+    # was killed before it could say so.
+    watcher.observe(State(total_cost_usd=2.0,
+                          input_tokens=1_000_000, output_tokens=1_000_000))
+
+    assert watcher.spent_usd == pytest.approx(60.0),         "the reported $2 must not erase the tokens nobody billed for"
+
+
+def test_the_reported_total_still_wins_when_it_is_the_larger():
+    """It usually is: the bill includes the subagents and these tokens are the
+    orchestrator's alone. The maximum is a floor under the ceiling, not a
+    different way of pricing the run."""
+    pricing = {"models": {"a": {"input_per_mtok": 1, "output_per_mtok": 30}}}
+    watcher = BudgetWatcher(ceiling_usd=1000.0, pricing=pricing)
+
+    watcher.observe(State(total_cost_usd=40.0, input_tokens=1000, output_tokens=1000))
+
+    assert watcher.spent_usd == pytest.approx(40.0)
+
+
 def test_stopping_the_replay_ends_the_stream():
     """A watcher that trips must actually be able to end the process."""
     process = ReplayProcess(fixture=FIXTURE)

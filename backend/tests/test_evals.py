@@ -74,7 +74,8 @@ def test_two_of_the_five_do_not_pass_and_that_is_the_point():
     stripped = brief("05-incoherencia-temporal")
     stripped["recipient"] = {k: v for k, v in stripped["recipient"].items()
                              if k != "birth_date"}
-    assert domain.check(stripped).status == "ok", \n        "with the undeclared key gone, FLOW-0 cannot see the incoherence at all"
+    assert domain.check(stripped).status == "ok", (
+        "with the undeclared key gone, FLOW-0 cannot see the incoherence at all")
 
 
 def test_the_injection_is_a_row_and_never_an_instruction():
