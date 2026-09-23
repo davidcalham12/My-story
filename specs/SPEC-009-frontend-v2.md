@@ -1,9 +1,9 @@
 ---
 id: SPEC-009
 title: frontend v2 — the panel v1 had, on the API v2 has, with a design
-status: draft
+status: approved
 created: 2026-09-23
-approved: —
+approved: 2026-09-23 — David Calderon — in chat to the session "Novaforge continuación con repositorios", 2026-09-23: "yo apruebo", answering the list that named this document; written at his instruction. Q1 of the grill had him write this line by hand; he approved in chat instead, and a hand edit remains welcome
 depends_on: docs/architecture.md §2.3 (FSD), D27–D29, SPEC-007 (backend v1), the v1 panel (`web/` in the claude-orchestrator branch of the old repo)
 ---
 
