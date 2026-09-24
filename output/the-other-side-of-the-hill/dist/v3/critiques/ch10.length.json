@@ -1,0 +1,10 @@
+{
+  "critic": "length",
+  "chapter": 10,
+  "kind": "arithmetic",
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "words": 1325, "band": [900, 1650], "findings": []},
+    {"iteration": 2, "score": 10, "words": 1321, "band": [900, 1650], "findings": []}
+  ]
+}

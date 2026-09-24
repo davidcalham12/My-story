@@ -1,7 +1,7 @@
 # Eval results
 
 FLOW-0 over the five committed briefs, read from the code that decides
-it, 2026-09-24 18:55 UTC. Profile for the novel half: `eval`.
+it, 2026-09-24 21:36 UTC. Profile for the novel half: `eval`.
 
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
@@ -83,19 +83,12 @@ premise is composed by the product, not by this script.
 | chapter_length | ch09 | 934 | outside 1000-1500 |
 | chapter_length | ch10 | 1039 | in band |
 | forbidden_words |  | 0 | none |
-| human_review |  | 8 | The owner read the complete ten-chapter book (v2) on 2026-09-24 and scored it a solid 8 overall. The owner gave one overall score, not one per criterion; the co |
-| judge_rubric | character_coherence | 9 | Every character maintains consistent personality and behavior across all appearances. The protagonist develops believably—introduced claiming fearlessness (Ch1) |
-| judge_rubric | continuity | 8 | The book maintains consistent facts and timeline across all ten chapters—the protagonist's birthday (Ch1) leads to the quest (Ch5), the overnight visit to Elena |
-| judge_rubric | mean | 8.333333333333334 | mean over all 6 criteria |
-| judge_rubric | narrative_arc | 8 | The book traces a complete arc from curiosity and setup (Ch1-4), through adventure and discovery (Ch5-6), to integration and transformed understanding (Ch7-10). |
-| judge_rubric | natural_personalisation | 8 | Despite the anonymized placeholder name, the protagonist is written as a fully-realized character with distinct consciousness, agency, and specific concrete det |
-| judge_rubric | pacing | 8 | The ten chapters are well-proportioned to their narrative weight. Setup chapters (Ch1-4) build appropriately toward the turning point; the climb itself (Ch5) is |
-| judge_rubric | tone | 9 | The book achieves and sustains the requested warm, funny, and gentle tone throughout all ten chapters. Ch1 establishes intimate coziness (honey on tables, Bruno |
+| human_review |  | — | not run: pending the owner's reading |
 | lean_chronology |  | — | not run: elan unavailable |
-| mandatory_facts |  | 1/3 | 1 of 3 mandatory facts covered; uncovered: 34, 35 |
+| mandatory_facts |  | 0/3 | 0 of 3 mandatory facts covered; uncovered: 34, 35, 36 |
 | schema_brief |  | pass | FLOW-0: ok |
 | schema_role_output |  | 61/61 | all parse |
-| visual_check |  | pass | 2026-09-24 build session, Playwright from Python (not the MCP client): 1 cover pass (title, dedication with the alias); 2 index pass (10/10 entries, links land) |
+| visual_check |  | pass | 2026-09-24 build session, Playwright from Python (not the MCP client): 4 'what changed' is the first page and links to chapters 3 and 10; 1 cover with dedicatio |
 
 ### 01-hijo — run `8ab6c57af9f6` (`stone-collector-birthday-adventure`)
 

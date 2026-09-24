@@ -94,7 +94,7 @@ def _found(needle: str, prose: str) -> bool:
 
 
 def record(conn: sqlite3.Connection, run_dir: Path, chapter: int,
-           version_id: int = 1) -> list[Usage]:
+           version_id: int = 1, run_id: str | None = None) -> list[Usage]:
     """Record what chapter `chapter` of version `version_id` uses.
 
     `version_id` defaults to 1 — the first published version — because FLOW-4
@@ -102,7 +102,9 @@ def record(conn: sqlite3.Connection, run_dir: Path, chapter: int,
     passes the new version explicitly; the rows of version 1 stay where they
     are, which is what "`dist/v1/` is untouched" (AC-7) means in the archive.
     """
-    run_id = run_dir.name
+    # `run_id` is named by a caller reading a version workspace (dist/v<n>/),
+    # whose directory name is no run's.
+    run_id = run_id or run_dir.name
     # A v2 run's id is not its slug; resolve it the way the ingest does, or a
     # v2 run finds no facts and every mandatory one reads uncovered.
     if not conn.execute("SELECT 1 FROM runs WHERE id = ?", (run_id,)).fetchone():

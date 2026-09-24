@@ -1,0 +1,158 @@
+{
+  "slug": "the-other-side-of-the-hill",
+  "profile": "exam",
+  "premise": "A warm, funny children's adventure novel for [NOMBRE_ANONIMIZADO], who turns ten today. [NOMBRE_ANONIMIZADO] is curious, collects smooth stones, and is afraid of the dark though he will not admit it. His scruffy terrier Bruno sleeps at the foot of his bed. The summer before this one he found a fossil on the beach at Cadaques and named it Captain Crunch. In the garden stands the cardboard observatory he built with his grandfather. [NOMBRE_ANONIMIZADO] has always wondered what is on the other side of the hill behind the house. This is the summer he goes to find out.",
+  "tone": "a warm, funny children's adventure - a read-aloud summer quest told close to the ground, brave and kind; small real wonders rather than magic, a dog who is a character, and a fear of the dark taken seriously and gently",
+  "chapters_planned": 10,
+  "stage": "FLOW-4",
+  "started_utc": "2026-09-24T15:24:29Z",
+  "privacy": "The buyer's child's given name is withheld under the organisation's data-protection policy and appears in every artefact as the literal token [NOMBRE_ANONIMIZADO]. One find-and-replace restores it locally.",
+  "chapters": [
+    {
+      "n": 1,
+      "title": "Ten Years Old",
+      "attempts": 1,
+      "accepted_attempt": 1,
+      "scores": {
+        "continuity": 8,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 9
+      },
+      "aggregate": 8
+    },
+    {
+      "n": 2,
+      "title": "What's Beyond",
+      "attempts": 1,
+      "accepted_attempt": 1,
+      "scores": {
+        "continuity": 8,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 8
+      },
+      "aggregate": 8
+    },
+    {
+      "n": 3,
+      "title": "The Hill Will Teach",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 8
+      },
+      "aggregate": 8,
+      "first_attempt_aggregate": 5
+    },
+    {
+      "n": 4,
+      "title": "The Lower Path",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 10
+      },
+      "aggregate": 10,
+      "first_attempt_aggregate": 7
+    },
+    {
+      "n": 5,
+      "title": "The Climb",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 9
+      },
+      "aggregate": 9,
+      "first_attempt_aggregate": 0
+    },
+    {
+      "n": 6,
+      "title": "On the Other Side",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 9
+      },
+      "aggregate": 9,
+      "first_attempt_aggregate": 4
+    },
+    {
+      "n": 7,
+      "title": "The Return",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 9,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 10
+      },
+      "aggregate": 9,
+      "first_attempt_aggregate": 0
+    },
+    {
+      "n": 8,
+      "title": "Marcos Knew",
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {
+        "continuity": 10,
+        "science": 10,
+        "outline": 10,
+        "length": 10,
+        "chatter": 10,
+        "prose": 10
+      },
+      "aggregate": 10,
+      "first_attempt_aggregate": 1
+    }
+  ],
+  "halted_utc": "2026-09-24T17:20:30Z",
+  "halt_reason": "Budget. 51.80 USD of the exam profile's 60.00 ceiling was spent through chapter 8. A gated chapter in this run cost 3-5 USD, so chapters 9 and 10 plus FLOW-5 and FLOW-6 would not fit. The gate was not reduced to fit it. Halted by the orchestrator, not by `decide`.",
+  "chapters_remaining": [
+    {
+      "n": 9,
+      "title": "The Question Answered",
+      "status": "not written"
+    },
+    {
+      "n": 10,
+      "title": "The Other Side Now",
+      "status": "not written",
+      "note": "carries the cardboard observatory scene and R3; the commission requires it"
+    }
+  ],
+  "stages_not_run": [
+    "FLOW-5 style",
+    "FLOW-6 publish and dist/book.md"
+  ],
+  "resume_from": "Chapter 9. Everything it needs is on disk: bible/, outline.md, and chapters/ch08.summary.md as the rolling summary. No chapter prose is required to continue."
+}

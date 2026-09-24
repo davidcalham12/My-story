@@ -1,0 +1,45 @@
+{
+  "critic": "prose",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "mechanical": 0,
+      "major": 0,
+      "minor": 1,
+      "why": "10 − 3×0 − 2×0 − 1×1 = 9",
+      "mechanical_defects": [],
+      "findings": [
+        {
+          "severity": "minor",
+          "quote": "Looking at them, [NOMBRE_ANONIMIZADO] could almost see the rooms where they had been found: the beach at Cadaques, the riverbed that rushed only in spring, the rocky shore of a place he had only heard described.",
+          "claim": "'rooms' for outdoor locations (beach, riverbed, rocky shore) is a momentary jolt in a read-aloud, pulling away from the grounded register.",
+          "fix": "could almost see the places where they had been found"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 9,
+      "mechanical": 0,
+      "major": 0,
+      "minor": 1,
+      "why": "10 − 3×0 − 2×0 − 1×1 = 9",
+      "mechanical_defects": [],
+      "findings": [
+        {
+          "severity": "minor",
+          "late": true,
+          "quote": "a ladder built by his grandfather's hands and his own patience",
+          "claim": "'Built by hands' and 'built by patience' do not parallel cleanly -- one concrete agent, one abstract -- so the pairing reads slightly off.",
+          "fix": "a ladder built with his grandfather's hands and his own patience",
+          "note": "Byte-identical to attempt 1, which this critic scored without raising it. Recorded as late in specs/loops/LOOP-003/late_findings.jsonl; counted in full per SKILL.md §3, not blocking, not patched (the chapter already accepts at 9 with it included)."
+        }
+      ]
+    }
+  ]
+}

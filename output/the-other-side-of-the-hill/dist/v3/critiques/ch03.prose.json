@@ -1,0 +1,27 @@
+{
+  "critic": "prose",
+  "chapter": 3,
+  "kind": "computed",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 1,
+  "formula": "10 - 3*mechanical - 2*major - 1*minor, floored at 0",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "mechanical": 0,
+      "major": 0,
+      "minor": 1,
+      "why": "10 - 3x0 - 2x0 - 1x1 = 9",
+      "findings": [
+        {"severity": "minor",
+         "quote": "And at night they come back down because the darkness makes it hard to see, and because in the darkness it is harder to follow a path you know by day.",
+         "claim": "\"Darkness\" repeats within the same sentence in close proximity.",
+         "fix": "Use \"darkness\" once, e.g. \"because the darkness makes it hard to see, let alone follow a path you know by day.\""}
+      ]
+    }
+  ],
+  "accepted_at_iteration": 1,
+  "accepted_score": 9,
+  "note": "Redo for the reader change ('the cardboard observatory' -> 'the wooden treehouse observatory'). Replaces the earlier chapter-3 attempts in this run, which were promoted and then reverted (moved to chapters/_redo-20260924T212801Z/) because the promoted text never named the observatory at all and so did not carry the change."
+}

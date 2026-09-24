@@ -144,3 +144,19 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
   Screenshot: `docs/screenshots/007-library.png` (fixture data).
 - Tests: backend 809 → 833 passed (5 skipped); frontend 104 → 119.
 - AC-7 (a real continuation from the web) waits for the owner's go and his ceiling.
+
+## Build session — 2026-09-24, ~21:45 UTC · v3 published (the reader change)
+
+| part | chapters | cost (measured) | turns | min | model |
+|---|---|---|---|---|---|
+| first pass, ch03 (promoted without the fact → set aside) | 3 | 4.24 USD | 80 | 19.5 | Sonnet 3.88 + Haiku 0.36 |
+| first pass, ch10 | 10 | 4.57 USD | 94 | 19.5 | Sonnet 4.16 + Haiku 0.41 |
+| redo ch03 with the arrival check (`e0b7c38`) | 3 | 1.50 USD | 57 | 6.7 | Sonnet 1.34 + Haiku 0.16 |
+| **v3 total** | 3, 10 | **10.31 USD** of the 25 approved | 231 | 45.7 | |
+
+- Earlier attempt cut by the org's spend limit (Opus, not a version): 7.52 USD, kept in `dist/_aborted-change-2/`.
+- v3 = parent v2, "what changed" page first (chapters 3 and 10); `visual_check` pass;
+  PDF in `ejemplos/novela-ejemplo-v3-cambio-del-lector.pdf`. Sentinel removed before the redo.
+- `mandatory_facts` v3: 0/3 — fact 36 still holds its **old** text in `facts` (the reader change
+  does not version fact texts), which v3 correctly no longer contains; the other two as in v2
+  (literal matching). Declared gap.

@@ -1,0 +1,24 @@
+{
+  "critic": "science",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 6,
+      "findings": [
+        {
+          "kind": "rule-violation",
+          "severity": "medium",
+          "quote": "It is half hers now, too.",
+          "claim": "R3 says the wooden treehouse observatory belongs to [NOMBRE_ANONIMIZADO] and Marcos jointly, and neither may promise or lend it without the other saying yes. This line has Marcos unilaterally declare Elena a co-owner, which is not a permission either grandfather can grant alone under R3 -- and goes beyond the outline's beat 2, which has Marcos simply say yes to being shown the observatory.",
+          "fix": "Marcos gives a plain yes to the question actually asked -- permission to show Elena the observatory -- without declaring any change of ownership.",
+          "reference": "bible/world.md § Rules - R3"
+        }
+      ]
+    },
+    {"iteration": 2, "score": 10, "findings": []}
+  ]
+}

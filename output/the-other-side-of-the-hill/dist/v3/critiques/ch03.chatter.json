@@ -1,0 +1,11 @@
+{
+  "critic": "chatter",
+  "chapter": 3,
+  "kind": "arithmetic",
+  "agent": null,
+  "drafts": 1,
+  "iterations": [
+    {"iteration": 1, "score": 10, "heading": "# Chapter 3 — The Hill Will Teach", "findings": []}
+  ],
+  "note": "Redo for the reader change ('the cardboard observatory' -> 'the wooden treehouse observatory')."
+}

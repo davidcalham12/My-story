@@ -1,0 +1,21 @@
+{
+  "critic": "outline",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": [
+        "Beat 1 (asks parents to climb again with the same rule; Rosa waits at the gate and asks to come next time) delivered in the opening section and Rosa's arrival",
+        "Beat 2 (thinks of showing the observatory to Elena, remembers it is half Marcos's, asks aloud, Marcos taps twice and says yes) delivered in the middle section",
+        "Beat 3 (Marcos and the boy enter the observatory, place Captain Crunch and the stones on the high shelf, Bruno sleeps in the dust below, evening stars appear) delivered in the closing section",
+        "All three beats present, in order. 10 - 0 = 10"
+      ]
+    },
+    {"iteration": 2, "score": 10, "findings": [], "notes": ["10 - 0 (no missing beats) - 0 (no out-of-order beats) = 10"]}
+  ]
+}

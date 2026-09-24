@@ -506,6 +506,13 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
     published = pdf.publish(conn, run_dir, run_id,
                             reason=f"reader change to fact {args.fact}",
                             change=change, chapters_from=workspace, n=n)
+    # The new version's fact usage, so its validators count what it carries:
+    # regenerated chapters from the workspace, the rest from the run.
+    from backend.chapters import fact_usage
+    for path in sorted((run_dir / "chapters").glob("ch[0-9][0-9].md")):
+        c = int(path.stem[2:])
+        source = workspace if (workspace / "chapters" / path.name).is_file() else run_dir
+        fact_usage.record(conn, source, c, version_id=published, run_id=run_id)
     print(json.dumps({
         "slug": args.slug, "fact": args.fact, "chapters": list(chapters),
         "version": published, "parent": parent_n,

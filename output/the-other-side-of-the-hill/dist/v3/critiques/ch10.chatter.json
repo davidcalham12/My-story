@@ -1,0 +1,10 @@
+{
+  "critic": "chatter",
+  "chapter": 10,
+  "kind": "arithmetic",
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "findings": []},
+    {"iteration": 2, "score": 10, "findings": []}
+  ]
+}

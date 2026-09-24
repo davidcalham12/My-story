@@ -354,3 +354,19 @@ def test_usage_finds_a_v2_runs_facts_by_slug(db, tmp_path):
     (run_dir / "chapters" / "ch01.md").write_text(
         "# Chapter 1\n\nAnd the dog is called Bruno, of course.\n", encoding="utf-8")
     assert record(db, run_dir, 1), "a v2 run's facts must be found by its slug"
+
+
+def test_usage_can_read_a_version_workspace_with_the_run_named(db, tmp_path):
+    """A reader change's chapters live in dist/v<n>/, whose name is no run's;
+    the caller names the run, and the usage is recorded against version n."""
+    db.execute(
+        "INSERT INTO runs (id, slug, premise, profile, config_snapshot, stage, "
+        "started_at) VALUES ('r9', 'gift', 'p', 'exam', '{}', 'complete', 't')")
+    db.execute("INSERT INTO facts (run_id, kind, text, source, mandatory) "
+               "VALUES ('r9', 'recipient', 'the dog is called Bruno', 'brief', 1)")
+    db.commit()
+    ws = tmp_path / "gift" / "dist" / "v3"
+    (ws / "chapters").mkdir(parents=True)
+    (ws / "chapters" / "ch03.md").write_text("the dog is called Bruno\n", encoding="utf-8")
+    assert record(db, ws, 3, version_id=3, run_id="r9")
+    assert db.execute("SELECT version_id FROM fact_usage").fetchone()[0] == 3
