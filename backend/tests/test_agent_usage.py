@@ -78,3 +78,14 @@ def test_reimport_rebuilds_a_runs_calls_from_its_streams(db, tmp_path):
     assert rows[0]["output_tokens"] == 6078 and rows[0]["cache_creation_input_tokens"] == 9823
     assert rows[0]["cost_provenance"] == "estimated" and rows[0]["provenance"] == "measured"
     assert rows[0]["cost_usd"] > 0
+
+
+def test_the_cost_splits_into_its_four_parts_and_a_total():
+    u = agent_usage.from_event(result_event(cr=1000))
+    parts = agent_usage.estimate_parts(u, loader.load_pricing())
+    assert set(parts) == {"input", "output", "cache_read_input_tokens",
+                          "cache_creation_input_tokens", "total"}
+    assert parts["total"] == pytest.approx(parts["input"] + parts["output"]
+                                           + parts["cache_read_input_tokens"]
+                                           + parts["cache_creation_input_tokens"])
+    assert parts["total"] == pytest.approx(agent_usage.estimate_cost(u, loader.load_pricing()))

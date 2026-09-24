@@ -476,6 +476,17 @@ def plan(run: Run, scrub: Scrubber | None = None) -> list[dict]:
         # and a reader would believe it.
         if call.get("cost_usd") is not None:
             op["cost_details"] = {"total": float(call["cost_usd"])}
+            # The four parts, so Langfuse shows input and output cost apart
+            # (estimated, at config/pricing.json's rates, like the total).
+            if call.get("output_tokens") is not None and call.get("model"):
+                from backend.commons.config import loader
+                from backend.commons.log import agent_usage
+                parts = agent_usage.estimate_parts({
+                    "model": call["model"],
+                    **{k: int(call.get(k) or 0) for k in agent_usage.FIELDS}},
+                    loader.load_pricing())
+                if parts:
+                    op["cost_details"] = parts
         ops.append(op)
 
         if call["agent"] == "chapter-writer" and call.get("chapter"):
@@ -648,6 +659,28 @@ def send(ops: list[dict], client, *, session_scope=None) -> dict:
     return counts
 
 
+def purge(client, trace_ids: list[str], *, sleep=None, timeout: float = 120) -> None:
+    """Delete these traces and wait until Langfuse no longer returns them.
+
+    SDK v4 mints observation ids itself, so a re-export adds rather than
+    replaces. Deleting the run's traces first makes it a replacement; waiting
+    matters because deletion is queued, and a deletion still pending when the
+    new observations arrive would take them too. Reads use the v2 endpoint —
+    the legacy GETs answer 410 in this organisation."""
+    import time
+
+    sleep = sleep or time.sleep
+    client.api.trace.delete_multiple(trace_ids=list(trace_ids))
+    waited = 0.0
+    while any(client.api.observations.get_many(trace_id=t, limit=1).data
+              for t in trace_ids):
+        if waited >= timeout:
+            sys.exit(f"Langfuse still returns observations for {trace_ids} after "
+                     f"{timeout:.0f}s; nothing was sent")
+        sleep(5)
+        waited += 5
+
+
 @contextmanager
 def _propagate_attributes(*, session_id: str):
     """The SDK's own session scope, imported late so `--dry-run` never needs it."""
@@ -692,6 +725,9 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Ship a finished storyMaker run to Langfuse.")
     parser.add_argument("workspace", type=Path, help="a run directory, e.g. output/<slug>")
+    parser.add_argument("--replace", action="store_true",
+                        help="delete this run's traces in Langfuse first and wait "
+                             "until they are gone, so a re-export does not duplicate")
     parser.add_argument("--dry-run", action="store_true",
                         help="print what would be sent; no credentials, no SDK, "
                              "no network")
@@ -724,6 +760,9 @@ def main(argv: list[str] | None = None) -> int:
                  f"({os.environ['LANGFUSE_BASE_URL']}). "
                  f"A key pair is valid on exactly one region.\n{detail}")
 
+    if args.replace:
+        purge(client, [o["trace_context"]["trace_id"] for o in ops
+                       if o["op"] == "observation" and o["parent"] is None])
     counts = send(ops, client)
     print(f"sent {counts['traces']} traces, {counts['spans']} spans, "
           f"{counts['scores']} scores and {counts['prompts']} prompt versions "

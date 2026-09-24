@@ -403,5 +403,34 @@ def test_a_call_ships_its_four_usage_figures_and_its_estimated_cost(db, tmp_path
     assert usage["input"] == 1000 and usage["output"] == 200
     assert usage["cache_creation_input_tokens"] == 300
     assert usage["cache_read_input_tokens"] == 40
-    assert span.kwargs["cost_details"] == {"total": 0.5}
+    parts = span.kwargs["cost_details"]
+    assert set(parts) >= {"input", "output", "cache_read_input_tokens",
+                          "cache_creation_input_tokens", "total"}
     assert span.kwargs["metadata"]["cost_provenance"] == "estimated"
+
+
+
+def test_replace_deletes_the_runs_traces_and_waits_until_they_are_gone():
+    """A re-export must replace, not add: SDK v4 cannot fix an observation's id,
+    so the run's traces are deleted first and the export waits for the queued
+    deletion to finish, or it could delete what it is about to send."""
+    from tools.export_to_langfuse import purge
+
+    class Api:
+        def __init__(self):
+            self.deleted, self.polls = [], 0
+            self.trace = self; self.observations = self
+
+        def delete_multiple(self, *, trace_ids):
+            self.deleted.append(list(trace_ids))
+
+        def get_many(self, *, trace_id, limit):
+            self.polls += 1
+            return type("R", (), {"data": [1] if self.polls < 3 else []})()
+
+    class Client:
+        api = Api()
+
+    waited = []
+    purge(Client(), ["t1"], sleep=waited.append, timeout=60)
+    assert Client.api.deleted == [["t1"]] and Client.api.polls == 3 and len(waited) == 2

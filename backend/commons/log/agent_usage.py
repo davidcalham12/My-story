@@ -55,15 +55,27 @@ def _rates(model: str, pricing: dict) -> dict | None:
     return models[max(keys, key=len)] if keys else None
 
 
-def estimate_cost(usage: dict, pricing: dict) -> float | None:
-    """Dollars for one call at the config's rates; None when the model has none."""
+def estimate_parts(usage: dict, pricing: dict) -> dict | None:
+    """Dollars per usage figure and their total, at the config's rates, in the
+    keys Langfuse's cost_details uses; None when the model has no rates."""
     rates = _rates(usage["model"], pricing)
     if rates is None or "cache_write_per_mtok" not in rates:
         return None
-    return (usage["input_tokens"] * rates["input_per_mtok"]
-            + usage["cache_creation_input_tokens"] * rates["cache_write_per_mtok"]
-            + usage["cache_read_input_tokens"] * rates["cache_read_per_mtok"]
-            + usage["output_tokens"] * rates["output_per_mtok"]) / 1_000_000
+    parts = {
+        "input": usage["input_tokens"] * rates["input_per_mtok"] / 1e6,
+        "cache_creation_input_tokens":
+            usage["cache_creation_input_tokens"] * rates["cache_write_per_mtok"] / 1e6,
+        "cache_read_input_tokens":
+            usage["cache_read_input_tokens"] * rates["cache_read_per_mtok"] / 1e6,
+        "output": usage["output_tokens"] * rates["output_per_mtok"] / 1e6,
+    }
+    return {**parts, "total": sum(parts.values())}
+
+
+def estimate_cost(usage: dict, pricing: dict) -> float | None:
+    """Dollars for one call at the config's rates; None when the model has none."""
+    parts = estimate_parts(usage, pricing)
+    return None if parts is None else parts["total"]
 
 
 def row(run_id: str, state: State, usage: dict, pricing: dict, ts: str) -> CallRow:
