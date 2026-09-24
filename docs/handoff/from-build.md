@@ -108,7 +108,10 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
 | eval 01 `8ab6c57af9f6` | 17 | 138,157 | 0.82 USD | absent |
 | eval 04 `8834d0ab189a` | 15 | 131,952 | 0.77 USD | 25.80 USD |
 
-- **Finding:** the Haiku agents are ~4 % of the novel's bill; the orchestrator is the rest.
+- **Finding (corrected 2026-09-24, ~21:25 UTC):** measured by model in each `result`'s
+  `modelUsage`, the Haiku agents are **6.07 USD of 74.20 (8 %)** — first run Opus 48.79 +
+  Haiku 4.38; resume Opus 19.34 + Haiku 1.69. The per-call estimate above (2.88 USD) is
+  about half the measured figure; it was first reported here as "~4 %", which was wrong.
 - Langfuse re-exported: novel 2 traces / 50 spans / 125 scores; evals 17 and 15 spans.
 - Not included: the failed v3 attempt's 7.52 USD (measured, `dist/v3/logs`), since it is no version.
 
