@@ -18,7 +18,7 @@ type Place =
 /** The three screens a novel has once it exists. Shown only when one is open,
  *  because a reader with no book has nothing to read and nothing to correct. */
 const OF_A_NOVEL = [
-  ['run', 'Writing'],
+  ['run', 'Progress'],
   ['read', 'Read'],
   ['change', 'Ask for a change'],
 ] as const
@@ -97,7 +97,13 @@ export function App() {
         {place.at === 'quick' && (
           <NewNovel onStarted={(id) => setPlace({ at: 'run', id })} />
         )}
-        {place.at === 'run' && <RunPage runId={place.id} />}
+        {place.at === 'run' && (
+          <RunPage
+            runId={place.id}
+            onRead={() => setPlace({ at: 'read', id: place.id })}
+            onChange={() => setPlace({ at: 'change', id: place.id })}
+          />
+        )}
         {place.at === 'read' && (
           <Read runId={place.id} onAskForAChange={() => setPlace({ at: 'change', id: place.id })} />
         )}

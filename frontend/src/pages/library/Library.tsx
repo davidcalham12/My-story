@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/shared/api/client'
 import type { Run } from '@/shared/api/types'
+import { plainStatus, stepOf } from '@/entities/run/status'
 
 /**
  * Every run, new beside imported.
@@ -30,26 +31,30 @@ export function Library({ onOpen, onNew }: {
   if (error) return <p className="panel panel--bad">{error}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
 
-  const status = (run: Run) =>
-    run.halted
-      ? { label: `Stopped · ${run.halted}`, tone: 'halt' }
-      : run.stage === 'complete'
-        ? { label: 'Complete', tone: 'ok' }
-        : { label: `Writing · ${run.stage}`, tone: 'live' }
+  const status = (run: Run) => plainStatus(run, false)
+  const count = (tone: string) => runs.filter((r) => status(r).tone === tone).length
+  const order = { live: 0, ok: 1, halt: 2 } as const
+  const sorted = [...runs].sort((x, y) => order[status(x).tone] - order[status(y).tone])
 
   return (
     <>
       <section className="hero">
-        <p className="eyebrow eyebrow--brand">Personalised novels</p>
-        <h1>The library</h1>
+        <p className="eyebrow eyebrow--brand">Your novels</p>
+        <h1>
+          {count('live')} being written · {count('ok')} ready · {count('halt')} stopped
+        </h1>
         <p className="lede">
-          {runs.length} run{runs.length === 1 ? '' : 's'}.{' '}
+          Each novel is a personalised gift in ten chapters. Open one to follow it, read
+          it, or correct a detail.
+        </p>
+        <button type="button" className="primary" onClick={onNew}>
+          Order a new novel
+        </button>
+        <p className="hint">
+          {runs.length} run{runs.length === 1 ? '' : 's'} in total;{' '}
           {runs.filter((r) => r.source === 'pre-loop003').length} imported from the
           previous implementation and kept apart from the statistics.
         </p>
-        <button type="button" className="primary" onClick={onNew}>
-          Write a new one
-        </button>
       </section>
 
       {runs.length === 0 && (
@@ -60,16 +65,17 @@ export function Library({ onOpen, onNew }: {
       )}
 
       <div className="grid grid--2">
-        {runs.map((run) => {
+        {sorted.map((run) => {
           const s = status(run)
           return (
             <article key={run.id} className="card card--action">
               <div className="row">
                 <span className={`badge badge--${s.tone}`}>{s.label}</span>
-                <span className="badge">{run.profile}</span>
+                <span className="badge">{run.profile === 'eval' ? 'test' : run.profile}</span>
                 {run.source === 'pre-loop003' && <span className="badge">imported</span>}
               </div>
               <h2>{run.slug}</h2>
+              {s.tone === 'live' && <p className="lede">Now: {stepOf(run.stage)}</p>}
               <p className="muted clamp">{run.premise}</p>
               <div className="card__foot">
                 <span className="hint">{run.id}</span>

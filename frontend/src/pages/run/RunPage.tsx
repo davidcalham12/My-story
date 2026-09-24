@@ -3,9 +3,15 @@ import { haltReason } from '@/entities/run/lib'
 import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
 import { GateTable } from '@/entities/critique/GateTable'
+import { plainStatus } from '@/entities/run/status'
 
-/** One run: what it is doing, what it cost, and how its gate behaved. */
-export function RunPage({ runId }: { runId: string }) {
+/** One run, pyramid order: the answer in one sentence, the next thing to do,
+ *  three figures, and the technical record folded underneath. */
+export function RunPage({ runId, onRead, onChange }: {
+  runId: string
+  onRead?: () => void
+  onChange?: () => void
+}) {
   const { detail, progress, live, error } = useRun(runId)
 
   if (error) return <p className="panel panel--bad">{error}</p>
@@ -13,27 +19,24 @@ export function RunPage({ runId }: { runId: string }) {
 
   const { run, cost, warnings, completeness, conformance } = detail
   const halted = haltReason(run)
+  const status = plainStatus(run, live)
 
   return (
     <>
-      <section className="hero">
+      <section className={`hero hero--${status.tone}`}>
+        <p className="eyebrow eyebrow--brand">{run.slug}</p>
+        <h1>{status.headline}</h1>
+        <p className="lede">{status.detail}</p>
+        {live && progress && <p className="hint">Last step: {progress.detail}</p>}
         <div className="row">
-          {live && <span className="badge badge--live">Writing now</span>}
-          {!live && !halted && run.stage === 'complete' && <span className="badge badge--ok">Complete</span>}
-          {halted && <span className="badge badge--halt">Stopped · {run.halted}</span>}
-          <span className="badge">{run.profile}</span>
-          <span className="badge">{run.stage}</span>
+          {status.tone === 'ok' && onRead && (
+            <button type="button" className="primary" onClick={onRead}>Read the book</button>
+          )}
+          {status.tone === 'ok' && onChange && (
+            <button type="button" onClick={onChange}>Ask for a change</button>
+          )}
         </div>
-        <h1>{run.slug}</h1>
-        <p className="muted clamp">{run.premise}</p>
       </section>
-
-      {live && (
-        <p className="panel panel--note">
-          <strong>Running.</strong>{' '}
-          {progress ? `${progress.stage} — ${progress.detail}` : 'starting'}
-        </p>
-      )}
 
       <div className="grid grid--3">
         <div className="stat">
@@ -54,6 +57,10 @@ export function RunPage({ runId }: { runId: string }) {
           </p>
         </div>
       </div>
+
+      <details className="more">
+        <summary>Technical details — for the team</summary>
+        <p className="hint">The order the novel was written from: {run.premise}</p>
 
       {halted && (
         <div className="panel panel--halt">
@@ -152,6 +159,7 @@ export function RunPage({ runId }: { runId: string }) {
       )}
 
       <GateTable detail={detail} />
+      </details>
     </>
   )
 }

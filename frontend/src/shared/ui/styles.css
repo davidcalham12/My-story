@@ -343,3 +343,28 @@ legend { font-weight: 700; font-size: var(--text-card-title); padding: 0 var(--s
     scroll-behavior: auto !important;
   }
 }
+
+/* --- pyramid order: the answer's colour, and the record folded ------------ */
+.hero--live { border-left-color: var(--primary); }
+.hero--ok { border-left-color: var(--pass); }
+.hero--halt { border-left-color: var(--halt); }
+.hero .row { margin-top: var(--s2); }
+
+details.more {
+  margin: var(--s6) 0 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--s3) var(--s5);
+}
+details.more > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--muted);
+  padding: var(--s2) 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+details.more[open] > summary { color: var(--ink); border-bottom: 1px solid var(--line); margin-bottom: var(--s3); }

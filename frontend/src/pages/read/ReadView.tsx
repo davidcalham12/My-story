@@ -47,8 +47,15 @@ export function ReadView(props: Props) {
   return (
     <div className="reader">
       <div>
-        <p className="eyebrow">Read</p>
-        <h1>The book</h1>
+        <section className="hero">
+          <p className="eyebrow eyebrow--brand">Read</p>
+          <h1>{versions.length > 0 ? 'Your book, ready to read' : 'The book is not published yet'}</h1>
+          <p className="lede">
+            {versions.length > 0
+              ? 'Choose a version, read it here or download the PDF. Every earlier version stays available.'
+              : 'It appears here as soon as the last chapter passes its checks.'}
+          </p>
+        </section>
 
         {error && <p className="panel panel--bad">{error}</p>}
 

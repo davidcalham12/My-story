@@ -251,12 +251,19 @@ export function InterviewForm(props: Props) {
 
   return (
     <>
-      <p className="eyebrow">A new novel</p>
-      <h1>Tell us about {who}</h1>
-      <p className="lede">
-        Ten minutes of answers and we write them a book. Nothing here is a test —
-        the page says what is still missing as you go.
-      </p>
+      <section className="hero">
+        <p className="eyebrow eyebrow--brand">A new novel</p>
+        <h1>Tell us about {who}</h1>
+        <p className="lede">
+          Ten minutes of answers and we write them a book. Nothing here is a test —
+          the page says what is still missing as you go.
+        </p>
+        <ol className="steps">
+          <li>The person, and the memories only they would recognise.</li>
+          <li>The story, its limits, and what it must include.</li>
+          <li>Before we start: check the answers, see the cost, order.</li>
+        </ol>
+      </section>
       <p>
         <button type="button" onClick={props.onLoadExample}>
           Fill this in with the example brief (01-hijo)
