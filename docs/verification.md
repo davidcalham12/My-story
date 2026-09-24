@@ -1140,6 +1140,40 @@ and read as pre-loop history in the panel.
 `conformance.json` (written by v2 and only by v2) is skipped and named on
 stderr. Left: a v2 run that died before writing the marker (SPEC-008 §4).
 
+### 3.23 The recipient's alias is put in by code, after the gate
+
+**What is not verified:** that the gate judged the book the reader gets. The
+organisation's privacy policy makes the orchestrator write the recipient's alias
+as `[NOMBRE_ANONIMIZADO]` in the Bible, the outline and the prose (measured on
+run `02412b7fe29e`: 135 occurrences by chapter 1). The owner chose to keep it
+(decision B, 2026-09-24): at publication `backend.publish.personalise` replaces
+the token with `recipient.alias` read from the stored brief. It is **mechanical**
+— a string replacement, no model — and the approved text is kept beside it as
+`chNN.anon.md`.
+**Why accepted:** the gate's six characteristics do not depend on which string
+names the protagonist, and the validators that do — `canonical_names`,
+`mandatory_facts`, `forbidden_words` — run *after* the replacement, on the
+substituted text, as does the PDF (`backend.publish.release`, tested in
+`test_personalise.py`). A side effect is privacy by design: no model is given
+the recipient's name.
+**Scope of damage:** a sentence where the alias reads worse than the token did
+(a possessive, a capital at a line start) — seen by nobody before the reader.
+**How we would find out:** the owner's reading (`human_review`) and the
+`visual_check` session, both on the substituted PDF.
+
+### 3.24 A unit that is stopped leaves no cost in the ledger
+
+**What is not verified:** the cost of a run or unit that is halted before its
+`result` event. `result` is the only measured total, and a stopped process
+never sends it; eval 01 (`8ab6c57af9f6`, halted by the operator after chapter
+1 on the owner's order) has `total_usd` **absent**.
+**Why accepted:** the budget ceiling does not rely on it: since `3aa0c43` it
+counts the maximum of what was reported and what was estimated.
+**Scope of damage:** a reported cost below what was spent, never a ceiling
+passed silently.
+**How we would find out:** the subscription's own usage page against the sum
+of `cost.json` files.
+
 ## 4. Code before agent
 
 **When a check can be done by a script, it is done by a script.** An agent judges
