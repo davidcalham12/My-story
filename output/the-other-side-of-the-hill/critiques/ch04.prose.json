@@ -1,0 +1,64 @@
+{
+  "critic": "prose",
+  "chapter": 4,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "fact-restated",
+          "severity": "high",
+          "quote": "The light was starting to change color, though. It was still afternoon, still hours of daylight left, but the quality of it was shifting. Golden instead of white.",
+          "claim": "The third statement that the light is changing, after the sun s slow tilt west and the bright hammer of midday going golden. It stops the climb dead.",
+          "fix": "Cut it and keep the long shadows line, which is a physical effect and does new work.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "word-echo",
+          "severity": "low",
+          "quote": "his ears had stayed happy all the way up, and they stayed happy now",
+          "claim": "stayed happy twice inside eleven words; read aloud it stutters",
+          "fix": "say it once",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "1 major, 1 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x1 - 1x1 = 7",
+      "major": 1,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "both findings resolved and no new defect created. The critic checked the two risks the patches introduced - a paragraph left hollow by the cut, and Rosa saying tomorrow twice - and found the first reads naturally into the shadow image and the second sits in character within her fast rambling speech.",
+      "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

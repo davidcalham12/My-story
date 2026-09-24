@@ -1,0 +1,24 @@
+{
+  "critic": "continuity",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "invented-canon",
+          "severity": "high",
+          "quote": "The village fountain was in the center of the plaza, under a dusty linden tree that had been old when [NOMBRE_ANONIMIZADO] s grandmother was young.",
+          "claim": "Introduces a grandmother of [NOMBRE_ANONIMIZADO] s on this side of the hill. The Bible s family entry is his parents plus Marcos the grandfather; the only grandmother in the book is Elena s, on the far side, unmet.",
+          "fix": "Cut the genealogy: a dusty linden tree that had been old for as long as anyone could remember.",
+          "reference": "bible/world.md, People and Groups, [NOMBRE_ANONIMIZADO] s Family"
+        }
+      ],
+      "notes": "one high-severity invented-canon finding; 10-2=8. Jar arithmetic verified: 6 stones taken from 43. Fossil, notebook and Bruno habits all match canon; the far side stays unknown."
+    }
+  ]
+}

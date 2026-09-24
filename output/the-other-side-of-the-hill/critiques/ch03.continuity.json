@@ -1,0 +1,21 @@
+{
+  "critic": "continuity",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "no invented relatives. The afternoon-shadow phrase describes where the paint has faded, a fixed feature, not the current hour, so the morning scene is consistent. Observatory two summers old and the stars pencilled at eight against an age of ten: consistent. Marcos gives away nothing about the far side."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored after three literal patches. Observatory still two summers old after the patch 3 rewording; Marcos substantively unchanged; no relative introduced; no name altered; nothing new asserted about the hill."
+    }
+  ]
+}

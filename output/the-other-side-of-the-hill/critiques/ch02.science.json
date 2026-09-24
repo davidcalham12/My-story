@@ -1,0 +1,15 @@
+{
+  "critic": "science",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "all seven rules checked. The mother restates R1 and her restatement matches it exactly, including the correction that the deadline is the touch and not the approach. R2 is explicitly not triggered and describing the absence of a trigger is not a breach. R3 R4 R6 R7 not engaged."
+    }
+  ]
+}

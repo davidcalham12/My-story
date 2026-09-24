@@ -1,0 +1,37 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "word-repetition",
+          "severity": "low",
+          "quote": "The light through his window was already the color of honey, which meant it was late enough that the kitchen would be warm and his grandmother might have left honey on the table with the bread.",
+          "claim": "honey appears twice in one sentence, once as the colour of light and once as the thing on the table; in a read-aloud this draws attention to the word rather than the picture",
+          "fix": "keep the honey-coloured light and name the thing on the table differently",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "0 major, 1 minor. The critic also asserted a mechanical verbatim repetition; check_prose counted 0 mechanical defects, so the critic assertion was dropped rather than charged.",
+      "why": "10 - 3x0 - 2x0 - 1x1 = 9, computed by backend.chapters.score_prose",
+      "major": 0,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

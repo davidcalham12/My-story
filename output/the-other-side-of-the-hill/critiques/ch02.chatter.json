@@ -1,0 +1,14 @@
+{
+  "critic": "chatter",
+  "chapter": 2,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

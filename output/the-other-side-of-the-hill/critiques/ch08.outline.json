@@ -1,0 +1,30 @@
+{
+  "critic": "outline",
+  "chapter": 8,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "all three beats present and in order; Marcos s answer word for word the outline s; the ending shows the love rather than naming it; M2 lands as love with the cost to Marcos visible, though asserted twice in narrator voice as well as dramatised."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [
+        {
+          "kind": "promise-weakened",
+          "severity": "high",
+          "quote": "He met his eyes-the grey ones that had been waiting for this moment since before he was born. Neither of them looked away.",
+          "claim": "The outline asks for him seeing only love there; with the naming clause cut, the love now depends entirely on the reader s inference.",
+          "fix": "restore a shorter concrete signal of the love without the abstraction",
+          "reference": "outline.md this entry Ends on"
+        }
+      ],
+      "notes": "beats unchanged and still in order. The critic raised one HIGH finding its scoring rule does not charge: cutting the clause that named what he saw in his grandfather s eyes has made the love implicit rather than demonstrated, and it judged the emotional content materially reduced. ORCHESTRATOR ARBITRATION: this is in direct opposition to the prose critic, which charged that same clause as the book telling a child what to feel at the moment it should show him - the identical disagreement these two critics had over chapter 3 s ending. The prose reading was followed and the outline critic s objection is recorded open rather than acted on. A reader deciding which was right should read the last two lines of chapter 8 and judge."
+    }
+  ]
+}

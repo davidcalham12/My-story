@@ -1,0 +1,30 @@
+{
+  "critic": "outline",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "three beats present and in order; ending delivered on the empty hands and the day ahead; M2 planted - the reader finishes certain Marcos knows something specific and has chosen silence, and reads the silence as care."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [
+        {
+          "kind": "promise-not-planted",
+          "severity": "high",
+          "quote": "He understood: this was all Marcos would say, and the answer was his own to find.",
+          "claim": "The compressed beat 3 keeps both understandings but drops the reasoning that made Marcos s withholding read as love rather than evasion, which M2 requires.",
+          "fix": "Keep the compression and add a single phrase naming the care, without restoring the abstract moralising the prose critic charged.",
+          "reference": "bible/mysteries.md M2; outline chapter 3 Plants"
+        }
+      ],
+      "notes": "rescored after the patches. All three beats still present and in order; beat 3 still delivers both halves in its compressed single sentence; the ending is unchanged. The critic raised one high-severity finding against M2 which its scoring rule (3 per missing beat, 1 per beat out of order) does not charge, so the score stands at 10 and the finding is recorded open. ORCHESTRATOR ARBITRATION: UPHELD as a real observation and OVERRULED as grounds to redraft. It is in direct opposition to the prose critic, which scored the very same passage a major defect for explaining its own meaning. Both readings are defensible and the two critics now pull opposite ways on one paragraph, which is the deadlock the FLOW-3 audit exists to prevent and which arrived here anyway. The chapter reached the threshold and decide returned accept."
+    }
+  ]
+}

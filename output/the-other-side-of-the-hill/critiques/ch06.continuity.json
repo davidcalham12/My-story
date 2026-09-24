@@ -1,0 +1,46 @@
+{
+  "critic": "continuity",
+  "chapter": 6,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "invented-canon",
+          "severity": "high",
+          "quote": "Rosa would be clearing the other dishes now, and his father would be reading in the window, and Marcos would be smoking his pipe in the doorway",
+          "claim": "Rosa is the baker s daughter and his friend, not a member of his household and not a servant. Putting her at his family s table clearing up makes her one.",
+          "fix": "His mother clears the dishes; Rosa is at the bakery, where the ovens are going for the feast.",
+          "reference": "bible/characters.md Rosa"
+        },
+        {
+          "kind": "spatial",
+          "severity": "high",
+          "quote": "three valleys away",
+          "claim": "He walked from his own garden to this kitchen between breakfast and sunset over ONE hill. Three valleys makes the journey impossible.",
+          "fix": "the other side of the hill",
+          "reference": "bible/world.md, the hill behind the house"
+        },
+        {
+          "kind": "self-contradiction",
+          "severity": "high",
+          "quote": "could see Bruno s scruffy back moving ahead of them both",
+          "claim": "One sentence later Bruno moved between them both. He cannot be ahead of them and between them at once, and the timeline row says Bruno moving between them.",
+          "fix": "Bruno between them the whole way down.",
+          "reference": "bible/timeline.md Day 5 Dawn"
+        }
+      ],
+      "notes": "three high findings; 10-6=4"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "all three resolved. The two consecutive Elena speeches were checked and read as natural flow with his response implied, not as self-contradiction."
+    }
+  ]
+}

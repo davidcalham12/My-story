@@ -1,0 +1,21 @@
+{
+  "critic": "science",
+  "chapter": 4,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "R2 s first limb does fire in the plaza - Bruno whines AND presses, both words present - and I know. It s not fair. satisfies notice, weigh and speak aloud. The rule does not say what Bruno may be warning about and the critic correctly declined to invent a clause about it. R1 obeyed."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored rather than carried forward. Patch B removed the sentence stating how much daylight was left, so R1 s evidence was re-checked and survives in his own arithmetic at the stopping point and in the sun still above the horizon at the foot. R2 s second limb still untriggered; the decision remains the boy s."
+    }
+  ]
+}

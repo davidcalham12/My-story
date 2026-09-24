@@ -1,0 +1,30 @@
+{
+  "critic": "outline",
+  "chapter": 5,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "missing-beat",
+          "severity": "medium",
+          "quote": "[NOMBRE_ANONIMIZADO] opened his mouth to answer. Behind him, the light had changed.",
+          "claim": "Beat 4 requires the sun to touch the horizon as he takes the first step down toward her. He never steps down.",
+          "fix": "He starts down, and the light changes on him mid-movement.",
+          "reference": "outline chapter 5 beat 4"
+        }
+      ],
+      "notes": "10 - 1. All four beats present and in order, but beat 4 s trigger - taking the first step down toward her - never happens, so the sun touches the horizon while he stands still and the rule observes rather than interrupts. Ending action present but staged where the chapter has not brought them. M4 lands as a discovery."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "beat 4 trigger now present - he took the first step down the slope toward her, then the sun touched the horizon. Ending fully delivered: they are physically together when she takes Bruno s collar, and the chapter closes on her leading them both toward the light. M4 still landed and strengthened."
+    }
+  ]
+}

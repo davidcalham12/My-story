@@ -1,0 +1,80 @@
+{
+  "critic": "prose",
+  "chapter": 7,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "gesture-explained",
+          "severity": "high",
+          "quote": "That nod meant his father understood. That he had given [NOMBRE_ANONIMIZADO] the hill on one condition, and [NOMBRE_ANONIMIZADO] had kept it.",
+          "claim": "The nod already works. The paragraph tells the reader what to feel and ends by translating a wordless thing into words.",
+          "fix": "Cut the paragraph.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "fact-restated",
+          "severity": "high",
+          "quote": "and left his plate there like a promise: we are waiting. You still have a place.",
+          "claim": "The mother says it, the narrator explains it at length, and the colon spells it out a third time.",
+          "fix": "End at like a promise.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "word-echo",
+          "severity": "low",
+          "quote": "looking out into the dark, looking toward the hill and the invisible path beyond",
+          "claim": "looking twice in one clause",
+          "fix": "one looking",
+          "reference": "prose characteristic, minor"
+        },
+        {
+          "kind": "word-echo",
+          "severity": "low",
+          "quote": "put a hand on his shoulder, and [NOMBRE_ANONIMIZADO] could feel that his hand was shaking",
+          "claim": "hand twice in a short sentence and the second is ambiguous as to whose it is",
+          "fix": "make the second a pronoun",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "2 major, 2 minor; check_prose clean. The critic weighed whether three repetitions of I kept the rule were the book insisting or a frightened child insisting, and judged them the child. It did not flag them.",
+      "why": "10 - 3x0 - 2x2 - 1x2 = 4",
+      "major": 2,
+      "minor": 2,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "all four resolved and no new defect. The critic checked three seams the patches risked - the nod now running straight into Bruno s paragraph, the boy s speech carrying more in one breath, and whether the new last line lands or is cut off - and cleared all three. It noted the long speech is at the edge of what a ten-year-old says in one breath but marked that LATE, since it was equally true of the draft it had already scored.",
+      "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "critic": "continuity",
+  "chapter": 4,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "ORCHESTRATOR ARBITRATION. The critic first returned 6 on two high-severity findings and both were OVERRULED, after which the critic itself accepted the reasoning and recomputed to 10. (1) Rosa s He just keeps saying it s less interesting than I think was charged as misquoting her father, whose words are canonically less interesting than you think. It is not a misquote but correct reported speech: what he said to her as you is what she reports as I. (2) Tomorrow I do this alone was charged against the note that Rosa is wrong to think he WANTS to be alone; being alone and wanting to be are different, and the outline s Ends on commissions this line in these words. A finding against a line the outline requires is a finding against the commission."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "carried at 10 after arbitration; the attempt-2 patches introduce no canon facts."
+    }
+  ]
+}

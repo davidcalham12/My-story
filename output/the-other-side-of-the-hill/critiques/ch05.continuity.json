@@ -1,0 +1,30 @@
+{
+  "critic": "continuity",
+  "chapter": 5,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "spatial",
+          "severity": "high",
+          "quote": "The girl reached down and took Bruno by the collar with one small hand, certain and gentle.",
+          "claim": "Elena is in the yard across the valley, her voice distorted by a distance he cannot judge, and one sentence later her hand is on the dog s collar. No paragraph moves anybody across that distance.",
+          "fix": "Write the movement: she climbs to him, or he comes down the near slope, before she takes the collar.",
+          "reference": "the chapter s own geography, crest above and yard below"
+        }
+      ],
+      "notes": "one high spatial finding; 10-2=8. Timeline sequence afternoon to late afternoon to sunset holds; Elena twelve as canon; her pebble habit absent but absence is not contradiction."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "spatial contradiction resolved - he steps down, she climbs toward him, when she reached him they meet, and the three descend together. Elena s grandmother in dialogue is consistent with canon and does not touch the rule that [NOMBRE_ANONIMIZADO] has none."
+    }
+  ]
+}

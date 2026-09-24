@@ -1,0 +1,89 @@
+{
+  "critic": "prose",
+  "chapter": 6,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 4,
+      "findings": [
+        {
+          "kind": "joke-reported-not-told",
+          "severity": "high",
+          "quote": "It s called Captain Crunch, he said quickly, as if speed would help. I named it when I was eight. After a cereal.",
+          "claim": "The reader is told he is embarrassed and told the name is silly, and Elena is kind about it. The kindness lands; the joke does not. This is the one place in the novel where a laugh was available.",
+          "fix": "Put the comedy in Elena s reply - taking the name completely seriously is funnier than any joke he could make.",
+          "reference": "prose characteristic, major; and the commissioned tone, warm funny and a little brave"
+        },
+        {
+          "kind": "image-spent",
+          "severity": "high",
+          "quote": "she was still looking back at the hill as if she were reading its story, as if the earth had given up more than just a fossil and now she was reading what it meant",
+          "claim": "reading twice in one sentence, after two earlier uses and a turning something over three lines before. The image was specific when it belonged to her hands and the fossils; stretched over her mind and the hill and the earth it goes slack.",
+          "fix": "End on something concrete - the sun on the stones, her face, the hill.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "fact-restated",
+          "severity": "low",
+          "quote": "She didn t laugh-not in the bad way, not in any way at all.",
+          "claim": "not in any way at all already contains not in the bad way",
+          "fix": "one clause",
+          "reference": "prose characteristic, minor"
+        },
+        {
+          "kind": "fact-restated",
+          "severity": "low",
+          "quote": "it caught the stones of the path and the stones of the dry-stone wall that ran down the slope",
+          "claim": "the stones of repeats inside one clause",
+          "fix": "name the two things once",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "2 major, 2 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x2 - 1x2 = 4",
+      "major": 2,
+      "minor": 2,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "missing-reply",
+          "severity": "low",
+          "quote": "Does it crunch? she asked.",
+          "claim": "It is immediately followed by That s a good name, she said, so Elena asks a question and speaks again with no reply from him between. Created by the attempt-2 patch.",
+          "fix": "one short answer from him between the two lines",
+          "reference": "prose characteristic, minor; introduced by the attempt-2 patch"
+        }
+      ],
+      "notes": "all four resolved. The critic judged the joke now lands - Does it crunch? engages the silliness as charming rather than stupid, and a ten-year-old would laugh. One new minor created by that same patch.",
+      "why": "10 - 3x0 - 2x0 - 1x1 = 9",
+      "major": 0,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

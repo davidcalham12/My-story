@@ -1,0 +1,62 @@
+{
+  "critic": "continuity",
+  "chapter": 7,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 0,
+      "findings": [
+        {
+          "kind": "object-fact",
+          "severity": "high",
+          "quote": "and I had Captain Crunch so I left him there next to it as a sort of-I don t know. A trade.",
+          "claim": "He did not leave the fossil. It is his and it must be on his own shelf for the last chapter of the book to happen.",
+          "fix": "He set the two side by side and brought it home.",
+          "reference": "bible/world.md Places; outline.md final entry beat 3"
+        },
+        {
+          "kind": "timeline-math",
+          "severity": "high",
+          "quote": "We went up really early, before it was light",
+          "claim": "Canon has him setting out after breakfast with the sun already high.",
+          "fix": "after breakfast, whole day ahead",
+          "reference": "bible/timeline.md Day 4 Morning"
+        },
+        {
+          "kind": "character-behaviour",
+          "severity": "high",
+          "quote": "Bruno was calm the whole time",
+          "claim": "Bruno pressed against his leg and whined, and that is the moment the book turns on.",
+          "fix": "Bruno was frightened and pressed close, and they went on anyway.",
+          "reference": "outline.md climb entry beat 2; bible/world.md R2"
+        },
+        {
+          "kind": "invented-canon",
+          "severity": "high",
+          "quote": "and sleeping on a hearthstone",
+          "claim": "There is no hearth in that house; Bruno circled three times and slept in the kitchen corner.",
+          "fix": "the corner of a strange kitchen",
+          "reference": "bible/characters.md Bruno"
+        },
+        {
+          "kind": "object-fact",
+          "severity": "high",
+          "quote": "Elena has this fossil, a real fossil in a rock",
+          "claim": "Hers is a smooth pale spiral from the riverbed, a different object.",
+          "fix": "the spiral, pale as a river stone",
+          "reference": "outline.md previous entry beat 2"
+        }
+      ],
+      "notes": "five high findings; 10-10=0, floored at 0. Every one is [NOMBRE_ANONIMIZADO] telling his parents something the reader watched not happen."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "all five resolved. Captain Crunch unambiguously still his. The critic was asked whether giving Elena the striped stone breaks anything later and found it does not - nothing in canon requires that stone to stay with him, unlike the fossil."
+    }
+  ]
+}

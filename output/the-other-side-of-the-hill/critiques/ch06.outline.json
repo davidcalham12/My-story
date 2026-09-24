@@ -1,0 +1,21 @@
+{
+  "critic": "outline",
+  "chapter": 6,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "all three beats present and in order. M1 lands as wonder rather than anticlimax - the critic called the kitchen luminous and said the revelation is that the magic was always the attention itself. M3 lands with neither child explaining it. Ending exact."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored because two patches touched cited passages. Ending still delivers both halves of its image; M3 still lands without explanation and Elena s new line is banter rather than explanation; M1 still lands as wonder, now carried by accumulated detail rather than by the cut metaphor."
+    }
+  ]
+}

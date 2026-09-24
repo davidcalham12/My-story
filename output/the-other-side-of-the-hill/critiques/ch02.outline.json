@@ -1,0 +1,15 @@
+{
+  "critic": "outline",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "three beats present and in order. Beat 2 is delivered with the agency reversed - Bruno fetches the leash rather than [NOMBRE_ANONIMIZADO] placing it - which the critic judged a delivery variation rather than an absence, and the orchestrator upheld: the beat s content (leash at the kitchen door, three circles, settling, waiting) all happens. Ending delivered on Rosa s line with flour still on her sleeves. M1 planted as an unanswerable question via Rosa s father s deflection, with no hint of a particular person."
+    }
+  ]
+}

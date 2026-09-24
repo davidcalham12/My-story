@@ -1,0 +1,21 @@
+{
+  "critic": "science",
+  "chapter": 6,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "R1 is silent on when morning travel may begin and only constrains stopping at sunset, so the pale pre-dawn start is not a breach; the walk reaches full daylight. His plate was laid. His place was waiting. matches R5 word for word. R3 not engaged. Dispatched late: the orchestrator omitted this critic from the chapter s first parallel round and ran it separately rather than leave a characteristic unscored."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored after the patches. R5 line intact; R1 evidence for a daylight descent survives patch 3 and is stronger; neither limb of R2 triggered; Elena s new question is a query, not an offer, so R3 is still not engaged and her hands are explicitly empty."
+    }
+  ]
+}

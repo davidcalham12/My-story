@@ -1,0 +1,24 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "invented-canon",
+          "severity": "high",
+          "quote": "which meant it was late enough that the kitchen would be warm and his grandmother might have left honey on the table with the bread",
+          "claim": "The household in bible/characters.md is [NOMBRE_ANONIMIZADO], his mother, his father and Bruno, with Marcos the grandfather visiting. No grandmother exists on this side of the hill; the only grandmother in the book is Elena s, on the far side, unmet.",
+          "fix": "Remove the attribution: the kitchen would be warm and there would be honey on the table with the bread",
+          "reference": "bible/characters.md, canonical names and household"
+        }
+      ],
+      "notes": "one high-severity invented-canon finding; 10-2=8"
+    }
+  ]
+}

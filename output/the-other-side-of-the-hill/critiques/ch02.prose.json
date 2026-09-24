@@ -1,0 +1,37 @@
+{
+  "critic": "prose",
+  "chapter": 2,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "fact-restated",
+          "severity": "medium",
+          "quote": "Then I m coming too, Rosa said.",
+          "claim": "The chapter s closing line restates what Rosa has just said in Also I want to go. I want to see what s there, so the ending lands on a beat the reader has already been given.",
+          "fix": "Cut the earlier declaration and let the closing line be the only one, or let her stance and the pause carry the end.",
+          "reference": "prose characteristic, major"
+        }
+      ],
+      "notes": "1 major, 0 minor. check_prose found 0 mechanical defects.",
+      "why": "10 - 3x0 - 2x1 - 1x0 = 8, computed by backend.chapters.score_prose",
+      "major": 1,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

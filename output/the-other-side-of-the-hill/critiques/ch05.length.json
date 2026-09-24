@@ -1,0 +1,20 @@
+{
+  "critic": "length",
+  "chapter": 5,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 0,
+      "findings": [],
+      "notes": "772 words against a band of 900-1650"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

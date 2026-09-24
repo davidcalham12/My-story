@@ -1,0 +1,62 @@
+{
+  "critic": "continuity",
+  "chapter": 8,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 1,
+      "findings": [
+        {
+          "kind": "object-fact",
+          "severity": "high",
+          "quote": "the smooth stone Elena had given him",
+          "claim": "Elena gave him nothing; he gave her the striped stone.",
+          "fix": "his own stones",
+          "reference": "bible/characters.md"
+        },
+        {
+          "kind": "object-fact",
+          "severity": "high",
+          "quote": "She gave me-",
+          "claim": "same error, in his own mouth",
+          "fix": "She showed me-",
+          "reference": "bible/characters.md Elena"
+        },
+        {
+          "kind": "attribution",
+          "severity": "high",
+          "quote": "the pale spiral Clara had let him hold",
+          "claim": "The fossil is Elena s and Elena showed it to him.",
+          "fix": "Elena s fossil",
+          "reference": "outline.md previous entry beat 2"
+        },
+        {
+          "kind": "invented-canon",
+          "severity": "high",
+          "quote": "coming out into the yard in her apron",
+          "claim": "The apron and flour belong to Rosa, a different girl in a different place.",
+          "fix": "her hand over her eyes, looking up at the hill",
+          "reference": "bible/characters.md"
+        },
+        {
+          "kind": "object-fact",
+          "severity": "medium",
+          "quote": "He d been lost.",
+          "claim": "He was frightened of being lost and never was lost. The distinction is the whole of M4.",
+          "fix": "frightened of being lost, though he had not been",
+          "reference": "bible/mysteries.md M4"
+        }
+      ],
+      "notes": "four high and one medium; 10-9=1"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "all five resolved. LIMITATION RECORDED: this rescore was made on the diff plus the orchestrator s statement that the rest was unchanged, not on a fresh read of the whole draft. The critic has only Glob and cannot read a file, so every verdict it gives is on the text placed in its prompt; it also emitted a Glob result pointing at a different run s directory before answering, which is noise rather than a reading."
+    }
+  ]
+}

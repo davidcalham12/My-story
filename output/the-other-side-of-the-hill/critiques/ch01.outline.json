@@ -1,0 +1,15 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "all three beats present and in order; ending delivered on the smooth stone under the kitchen light; M3 planted through action and M4 planted without being stated"
+    }
+  ]
+}

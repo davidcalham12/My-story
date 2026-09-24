@@ -1,0 +1,32 @@
+{
+  "critic": "science",
+  "chapter": 8,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "rule-break",
+          "rule": "R6",
+          "clause": "he answers plainly and in one sentence",
+          "severity": "high",
+          "quote": "I have known Elena s house was there since before you were born. I wanted you to find it yourself, and you did.",
+          "claim": "Two sentences where the rule allows one.",
+          "fix": "Join them.",
+          "reference": "bible/world.md R6"
+        }
+      ],
+      "notes": "one high R6 finding: the second limb applies because he has been to the place, and it requires ONE sentence; the draft gives two. The critic correctly held that Marcos s later speech answers a different remark."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "R6 second limb now satisfied - one plain sentence, no story. ORCHESTRATOR ARBITRATION: the outline commissioned this answer in TWO sentences and R6 allows one, so outline and Bible were in direct conflict. The rule won, because it is canon and because the one-sentence plainness is the payoff the book was built toward; the outline s content survives the join. This conflict is one the FLOW-3 commission audit did not catch and should have."
+    }
+  ]
+}

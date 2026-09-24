@@ -1,0 +1,38 @@
+{
+  "critic": "outline",
+  "chapter": 7,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "beat-out-of-order",
+          "severity": "medium",
+          "quote": "His mother crossed the yard in three strides and pulled him against her. One hand went into his hair the way it did when he was small.",
+          "claim": "Beat 3 is the answer to his telling and here it happens before he has told them anything.",
+          "fix": "Keep the reflex, save the embrace for after.",
+          "reference": "outline.md this entry beats 2 and 3"
+        },
+        {
+          "kind": "ending-not-delivered",
+          "severity": "medium",
+          "quote": "And they did. They had all of it, now. The sun was fully up, and he was home, and there was time.",
+          "claim": "The chapter carries on past the required final image and closes on a summary about time.",
+          "fix": "End on her hand in his hair and the father s nod.",
+          "reference": "outline.md this entry Ends on"
+        }
+      ],
+      "notes": "10 - 1 for beat 3 out of order. All four elements of beat 2 delivered. The critic also observed in notes that the chapter does not end on the outline s image but carries two exchanges past it; the orchestrator raised that as a second finding on the sheet."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "both resolved. Beat 3 now sits after the telling - the arm grip on arrival is a reflex, and the hand in the hair is the pull-close, now the chapter s last line. The critic judged the ending delivered with the nod immediately preceding it."
+    }
+  ]
+}

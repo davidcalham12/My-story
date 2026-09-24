@@ -1,0 +1,15 @@
+{
+  "critic": "science",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 1,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "all seven rules checked; R1 restated approximately by the father in dialogue and the restatement is consistent with the rule; R5 sustained by supper at six o clock with the family sitting to it; R2 R3 R6 R7 not engaged by this chapter"
+    }
+  ]
+}

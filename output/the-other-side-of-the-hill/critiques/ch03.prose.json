@@ -1,0 +1,81 @@
+{
+  "critic": "prose",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 5,
+      "findings": [
+        {
+          "kind": "paragraph-advances-nothing",
+          "severity": "high",
+          "quote": "He was not doing any of this quickly. The morning was his, the tape was his, the lens was his. There was no rush in Marcos, and he moved through the world the way an old house moves through a storm",
+          "claim": "Marcos s unhurriedness is stated four ways in one paragraph after already being shown two paragraphs earlier.",
+          "fix": "Keep the lens and the thumbprint smear; keep one statement of the slowness, the concrete one.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "meaning-restated",
+          "severity": "high",
+          "quote": "but because some answers cannot be carried from one person to another like stones in a bag. They have to be walked toward and found. They have to be yours alone.",
+          "claim": "The narrator explains the chapter s meaning after the dialogue has already delivered it two lines earlier.",
+          "fix": "Keep the understanding, in his head, in one concrete sentence.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "word-echo",
+          "severity": "low",
+          "quote": "The cardboard observatory stood where it had stood for two summers",
+          "claim": "the phrase echoes itself inside six words, in the chapter s second sentence",
+          "fix": "same fact, one stood",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "2 major, 1 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x2 - 1x1 = 5",
+      "major": 2,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "abrupt-transition",
+          "severity": "medium",
+          "quote": "Marcos wiped it with the hem of his shirt, leaving a thumbprint smear, then wiped that away too. He moved through the world the way an old house moves through a storm",
+          "claim": "Patch 1 removed the clause that carried the reader from the action to the simile, so the leap from wiping a lens to a statement about his nature is now unmediated.",
+          "fix": "one short bridging clause between the two sentences",
+          "reference": "prose characteristic, major; introduced by attempt 2 patch 1"
+        }
+      ],
+      "notes": "All three attempt-1 findings resolved by the patches. One new major, caused by the patch itself: cutting the bridge left the action and the simile butted together. Not a late finding - it did not exist in attempt 1.",
+      "why": "10 - 3x0 - 2x1 - 1x0 = 8",
+      "major": 1,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

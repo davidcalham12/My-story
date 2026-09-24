@@ -1,0 +1,32 @@
+{
+  "critic": "science",
+  "chapter": 7,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "R1 stated correctly in his own mouth and his actions match. R5 obeyed on all three limbs. R2 not engaged by this chapter in the critic s first reading."
+    },
+    {
+      "iteration": 2,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "rule-violation",
+          "rule": "R2",
+          "clause": "he must notice, weigh, and speak aloud about",
+          "severity": "medium",
+          "quote": "I said to Bruno that I wasn t sure which way was back, and that was scary because he was trusting me, and I couldn t let him down, so we just-we just kept going forward because stopping didn t help.",
+          "claim": "In his retelling he does not verbalise that he recognised Bruno s pressing as the warning.",
+          "fix": "none applied - see the arbitration in notes",
+          "reference": "bible/world.md R2"
+        }
+      ],
+      "notes": "R5 still established on all three limbs after the shortening. R1 undisturbed. R3 not engaged by the gift of a stone. One medium R2 finding, OVERRULED BY THE ORCHESTRATOR and recorded rather than acted on: R2 governs what [NOMBRE_ANONIMIZADO] must do ON THE HILL when Bruno warns him, and he did it there - he stopped and spoke aloud to the dog, and that chapter scored 10 on this same rule. This chapter is him RETELLING the event to his parents days later. A rule about conduct does not also require the conduct to be re-enacted inside a later report of it, and reading it that way would make every summary of a past scene a fresh breach. The score is left as the critic returned it because it does not change the verdict."
+    }
+  ]
+}

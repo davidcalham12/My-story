@@ -1,0 +1,72 @@
+{
+  "critic": "prose",
+  "chapter": 8,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 5,
+      "findings": [
+        {
+          "kind": "book-explains-itself",
+          "severity": "high",
+          "quote": "It was Marcos admitting, in that single sentence, that sometimes a ten-year-old needs a direct answer, that circling isn t always enough",
+          "claim": "The narrator explains in adult abstractions what the scene has just delivered, handing the child a conclusion instead of a discovery.",
+          "fix": "Keep the plainness that angered him; cut the maxim.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "book-explains-itself",
+          "severity": "high",
+          "quote": "and found in them what had always been there: a man who believed in him so completely that he would let him be frightened to prove it.",
+          "claim": "The last line tells the child what to feel at the exact moment it should be showing him.",
+          "fix": "Show the gaze held.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "narrator-through-the-dog",
+          "severity": "low",
+          "quote": "That was Bruno s way of saying that things were confusing and frightening, but that he was staying right there anyway",
+          "claim": "Three translations of Bruno s behaviour in three paragraphs turn the dog into a device the narrator speaks through.",
+          "fix": "Keep the actions, cut two of the three translations.",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "2 major, 1 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x2 - 1x1 = 5",
+      "major": 2,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "both majors and the minor resolved; no new defect. The critic checked the two seams the cuts risked - whether the anger paragraph is now too bare and whether Neither of them looked away is too flat a last line - and cleared both, calling the new ending the right note to land on.",
+      "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

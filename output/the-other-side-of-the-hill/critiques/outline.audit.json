@@ -1,0 +1,74 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-24T15:41:18Z",
+  "verdict": "defects",
+  "violations": [
+    {
+      "chapter": 9,
+      "beat": 1,
+      "rule": "R5",
+      "clause": "supper is at the same time every night",
+      "severity": "high",
+      "claim": "CH9 B1 has the family eating 'all together at last', which under the outline's reading of R5 means nobody ate supper on the night of Day 4 while [NOMBRE_ANONIMIZADO] was on the far side of the hill. That satisfies the first limb of R5 and breaks the second: supper did not happen at its time that night.",
+      "fix": "R5 is restated so that both limbs can hold at once - the hour is fixed and the family begins without the absent, whose place is laid and whose meal is kept. Then Day 4's supper happened on time, [NOMBRE_ANONIMIZADO]'s did not, and CH9's 'all together at last' is true without contradiction.",
+      "arbitration": "UPHELD. The critic is right that the two limbs of R5 cannot both hold across Day 4 as the rule is currently worded, and the defect is in the rule rather than in the beat. Fixed in bible/world.md by its author rather than in the outline, because moving the beat would leave the same rule waiting to deadlock CH7."
+    }
+  ],
+  "ambiguities": [
+    {
+      "rule": "R5",
+      "clause": "No one eats supper until the whole family is home, and supper is at the same time every night",
+      "reading_a": "Supper is deferred until everyone is present; the fixed hour applies only to nights when everyone can be there.",
+      "reading_b": "Supper is at a fixed hour and does not wait; whoever is absent does not eat.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD. Both readings are defensible from the sentence and they contradict each other across CH7 and CH9, which is the shape of deadlock this check exists to catch. Neither reading is adopted whole: the rule is restated so the hour is fixed AND the absent are waited for in the only way a family actually can - a place laid and a plate kept.",
+      "applied": "worldbuilder redrafts R5 to state the fixed hour, that the family begins at it, and that an absent member's place is laid and meal kept until they are home."
+    },
+    {
+      "rule": "R6",
+      "clause": "will answer a direct question honestly, but only if [NOMBRE_ANONIMIZADO] asks it aloud and is prepared to hear the answer",
+      "reading_a": "Marcos must answer the content of the question directly; a truthful evasion is a breach.",
+      "reading_b": "Marcos must be honest, but a story that circles the truth satisfies the rule.",
+      "outline_assumes": "b",
+      "arbitration": "UPHELD and decisive. CH3 is built on reading b and CH8 is built on reading a, so under one reading CH3 cannot pass and under the other CH8 is unearned. The rule must name the condition that separates them, which it already gestures at and does not define: 'prepared to hear the answer'.",
+      "applied": "worldbuilder redrafts R6 so the condition is the discriminator - Marcos answers in a story while the question is asked out of curiosity, and answers plainly the first time it is asked by someone who has been to the place and can bear the answer. CH3 and CH8 then both obey the same rule."
+    },
+    {
+      "rule": "R2",
+      "clause": "when the dog stops and turns back, [NOMBRE_ANONIMIZADO] must take that seriously",
+      "reading_a": "He must turn back with Bruno; the dog's judgement binds.",
+      "reading_b": "He must not ignore it, but may go on once he has genuinely weighed it.",
+      "outline_assumes": "neither - CH5 B2 has Bruno whine and move close, which is not the rule's trigger at all",
+      "arbitration": "UPHELD. The critic is right that the trigger is never actually pulled in the outline, and that is worse than a breach: the rule sits over the whole climb with no scene deciding what it means, so two critics will read CH5 two ways. It also matters to the book - a dog whose warning binds absolutely makes the climb impossible, and one whose warning means nothing makes Bruno a prop, which promise 1 forbids.",
+      "applied": "worldbuilder separates the two signals in R2: whining and pressing close is a warning to be heeded and may be gone past; stopping dead and turning back is a stop that binds, and [NOMBRE_ANONIMIZADO] goes no further."
+    },
+    {
+      "rule": "R1",
+      "clause": "once the sun touches the horizon, he must have come home or stopped to wait for daylight",
+      "reading_a": "He must already be in one of those two states at the instant the sun touches the horizon.",
+      "reading_b": "He must reach one of them during the fall of the light; a grace period is allowed.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD in part, OVERRULED on the second half. The touch-of-horizon instant is the deadline and reading a stands - the outline assumes it and CH5 B4 meets it. The critic's further question, whether a stop caused by Elena counts as his stopping, is the real ambiguity: it must, or R1 rewards a boy who freezes and punishes one who is told to stay put, which is the opposite of the book's argument about bravery.",
+      "applied": "worldbuilder states in R1 that what the rule requires is that he is no longer travelling when the sun touches the horizon, however he came to stop, and that stopping on the far side is obedience to R1 and not a breach of it."
+    },
+    {
+      "rule": "R4",
+      "clause": "When the sun is fully down, the rules of moving and seeing change",
+      "reading_a": "Moving in full dark is forbidden or beyond him.",
+      "reading_b": "Moving in full dark is possible but different - disorienting, slow, frightening.",
+      "outline_assumes": "neither",
+      "arbitration": "UPHELD. A rule that says the rules change without saying what they change to cannot be applied by a critic or obeyed by a writer, and CH5, CH6 and CH9 all touch the dark. This is the one rule in the file that is currently unevaluable.",
+      "applied": "worldbuilder redrafts R4 to name what changes: distance stops being judgeable, a known path stops being findable, and a person who moves anyway gets further from where they meant to be - which is also the plain statement of what M4 says [NOMBRE_ANONIMIZADO] is really afraid of."
+    },
+    {
+      "rule": "R7",
+      "clause": "a person calling from the other side sounds both nearer and farther than she truly is",
+      "reading_a": "A figure of speech about how hills carry sound.",
+      "reading_b": "A rule with a consequence - a voice on the hill cannot be used to judge distance.",
+      "outline_assumes": "b, in CH5 B4",
+      "arbitration": "OVERRULED as a finding against the outline; recorded because it is the one rule the audit did not raise and CH5 B4 rests on it. Reading b is the only one that makes R7 a rule rather than a description, and CH5 B4 already uses it correctly: Elena's call tells [NOMBRE_ANONIMIZADO] she is there and tells him nothing about how far. No redraft required.",
+      "applied": "none - the outline already obeys the reading that makes the rule checkable."
+    }
+  ]
+}

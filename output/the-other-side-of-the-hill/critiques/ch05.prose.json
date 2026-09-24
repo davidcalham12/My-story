@@ -1,0 +1,89 @@
+{
+  "critic": "prose",
+  "chapter": 5,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 3,
+      "findings": [
+        {
+          "kind": "dialogue-belongs-to-no-one",
+          "severity": "high",
+          "quote": "I m frightened. Not of the dark. Of being lost here. Of not knowing the way back down and not being able to bring you home.",
+          "claim": "Three parallel grammatically complete clauses in the right order: the narrator s summary of a child s psychology, not a frightened child.",
+          "fix": "Break it into fragments; let the real fear arrive last and sideways.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "fact-restated",
+          "severity": "high",
+          "quote": "It was not the dark he was afraid of.",
+          "claim": "The discovery lands here and is then said again in the speech immediately after. The quoted line is the good one; the speech repeats it.",
+          "fix": "Keep the line; make the speech add what the narration did not.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "dialogue-belongs-to-no-one",
+          "severity": "high",
+          "quote": "We can t come down, the girl called, and her voice came both nearer and farther still. It s not safe to come down now. You ll have to stay.",
+          "claim": "Assured, complete and informative - anyone who knew the rules could say it. Elena is twelve and speaks carefully and slowly as if testing each word.",
+          "fix": "Shorter, broken where she finds the word, asking rather than instructing.",
+          "reference": "bible/characters.md Elena"
+        },
+        {
+          "kind": "fact-restated",
+          "severity": "low",
+          "quote": "but he did not stop. He did not refuse.",
+          "claim": "the two sentences say nearly the same thing",
+          "fix": "say it once",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "3 major, 1 minor; check_prose clean. The critic was also asked for a third array naming where the chapter was THIN, which is not charged against the score and which supplied the word budget for the redraft: the climb in his body 120, the breakthrough 100, the rule arriving 80, the arrival at the house 130.",
+      "why": "10 - 3x0 - 2x3 - 1x1 = 3",
+      "major": 3,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "incomplete-clause",
+          "severity": "low",
+          "quote": "One foot, then the other. Bruno stayed pressed against him, his breath quick and anxious, but forward.",
+          "claim": "but forward has no verb, so the sentence reads as unfinished. Created by the attempt-2 patch, not present in attempt 1.",
+          "fix": "Forward. as its own sentence, or but pressed forward.",
+          "reference": "prose characteristic, minor; introduced by the attempt-2 patch"
+        }
+      ],
+      "notes": "all three majors resolved. The fix for the attempt-1 minor introduced a new one: but forward. has no verb. The critic checked the two seams the patches risked - Elena s unanswered question and the legs described twice - and cleared both.",
+      "why": "10 - 3x0 - 2x0 - 1x1 = 9",
+      "major": 0,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": [
+          "duplicate-sentence",
+          "heading-without-a-blank-line",
+          "echoed-opening"
+        ]
+      }
+    }
+  ]
+}

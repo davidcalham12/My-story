@@ -1,0 +1,21 @@
+{
+  "critic": "science",
+  "chapter": 3,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "R2 trigger requires whining AND pressing; Bruno presses without whining, so the trigger is not met and no spoken response is owed. R6 satisfied on both halves: Marcos tells the truth and circles it, and holds the story form even when challenged directly."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored after the patches. Patch 2 shortened only the narration of the boy s understanding and left every line of Marcos s dialogue untouched, so R6 still holds. R3 not engaged."
+    }
+  ]
+}

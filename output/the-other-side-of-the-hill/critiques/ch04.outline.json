@@ -1,0 +1,30 @@
+{
+  "critic": "outline",
+  "chapter": 4,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "missing-beat",
+          "severity": "high",
+          "quote": "Well, I can t come today.",
+          "claim": "Beat 1 requires Rosa to establish she cannot come TOMORROW, the day of the climb. Saying she cannot come today establishes only that she is busy this afternoon, which the reader already assumes. The promise she made at the end of chapter 2 is then never paid anywhere in the book.",
+          "fix": "She says she cannot come tomorrow, and the bakery s claim on her lands on tomorrow.",
+          "reference": "outline chapter 4 beat 1"
+        }
+      ],
+      "notes": "10 - 3 for beat 1 missing. Beats 2 and 3 present and in order, agency correct, ending delivered."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "beat 1 now delivered: Well, I can t come tomorrow, with the ovens going tomorrow for the feast. Read against the last line, a reader now finishes the chapter knowing where Rosa will be on the day of the climb and why. Beats 2 and 3 and the ending unaffected."
+    }
+  ]
+}

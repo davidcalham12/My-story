@@ -1,0 +1,21 @@
+{
+  "critic": "science",
+  "chapter": 5,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "R2 first limb fires and all three requirements are met - notice, weigh, speak aloud - and the second limb is correctly untriggered. R1 obeyed and the draft s reading of it is right. The critic additionally raised an AMBIGUITY it was asked for: whether moving to shelter after the deadline is travelling. Arbitrated by the orchestrator on canon - the timeline row for Day 4 sunset says Elena invites him and Bruno to shelter, so going to shelter is the stop R1 requires. Recorded as an ambiguity found, not as a finding against the draft."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "rescored under the arbitration. R2 first limb still satisfied by the rewritten speech; second limb still untriggered although the explicit negation was cut; R1 compliant; R7 correct - her voice is distorted while she calls across the valley and undistorted once she has climbed to him."
+    }
+  ]
+}
