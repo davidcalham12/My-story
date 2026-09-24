@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "profile": "tiny",
+
+  "novel": {
+    "chapters": 3,
+    "words_per_chapter": { "target": 400, "min": 300, "max": 550 },
+    "lines_per_chapter": { "max": 70 },
+    "chars_per_line": { "max": 90 },
+    "paragraphs_per_chapter": { "min": 4, "max": 12 },
+    "sentences_per_paragraph": { "max": 6 },
+    "pov": "third-limited",
+    "tense": "past"
+  },
+
+  "bible": {
+    "world_max_words": 350,
+    "characters_max": 3,
+    "characters_max_words_each": 80,
+    "timeline_max_events": 8,
+    "mysteries_max": 3,
+    "outline_beats_per_chapter": { "min": 2, "max": 4 }
+  },
+
+  "context": {
+    "prior_summary_max_words": 120,
+    "include_bible_files": ["world.md", "characters.md", "timeline.md", "mysteries.md"],
+    "include_full_outline": false
+  },
+
+  "quality_gate": {
+    "threshold": 8,
+    "max_revisions": 2,
+    "critics": ["continuity", "science", "length"],
+    "on_exhausted": "accept_with_warnings"
+  },
+
+  "engine": {
+    "name": "mock",
+    "model": "claude-opus-5",
+    "max_tokens_per_call": 1500,
+    "temperature": 0.7
+  },
+
+  "budget": {
+    "max_cost_usd": 2.0,
+    "max_total_tokens": 200000
+  },
+
+  "outputs": {
+    "formats": ["markdown", "pdf"],
+    "markdown": {
+      "single_file": true,
+      "filename": "book.md",
+      "include_synopsis": true,
+      "include_bible_appendix": false,
+      "chapter_heading_level": 2
+    },
+    "pdf": {
+      "filename": "book.pdf",
+      "page_size": "A5",
+      "font_size_pt": 11,
+      "line_spacing": 1.3,
+      "margins_mm": 18,
+      "chapter_starts_new_page": true,
+      "page_numbers": true,
+      "title_page": true
+    }
+  }
+}

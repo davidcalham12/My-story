@@ -238,6 +238,10 @@ PLAN-001, que es mejor por estar hecho con el código delante). **El dueño debe
 confirmar** que la entrega es `StoryMaker` y, si quiere, borrar `My-story` o
 dejarlo como histórico. Lo pregunto yo.
 
+> **Confirmado (2026-09-24).** El dueño decidió que `My-story` lleve todo: es
+> una copia completa de `StoryMaker` (fusionada conservando su historia) y lo que
+> tenía antes está en `historico/`. Cada push va a los dos repositorios.
+
 ### 8. Recordatorio de calendario
 
 El vídeo lo graba el dueño: la demo del cambio del lector (E8) tiene que estar
