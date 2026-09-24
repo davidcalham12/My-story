@@ -20,7 +20,7 @@ from backend.main import app
 from backend.runs import conductor as C
 from backend.runs import router as runs_router
 from backend.runs import service as S
-from backend.runs.service import RunService
+from backend.runs.service import Refused, RunService
 
 from backend.tests.test_conductor import FakeProcess, result_line, turn
 
@@ -159,8 +159,12 @@ def test_the_original_launch_is_segment_one(db, tmp_path):
 
 def test_the_hand_made_resume_block_becomes_segment_two(db, tmp_path, argv):
     """The example novel's `cost.json` carries its first run and a resume that
-    was recorded by hand (spec §8). Those are its segments one and two."""
-    run_dir = _make_run(db, tmp_path, upto=2, halted=None, stage="complete")
+    was recorded by hand (spec §8). Those are its segments one and two. Its
+    budget is the exam profile's (60, so the per-novel cap is 120 > 74.20)."""
+    exam = _snapshot(budget={"max_cost_usd": 60.0, "max_calls": 500,
+                             "novel_ceiling_multiple": 2})
+    run_dir = _make_run(db, tmp_path, upto=2, halted=None, stage="complete",
+                        snapshot=exam)
     (run_dir / "cost.json").write_text(json.dumps({
         "total_cost_usd": 74.2047088, "provenance": "measured",
         "first_run_usd": 53.174548899999984,
@@ -212,6 +216,25 @@ def test_every_continuation_gets_the_profiles_ceiling_fresh(db, tmp_path, argv, 
     assert seg["kind"] == "continue"
     assert seg["ceiling_usd"] == pytest.approx(25.0)
     assert seg["ceiling_by"] == "profile"
+
+
+def test_continue_is_refused_once_the_novel_has_spent_its_per_novel_cap(db, tmp_path, argv):
+    """SR-05, the owner's choice (2026-09-24, "Tope automático por novela"):
+    no figure is asked, but a novel that has spent budget.novel_ceiling_multiple
+    x its profile's ceiling (2 x 25 = 50 here) is not continued again, and the
+    reason says so. Nothing is launched."""
+    _make_run(db, tmp_path, halted=("budget", "spent $50.10"), upto=3, spent=50.1)
+
+    with pytest.raises(Refused, match="50"):
+        _svc(db, tmp_path).resume(RUN_ID, _wait=True)
+    assert argv == []
+
+
+def test_just_under_the_per_novel_cap_continues(db, tmp_path, argv):
+    _make_run(db, tmp_path, halted=("budget", "spent $49"), upto=3, spent=49.0)
+
+    _svc(db, tmp_path).resume(RUN_ID, _wait=True)
+    assert argv
 
 
 def test_novaforge_budget_still_lowers_the_continuations_ceiling(db, tmp_path, argv):

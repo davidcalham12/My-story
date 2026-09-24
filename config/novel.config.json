@@ -110,9 +110,11 @@
   "_comment_orchestration": "SPEC-EXAM-006. Who conducts FLOW-4. `claude` (the default) is a Claude Code orchestrator per chapter unit reading units/chapter.md; `python` is backend/chapters/loop.py, which calls each agent as its own process and applies the gate in code. `python` needs the conductor: with NOVAFORGE_ORCHESTRATOR=single a run is refused at start. `bible_critic` makes the loop dispatch bible-critic for continuity, science and outline instead of the three separate critics.",
   "orchestration": { "chapter_loop": "claude", "bible_critic": false },
   "_comment_budget": "Enforced, measured on the stream (SPEC-007 FR-BUD-1/4, PLAN-007 6.5): the profile's max_cost_usd is passed to claude -p as --max-budget-usd and watched by the backend; the call that crosses it is the last one. NOVAFORGE_BUDGET can only lower it. tiny was 5.0 against a measured $18.82 and is 25.0 since PLAN-007 (P-1, approved with the plan). max_calls is still advisory.",
+  "_comment_novel_ceiling_multiple": "SR-05, the owner's choice (2026-09-24, \"Tope automático por novela\"): Continue asks for no figure and each continuation gets the profile's ceiling fresh, so a novel is not continued again once what it has spent (the known segments) reaches this multiple of the profile's ceiling.",
   "budget": {
     "max_cost_usd": 25.0,
-    "max_calls": 500
+    "max_calls": 500,
+    "novel_ceiling_multiple": 2
   },
   "outputs": {
     "formats": [

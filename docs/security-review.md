@@ -37,7 +37,7 @@ further step; **low** = limited impact or needs an unlikely precondition;
 | SR-02 | prompt injection | medium | CONFIRMED | the orchestrator's allowlist includes `Bash(python *)` and `Bash(node *)`, so a steered orchestrator can run arbitrary code |
 | SR-03 | prompt injection | low | CONFIRMED | the reader-change `to` (and the old fact text) is interpolated into the chapter-unit prompt |
 | SR-04 | path traversal | medium | CONFIRMED | `profile` from the request body is a filename: `../` escapes `config/profiles/` and any `*.json` can become the run's config, budget included |
-| SR-05 | budget | medium | CONFIRMED | `POST /api/runs/{id}/resume` starts each resume with a fresh budget: a $1.00 ceiling allowed $3.60 in a local check |
+| SR-05 | budget | medium | MITIGATED 2026-09-24 | `POST /api/runs/{id}/resume` starts each resume with a fresh budget: a $1.00 ceiling allowed $3.60 in a local check. The owner keeps the fresh ceiling per continuation (SPEC-007 §8) and adds a per-novel cap: Continue is refused once the known spend reaches `budget.novel_ceiling_multiple` (2) × the profile's ceiling |
 | SR-06 | budget | low | CONFIRMED | the reader change and the judge spend outside the run's ceiling and outside the queue of one |
 | SR-07 | orphans | low | CONFIRMED | red-team cases 9 and 13: the shutdown hook covers a graceful stop only; the startup sweep does not check the pid |
 | SR-08 | PII | medium | CONFIRMED | the recipient alias is in the premise every orchestrator reads, contradicting "no model is given the recipient's name" |
@@ -168,6 +168,8 @@ to the local API (SR-04, SR-05).
   `CONFIG/"profiles"`. Add a test that `../novel.config` is a 422.
 
 ### SR-05 — Resume restarts the budget from zero
+
+**Decision (2026-09-24, the owner: "Tope automático por novela").** Each continuation keeps the profile's ceiling fresh (SPEC-EXAM-007 §8: no figure is asked), and a per-novel cap bounds the total: `budget.novel_ceiling_multiple` (2) × the profile's ceiling, counted over the novel's known segments. A segment with no measured figure adds nothing, so the sum is a floor — declared. Tests: `test_continue_is_refused_once_the_novel_has_spent_its_per_novel_cap`, `test_just_under_the_per_novel_cap_continues`.
 
 - **Area:** budget/DoS. **Severity:** medium. **Status:** CONFIRMED.
 - **Where:** `backend/runs/service.py:262-298` (`resume`), `:300-336`

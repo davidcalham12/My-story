@@ -516,6 +516,19 @@ class RunService:
                               "profile or its snapshot, and a run never starts "
                               "without one") from None
             ceiling_by = "profile"
+            # SR-05: a per-novel cap, so pressing Continue again and again is not
+            # an unbounded bill. Known segments only — an absent one adds
+            # nothing it cannot prove, so the sum is a floor (declared).
+            multiple = (cfg.get("budget") or {}).get("novel_ceiling_multiple")
+            profile_ceiling = (cfg.get("budget") or {}).get("max_cost_usd")
+            known = sum(float(seg["total_usd"]) for seg in prior
+                        if seg.get("total_usd") is not None)
+            if multiple and profile_ceiling and known >= multiple * profile_ceiling:
+                raise Refused(
+                    f"this novel has already spent ${known:.2f}, which reaches its "
+                    f"per-novel cap of ${multiple * profile_ceiling:.2f} "
+                    f"({multiple} x the profile's ${profile_ceiling:.2f}); it is not "
+                    "continued again")
 
             if not read_repo.segments(self.conn, run_id):
                 # Recorded before segments existed: write the ones its row and
