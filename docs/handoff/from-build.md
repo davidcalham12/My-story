@@ -111,3 +111,14 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
 - **Finding:** the Haiku agents are ~4 % of the novel's bill; the orchestrator is the rest.
 - Langfuse re-exported: novel 2 traces / 50 spans / 125 scores; evals 17 and 15 spans.
 - Not included: the failed v3 attempt's 7.52 USD (measured, `dist/v3/logs`), since it is no version.
+
+## Build session — 2026-09-24, 21:08 UTC · manual measure: v3 publication blocked
+
+- The v3 process (`backend.versions.change`, launched 20:3x UTC on Sonnet, 25 USD) runs the
+  old code: it would have published v3 on its own when ch10 passed, with ch03 promoted
+  **without** fact 36 (0 mentions of the observatory).
+- **Manual measure, 21:08 UTC:** a sentinel file at
+  `output/the-other-side-of-the-hill/dist/v3/novel.html`. `write_version` opens that path
+  with mode `"x"`, so publication fails **before** a `versions` row is written. To be removed
+  when ch03 is redone under `e0b7c38` (the owner's "Rehacer el cap. 3 con control").
+- Measured so far: v3 ch03 4.24 USD · 80 turns · 19.5 min (Sonnet 3.88 + Haiku 0.36).
