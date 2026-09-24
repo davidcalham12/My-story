@@ -1,7 +1,7 @@
 # Eval results
 
 FLOW-0 over the five committed briefs, read from the code that decides
-it, 2026-09-24 15:27 UTC. Profile for the novel half: `eval`.
+it, 2026-09-24 15:33 UTC. Profile for the novel half: `eval`.
 
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
@@ -58,16 +58,15 @@ worth, and it is data from that moment on.
 Every figure above is FLOW-0 and is **measured**: it is the output of
 `backend/brief/domain.py` on the committed fixtures, at no cost.
 
-The columns a novel would fill are **absent**, not zero:
+The novel half below is read from the `validations` table, one row per
+validator per run (`python -m backend.publish.record_all`). A cell that
+says `not run` was not run; a missing run is **absent**, not zero.
 
-- whether the forbidden terms stayed out of the prose
-- whether every mandatory fact reached the book
-- whether the gate's six characteristics passed
+Runs start from the stored brief (`POST /api/runs {brief_id}`), so the
+premise is composed by the product, not by this script.
 
-Nobody has looked, so nothing is claimed. `--novel <id>` looks, at up to
-$25 a brief on the `eval` profile.
+## Novel half
 
-And one gap this tool made visible rather than papered over: **nothing
-in the product turns a brief into a run.** The premise for `--novel` is
-composed by this script, which is why the eval can run at all and why
-the join is named here instead of assumed.
+### 01-hijo — run `8ab6c57af9f6` (`stone-collector-birthday-adventure`)
+
+absent: no validator has recorded this run

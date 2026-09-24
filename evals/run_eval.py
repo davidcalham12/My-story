@@ -257,22 +257,61 @@ def table(rows: list[dict]) -> str:
         "Every figure above is FLOW-0 and is **measured**: it is the output of",
         "`backend/brief/domain.py` on the committed fixtures, at no cost.",
         "",
-        "The columns a novel would fill are **absent**, not zero:",
+        "The novel half below is read from the `validations` table, one row per",
+        "validator per run (`python -m backend.publish.record_all`). A cell that",
+        "says `not run` was not run; a missing run is **absent**, not zero.",
         "",
-        "- whether the forbidden terms stayed out of the prose",
-        "- whether every mandatory fact reached the book",
-        "- whether the gate's six characteristics passed",
-        "",
-        "Nobody has looked, so nothing is claimed. `--novel <id>` looks, at up to",
-        "$25 a brief on the `eval` profile.",
-        "",
-        "And one gap this tool made visible rather than papered over: **nothing",
-        "in the product turns a brief into a run.** The premise for `--novel` is",
-        "composed by this script, which is why the eval can run at all and why",
-        "the join is named here instead of assumed.",
+        "Runs start from the stored brief (`POST /api/runs {brief_id}`), so the",
+        "premise is composed by the product, not by this script.",
         "",
     ]
+    out += novel_half()
     return "\n".join(out)
+
+
+def _eval_id_of(payload_json: str) -> str | None:
+    try:
+        stored = domain.parse(json.loads(payload_json)).model_dump()
+    except Exception:
+        return None
+    for path in sorted(BRIEFS.glob("*.json")):
+        try:
+            if domain.parse(load(path)).model_dump() == stored:
+                return path.stem
+        except Exception:                      # a brief that does not parse
+            continue
+    return None
+
+
+def novel_half(db_path: Path = ROOT / "novaforge.db") -> list[str]:
+    """The `validations` rows of every eval-profile run started from a brief."""
+    if not db_path.is_file():
+        return ["## Novel half", "", "absent: no database", ""]
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    runs = conn.execute(
+        "SELECT r.id, r.slug, b.payload FROM runs r JOIN briefs b ON b.id = r.brief_id "
+        "WHERE r.profile = ? ORDER BY r.started_at", (PROFILE,)).fetchall()
+    out = ["## Novel half", ""]
+    if not runs:
+        return out + ["absent: no eval run has been recorded yet", ""]
+    for run in runs:
+        rows = conn.execute(
+            "SELECT validator, criterion, value, justification FROM validations "
+            "WHERE run_id = ? AND version = 1 ORDER BY validator, criterion",
+            (run["id"],)).fetchall()
+        out += [f"### {_eval_id_of(run['payload']) or '?'} — run `{run['id']}` "
+                f"(`{run['slug']}`)", ""]
+        if not rows:
+            out += ["absent: no validator has recorded this run", ""]
+            continue
+        out += ["| validator | criterion | value | why |", "|---|---|---|---|"]
+        for r in rows:
+            why = (r["justification"] or "").replace("|", "\\|")[:160]
+            value = r["value"] if r["value"] is not None else "—"
+            out.append(f"| {r['validator']} | {r['criterion'] or ''} | {value} | {why} |")
+        out.append("")
+    return out
 
 
 def main() -> int:
