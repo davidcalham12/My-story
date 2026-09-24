@@ -1,7 +1,7 @@
 # Eval results
 
 FLOW-0 over the five committed briefs, read from the code that decides
-it, 2026-09-24 18:30 UTC. Profile for the novel half: `eval`.
+it, 2026-09-24 18:42 UTC. Profile for the novel half: `eval`.
 
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
