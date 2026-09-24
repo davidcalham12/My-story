@@ -93,3 +93,21 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
   The workspace `dist/v3/` is kept as the evidence.
 - `change.py` reported this as `halted: gate`; that label is wrong for a unit the CLI cut —
   to be fixed. The owner has since switched accounts. v3 and AC-5 await a new approval.
+
+## Build session — 2026-09-24, ~21:15 UTC · block 1: costs recorded properly ($0)
+
+- `4701d47`: a `calls` row per dispatched agent from the Agent tool's `tool_use_result`
+  (input, cache creation, cache read, output — measured; resolved model; duration), cost per
+  call **estimated** from `config/pricing.json` (cache rates added; `cost_provenance`).
+  `task_progress` no longer writes rows. Migration 018. Exporter ships all four figures.
+- Reimported from the recorded streams (the novel also from `logs/resume.stream.jsonl`):
+
+| run | calls | agents' output tokens | agents' cost (estimated) | run total (measured) |
+|---|---|---|---|---|
+| novel `02412b7fe29e` | 50 | 488,039 | 2.88 USD | 74.20 USD |
+| eval 01 `8ab6c57af9f6` | 17 | 138,157 | 0.82 USD | absent |
+| eval 04 `8834d0ab189a` | 15 | 131,952 | 0.77 USD | 25.80 USD |
+
+- **Finding:** the Haiku agents are ~4 % of the novel's bill; the orchestrator is the rest.
+- Langfuse re-exported: novel 2 traces / 50 spans / 125 scores; evals 17 and 15 spans.
+- Not included: the failed v3 attempt's 7.52 USD (measured, `dist/v3/logs`), since it is no version.
