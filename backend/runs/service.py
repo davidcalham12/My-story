@@ -233,6 +233,9 @@ class RunService:
             # exists. The fixture keeps testing the single-process path, which
             # is also the fallback, and `test_conductor.py` tests the other.
             return self._execute_single(live, premise, profile, tone, cfg)
+        if self.settings.single_orchestrator:
+            # The approved fallback (spec §8, Q29), taken on purpose.
+            return self._execute_single(live, premise, profile, tone, cfg)
 
         self._conduct(live, cfg, self.get(live.run_id)["slug"])
 

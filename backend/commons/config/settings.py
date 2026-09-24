@@ -30,6 +30,9 @@ class Settings:
     # LOWER the profile's `budget.max_cost_usd`, never raise it — it is the
     # operator's brake, not a second source for the figure.
     budget_ceiling_usd: float | None = None
+    # The fallback the owner approved (docs/spec.md §8, Q29): one orchestrator
+    # for the whole novel instead of the per-unit conductor. Off by default.
+    single_orchestrator: bool = False
 
 
 def load_settings() -> Settings:
@@ -38,4 +41,5 @@ def load_settings() -> Settings:
         use_recorded_stream=os.environ.get("USE_RECORDED_STREAM", "true").lower() != "false",
         budget_ceiling_usd=(float(os.environ["NOVAFORGE_BUDGET"])
                             if os.environ.get("NOVAFORGE_BUDGET") else None),
+        single_orchestrator=os.environ.get("NOVAFORGE_ORCHESTRATOR", "").lower() == "single",
     )
