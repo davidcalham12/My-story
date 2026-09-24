@@ -120,7 +120,48 @@ continuation's time, models, orchestration and ceiling.
 | Langfuse keeps a binned novel's traces | incidental | on purpose: cost spent is not undone by hiding a novel |
 | No permanent deletion | incidental | the owner's choice |
 
-## 7. Order
+## 7. Precisions from the build session's review against the code
+
+Folded in after approval. They make §2–§4 implementable and do not change what
+the owner approved.
+
+1. **"Stopped" means units are missing, not a stage.** A run is stopped when
+   `conductor.is_done` reports missing units and no process is live,
+   whatever its `stage` says. The example novel stopped itself at 8/10 with
+   `stage = complete`, and a rule by stage would never offer "Continuar" there.
+   `resume` changes accordingly; a run with every unit done is refused as
+   complete.
+2. **The config for a segment** = the run's `config_snapshot` with `models` and
+   `orchestration` overlaid from the profile as it is today, for this segment
+   only. The snapshot row is not rewritten.
+3. **Spent is the run's measured spend across all segments.** `ceiling_for`
+   and `budget_left` start at 0 in every new process. "Profile ceiling minus
+   spent" therefore subtracts the sum of the earlier segments' measured
+   `result` costs.
+4. **Storage.** Migration 019 adds `runs.trashed_at` and a table
+   `run_segments(run_id, n, started_at, finished_at, orchestrator_model,
+   chapter_loop, ceiling_usd, ceiling_by, cost_usd, cost_provenance)`.
+   - `n = 1` is the original launch.
+   - The hand-made `resume` block in the example novel's `cost.json` becomes
+     its segment 2.
+5. **The 100k refusal.**
+   - With `chapter_loop = python` the packet is measured before launch, so the
+     check is exact.
+   - With `claude` it is **estimated**: the measured start-up floor (~49k) plus
+     bytes/4 of the unit's declared inputs. The panel says "estimated".
+   - The continuation is refused only when the estimate exceeds 100,000 **and**
+     the unit is the one that halted; otherwise it may continue.
+6. **Bin edge cases.**
+   - `unique_slug` also looks in `output/_papelera/`, so a new run never takes
+     a binned run's slug.
+   - `restore` refuses when `output/<slug>/` already exists, and says why.
+   - A move that fails on Windows because a file is open returns a readable
+     error, never a 500.
+7. **Budget mapping.** A CLI `result` with subtype `error_max_budget_usd`
+   must end as `runs.halted = 'budget'`, not `'process'`, or the panel never
+   asks for a new ceiling. A test pins it.
+
+## 8. Order
 
 After the v3, and after or beside SPEC-EXAM-006's code (both are $0 until
 something real is launched). AC-7 costs money and waits for the owner's go and
