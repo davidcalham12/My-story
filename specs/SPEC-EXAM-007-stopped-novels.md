@@ -161,7 +161,37 @@ the owner approved.
    must end as `runs.halted = 'budget'`, not `'process'`, or the panel never
    asks for a new ceiling. A test pins it.
 
-## 8. Order
+## 8. Owner's changes after seeing it built (2026-09-24, ~21:45 UTC)
+
+David Calderon, in chat to the coordinating session: "no me gusto lo del limite
+de dinero quiero que nada mas sea continuar y que se gaste lo menos posible
+tambien quiero que todas las novelas no solo las que les falta acabar acaben en
+el bin". These replace the earlier choices in §2 and §3.
+
+1. **Continue never asks for a figure.** The button continues. The owner's
+   earlier choice, "Pedir un techo nuevo", is withdrawn.
+   - The budget ceiling (AGENTS.md §6) is **not removed**: its mechanism stays
+     as an automatic safety net and the owner does not type anything.
+   - Each continuation gets the **profile's ceiling as a fresh ceiling for this
+     segment**, recorded with `ceiling_by = 'profile'`.
+   - This also applies to a run stopped by its budget and to a run whose spend
+     is absent.
+   - The modal shows the ceiling as information, not as a question.
+   - Removing the ceiling altogether would change a protected value. It is not
+     part of this change.
+2. **"Lo menos posible."** A continuation always uses the cheapest current
+   configuration (§2): Sonnet today, and the Python chapter loop as soon as
+   SPEC-EXAM-006's AC-6 is measured and the owner turns it on. Promoted chapters
+   are never redone.
+3. **Every novel can go to the bin**, the complete ones included.
+   - Only a live run is refused.
+   - Restore works the same way.
+   - Binning a complete novel moves its directory; the PDFs already copied to
+     `ejemplos/` are not touched.
+   - The confirmation for a complete novel names its versions ("v1, v2, v3
+     will be moved to the bin"), so it is not moved by accident.
+
+## 9. Order
 
 After the v3, and after or beside SPEC-EXAM-006's code (both are $0 until
 something real is launched). AC-7 costs money and waits for the owner's go and
