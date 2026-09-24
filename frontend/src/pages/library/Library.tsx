@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '@/shared/api/client'
 import type { Run } from '@/shared/api/types'
-import { plainStatus, stepOf } from '@/entities/run/status'
+import { plainStatus, stepOf, titleOf } from '@/entities/run/status'
 
 /**
  * Every run, new beside imported.
@@ -86,7 +86,7 @@ export function Library({ onOpen, onNew }: {
                 <span className="badge">{run.profile === 'eval' ? 'test' : run.profile}</span>
                 {run.source === 'pre-loop003' && <span className="badge">imported</span>}
               </div>
-              <h2>{run.slug}</h2>
+              <h2>{titleOf(run)}</h2>
               {s.tone === 'live' && <p className="lede">Now: {stepOf(run.stage)}</p>}
               <p className="muted clamp">{run.premise}</p>
               <div className="card__foot">

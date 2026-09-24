@@ -28,6 +28,8 @@ import sqlite3
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from backend.commons.title import title_of
+
 from backend import versions as versions_repo
 
 
@@ -235,22 +237,9 @@ def _chapter(path: Path, n: int) -> Chapter:
 
 
 def _title(run_dir: Path) -> str:
-    """The book's title, from the manuscript the run assembled.
-
-    Falls back to the slug rather than inventing one: a novel published under a
-    title nobody wrote is the kind of figure `docs/verification.md` G12 is about.
-    """
-    book = run_dir / "dist" / "book.md"
-    if book.is_file():
-        for line in book.read_text(encoding="utf-8").splitlines():
-            if line.startswith("# "):
-                return line[2:].strip()
-    state = run_dir / "state.json"
-    if state.is_file():
-        slug = json.loads(state.read_text(encoding="utf-8")).get("slug")
-        if slug:
-            return str(slug)
-    return run_dir.name
+    """The book's title: see `backend.commons.title` — what the pipeline wrote,
+    and the slug's own words only when nothing else named the book."""
+    return title_of(run_dir)
 
 
 def _dedication(run_dir: Path) -> str | None:

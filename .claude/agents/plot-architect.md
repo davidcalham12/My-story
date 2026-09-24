@@ -18,6 +18,12 @@ different question and the only one they are entitled to answer.
 
 Produce an outline with one entry per chapter. Do not write prose.
 
+**Name the book first.** The outline's first line is `# <Title> — Outline`,
+and that title is the one on the cover. Make it one a reader would pick up:
+two to six words, specific to *this* story — a name, an object or a promise
+from it (*Captain Crunch and the Hill*, not *A Birthday Adventure*). Never a
+slug, never hyphens between words, never the word "novel" or "story".
+
 Open with a `## Promises` section: the questions this book asks the reader to
 stay for. Then `## Chapters`, and for each chapter exactly this shape:
 

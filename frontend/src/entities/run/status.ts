@@ -74,3 +74,16 @@ export function plainStatus(run: Run, live: boolean, published?: boolean): Plain
     detail: 'Open Read to see the book. If a detail is wrong, Ask for a change.',
   }
 }
+
+const SMALL = new Set(['a', 'an', 'and', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with'])
+
+/** The book's title for display: the server's (`backend/commons/title.py`), or
+ *  the slug's own words capitalised — never the slug with its hyphens. */
+export function titleOf(run: Run): string {
+  if (run.title) return run.title
+  return run.slug
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((w, i) => (i > 0 && SMALL.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)))
+    .join(' ')
+}

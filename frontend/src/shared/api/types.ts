@@ -35,6 +35,8 @@ export const CHARACTERISTICS: Characteristic[] = [
 export interface Run {
   id: string
   slug: string
+  /** The book's title, from what the pipeline wrote; absent on an older server. */
+  title?: string
   premise: string
   profile: string
   tone: string | null

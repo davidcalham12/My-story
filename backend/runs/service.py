@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Iterator
 
 from backend.commons.config import loader
+from backend.commons.title import title_of
 from backend.commons.config.settings import Settings
 from backend.brief import domain as brief_domain
 from backend.policy import forbidden
@@ -120,14 +121,18 @@ class RunService:
 
     # ------------------------------------------------------------- reading
 
+    def _titled(self, run: dict) -> dict:
+        # The book's title for the panel, from the same place the PDF takes it.
+        return run | {"title": title_of(Path(self.settings.output_dir) / run["slug"])}
+
     def list(self) -> list[dict]:
-        return read_repo.list_runs(self.conn)
+        return [self._titled(r) for r in read_repo.list_runs(self.conn)]
 
     def get(self, run_id: str) -> dict:
         run = read_repo.get_run(self.conn, run_id)
         if not run:
             raise NotFound(run_id)
-        return run
+        return self._titled(run)
 
     def detail(self, run_id: str) -> dict:
         return {

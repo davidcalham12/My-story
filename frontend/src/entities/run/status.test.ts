@@ -46,3 +46,14 @@ describe('plainStatus — the answer first, in words anyone reads', () => {
     expect(plainStatus(run({ halted: 'user' }), false, true).tone).toBe('ok')
   })
 })
+
+describe('titleOf — the book, not the slug', () => {
+  it('uses the title the server sends', async () => {
+    const { titleOf } = await import('./status')
+    expect(titleOf(run({ slug: 'x-y', title: 'The Key' } as Partial<Run>))).toBe('The Key')
+  })
+  it('turns a slug into words when there is no title', async () => {
+    const { titleOf } = await import('./status')
+    expect(titleOf(run({ slug: 'the-other-side-of-the-hill' }))).toBe('The Other Side of the Hill')
+  })
+})

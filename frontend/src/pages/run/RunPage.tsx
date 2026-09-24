@@ -5,7 +5,7 @@ import { haltReason } from '@/entities/run/lib'
 import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
 import { GateTable } from '@/entities/critique/GateTable'
-import { plainStatus } from '@/entities/run/status'
+import { plainStatus, titleOf } from '@/entities/run/status'
 
 /** One run, pyramid order: the answer in one sentence, the next thing to do,
  *  three figures, and the technical record folded underneath. */
@@ -33,7 +33,7 @@ export function RunPage({ runId, onRead, onChange }: {
   return (
     <>
       <section className={`hero hero--${status.tone}`}>
-        <p className="eyebrow eyebrow--brand">{run.slug}</p>
+        <p className="eyebrow eyebrow--brand">{titleOf(run)}</p>
         <h1>{status.headline}</h1>
         <p className="lede">{status.detail}</p>
         {live && progress && <p className="hint">Last step: {progress.detail}</p>}
