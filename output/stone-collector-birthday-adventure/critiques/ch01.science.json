@@ -1,0 +1,25 @@
+{
+  "critic": "science",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 3,
+  "_note": "The world critic under its historical name. This is a contemporary children's story, so it audits the bullets under ## Rules in bible/world.md - tide, dark, dog, grandfather, observatory - not physics.",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": []
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

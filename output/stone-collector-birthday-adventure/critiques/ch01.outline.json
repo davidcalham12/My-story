@@ -1,0 +1,34 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [
+        {
+          "kind": "altered",
+          "severity": "medium",
+          "beat": 2,
+          "quote": "High tide's at eight-thirty - my father showed me that.",
+          "claim": "Beat 2 requires the visit to follow the 8:30 high tide; the line names the time without establishing it has passed.",
+          "fix": "Establish that the tide has gone before the walk to the garden.",
+          "reference": "outline.md, chapter 1 beat 2"
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

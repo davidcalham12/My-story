@@ -1,0 +1,45 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-24T15:38:41Z",
+  "verdict": "defects",
+  "violations": [],
+  "ambiguities": [
+    {
+      "rule": "R2",
+      "clause": "cannot go beyond the edge of the town",
+      "reading_a": "'Beyond the edge of the town' means inland, toward other villages; rocks at the edge of town on the seaward side are within the permitted area, covered by 'He can go to the beach'.",
+      "reading_b": "'Beyond the edge of the town' means any location outside the town boundary; rocks described as 'at the edge of town' may sit on or past the forbidden threshold.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD as a genuine ambiguity, and a dangerous one. Chapter 3 beat 3 sends him to the rocks alone. Under reading_b that beat is forbidden by canon and the climax cannot be written at all; under reading_a it is ordinary. A critic that takes reading_b at chapter 3 would reject a chapter no redraft can fix, because the outline that commissioned it assumed reading_a. The rule's own list already names the beach and the harbour as permitted, which favours reading_a, but 'the edge of the town' is doing two jobs in one sentence and must be split.",
+      "applied": "R2 sent back to worldbuilder to state the seaward boundary explicitly and separately from the inland one."
+    },
+    {
+      "rule": "R3",
+      "clause": "This story takes place in summer, where dark is rare.",
+      "reading_a": "A descriptive statement about summer light — darkness arrives late and is never total. It constrains the texture of a scene, not whether a scene may be about darkness.",
+      "reading_b": "A prescription that darkness must stay rare as a story element, so a climax whose whole danger is the dark contradicts canon.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD, and this is the single most consequential line in the world file. The entire book turns on mystery 3 — can he be brave in the dark — and R3 is the rule a critic will read when judging it. Under reading_b chapter 3 is unwritable; under reading_a it is the point of the book. Worse, the sentence 'dark is rare' actively defuses the ending even under reading_a: it tells the reader the danger is not real. This is the deadlock the skill warns about, arriving at the payoff chapter where it costs the most.",
+      "applied": "R3 sent back to worldbuilder to separate the physical fact (late, incomplete summer dark) from the character fact (the fear, unadmitted) and to delete the 'dark is rare' clause that reads as a prescription."
+    },
+    {
+      "rule": "R7",
+      "clause": "If the collection is threatened, he will act.",
+      "reading_a": "'Threatened' covers only existing stones at risk of loss or damage.",
+      "reading_b": "'Threatened' also covers the collection being incomplete — a missing stone the collection needs.",
+      "outline_assumes": "b",
+      "arbitration": "UPHELD as ambiguous but OVERRULED as a blocker. The outline leans on reading_b to motivate the climax, and reading_a would make that motivation thin rather than forbidden. A chapter can be written and can pass under either reading, so this does not justify a second worldbuilder call. Recorded so that a critic invoking reading_a at chapter 3 is answered from this file rather than argued with.",
+      "applied": "none — noted, not fixed."
+    },
+    {
+      "rule": "R1",
+      "clause": "No character can stay on the beach when the tide is coming in unless they can reach safe ground before it cuts them off.",
+      "reading_a": "The clause forbids only being caught by a RISING tide. At dusk the tide is falling, so the climax satisfies it.",
+      "reading_b": "The clause is a proxy for reachability, so a stone on the lower rocks must actually be out of the water when he arrives.",
+      "outline_assumes": "a",
+      "arbitration": "OVERRULED as a violation; UPHELD as a caveat. Raised by the orchestrator, not by the critic, which returned no violations and did not show its working on the tide. The arithmetic: high 08:30, low 14:30, so the next high falls near 20:45 and the tide recedes from then on. Cadaques dusk in summer is after 21:00. The tide at the climax is therefore FALLING, chapter 2's late-afternoon rise is consistent, and beat 2's 'the tide will recede for a brief window' is correct — the window is bounded by darkness, not by the water. R1's literal clause is satisfied and no outline change is warranted. The caveat: half an hour past high tide the lower rocks are at their most covered, so the chapter must not show him strolling onto dry lower rocks. Carried into the chapter 3 writer prompt rather than into the outline.",
+      "applied": "none to the outline; constraint carried into the FLOW-4 chapter 3 prompt."
+    }
+  ]
+}

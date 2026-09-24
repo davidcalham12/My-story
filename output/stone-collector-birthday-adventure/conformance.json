@@ -1,0 +1,10 @@
+{
+  "_comment": "Recomputed from this run's own record: what the gate decided, against the rule it was supposed to follow. `breached` means a chapter entered this book that should not have.",
+  "attempts_checked": 3,
+  "unjudgeable": 0,
+  "breaches": [
+    "ch01 attempt 1: verdict the rule would not give \u2014 recorded 'halt', the rule says 'retry' (aggregate 5 below threshold 8 on attempt 1 of 3: redraft against a level-1 sheet)",
+    "ch01 attempt 2: verdict the rule would not give \u2014 recorded 'halt', the rule says 'retry' (aggregate 6 below threshold 8 on attempt 2 of 3: redraft against a level-2 sheet)"
+  ],
+  "verdict": "breached"
+}

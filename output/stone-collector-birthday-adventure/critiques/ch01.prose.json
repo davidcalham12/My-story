@@ -1,0 +1,101 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model+arithmetic",
+  "agent": "prose-critic + backend.chapters.score_prose",
+  "drafts": 3,
+  "_note": "The critic returns quoted major/minor findings and NO score; score_prose computes 10 - 3*mechanical - 2*major - 1*minor. The mechanical term comes from backend.chapters.check_prose and is recorded here per iteration rather than in a separate file, because promote reads exactly one file per characteristic and this is that file.",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 5,
+      "why": "10 - 3*0 - 2*1 - 1*3 = 5",
+      "mechanical": 0,
+      "major": 1,
+      "minor": 3,
+      "mechanical_check": {
+        "verdict": "clean",
+        "defects": []
+      },
+      "findings": [
+        {
+          "kind": "generic-dialogue",
+          "severity": "major",
+          "quote": "High tide's just gone past. Come on. I want to show you something.",
+          "claim": "Warm but generic; any kind adult could say it. Nothing in it is Pau.",
+          "fix": "Let the tide line carry his character - he knows the table by heart - and weave in one memory.",
+          "reference": "bible/characters.md, Pau"
+        },
+        {
+          "kind": "abstraction",
+          "severity": "minor",
+          "quote": "when you lay inside it, the rest of the world disappeared",
+          "claim": "Tells the reader nothing they can see, hear or feel.",
+          "fix": "Name one sense that goes quiet.",
+          "reference": "the brief's tone"
+        },
+        {
+          "kind": "abstraction",
+          "severity": "minor",
+          "quote": "nothing else existed",
+          "claim": "Doing no work, and the second abstraction in a row.",
+          "fix": "Cut it, or name what does remain.",
+          "reference": "the brief's tone"
+        },
+        {
+          "kind": "abstraction",
+          "severity": "minor",
+          "quote": "mysterious in shape",
+          "claim": "Describes nothing, and what it is failing to describe is Captain Crunch - one of the three real details the book was bought for.",
+          "fix": "Describe the form a boy's thumb would find.",
+          "reference": "bible/world.md, Things - Captain Crunch"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 6,
+      "why": "10 - 3*0 - 2*2 - 1*0 = 6",
+      "mechanical": 0,
+      "major": 2,
+      "minor": 0,
+      "mechanical_check": {
+        "verdict": "clean",
+        "defects": []
+      },
+      "findings": [
+        {
+          "kind": "person-shift",
+          "severity": "major",
+          "quote": "when you lay inside it, the garden fell silent beyond the cardboard. It was just you and the heavens, and Pau lay solid beside you.",
+          "claim": "Switches from third person about one boy to a general 'you', and seats Pau beside him a full paragraph before Pau lies down.",
+          "fix": "Third person, and do not bring Pau in early.",
+          "reference": "bible/characters.md"
+        },
+        {
+          "kind": "flat-payoff",
+          "severity": "major",
+          "late": true,
+          "quote": "It was just the sky, pale blue and simple. But Pau's voice had changed when he said it.",
+          "claim": "Pau points, his voice changes, and what is there is empty blue. The build-up is real and the payoff is nothing.",
+          "fix": "Make the empty blue the point, leaning toward the constellation book that follows.",
+          "reference": "bible/mysteries.md, the promise this chapter must land",
+          "late_note": "LATE FINDING. This passage is byte-identical in attempt 1, where the same critic examined it and wrote in its own notes that it was 'more a question of expectation management than prose defect, so not flagged as major'. Recorded in specs/loops/LOOP-003/late_findings.jsonl. It was NOT discounted from the attempt-2 score: discounting it would have produced prose 8, an aggregate of 8 and an accept, which is exactly the rationalisation patch_then_halt exists to prevent."
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "why": "10 - 3*0 - 2*0 - 1*0 = 10",
+      "mechanical": 0,
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "verdict": "clean",
+        "defects": []
+      },
+      "findings": []
+    }
+  ]
+}

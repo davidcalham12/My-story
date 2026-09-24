@@ -1,0 +1,42 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "collection-composition",
+          "severity": "high",
+          "quote": "the small black river stone Ava had found with him in July",
+          "claim": "The Stone Collection is canonically smooth stones from the beach; a river stone comes from a river.",
+          "fix": "Make it a beach stone; keep Ava and keep July.",
+          "reference": "bible/world.md, Things - The Stone Collection"
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "timeline-tense",
+          "severity": "medium",
+          "quote": "High tide's at eight-thirty - my father showed me that.",
+          "claim": "Names the tide time without placing it in the past, so a reader cannot tell whether the observatory visit falls before or after the 8:30 high tide the timeline requires.",
+          "fix": "Put the tide in the past tense.",
+          "reference": "bible/timeline.md, the mid-morning row"
+        }
+      ]
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": []
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "_snapshot": "Merged config for this run: config/novel.config.json with config/profiles/eval.json overlaid key by key. The `bible` block is the profile's in whole (CFG-2a).",
+  "_tone_decision": "novel.tone was null. Read off the premise by the orchestrator and written here before any agent ran, per SKILL.md step 0.2. The premise is a 10th-birthday gift book for a curious, stone-collecting child who is afraid of the dark and will not say so: that is contemporary children's adventure, warm and comic, with real courage in it — not fantasy and not science fiction. The `science` critic therefore audits the story's OWN rules under `## Rules` in bible/world.md (the rules of a seaside town, a tide, a garden observatory and the dark), not physics.",
+  "_pii_note": "Organisation data-protection policy applies. The recipient is a real, named minor. The protagonist's name is carried through the whole run as the literal token [NOMBRE_ANONIMIZADO]; it is the canonical spelling in bible/characters.md and every downstream prompt. One find-and-replace personalises the finished book. Non-personal detail supplied by the buyer (the dog Bruno, the fossil Captain Crunch, the cardboard observatory, Cadaques) is carried verbatim, as it identifies no person.",
+  "profile": "eval",
+  "slug": "stone-collector-birthday-adventure",
+  "novel": {
+    "chapters": 3,
+    "tone": "warm, funny children's seaside adventure — brave-at-heart, contemporary, for a reader of 10",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": { "min": 300, "target": 420, "max": 550 },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": { "min": 5, "max": 24 },
+    "sentences_per_paragraph": { "min": 1, "max": 5 },
+    "lines_per_chapter": { "min": 25, "max": 95 },
+    "chars_per_line": { "max": 64 },
+    "beats_per_chapter": { "min": 3, "max": 5 },
+    "promises": { "min": 3, "max": 5 }
+  },
+  "bible": {
+    "world_min_words": 500,
+    "world_max_words": 900,
+    "technology_entries": { "min": 4, "max": 6 },
+    "factions": { "min": 3, "max": 4 },
+    "world_rules": { "min": 5, "max": 8 },
+    "characters": { "min": 5, "max": 7 },
+    "timeline_rows": { "min": 10, "max": 14 },
+    "mysteries": { "min": 4, "max": 5 }
+  },
+  "context": {
+    "max_summary_words": 120,
+    "forbid_prior_chapter_prose": true,
+    "max_concurrent_tokens": 100000,
+    "max_summary_facts": 40
+  },
+  "quality_gate": {
+    "critics": ["continuity", "science", "outline", "length", "chatter", "prose"],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "patch_then_halt"
+  },
+  "feedback": {
+    "sheet_template": "specs/loops/LOOP-003/sheet_template/v01.md",
+    "validate_before_sending": true,
+    "escalate_to_literal_at_attempt": 3,
+    "keep_attempt_drafts": true,
+    "late_finding_blocks": false
+  },
+  "style": { "word_count_tolerance_pct": 0 },
+  "models": { "orchestrator": null },
+  "budget": { "max_cost_usd": 25.0, "max_calls": 200 },
+  "outputs": {
+    "formats": ["markdown"],
+    "synopsis": { "words": { "min": 150, "max": 250 }, "comparables": { "min": 2, "max": 3 } },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  },
+  "_word_band": "length scores 10 inside 300-550 widened by tolerance_pct 25 => 225 to 687 words."
+}

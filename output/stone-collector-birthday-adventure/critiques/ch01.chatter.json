@@ -1,0 +1,28 @@
+{
+  "critic": "chatter",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": "orchestrator (head -c)",
+  "drafts": 3,
+  "_note": "Scores 0 if the draft does not begin with '# Chapter'. Computed in the shell; reproduces.",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "first_line": "# Chapter 1 - The Tenth Birthday",
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "first_line": "# Chapter 1 - The Tenth Birthday",
+      "findings": []
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "first_line": "# Chapter 1 - The Tenth Birthday",
+      "findings": []
+    }
+  ]
+}

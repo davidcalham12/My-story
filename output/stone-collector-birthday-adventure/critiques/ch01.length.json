@@ -1,0 +1,32 @@
+{
+  "critic": "length",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": "orchestrator (wc -w)",
+  "drafts": 3,
+  "_note": "Computed in the shell, not by a model. This one reproduces. Band is words_per_chapter 300-550 widened by tolerance_pct 25, so 225-687.",
+  "band": {
+    "min": 225,
+    "max": 687
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 506,
+      "findings": []
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "words": 519,
+      "findings": []
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "words": 556,
+      "findings": []
+    }
+  ]
+}
