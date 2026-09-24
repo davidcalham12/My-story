@@ -293,3 +293,10 @@ hay trabajo sin commitear en la VM, **commitéalo ya** aunque esté a medias.
    antes/después de la nota del judge sobre el brief 01, o se declara.
 7. Al cerrar cada bloque: `from-build.md` con coste, minutos y commit. El dueño
    sigue el avance desde aquí.
+
+**Añadido 14:45 UTC, antes de que arranque la VM:** hay nuevos
+`docs/browser-mcp.md` (checklist de `visual_check`, sesiones pendientes),
+`presentacion/guion.md` (deck slide a slide, con cada cifra `PENDIENTE` que
+tenéis que medir hoy) y `presentacion/README.md` (guion del vídeo, frase del
+email). Sólo documentación; no toca `backend/` ni `evals/`. Al publicar v1 y v2,
+rellenad la tabla de sesiones de `browser-mcp.md` y las `PENDIENTE` del guion.
