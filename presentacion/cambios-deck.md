@@ -22,15 +22,22 @@ dueño). Es una guía, no la versión final.
 | 6 · Roles y bucle (pie) | "Claude Code orquesta" | "Claude Code orquesta (Sonnet); los agentes corren en Haiku" | e5e3e9b; el stream de la v3 dice `claude-sonnet-5` |
 | 6 · Roles y bucle (título) | "Doce agentes" | trece ficheros en `.claude/agents/` (con `bible-critic`, que solo se activa por perfil). Decir "trece" o quitar el número | `.claude/agents/` |
 | 11 · Presupuesto (nota) | "Palanca ya construida: orquestador en Sonnet y tres críticos en uno" | "Palancas: orquestador en Sonnet (aplicado el 24-09; la novela de ejemplo corrió en Opus) y bucle del capítulo en código (SPEC-EXAM-006, aprobado)" | e5e3e9b, SPEC-EXAM-006 |
-| 2 · Resumen, "Coste bajo control" | "el siguiente paso reduce a la mitad las llamadas por capítulo" | "los agentes son el 4 % del coste; el resto es el orquestador, y el siguiente paso aprobado lo sustituye por código" | ver §2 |
+| 2 · Resumen, "Coste bajo control" | "el siguiente paso reduce a la mitad las llamadas por capítulo" | "los agentes son el 8 % del coste (medido); el 92 % es el orquestador, y el siguiente paso aprobado lo sustituye por código" | ver §2 |
 
 ## 2. Diapositiva nueva: "Dónde se va el dinero" (tras la 10)
 
 Es el argumento más fuerte del deck.
 
 - **74,20 $ medidos** por la novela de 10 capítulos, en **169 min** y 468 turnos.
-- **Agentes (Haiku): 2,88 $ en 50 llamadas**, un 4 %, estimado por llamada con
-  `config/pricing.json`. **El orquestador: ~96 %**, por diferencia.
+- **Medido por modelo** (`modelUsage` del `result` de cada proceso):
+  - primer tramo 53,17 $ = Opus 48,79 $ + Haiku 4,38 $;
+  - reanudación 21,03 $ = Opus 19,34 $ + Haiku 1,69 $.
+- **Resultado: agentes (Haiku) 6,07 $, el 8 %; orquestador (Opus) 68,13 $,
+  el 92 %.** Todo medido.
+- La estimación por llamada de Langfuse (2,88 $ en 50 llamadas) **se queda
+  corta a la mitad**: no ve todas las llamadas ni todo lo que cada una cachea.
+  No usarla en el deck; usar la cifra medida. (Corregido el 24-09 a las
+  21:25 UTC; la versión anterior de esta nota decía "4 %, estimado".)
 - Tabla medida (`modelUsage` del evento `result`):
 
 | tramo | total | orquestador | agentes | min |
