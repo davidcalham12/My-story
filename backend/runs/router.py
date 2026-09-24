@@ -7,9 +7,9 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
-from backend.runs.models import RunCreated, StartRun
-from backend.runs.service import (AlreadyRunning, BriefNotReady, NotFound, NotLive,
-                                  RunService)
+from backend.runs.models import ResumeRun, RunCreated, StartRun
+from backend.runs.service import (AlreadyRunning, BriefNotReady, CeilingRequired,
+                                  NotFound, NotLive, Refused, RunService)
 
 router = APIRouter()
 
@@ -39,8 +39,9 @@ def start_run(body: StartRun, svc: RunService = Depends(get_service)) -> RunCrea
 
 
 @router.get("")
-def list_runs(svc: RunService = Depends(get_service)) -> list[dict]:
-    return svc.list()
+def list_runs(trashed: bool = False, svc: RunService = Depends(get_service)) -> list[dict]:
+    """The library; with `?trashed=true`, the bin (SPEC-EXAM-007 §3)."""
+    return svc.list(trashed=trashed)
 
 
 @router.get("/{run_id}")
@@ -64,15 +65,43 @@ def halt(run_id: str, svc: RunService = Depends(get_service)) -> dict:
 
 
 @router.post("/{run_id}/resume", status_code=status.HTTP_200_OK)
-def resume(run_id: str, svc: RunService = Depends(get_service)) -> dict:
-    """Continue a run that stopped, in the directory it stopped in."""
+def resume(run_id: str, body: ResumeRun | None = None,
+           svc: RunService = Depends(get_service)) -> dict:
+    """Continue a run that stopped, in the directory it stopped in.
+
+    Every refusal carries its reason in `detail`, and the panel shows it as it
+    is: 409 for a run that cannot be continued now, 422 for one that needs a
+    ceiling typed for it (SPEC-EXAM-007 §2).
+    """
     try:
-        return svc.resume(run_id)
+        return svc.resume(run_id, ceiling_usd=body.ceiling_usd if body else None)
     except NotFound as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
-    except NotLive as exc:
+    except (NotLive, AlreadyRunning, Refused) as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
-    except AlreadyRunning as exc:
+    except CeilingRequired as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
+
+
+@router.post("/{run_id}/trash", status_code=status.HTTP_200_OK)
+def trash(run_id: str, svc: RunService = Depends(get_service)) -> dict:
+    """Move a stopped novel to `output/_papelera/`. Nothing is deleted."""
+    try:
+        return svc.trash(run_id)
+    except NotFound as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except Refused as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+
+
+@router.post("/{run_id}/restore", status_code=status.HTTP_200_OK)
+def restore(run_id: str, svc: RunService = Depends(get_service)) -> dict:
+    """Move a binned novel back, byte for byte, and clear `trashed_at`."""
+    try:
+        return svc.restore(run_id)
+    except NotFound as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except Refused as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
 
 

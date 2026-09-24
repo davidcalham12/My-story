@@ -44,6 +44,22 @@ from backend.commons.runner.watch import ContextWatcher, State, WatchTripped, ap
 ROOT = Path(__file__).resolve().parents[2]
 PROCEDURES = ROOT / ".claude" / "skills" / "storymaker" / "units"
 
+#: What a fresh orchestrator carries before it opens a file, measured by the
+#: first conductor run (`novaforge-v2` domain-knowledge §8.8; see `units_for`).
+STARTUP_FLOOR = 48_800
+
+#: The subtype of the `result` a CLI sends when its own `--max-budget-usd`
+#: stops it. It is a budget halt, whatever else the unit left undone.
+BUDGET_SUBTYPE = "error_max_budget_usd"
+
+_BIBLE = ("bible/world.md", "bible/characters.md", "bible/timeline.md",
+          "bible/mysteries.md")
+
+#: The stage each unit belongs to, in `flow.yaml`'s numbering.
+_STAGE = {"world": "FLOW-1", "cast-characters": "FLOW-2", "cast-chronology": "FLOW-2",
+          "outline-write": "FLOW-3", "outline-audit": "FLOW-3", "chapter": "FLOW-4",
+          "finish": "FLOW-5"}
+
 
 @dataclass(frozen=True)
 class Unit:
@@ -89,6 +105,30 @@ class Unit:
                     f"chapters/ch{self.chapter:02d}.summary.md")
         return ("dist/book.md", "synopsis.md")
 
+    @property
+    def stage(self) -> str:
+        return _STAGE[self.key]
+
+    @property
+    def inputs(self) -> tuple[str, ...]:
+        """What this unit's procedure tells it to read, relative to the run
+        directory. Used only to **estimate** a unit's packet before launch
+        (SPEC-EXAM-007 §7.5); the procedure file stays the authority."""
+        if self.key == "world":
+            return ("config.snapshot.json",)
+        if self.key == "cast-characters":
+            return ("bible/world.md",)
+        if self.key == "cast-chronology":
+            return ("bible/world.md", "bible/characters.md")
+        if self.key == "outline-write":
+            return _BIBLE
+        if self.key == "outline-audit":
+            return (*_BIBLE, "outline.md")
+        if self.key == "chapter":
+            previous = (f"chapters/ch{self.chapter - 1:02d}.summary.md",) if self.chapter > 1 else ()
+            return (*_BIBLE, "outline.md", *previous)
+        return ()  # finish: assembles files the conductor names, reads no packet
+
 
 def units_for(cfg: dict) -> list[Unit]:
     """The whole run, as processes, in `flow.yaml` order.
@@ -125,6 +165,25 @@ def is_done(unit: Unit, run_dir: Path) -> bool:
     of the arrangement rather than a feature somebody has to maintain.
     """
     return all((run_dir / rel).is_file() for rel in unit.outputs)
+
+
+def first_missing(cfg: dict, run_dir: Path) -> Unit | None:
+    """The unit a continuation would start from, or None when every unit is done.
+
+    This, and not `stage`, is what decides whether a run is stopped
+    (SPEC-EXAM-007 §7.1): the example novel stopped itself at 8/10 with
+    `stage = complete`.
+    """
+    return next((u for u in units_for(cfg) if not is_done(u, run_dir)), None)
+
+
+def estimate_packet(unit: Unit, run_dir: Path) -> int:
+    """An **estimate** of the context a unit would reach: the start-up floor
+    plus a quarter of the bytes it declares it reads. Not a measurement; the
+    panel says "estimated" wherever it shows it."""
+    size = sum((run_dir / rel).stat().st_size for rel in unit.inputs
+               if (run_dir / rel).is_file())
+    return STARTUP_FLOOR + size // 4
 
 
 def prompt_for(unit: Unit, *, slug: str, run_dir: Path) -> str:
@@ -314,6 +373,7 @@ class Conductor:
             self.process = process
             outcome.units_run.append(unit)
             halted: tuple[str, str] | None = None
+            reported = outcome.state.results
 
             try:
                 process.start()
@@ -348,6 +408,14 @@ class Conductor:
                 self.process = None
 
             outcome.largest_turn[unit.name] = watcher.largest_orchestrator_turn
+
+            if (halted is None and outcome.state.results > reported
+                    and outcome.state.last_subtype == BUDGET_SUBTYPE):
+                # The CLI's own ceiling stopped the unit. Filed as `process`
+                # below, the panel would never ask for a new ceiling.
+                figure = "" if left is None else f" of ${left:.2f}"
+                halted = ("budget", f"{unit.name}: the CLI stopped at its "
+                                    f"--max-budget-usd{figure}")
 
             if halted is None and not is_done(unit, self.run_dir):
                 missing = [rel for rel in unit.outputs if not (self.run_dir / rel).is_file()]

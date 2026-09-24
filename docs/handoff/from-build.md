@@ -125,3 +125,22 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
   with mode `"x"`, so publication fails **before** a `versions` row is written. To be removed
   when ch03 is redone under `e0b7c38` (the owner's "Rehacer el cap. 3 con control").
 - Measured so far: v3 ch03 4.24 USD · 80 turns · 19.5 min (Sonnet 3.88 + Haiku 0.36).
+
+---
+
+## Build agent, worktree `sm-007` (branch `spec-007`) — 2026-09-24, 21:30 UTC
+
+### SPEC-EXAM-007 built, $0 (no `claude`, no network)
+- `specs/PLAN-EXAM-007-stopped-novels.md` is **draft**: written and built in one pass at the
+  coordinating session's request; it needs the owner's approval in its header.
+- Migration 019: `runs.trashed_at` and a `changes` table (the coordinating session's design,
+  shared with SPEC-EXAM-008). The launch is `kind='generate'`, each continuation
+  `kind='continue'`; there is no `run_segments` table. The 008 cost columns stay NULL.
+- `POST /api/runs/{id}/resume {ceiling_usd?}`, `/trash`, `/restore`, `GET /api/runs?trashed=true`.
+  Stopped = units missing (`conductor.first_missing`), not `stage`. Models and orchestration
+  come from today's profile for the segment only. `error_max_budget_usd` → `halted='budget'`.
+- Panel: "Continuar" (dialog: why, spent measured or absent, where from, USD figure when
+  asked), "Mover a la papelera" (one confirmation), "Papelera" tab with "Restaurar".
+  Screenshot: `docs/screenshots/007-library.png` (fixture data).
+- Tests: backend 809 → 833 passed (5 skipped); frontend 104 → 119.
+- AC-7 (a real continuation from the web) waits for the owner's go and his ceiling.

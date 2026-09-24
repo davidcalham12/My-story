@@ -81,6 +81,8 @@
   --radius-pill: 999px;
   --shadow: 0 1px 2px rgba(30, 45, 61, 0.06), 0 4px 16px rgba(30, 45, 61, 0.06);
   --shadow-lift: 0 2px 4px rgba(30, 45, 61, 0.08), 0 12px 32px rgba(30, 45, 61, 0.12);
+  /* Behind a dialog: the page stays visible, and clearly not the thing to act on. */
+  --scrim: rgba(30, 45, 61, 0.45);
   --wide: 1120px;
   --gutter: var(--s4);       /* never smaller: 375px − 2×16 is the phone column */
   --measure: 72ch;

@@ -144,6 +144,56 @@ def save_gate_set(conn, run_id: str, characteristics) -> None:
                      (json.dumps(list(characteristics)), run_id))
 
 
+def open_change(conn, run_id: str, *, n: int, kind: str, started_at: str,
+                orchestrator_model: str | None = None, chapter_loop: str | None = None,
+                ceiling_usd: float | None = None, ceiling_by: str | None = None,
+                finished_at: str | None = None, total_usd: float | None = None,
+                provenance: str | None = None, minutes: float | None = None,
+                note: str | None = None) -> None:
+    """One row of `changes`: what a segment of a run ran under (SPEC-EXAM-007
+    §7.4). SPEC-007 writes `generate` and `continue`; the table is shared with
+    SPEC-EXAM-008, whose cost columns stay NULL here — absent, never 0.
+
+    The finished fields are here too so a segment recorded after the fact —
+    the hand-written `resume` block in a `cost.json` — lands in one statement.
+    """
+    with tx(conn):
+        conn.execute(
+            "INSERT INTO changes (run_id, n, kind, started_at, finished_at, "
+            "orchestrator_model, chapter_loop, ceiling_usd, ceiling_by, total_usd, "
+            "provenance, minutes, note) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (run_id, n, kind, started_at, finished_at, orchestrator_model,
+             chapter_loop, ceiling_usd, ceiling_by, total_usd, provenance, minutes,
+             note))
+
+
+def close_change(conn, run_id: str, n: int, *, total_usd: float | None,
+                 provenance: str) -> None:
+    """`total_usd` None stays NULL: a segment that reported nothing was not
+    free. `minutes` is this clock's, from the row's own start to now."""
+    finished = now()
+    with tx(conn):
+        conn.execute(
+            "UPDATE changes SET finished_at = ?, total_usd = ?, provenance = ?, "
+            "minutes = (julianday(?) - julianday(started_at)) * 1440.0 "
+            "WHERE run_id = ? AND n = ?",
+            (finished, total_usd, provenance, finished, run_id, n))
+
+
+def set_trashed(conn, run_id: str, trashed: bool) -> None:
+    with tx(conn):
+        conn.execute("UPDATE runs SET trashed_at = ? WHERE id = ?",
+                     (now() if trashed else None, run_id))
+
+
+def reopen(conn, run_id: str) -> None:
+    """The halt a continuation resumes past stops being the run's state. It
+    stays in `events` and in the warnings; the row says running."""
+    with tx(conn):
+        conn.execute("UPDATE runs SET halted = NULL, halted_detail = NULL, "
+                     "finished_at = NULL WHERE id = ?", (run_id,))
+
+
 def append_event(conn, run_id: str, *, seq: int, type: str, payload: str,
                  unit: str | None = None) -> None:
     """One raw stream line, before anything is derived from it (FR-RNR-3).

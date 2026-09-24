@@ -427,6 +427,9 @@ def test_resuming_continues_the_same_run_in_the_same_directory(db, tmp_path):
     repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
                     profile="tiny", tone=None, snapshot=cfg)
     repo.halt(db, RUN_ID, "context", "cast: a turn carried 100,669 tokens")
+    # A continuation's ceiling is the profile's minus what was measured; with
+    # no measured spend it asks for a figure instead (SPEC-EXAM-007 §2).
+    repo.save_cost(db, RUN_ID, cost_usd=3.0, provenance="measured")
     run_dir = tmp_path / SLUG
     (run_dir / "bible").mkdir(parents=True)
     for name in ("world", "characters", "timeline", "mysteries"):
@@ -455,6 +458,12 @@ def test_resuming_a_finished_run_is_refused(db, tmp_path):
     repo.create_run(db, run_id=RUN_ID, slug=SLUG, premise="a premise long enough",
                     profile="tiny", tone=None, snapshot=loader.resolve("tiny"))
     repo.finish(db, RUN_ID)
+    # Complete means every unit's outputs are on disk, not `stage = complete`
+    # (SPEC-EXAM-007 §7.1): the example novel stopped at 8/10 with that stage.
+    for unit in C.units_for(loader.resolve("tiny")):
+        for rel in unit.outputs:
+            (tmp_path / SLUG / rel).parent.mkdir(parents=True, exist_ok=True)
+            (tmp_path / SLUG / rel).write_text("x", encoding="utf-8")
     svc = RunService(db, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
                                   use_recorded_stream=False))
 

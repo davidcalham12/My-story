@@ -387,3 +387,33 @@ a.button.primary { background: var(--primary); border-color: var(--primary); col
 a.button.primary:hover { background: var(--primary-pressed); border-color: var(--primary-pressed); }
 .reader__actions { margin: var(--s3) 0; }
 .reader__page { background: var(--page); height: 80vh; }
+
+/* --- a dialog (SPEC-EXAM-007: "Continuar") ------------------------------- */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--s7) var(--gutter);
+  overflow-y: auto;
+  z-index: 10;
+}
+.dialog {
+  background: var(--panel);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lift);
+  border-left: 6px solid var(--primary);
+  padding: var(--s5) var(--s6);
+  width: 100%;
+  max-width: 560px;
+}
+.dialog h2 { margin-top: 0; }
+.dialog__actions { display: flex; justify-content: flex-end; gap: var(--s2); flex-wrap: wrap; margin-top: var(--s5); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--s2) var(--s4); margin: var(--s4) 0; }
+.facts dt { color: var(--muted); font-size: var(--text-footnote); font-weight: 700; padding-top: 2px; }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.card__actions { display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+.confirm { background: var(--qr-primary-soft); border-radius: var(--radius-sm); padding: var(--s3); display: grid; gap: var(--s2); }
+.confirm p { margin: 0; }

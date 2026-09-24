@@ -8,17 +8,40 @@ import sqlite3
 from backend.commons.config import loader
 
 
-def list_runs(conn: sqlite3.Connection) -> list[dict]:
+def list_runs(conn: sqlite3.Connection, *, trashed: bool = False) -> list[dict]:
+    """The library, or — with `trashed` — the bin. Never both: a binned run is
+    hidden from the library's list and its counts (SPEC-EXAM-007 §3)."""
+    where = "trashed_at IS NOT NULL" if trashed else "trashed_at IS NULL"
     return [dict(r) for r in conn.execute(
         "SELECT id, slug, premise, profile, tone, stage, halted, halted_detail, "
-        "source, started_at, finished_at FROM runs ORDER BY started_at DESC"
+        f"source, started_at, finished_at, trashed_at FROM runs WHERE {where} "
+        "ORDER BY started_at DESC"
     )]
+
+
+#: The kinds of `changes` row that write the book, as opposed to changing it
+#: afterwards (SPEC-EXAM-008). A continuation's ceiling subtracts these.
+SEGMENT_KINDS = ("generate", "continue")
+
+
+def segments(conn: sqlite3.Connection, run_id: str) -> list[dict]:
+    """The rows of `changes` that wrote this run's book, in order."""
+    return [dict(r) for r in conn.execute(
+        "SELECT * FROM changes WHERE run_id = ? AND kind IN (?, ?) ORDER BY n",
+        (run_id, *SEGMENT_KINDS))]
+
+
+def last_change(conn: sqlite3.Connection, run_id: str) -> int:
+    """The highest `n` of any kind: `(run_id, n)` is unique across all of them."""
+    row = conn.execute("SELECT MAX(n) AS n FROM changes WHERE run_id = ?",
+                       (run_id,)).fetchone()
+    return int(row["n"] or 0)
 
 
 def get_run(conn: sqlite3.Connection, run_id: str) -> dict | None:
     row = conn.execute(
         "SELECT id, slug, premise, profile, tone, stage, halted, halted_detail, "
-        "source, started_at, finished_at, config_snapshot FROM runs WHERE id = ?",
+        "source, started_at, finished_at, trashed_at, config_snapshot FROM runs WHERE id = ?",
         (run_id,)
     ).fetchone()
     if not row:

@@ -1,104 +1,134 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/shared/api/client'
 import type { Run } from '@/shared/api/types'
-import { plainStatus, stepOf, titleOf } from '@/entities/run/status'
+import { titleOf } from '@/entities/run/status'
+import { ContinueDialog } from './ContinueDialog'
+import { LibraryView, type LibraryPlace } from './LibraryView'
 
 /**
- * Every run, new beside imported.
- *
- * Imported ones are marked and never pooled into statistics: they were judged by
- * a different set of characteristics, so a pass rate over them does not measure
- * what it claims. Evidence, not sample.
+ * The library's state: the runs, the bin, and what the owner is in the middle
+ * of doing to one of them. Everything it draws is `LibraryView` and
+ * `ContinueDialog`, which are pure and tested (SPEC-EXAM-007 AC-6).
  */
 export function Library({ onOpen, onNew }: {
   onOpen: (id: string) => void
   onNew: () => void
 }) {
   const [runs, setRuns] = useState<Run[] | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [binned, setBinned] = useState<Run[] | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
   // Which runs actually published a book: a "complete" row is not proof there
   // is anything to read, and a stopped one may still have published.
   const [published, setPublished] = useState<Record<string, boolean>>({})
+  const [view, setView] = useState<LibraryPlace>('library')
+  const [confirming, setConfirming] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  // The continuation being prepared, and what has been typed for it.
+  const [continuing, setContinuing] = useState<Run | null>(null)
+  const [ceiling, setCeiling] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [dialogError, setDialogError] = useState<string | null>(null)
 
-  useEffect(() => {
-    let alive = true
+  const load = useCallback((alive: () => boolean = () => true) => {
     api.list().then(
       (r) => {
-        if (!alive) return
+        if (!alive()) return
         setRuns(r)
         r.forEach((run) =>
           api.versions(run.id).then(
-            (v) => alive && setPublished((p) => ({ ...p, [run.id]: v.length > 0 })),
+            (v) => alive() && setPublished((p) => ({ ...p, [run.id]: v.length > 0 })),
             () => undefined,
           ),
         )
       },
-      (e) => alive && setError(String(e)),
+      (e) => alive() && setLoadError(String(e)),
     )
+    // An older server has no bin; the library still works without it.
+    api.bin().then((b) => alive() && setBinned(b), () => alive() && setBinned([]))
+  }, [])
+
+  useEffect(() => {
+    let alive = true
+    load(() => alive)
     return () => {
       alive = false
     }
-  }, [])
+  }, [load])
 
-  if (error) return <p className="panel panel--bad">{error}</p>
+  if (loadError) return <p className="panel panel--bad">{loadError}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
 
-  const status = (run: Run) => plainStatus(run, false, published[run.id])
-  const count = (tone: string) => runs.filter((r) => status(r).tone === tone).length
-  const order = { live: 0, ok: 1, halt: 2 } as const
-  const sorted = [...runs].sort((x, y) => order[status(x).tone] - order[status(y).tone])
+  /** A bin move: the reason on screen when refused, the lists re-read when not. */
+  const act = (what: Promise<unknown>, done: string) => {
+    setError(null)
+    setNotice(null)
+    what.then(
+      () => {
+        setNotice(done)
+        load()
+      },
+      (e) => setError(e instanceof Error ? e.message : String(e)),
+    )
+  }
+
+  const confirmContinue = () => {
+    if (!continuing) return
+    setBusy(true)
+    setDialogError(null)
+    api.resume(continuing.id, continuing.asks_for_figure ? Number(ceiling) : null).then(
+      () => {
+        setBusy(false)
+        setContinuing(null)
+        onOpen(continuing.id)
+      },
+      (e) => {
+        setBusy(false)
+        setDialogError(e instanceof Error ? e.message : String(e))
+      },
+    )
+  }
 
   return (
     <>
-      <section className="hero">
-        <p className="eyebrow eyebrow--brand">Your novels</p>
-        <h1>
-          {count('live')} being written · {count('ok')} ready · {count('halt')} stopped
-        </h1>
-        <p className="lede">
-          Each novel is a personalised gift in ten chapters. Open one to follow it, read
-          it, or correct a detail.
-        </p>
-        <button type="button" className="primary" onClick={onNew}>
-          Order a new novel
-        </button>
-        <p className="hint">
-          {runs.length} run{runs.length === 1 ? '' : 's'} in total;{' '}
-          {runs.filter((r) => r.source === 'pre-loop003').length} imported from the
-          previous implementation and kept apart from the statistics.
-        </p>
-      </section>
-
-      {runs.length === 0 && (
-        <p className="panel muted">
-          Nothing yet. A <code>tiny</code> run is three chapters and, on the mock
-          engine, costs nothing.
-        </p>
+      <LibraryView
+        view={view}
+        runs={runs}
+        binned={binned}
+        published={published}
+        confirming={confirming}
+        notice={notice}
+        error={error}
+        onView={(v) => {
+          setView(v)
+          setConfirming(null)
+        }}
+        onOpen={onOpen}
+        onNew={onNew}
+        onContinue={(run) => {
+          setContinuing(run)
+          setCeiling('')
+          setDialogError(null)
+        }}
+        onTrash={(run) => setConfirming(run.id)}
+        onCancelTrash={() => setConfirming(null)}
+        onConfirmTrash={(run) => {
+          setConfirming(null)
+          act(api.trash(run.id), `«${titleOf(run)}» is in the Papelera. Nothing was deleted.`)
+        }}
+        onRestore={(run) => act(api.restore(run.id), `«${titleOf(run)}» is back in the library.`)}
+      />
+      {continuing && (
+        <ContinueDialog
+          run={continuing}
+          ceiling={ceiling}
+          busy={busy}
+          error={dialogError}
+          onCeiling={setCeiling}
+          onConfirm={confirmContinue}
+          onCancel={() => setContinuing(null)}
+        />
       )}
-
-      <div className="grid grid--2">
-        {sorted.map((run) => {
-          const s = status(run)
-          return (
-            <article key={run.id} className="card card--action">
-              <div className="row">
-                <span className={`badge badge--${s.tone}`}>{s.label}</span>
-                <span className="badge">{run.profile === 'eval' ? 'test' : run.profile}</span>
-                {run.source === 'pre-loop003' && <span className="badge">imported</span>}
-              </div>
-              <h2>{titleOf(run)}</h2>
-              {s.tone === 'live' && <p className="lede">Now: {stepOf(run.stage)}</p>}
-              <p className="muted clamp">{run.premise}</p>
-              <div className="card__foot">
-                <span className="hint">{run.id}</span>
-                <button type="button" className="primary" onClick={() => onOpen(run.id)}>
-                  Open
-                </button>
-              </div>
-            </article>
-          )
-        })}
-      </div>
     </>
   )
 }

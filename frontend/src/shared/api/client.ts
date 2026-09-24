@@ -32,6 +32,20 @@ export const api = {
       body: JSON.stringify({ premise, profile, tone }),
     }),
 
+  /* --- stopped novels (SPEC-EXAM-007) ----------------------------------- */
+
+  /** Continue a stopped novel. `ceiling_usd` is the owner's figure for this
+   *  continuation; `null` lets the backend use the profile's minus the spend. */
+  resume: (id: string, ceiling_usd: number | null) =>
+    json<{ id: string; segment: number; ceiling_usd: number }>(`/api/runs/${id}/resume`, {
+      method: 'POST',
+      body: JSON.stringify(ceiling_usd === null ? {} : { ceiling_usd }),
+    }),
+  trash: (id: string) => json<{ id: string }>(`/api/runs/${id}/trash`, { method: 'POST' }),
+  restore: (id: string) => json<{ id: string }>(`/api/runs/${id}/restore`, { method: 'POST' }),
+  /** The bin: runs moved to `output/_papelera/`, hidden from the library. */
+  bin: () => json<Run[]>('/api/runs?trashed=true'),
+
   /* --- the brief (FLOW-0) ------------------------------------------------ */
 
   /** Free, and callable as often as the form likes: it spends nothing and it

@@ -70,6 +70,34 @@ class OrchestrationRefused(BriefNotReady):
     to start: nothing was created, and the sentence says why."""
 
 
+class Refused(Exception):
+    """A continuation or a bin move that is not done, with the reason why.
+
+    Every refusal carries a sentence the panel shows as it is (SPEC-EXAM-007
+    §2, §3): a refusal the owner cannot read is a button that does nothing.
+    """
+
+
+class CeilingRequired(Exception):
+    """A continuation that needs a ceiling in USD typed for it (SPEC-EXAM-007 §2).
+
+    A run stopped by its budget, one with nothing left of its profile's
+    ceiling, or one whose spend was never measured, does not start without one.
+    """
+
+
+#: Where a binned run's directory goes, under the output directory. Nothing in
+#: it is deleted; `restore` moves it back (SPEC-EXAM-007 §3).
+BIN = "_papelera"
+
+
+def _move(src: Path, dst: Path) -> None:
+    """A rename, never a copy: same volume, so it is all or nothing. On
+    Windows it fails while a file inside is open, which is the case a readable
+    refusal exists for."""
+    src.rename(dst)
+
+
 def slugify(premise: str) -> str:
     """A fallback only.
 
@@ -81,7 +109,7 @@ def slugify(premise: str) -> str:
     return "-".join(words[:6])[:40] or "untitled"
 
 
-def unique_slug(conn, base: str) -> str:
+def unique_slug(conn, base: str, bin_dir: Path | None = None) -> str:
     """`base`, or `base-2`, `base-3`, … — the first one no run holds.
 
     `runs.slug` is UNIQUE and the fallback is the premise's first six words, so
@@ -89,6 +117,10 @@ def unique_slug(conn, base: str) -> str:
     still overwrites this one when the stream reveals it.
     """
     taken = {row[0] for row in conn.execute("SELECT slug FROM runs WHERE slug LIKE ?", (base + "%",))}
+    # A binned run's directory keeps its name in the bin; a new run that took
+    # it could never be restored beside it (SPEC-EXAM-007 §7.6).
+    if bin_dir is not None and bin_dir.is_dir():
+        taken |= {p.name for p in bin_dir.iterdir() if p.name.startswith(base)}
     if base not in taken:
         return base
     n = 2
@@ -117,6 +149,9 @@ class Live:
     #: Under the conductor: the units that ran, and each one's largest turn.
     units: list[str] = field(default_factory=list)
     largest_turn: dict[str, int] = field(default_factory=dict)
+    #: Which `changes` row (its `n`) this process is (SPEC-EXAM-007); None
+    #: when the caller opened none.
+    segment: int | None = None
 
 
 class RunService:
@@ -130,16 +165,190 @@ class RunService:
 
     def _titled(self, run: dict) -> dict:
         # The book's title for the panel, from the same place the PDF takes it.
-        return run | {"title": title_of(Path(self.settings.output_dir) / run["slug"])}
+        return run | {"title": title_of(self._dir_of(run))}
 
-    def list(self) -> list[dict]:
-        return [self._titled(r) for r in read_repo.list_runs(self.conn)]
+    def _dir_of(self, run: dict) -> Path:
+        """Where the run's files are: its own directory, or the bin's."""
+        out = Path(self.settings.output_dir)
+        return (out / BIN if run.get("trashed_at") else out) / run["slug"]
+
+    def list(self, trashed: bool = False) -> list[dict]:
+        return [self._titled(r) | self._standing(r)
+                for r in read_repo.list_runs(self.conn, trashed=trashed)]
 
     def get(self, run_id: str) -> dict:
         run = read_repo.get_run(self.conn, run_id)
         if not run:
             raise NotFound(run_id)
-        return self._titled(run)
+        return self._titled(run) | self._standing(run)
+
+    # ------------------------------------------------ stopped (SPEC-EXAM-007)
+
+    def _is_live(self, run_id: str) -> bool:
+        live = self._live
+        return bool(live and live.run_id == run_id and not live.done)
+
+    def _snapshot(self, run_id: str) -> dict:
+        row = self.conn.execute(
+            "SELECT config_snapshot FROM runs WHERE id = ?", (run_id,)).fetchone()
+        return json.loads(row["config_snapshot"] or "{}") if row else {}
+
+    def _standing(self, run: dict) -> dict:
+        """Whether the run can be continued, from where, and at what price.
+
+        **Stopped means units are missing and no process is live** (§7.1), not
+        a stage: the example novel stopped itself at 8/10 with `stage =
+        complete`. A snapshot with no chapter count (imported history) has no
+        units to ask about, and falls back to its row.
+        """
+        run_dir = self._dir_of(run)
+        live = self._is_live(run["id"])
+        snapshot = self._snapshot(run["id"])
+        try:
+            missing = conductor.first_missing(snapshot, run_dir)
+            complete = missing is None
+        except (KeyError, TypeError, ValueError):
+            missing = None
+            complete = run.get("stage") == "complete" and not run.get("halted")
+        stopped = not live and not complete
+
+        spent, provenance = _spent(self._segments(run["id"], run_dir))
+        try:
+            left = self._left(run, self._segment_config(run["profile"], snapshot), spent)
+            asks, why = False, None
+        except CeilingRequired as exc:
+            left, asks, why = None, True, str(exc)
+
+        return {
+            "live": live,
+            "complete": complete,
+            "stopped": stopped,
+            "resume_from": missing.name if stopped and missing else None,
+            "resume_stage": missing.stage if stopped and missing else None,
+            # Across every segment; None when any of them is unmeasured.
+            "spent_usd": spent,
+            "spent_provenance": provenance,
+            "asks_for_figure": asks,
+            "figure_reason": why,
+            "ceiling_left_usd": left,
+            "context_refusal": (self._context_refusal(run, snapshot, missing, run_dir)
+                                if stopped else None),
+        }
+
+    def _context_refusal(self, run: dict, cfg: dict, unit, run_dir: Path) -> str | None:
+        """§2 and §7.5: a unit that halted on the 100k ceiling, about to be sent
+        a packet estimated over it again, is not continued.
+
+        With `chapter_loop = claude` the packet cannot be measured before
+        launch, so this is an **estimate** and says so. It refuses only for the
+        unit that halted; any other unit may continue.
+        """
+        if run.get("halted") != "context" or unit is None:
+            return None
+        if not (run.get("halted_detail") or "").startswith(f"{unit.name}:"):
+            return None
+        ceiling = int(cfg["context"]["max_concurrent_tokens"])
+        estimate = conductor.estimate_packet(unit, run_dir)
+        if estimate <= ceiling:
+            return None
+        return (f"{unit.name} stopped on the {ceiling:,}-token ceiling and would be "
+                f"sent the same packet again: estimated {estimate:,} tokens (the "
+                f"~{conductor.STARTUP_FLOOR:,} a fresh orchestrator carries plus a "
+                f"quarter of the bytes it reads). Continuing would spend on a run "
+                f"that must stop again; it becomes continuable when the packet is "
+                f"smaller.")
+
+    def _segments(self, run_id: str, run_dir: Path) -> list[dict]:
+        """The run's segments; for a run recorded before there were any, the
+        ones its row and its `cost.json` imply, without writing them (§7.4)."""
+        rows = read_repo.segments(self.conn, run_id)
+        if rows:
+            return rows
+        run = self.conn.execute(
+            "SELECT started_at, finished_at, cost_usd, cost_provenance, "
+            "config_snapshot FROM runs WHERE id = ?", (run_id,)).fetchone()
+        if run is None:
+            return []
+        snapshot = json.loads(run["config_snapshot"] or "{}")
+        first = {
+            "n": 1, "kind": "generate",
+            "started_at": run["started_at"], "finished_at": run["finished_at"],
+            "orchestrator_model": (snapshot.get("models") or {}).get("orchestrator"),
+            "chapter_loop": (snapshot.get("orchestration") or {}).get("chapter_loop") or "claude",
+            "ceiling_usd": (snapshot.get("budget") or {}).get("max_cost_usd"),
+            "ceiling_by": "profile",
+            "total_usd": run["cost_usd"],
+            "provenance": run["cost_provenance"] or (
+                "absent" if run["cost_usd"] is None else "measured"),
+            "note": "recorded at its first continuation, from the run's row",
+        }
+        try:
+            on_disk = json.loads((run_dir / "cost.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            on_disk = {}
+        resume = on_disk.get("resume")
+        if isinstance(resume, dict) and isinstance(on_disk.get("first_run_usd"), (int, float)):
+            # The example novel's hand-made resume block (docs/spec.md §8): its
+            # first run and its second segment, each from its own result event.
+            # What the second ran under was not recorded, so it stays NULL.
+            first |= {"total_usd": float(on_disk["first_run_usd"]),
+                      "provenance": "measured",
+                      "note": "recorded at its first continuation, from cost.json's first_run_usd"}
+            return [first, {
+                "n": 2, "kind": "continue", "started_at": None, "finished_at": None,
+                "orchestrator_model": None, "chapter_loop": "claude",
+                "ceiling_usd": None, "ceiling_by": "owner",
+                "total_usd": resume.get("total_cost_usd"),
+                "provenance": resume.get("provenance") or "measured",
+                "note": ("recorded afterwards from cost.json's hand-made resume block; "
+                         "its start time, model and ceiling were not recorded, so "
+                         "started_at is when this row was written"),
+            }]
+        if first["total_usd"] is None and isinstance(on_disk.get("total_cost_usd"), (int, float)):
+            first |= {"total_usd": float(on_disk["total_cost_usd"]),
+                      "provenance": on_disk.get("provenance") or "measured"}
+        return [first]
+
+    def _segment_config(self, profile: str, snapshot: dict) -> dict:
+        """§7.2: the snapshot, with `models` and `orchestration` from the
+        profile as it is today — for this segment only. Nothing is written."""
+        cfg = json.loads(json.dumps(snapshot))
+        try:
+            today = loader.resolve(profile)
+        except Exception:  # noqa: BLE001 - a profile that no longer exists
+            return cfg
+        for key in ("models", "orchestration"):
+            if key in today:
+                cfg[key] = today[key]
+        return cfg
+
+    def _left(self, run: dict, cfg: dict, spent: float | None) -> float:
+        """What a continuation may spend when nobody types a figure (§2).
+
+        The profile's ceiling minus what the run has spent across all its
+        segments. A spend nobody measured cannot be subtracted — absent is not
+        zero — so the panel asks for a figure instead.
+        """
+        if run.get("halted") == "budget":
+            raise CeilingRequired(
+                "this novel stopped on its budget ceiling; continuing needs a new "
+                "ceiling in USD for this continuation")
+        try:
+            ceiling = self.ceiling_for(cfg)
+        except (KeyError, TypeError, ValueError):
+            raise CeilingRequired("this run's profile has no budget ceiling on "
+                                  "record; type a ceiling in USD") from None
+        if spent is None:
+            raise CeilingRequired(
+                f"what this novel has spent is not measured, so the profile's "
+                f"ceiling of ${ceiling:.2f} cannot be reduced by it; type a "
+                f"ceiling in USD")
+        left = ceiling - spent
+        if left <= 0:
+            raise CeilingRequired(
+                f"it has spent ${spent:.2f} of the profile's ceiling of "
+                f"${ceiling:.2f}; nothing is left, so type a ceiling in USD")
+        return left
 
     def detail(self, run_id: str) -> dict:
         return {
@@ -227,7 +436,8 @@ class RunService:
             if self._live and not self._live.done:
                 raise AlreadyRunning("a run is already in flight; the queue is one")
             run_id = uuid.uuid4().hex[:12]
-            slug = unique_slug(self.conn, slugify(premise))
+            slug = unique_slug(self.conn, slugify(premise),
+                               bin_dir=Path(self.settings.output_dir) / BIN)
             cfg = loader.resolve(profile)
             refused = conductor.refusal(cfg, single=self.settings.single_orchestrator)
             if refused:
@@ -242,7 +452,12 @@ class RunService:
                 tone=tone.strip() or None, snapshot=cfg, brief_id=brief_id,
             )
             write_repo.save_skill_sha(self.conn, run_id, at_start=self._skill_sha())
-            live = Live(run_id=run_id)
+            write_repo.open_change(
+                self.conn, run_id, n=1, kind="generate", started_at=_now(),
+                orchestrator_model=(cfg.get("models") or {}).get("orchestrator"),
+                chapter_loop=(cfg.get("orchestration") or {}).get("chapter_loop") or "claude",
+                ceiling_usd=self.ceiling_for(cfg), ceiling_by="profile")
+            live = Live(run_id=run_id, segment=1)
             self._live = live
 
         threading.Thread(
@@ -269,7 +484,8 @@ class RunService:
 
         self._conduct(live, cfg, self.get(live.run_id)["slug"])
 
-    def resume(self, run_id: str, *, _wait: bool = False) -> dict:
+    def resume(self, run_id: str, *, ceiling_usd: float | None = None,
+               _wait: bool = False) -> dict:
         """Continue a run that stopped, in the directory it stopped in.
 
         The first real conductor run halted at `cast` with its four Bible files
@@ -281,38 +497,107 @@ class RunService:
         What makes this cheap is that nothing has to be remembered. The
         conductor asks the filesystem which units are done, so a resumed run is
         an ordinary run whose first units are already finished.
+
+        SPEC-EXAM-007 adds what a continuation runs under: `models` and
+        `orchestration` from the profile as it is today, for this segment only
+        (§7.2), and a ceiling that is the owner's typed figure, or the profile's
+        minus the measured spend (§2). Each continuation is a `changes` row of
+        kind `continue`, in the table SPEC-EXAM-008 shares.
         """
         run = self.get(run_id)
-        if run.get("stage") == "complete":
-            raise NotLive(f"run {run_id} is complete; there is nothing to resume")
+        if run.get("trashed_at"):
+            raise Refused(f"run {run_id} is in the bin; restore it before continuing it")
+        if run["complete"]:
+            raise NotLive(f"run {run_id} is complete: every unit's outputs are on "
+                          "disk, so there is nothing to resume")
         with self._lock:
             if self._live and not self._live.done:
                 raise AlreadyRunning("a run is already in flight; the queue is one")
-            cfg = json.loads(self.conn.execute(
-                "SELECT config_snapshot FROM runs WHERE id = ?", (run_id,)
-            ).fetchone()["config_snapshot"])
+            if run["context_refusal"]:
+                raise Refused(run["context_refusal"])
+            cfg = self._segment_config(run["profile"], self._snapshot(run_id))
             refused = conductor.refusal(cfg, single=self.settings.single_orchestrator)
             if refused:
                 raise OrchestrationRefused(refused)
-            # The halt that is being resumed past stops being the run's state.
-            # It stays in `events` and in the warnings; the row says running.
-            with self.conn:
-                self.conn.execute(
-                    "UPDATE runs SET halted = NULL, halted_detail = NULL, "
-                    "finished_at = NULL WHERE id = ?", (run_id,))
-            live = Live(run_id=run_id)
+            prior = self._segments(run_id, self._dir_of(run))
+            if ceiling_usd is not None:
+                # The owner's figure for this continuation, lowered — never
+                # raised — by NOVAFORGE_BUDGET, as the profile's is.
+                env = self.settings.budget_ceiling_usd
+                ceiling = float(ceiling_usd) if env is None else min(float(ceiling_usd), env)
+                ceiling_by = "owner"
+            else:
+                ceiling = self._left(run, cfg, _spent(prior)[0])
+                ceiling_by = "profile"
+
+            if not read_repo.segments(self.conn, run_id):
+                # Recorded before segments existed: write the ones its row and
+                # its cost.json imply, so the record starts at its launch.
+                for seg in prior:
+                    write_repo.open_change(
+                        self.conn, run_id,
+                        **(seg | {"n": read_repo.last_change(self.conn, run_id) + 1,
+                                  "started_at": seg["started_at"] or _now()}))
+            n = read_repo.last_change(self.conn, run_id) + 1
+            model = (cfg.get("models") or {}).get("orchestrator")
+            write_repo.open_change(
+                self.conn, run_id, n=n, kind="continue", started_at=_now(),
+                orchestrator_model=model,
+                chapter_loop=(cfg.get("orchestration") or {}).get("chapter_loop") or "claude",
+                ceiling_usd=ceiling, ceiling_by=ceiling_by)
+            # The halt being resumed past stops being the run's state. It stays
+            # in `events` and in the warnings; the row says running.
+            write_repo.reopen(self.conn, run_id)
+            live = Live(run_id=run_id, segment=n)
             self._live = live
 
-        args = (live, cfg, run["slug"])
+        args = (live, cfg, run["slug"], ceiling)
         if _wait:
             self._conduct(*args)
         else:
             threading.Thread(target=self._conduct, args=args, daemon=True).start()
-        return {"id": run_id, "slug": run["slug"], "resumed": True}
+        return {"id": run_id, "slug": run["slug"], "resumed": True, "segment": n,
+                "ceiling_usd": ceiling, "ceiling_by": ceiling_by,
+                "orchestrator_model": model}
 
-    def _conduct(self, live: Live, cfg: dict, slug: str) -> None:
-        """Drive the units of one run. Shared by `start` and `resume`."""
-        budget = self._budget_watcher(cfg)
+    # -------------------------------------------------------------- the bin
+
+    def trash(self, run_id: str) -> dict:
+        """Move a stopped novel to the bin. Nothing is deleted (§3)."""
+        run = self.get(run_id)
+        if run.get("trashed_at"):
+            raise Refused(f"run {run_id} is already in the bin")
+        if run["live"]:
+            raise Refused(f"run {run_id} is live; halt it before moving it to the bin")
+        if run["complete"]:
+            raise Refused(f"run {run_id} is a complete novel: a published book is not "
+                          "a stopped novel, and removing one is a different decision")
+        out = Path(self.settings.output_dir)
+        _relocate(run["slug"], out / run["slug"], out / BIN / run["slug"],
+                  f"{BIN}/{run['slug']}/ already exists in the bin; nothing was moved")
+        write_repo.set_trashed(self.conn, run_id, True)
+        return {"id": run_id, "trashed": True}
+
+    def restore(self, run_id: str) -> dict:
+        """Move a binned novel back where it was, and clear `trashed_at`."""
+        run = self.get(run_id)
+        if not run.get("trashed_at"):
+            raise Refused(f"run {run_id} is not in the bin")
+        out = Path(self.settings.output_dir)
+        _relocate(run["slug"], out / BIN / run["slug"], out / run["slug"],
+                  f"output/{run['slug']}/ already exists again; restoring would put "
+                  "one novel on top of another, so nothing was moved")
+        write_repo.set_trashed(self.conn, run_id, False)
+        return {"id": run_id, "trashed": False}
+
+    def _conduct(self, live: Live, cfg: dict, slug: str,
+                 ceiling: float | None = None) -> None:
+        """Drive the units of one run. Shared by `start` and `resume`.
+
+        `ceiling` is this segment's; None means the profile's (`ceiling_for`).
+        """
+        ceiling = self.ceiling_for(cfg) if ceiling is None else ceiling
+        budget = BudgetWatcher(ceiling_usd=ceiling, pricing=loader.load_pricing())
         state = State()
         halted: tuple[str, str] | None = None
         run_dir = Path(self.settings.output_dir) / slug
@@ -326,13 +611,13 @@ class RunService:
 
         factory = getattr(self, "_conductor_factory", None) or conductor.real_process(
             run_dir, cwd=Path(self.settings.repo_root),
-            max_budget_usd=self.ceiling_for(cfg),
+            max_budget_usd=ceiling,
             model=(cfg.get("models") or {}).get("orchestrator"))
 
         maestro = conductor.Conductor(
             conn=self.conn, run_id=live.run_id, slug=slug, run_dir=run_dir,
             cfg=cfg, on_event=on_event, process_factory=factory,
-            max_budget_usd=self.ceiling_for(cfg),
+            max_budget_usd=ceiling,
             seq=self._last_seq(live.run_id),
             chapter_loop=self._chapter_loop(live, run_dir, cfg),
         )
@@ -347,6 +632,9 @@ class RunService:
         except Exception as exc:
             halted = ("interrupted", str(exc)[:500])
         finally:
+            # The conductor names the directory, so here the slug is known
+            # rather than learned; the cost and the archive need it either way.
+            state.slug = state.slug or slug
             self._finish(live, state, halted)
 
     def _chapter_loop(self, live: Live, run_dir: Path, cfg: dict):
@@ -434,7 +722,11 @@ class RunService:
                 # would be a different run.
                 halted = ("process", "the orchestrator ended without a result event")
             elif halted is None and state.error:
-                halted = ("gate", state.error)
+                # The CLI's own ceiling is a budget halt, or the panel never
+                # asks for a new one (SPEC-EXAM-007 §7.7).
+                kind = ("budget" if state.last_subtype == conductor.BUDGET_SUBTYPE
+                        else "gate")
+                halted = (kind, state.error)
         except Exception as exc:
             halted = ("interrupted", str(exc)[:500])
         finally:
@@ -515,8 +807,19 @@ class RunService:
                 write_repo.finish(self.conn, live.run_id)
                 live.result = "complete"
 
+            units = len(getattr(live, "units", []) or [])
+            earlier: list[dict] = []
+            if live.segment is not None:
+                write_repo.close_change(
+                    self.conn, live.run_id, live.segment, total_usd=state.total_cost_usd,
+                    provenance=("absent" if state.total_cost_usd is None else
+                                     "reconstructed" if state.results < units else
+                                     "measured"))
+                earlier = [seg for seg in read_repo.segments(self.conn, live.run_id)
+                           if seg["n"] < live.segment]
+
             if state.total_cost_usd is not None:
-                self._write_cost(state, units=len(getattr(live, "units", []) or []))
+                self._write_cost(state, units=units, earlier=earlier)
 
             # The parser skips a line it cannot read; the record says so. The
             # backend writes no log file, so the database is the log (P-8).
@@ -671,7 +974,8 @@ class RunService:
                 # be written is still better than a follower that never returns.
                 pass
 
-    def _write_cost(self, state: State, *, units: int = 0) -> None:
+    def _write_cost(self, state: State, *, units: int = 0,
+                    earlier: list[dict] | None = None) -> None:
         """The whole run's cost, orchestrator included, straight from Claude Code.
 
         This is the figure v1 could not see. Its absence is why a $6.21 estimate
@@ -691,23 +995,41 @@ class RunService:
         silent = max(0, units - state.results)
         path = Path(self.settings.output_dir) / state.slug / "cost.json"
         path.parent.mkdir(parents=True, exist_ok=True)
+        this = "measured" if not silent else "reconstructed"
+        total, provenance, extra = state.total_cost_usd, this, {}
+        if earlier:
+            # A continued run: the total is every segment's, not this one's
+            # (SPEC-EXAM-007 §7.3). A segment with no figure makes the total a
+            # lower bound, and the grade says so rather than reading as whole.
+            known = [seg["total_usd"] for seg in earlier if seg["total_usd"] is not None]
+            total = state.total_cost_usd + sum(known)
+            if len(known) < len(earlier) or any(
+                    seg["provenance"] != "measured" for seg in earlier):
+                provenance = "reconstructed"
+            extra = {"segments": [
+                *({"n": seg["n"], "kind": seg["kind"], "cost_usd": seg["total_usd"],
+                   "provenance": seg["provenance"]} for seg in earlier),
+                {"n": earlier[-1]["n"] + 1, "kind": "continue",
+                 "cost_usd": state.total_cost_usd, "provenance": this},
+            ]}
         path.write_text(json.dumps({
             "_comment": "From Claude Code's own result events, summed over the "
                         "run's units. The orchestrator turns are included — "
                         "which is most of it.",
-            "total_cost_usd": state.total_cost_usd,
+            "total_cost_usd": total,
             "turns": state.turns,
             "duration_ms": state.duration_ms,
             "subagent_dispatches": len(state.dispatched),
             "units_run": units or None,
             "units_that_reported": state.results,
             "units_stopped_before_reporting": silent,
-            "provenance": "measured" if not silent else "reconstructed",
+            "provenance": provenance,
             "_comment_provenance": None if not silent else (
                 f"{silent} unit(s) were stopped mid-turn and sent no result, so "
                 "their cost is in no record. This total is every unit that "
                 "finished and nothing for the ones that did not — a lower bound, "
                 "not the bill."),
+            **extra,
         }, indent=2) + "\n", encoding="utf-8")
 
     # ------------------------------------------------------------- halting
@@ -796,3 +1118,32 @@ class RunService:
         live = self._live
         if live and live.run_id == run_id and live.process is not None:
             live.process.stop()  # type: ignore[attr-defined]
+
+
+def _relocate(slug: str, src: Path, dst: Path, exists: str) -> None:
+    """Move a run's directory to or from the bin, or refuse with a reason."""
+    if dst.exists():
+        raise Refused(exists)
+    if not src.exists():
+        return  # a run that never wrote a file: only its row moves
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        _move(src, dst)
+    except OSError as exc:
+        raise Refused(
+            f"could not move {slug}/: a file in it is open in another program "
+            f"({exc.strerror or exc}). Close it and try again; nothing was moved."
+        ) from exc
+
+
+def _spent(segments: list[dict]) -> tuple[float | None, str]:
+    """What a run has spent across its segments, and how that is known.
+
+    None when any segment has no figure: a sum that skipped one would read as
+    the whole bill, and absent is never zero.
+    """
+    if not segments or any(seg["total_usd"] is None for seg in segments):
+        return None, "absent"
+    measured = all(seg["provenance"] == "measured" for seg in segments)
+    return (float(sum(seg["total_usd"] for seg in segments)),
+            "measured" if measured else "reconstructed")

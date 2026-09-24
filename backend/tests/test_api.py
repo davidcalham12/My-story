@@ -489,6 +489,9 @@ def test_a_taken_fallback_slug_gets_a_suffix_instead_of_a_500(client_for, db):
         third = client.post("/api/runs", json={"premise": PREMISE})
         assert third.status_code == 201, third.text
         assert third.json()["slug"] == taken + "-3"
+        # Waited for, or its thread is still writing to the connection the
+        # `db` fixture closes: an intermittent segfault in the next test.
+        _wait(client, third.json()["id"])
 
 
 def test_the_learned_slug_still_overwrites_the_suffixed_fallback(client, db):

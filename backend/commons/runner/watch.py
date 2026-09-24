@@ -73,6 +73,10 @@ class State:
     results: int = 0
     finished: bool = False
     error: str | None = None
+    #: The last `result`'s subtype. `error_max_budget_usd` is the CLI's own
+    #: ceiling, and it must end as a `budget` halt: filed as `process`, the
+    #: panel never asks for a new ceiling (SPEC-EXAM-007 §7.7).
+    last_subtype: str | None = None
 
 
 def _message(event: dict) -> dict:
@@ -168,6 +172,7 @@ def apply(state: State, event: dict) -> State:
         state.total_cost_usd = _add(state.total_cost_usd, event.get("total_cost_usd"))
         state.turns = _add(state.turns, event.get("num_turns"))
         state.duration_ms = _add(state.duration_ms, event.get("duration_ms"))
+        state.last_subtype = event.get("subtype")
         if event.get("is_error"):
             state.error = str(event.get("result") or "the run reported an error")
         state.headline = "finished" if not state.error else "the run reported an error"

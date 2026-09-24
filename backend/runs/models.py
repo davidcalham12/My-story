@@ -67,3 +67,13 @@ class Cost(BaseModel):
     # How the figures were obtained. A mixed run says so rather than picking the
     # flattering one.
     provenance: list[str]
+
+
+class ResumeRun(BaseModel):
+    """SPEC-EXAM-007 §4. `ceiling_usd` is the owner's figure for this
+    continuation: required when the run stopped on its budget, or when nothing
+    is left of the profile's ceiling; otherwise the profile's minus the spend."""
+
+    model_config = {"extra": "forbid"}
+
+    ceiling_usd: float | None = Field(default=None, gt=0)

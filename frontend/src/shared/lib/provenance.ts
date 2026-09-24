@@ -68,3 +68,12 @@ export function money(cost: Cost | undefined): string {
   if (!cost.total_usd && !cost.calls) return 'not recorded'
   return `$${cost.total_usd.toFixed(2)}`
 }
+
+/**
+ * A dollar figure that may be absent. `null` is "not measured", never `$0.00`:
+ * a stopped run whose spend nobody recorded did not run for free.
+ */
+export function usd(value: number | null | undefined): string {
+  if (value === null || value === undefined) return 'not measured'
+  return `$${value.toFixed(2)}`
+}
