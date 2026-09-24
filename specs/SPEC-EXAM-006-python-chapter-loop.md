@@ -1,11 +1,11 @@
 ---
 id: SPEC-EXAM-006
 title: The chapter loop in Python — the model judges, the code conducts
-status: draft — awaiting the owner's approval
+status: approved
 owner: David Calderon
 requested_by: David Calderon — in chat to the coordinating session, 2026-09-24: "si, escribe el spec del orquestador en python"
-approved_by: (pending — the owner approves by dictating a sentence, copied here in his words)
-approved_on: (pending)
+approved_by: David Calderon — in chat to the coordinating session, 2026-09-24, after the build session's six-point review was folded in: "apruebo el SPEC-EXAM-006, techo 3 USD para la prueba"
+approved_on: 2026-09-24
 names_protected_value: none of the values in AGENTS.md §6 changes — the threshold of 8, the six characteristics, three attempts, every agent's `tools:` line, patch_then_halt, the 100,000-token ceiling and the budget ceiling are all kept, and several become stricter (§5). What changes is an architectural rule in CLAUDE.md: "Claude Code orchestrates; Python launches, watches and archives". For FLOW-4 only, behind a switch whose default is the current behaviour, Python conducts. Recorded in docs/architecture.md §8 when approved.
 depends_on: SPEC-EXAM-003 (the conductor), backend/chapters/domain.py, backend/commons/runner, backend/publish/run_judge.py (the precedent), .claude/agents/, output/*/dist/*/procedure/chapter.md
 ---

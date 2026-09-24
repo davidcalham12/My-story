@@ -1,0 +1,127 @@
+---
+id: SPEC-EXAM-007
+title: A stopped novel can be continued, cheaper and to the same gate, or put in the bin and restored
+status: approved
+owner: David Calderon
+requested_by: David Calderon — in chat to the coordinating session, 2026-09-24: "las novelas que se pararon quiero tener la opcion de eliminarlas o que continue su proceso y quiero que todo este funcionando bien de una manera que gaste menos y que tenga la misma calidad"
+decisions: chosen by the owner in the same session — deleting is "Papelera recuperable"; continuing uses "La más barata vigente"; a run stopped by its budget continues only after "Pedir un techo nuevo"
+approved_by: David Calderon — in chat to the coordinating session, 2026-09-24: "apruebo el SPEC-EXAM-007"
+approved_on: 2026-09-24
+names_protected_value: the budget ceiling — the mechanism is unchanged (the CLI's --max-budget-usd plus the watcher). What is new is that a continued run carries a ceiling the owner types for that continuation, as he did for the example novel (75 USD, spec §8). Nothing else in AGENTS.md §6 is touched: the gate that judges a continued chapter is the same gate.
+depends_on: backend/runs/service.py::resume, backend/runs/router.py, the conductor (SPEC-EXAM-003), SPEC-EXAM-006, frontend pages library and read
+---
+
+# SPEC-EXAM-007 — Stopped novels: continue them or bin them
+
+## 1. What is wanted, and why
+
+The library shows novels that stopped: on their budget, on the 100k ceiling, by
+the operator, or on the organisation's spend limit. **Today there are four**:
+
+| run | where | why |
+|---|---|---|
+| `aa1bbe9269aa` | FLOW-1 | organisation spend limit (recorded as `gate`, before e5e3e9b) |
+| `8834d0ab189a` (finisterre, eval 04) | FLOW-3 | budget, 25.80 of 25 USD |
+| `8ab6c57af9f6` (stone-collector, eval 01) | FLOW-4 | stopped by the operator |
+| `db2fed5bd97a` (leo-and-bruno) | FLOW-3 | the 100k ceiling |
+
+From the web, the owner can do nothing with them. He wants two things:
+- **continue** a stopped novel, spending less than it would have and to the same quality;
+- **remove** one he does not want, recoverably.
+
+`POST /api/runs/{id}/resume` already exists and works (the conductor asks the
+filesystem which units are done). It has no button, and it continues with the
+**config the run started with** — for every stopped run today, Opus as the
+orchestrator, the expensive one.
+
+## 2. Continue
+
+**In the panel.** A stopped novel shows **"Continuar"**. Before anything
+starts, the panel shows:
+- why it stopped;
+- what it has spent (measured, or absent);
+- which stage it will continue from.
+
+**The cheapest current configuration.** A continued run takes `models` and
+`orchestration` from **its profile as it is today**, not from its snapshot:
+- today that means Sonnet as the orchestrator;
+- once SPEC-EXAM-006's AC-6 is measured and the owner turns the switch on, it
+  also means the Python chapter loop.
+
+The snapshot is not rewritten. A `resumed` entry is appended to the run with
+the time, the models, the orchestration and the ceiling, so the record says
+what each segment ran under.
+
+**Same quality.** The threshold of 8, the six characteristics, three attempts
+and patch_then_halt come from the same code for a continued chapter as for a
+new one. Chapters already promoted are not redone.
+
+**The ceiling.**
+- **Stopped by its budget:** "Continuar" asks for a new ceiling in USD, for
+  this continuation. Without a figure it does not start. The figure and who
+  typed it are recorded.
+- **Any other reason:** the ceiling is the profile's, minus what the run has
+  already spent (measured). If nothing is left, the panel asks for a figure as
+  above.
+
+**Refusals, each with its reason on screen:**
+- the run is complete (as today);
+- another run is live (as today: the queue is one);
+- the run stopped on the 100k ceiling and the continuation would dispatch the
+  same unit with the same packet. The panel says so and does not spend on a
+  run that must halt again. The run becomes continuable when SPEC-EXAM-006 or
+  a smaller packet changes that.
+
+## 3. The bin (papelera)
+
+- A stopped novel shows **"Mover a la papelera"**. It asks for one
+  confirmation.
+- **What moves.** The run's row gets `trashed_at`, and its directory moves to
+  `output/_papelera/<slug>/`. Nothing is deleted.
+- **The library** hides binned runs from its list and its counts. A
+  **"Papelera"** view lists them, each with **"Restaurar"**, which moves the
+  directory back and clears `trashed_at`.
+- **Langfuse is not touched.** A binned novel's traces stay, because what it
+  cost was spent.
+- **Refused:** a live run, and a complete novel. A published book is not a
+  stopped novel, and removing one is a different decision.
+- **Permanent deletion is out of scope.** The owner chose a recoverable bin.
+
+## 4. Interfaces
+
+| method | path | body | effect |
+|---|---|---|---|
+| POST | `/api/runs/{id}/resume` | `{ceiling_usd?}` | as today, plus §2: current models and orchestration, the ceiling rules, the `resumed` record |
+| POST | `/api/runs/{id}/trash` | — | §3 |
+| POST | `/api/runs/{id}/restore` | — | §3 |
+| GET | `/api/runs?trashed=true` | — | the bin |
+
+A migration adds `runs.trashed_at` and a `run_segments` table (or rows in an
+existing table, whichever the plan finds already fits) holding each
+continuation's time, models, orchestration and ceiling.
+
+## 5. Acceptance criteria
+
+| id | criterion | letter |
+|---|---|---|
+| AC-1 | A continued run launches with the profile's current `models.orchestrator` (a test pins `--model sonnet` for a run whose snapshot says null) and records the segment | T |
+| AC-2 | A run stopped by `budget` is not continued without `ceiling_usd`; with it, `--max-budget-usd` is that figure | T |
+| AC-3 | Promoted chapters are not redone after continuing (fake runner) | T |
+| AC-4 | Trash and restore move the directory and back, byte-identical; the bin and the library counts are right | T |
+| AC-5 | Trash refuses a live run and a complete novel; resume refuses a complete run and a second live one, each with its reason | T |
+| AC-6 | In the panel: the stopped cards show both buttons; the bin view restores; the budget case asks for the figure (component tests) | T |
+| AC-7 | **Demonstration:** the owner continues one stopped novel from the web, with its measured cost and minutes recorded in from-build.md | D |
+
+## 6. Gaps
+
+| gap | level | why accepted |
+|---|---|---|
+| A continued run mixes models across segments | incidental | recorded per segment; a reader of the record sees which chapters ran under which |
+| Langfuse keeps a binned novel's traces | incidental | on purpose: cost spent is not undone by hiding a novel |
+| No permanent deletion | incidental | the owner's choice |
+
+## 7. Order
+
+After the v3, and after or beside SPEC-EXAM-006's code (both are $0 until
+something real is launched). AC-7 costs money and waits for the owner's go and
+his ceiling.
