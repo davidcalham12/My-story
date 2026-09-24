@@ -23,6 +23,12 @@
   --qr-ink: #233441;
   --qr-deep: #1E2D3D;
   --qr-card: #F5F5F5;
+  --qr-accent: #F87936;
+  /* Tints of the brand orange and ink for large quiet surfaces (a hero band,
+     a chosen card, a badge). Derived, not new hues: the same two colours at
+     low strength, so the page stays two-colour. */
+  --qr-primary-soft: #FFF1E8;
+  --qr-ink-soft: #EEF1F4;
 
   /* --- supporting greys and states --------------------------------------- *
    * Not brand colours: the three state hues below are the smallest set that
@@ -70,8 +76,12 @@
   --s7: 48px;
 
   /* --- surfaces ---------------------------------------------------------- */
-  --radius: 10px;
-  --radius-sm: 6px;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --shadow: 0 1px 2px rgba(30, 45, 61, 0.06), 0 4px 16px rgba(30, 45, 61, 0.06);
+  --shadow-lift: 0 2px 4px rgba(30, 45, 61, 0.08), 0 12px 32px rgba(30, 45, 61, 0.12);
+  --wide: 1120px;
   --gutter: var(--s4);       /* never smaller: 375px − 2×16 is the phone column */
   --measure: 72ch;
 }
@@ -87,6 +97,8 @@
   --pass: #6FC79C;
   --halt: #D9A860;
   --on-primary: #11171D;
+  --qr-primary-soft: #2A1F18;
+  --qr-ink-soft: #1F2730;
   /* The brand orange holds its contrast on a dark ground; the pressed one does
      not, so the roles swap rather than the values being invented. */
   --primary: var(--qr-primary);

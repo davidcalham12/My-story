@@ -30,19 +30,27 @@ export function Library({ onOpen, onNew }: {
   if (error) return <p className="panel panel--bad">{error}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
 
+  const status = (run: Run) =>
+    run.halted
+      ? { label: `Stopped · ${run.halted}`, tone: 'halt' }
+      : run.stage === 'complete'
+        ? { label: 'Complete', tone: 'ok' }
+        : { label: `Writing · ${run.stage}`, tone: 'live' }
+
   return (
     <>
-      <h1>The library</h1>
-      <p className="lede">
-        {runs.length} run{runs.length === 1 ? '' : 's'}.{' '}
-        {runs.filter((r) => r.source === 'pre-loop003').length} imported from the
-        previous implementation and kept apart from the statistics.
-      </p>
-      <p>
+      <section className="hero">
+        <p className="eyebrow eyebrow--brand">Personalised novels</p>
+        <h1>The library</h1>
+        <p className="lede">
+          {runs.length} run{runs.length === 1 ? '' : 's'}.{' '}
+          {runs.filter((r) => r.source === 'pre-loop003').length} imported from the
+          previous implementation and kept apart from the statistics.
+        </p>
         <button type="button" className="primary" onClick={onNew}>
           Write a new one
         </button>
-      </p>
+      </section>
 
       {runs.length === 0 && (
         <p className="panel muted">
@@ -51,20 +59,28 @@ export function Library({ onOpen, onNew }: {
         </p>
       )}
 
-      {runs.map((run) => (
-        <article key={run.id} className={`panel${run.halted ? ' panel--halt' : ''}`}>
-          <h2>{run.slug}</h2>
-          <p className="muted">{run.premise}</p>
-          <p className="muted">
-            {run.profile} · {run.stage}
-            {run.halted && <> · <strong>halted: {run.halted}</strong></>}
-            {run.source === 'pre-loop003' && <> · imported</>}
-          </p>
-          <button type="button" onClick={() => onOpen(run.id)}>
-            Open
-          </button>
-        </article>
-      ))}
+      <div className="grid grid--2">
+        {runs.map((run) => {
+          const s = status(run)
+          return (
+            <article key={run.id} className="card card--action">
+              <div className="row">
+                <span className={`badge badge--${s.tone}`}>{s.label}</span>
+                <span className="badge">{run.profile}</span>
+                {run.source === 'pre-loop003' && <span className="badge">imported</span>}
+              </div>
+              <h2>{run.slug}</h2>
+              <p className="muted clamp">{run.premise}</p>
+              <div className="card__foot">
+                <span className="hint">{run.id}</span>
+                <button type="button" className="primary" onClick={() => onOpen(run.id)}>
+                  Open
+                </button>
+              </div>
+            </article>
+          )
+        })}
+      </div>
     </>
   )
 }

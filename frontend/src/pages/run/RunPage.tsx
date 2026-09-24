@@ -16,15 +16,44 @@ export function RunPage({ runId }: { runId: string }) {
 
   return (
     <>
-      <h1>{run.slug}</h1>
-      <p className="lede">{run.premise}</p>
+      <section className="hero">
+        <div className="row">
+          {live && <span className="badge badge--live">Writing now</span>}
+          {!live && !halted && run.stage === 'complete' && <span className="badge badge--ok">Complete</span>}
+          {halted && <span className="badge badge--halt">Stopped · {run.halted}</span>}
+          <span className="badge">{run.profile}</span>
+          <span className="badge">{run.stage}</span>
+        </div>
+        <h1>{run.slug}</h1>
+        <p className="muted clamp">{run.premise}</p>
+      </section>
 
       {live && (
-        <p className="panel">
+        <p className="panel panel--note">
           <strong>Running.</strong>{' '}
           {progress ? `${progress.stage} — ${progress.detail}` : 'starting'}
         </p>
       )}
+
+      <div className="grid grid--3">
+        <div className="stat">
+          <p className="stat__label">Calls</p>
+          <p className="stat__value">{cost.calls}</p>
+        </div>
+        <div className="stat">
+          <p className="stat__label">Tokens in / out</p>
+          <p className="stat__value">
+            {tokens(cost.input_tokens)} / {tokens(cost.output_tokens)}{' '}
+            <Provenance grade={cost.tokens_provenance} />
+          </p>
+        </div>
+        <div className="stat">
+          <p className="stat__label">Cost</p>
+          <p className="stat__value">
+            {money(cost)} <Provenance grade={gradeOf(cost)} />
+          </p>
+        </div>
+      </div>
 
       {halted && (
         <div className="panel panel--halt">
@@ -39,7 +68,7 @@ export function RunPage({ runId }: { runId: string }) {
         </div>
       )}
 
-      <h2>Did it obey its own gate?</h2>
+      <h2 className="section">Did it obey its own gate?</h2>
       <p className={`panel panel--${conformance.verdict === 'breached' ? 'bad' : 'ok'}`}>
         {conformance.verdict === 'conformant' && (
           <>
@@ -81,28 +110,6 @@ export function RunPage({ runId }: { runId: string }) {
         </p>
       )}
 
-      <h2>What it cost</h2>
-      <table>
-        <tbody>
-          <tr>
-            <th>calls</th>
-            <td className="num">{cost.calls}</td>
-          </tr>
-          <tr>
-            <th>tokens in / out</th>
-            <td className="num">
-              {tokens(cost.input_tokens)} / {tokens(cost.output_tokens)}{' '}
-              <Provenance grade={cost.tokens_provenance} />
-            </td>
-          </tr>
-          <tr>
-            <th>cost</th>
-            <td className="num">
-              {money(cost)} <Provenance grade={gradeOf(cost)} />
-            </td>
-          </tr>
-        </tbody>
-      </table>
       {cost.provenance.includes('reconstructed') && (
         <p className="hint">
           Some figures were rebuilt afterwards from what survived. An imported run
@@ -118,7 +125,7 @@ export function RunPage({ runId }: { runId: string }) {
             A gap reads as a gap. A run that never wrote gate rows must not
             resemble one whose gate passed everything first time.
           </p>
-          <table>
+          <div className="table-card scroll-x"><table>
             <tbody>
               {completeness.map((gap) => (
                 <tr key={gap.field}>
@@ -127,7 +134,7 @@ export function RunPage({ runId }: { runId: string }) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </>
       )}
 
@@ -135,7 +142,7 @@ export function RunPage({ runId }: { runId: string }) {
         <>
           <h2>Warnings</h2>
           {warnings.map((warning, i) => (
-            <p key={i} className="panel">
+            <p key={i} className="panel panel--halt">
               <strong>{warning.kind}</strong>
               {warning.chapter !== null ? ` (chapter ${warning.chapter})` : ''} —{' '}
               {warning.detail}

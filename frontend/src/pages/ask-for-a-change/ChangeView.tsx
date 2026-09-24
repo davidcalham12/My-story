@@ -49,45 +49,68 @@ export function ChangeView(props: Props) {
 
   return (
     <>
-      <p className="eyebrow">Ask for a change</p>
-      <h1>Something in the book is wrong</h1>
-      <p className="lede">
-        Pick the detail, tell us what it should say, and we will show you exactly which
-        chapters that touches before anything is written.
-      </p>
+      <section className="hero">
+        <p className="eyebrow eyebrow--brand">Ask for a change</p>
+        <h1>Something in the book is wrong</h1>
+        <p className="lede">
+          Pick the detail, tell us what it should say, and we will show you exactly which
+          chapters that touches before anything is written.
+        </p>
+        <ol className="steps">
+          <li>Pick the detail that is wrong.</li>
+          <li>Write what it should say.</li>
+          <li>See which chapters change, then confirm.</li>
+        </ol>
+      </section>
 
       {error && <p className="panel panel--bad">{error}</p>}
 
-      <h2>What the story relies on</h2>
-      {facts.length === 0 ? (
-        <p className="panel muted">
-          No facts were recorded for this novel, so there is nothing here to correct.
-        </p>
-      ) : (
-        <ul className="list">
-          {facts.map((fact) => (
-            <li key={fact.id} data-fact={fact.id} className={fact.id === chosenId ? 'chosen' : undefined}>
-              <button
-                type="button"
-                className="link"
-                aria-pressed={fact.id === chosenId}
-                onClick={() => props.onChoose(fact.id)}
-              >
-                {fact.text}
-              </button>
-              <p className="hint">
-                {fact.source === 'freetext'
-                  ? // Same table, different trust: a freetext row is a lead for
-                    // a human, never a promise the publish gate checks for.
-                    'From what you pasted — material for the story, not something we promised to include. '
-                  : 'Something the finished book is checked for. '}
-                {fact.chapters.length > 0
-                  ? `Used in ${listChapters(fact.chapters)}.`
-                  : 'Which chapters use it was not recorded.'}
+      <div className="split">
+        <section>
+          <h2>What the story relies on</h2>
+          {facts.length === 0 ? (
+            <div className="panel panel--halt">
+              <p><strong>No facts were recorded for this novel, so there is nothing here to correct.</strong></p>
+              <p className="muted">
+                A change works on the details the book was built from. They are recorded when a
+                novel is ordered through <em>New novel</em> and linked to chapters when it is
+                published. Open a novel ordered that way, or wait until this one is published.
               </p>
-            </li>
-          ))}
-        </ul>
+            </div>
+          ) : (
+            <ul className="choices">
+              {facts.map((fact) => (
+                <li key={fact.id} data-fact={fact.id}>
+                  <button
+                    type="button"
+                    className="choice"
+                    aria-pressed={fact.id === chosenId}
+                    onClick={() => props.onChoose(fact.id)}
+                  >
+                    <span className="choice__text">{fact.text}</span>
+                    <span className="hint">
+                      {fact.source === 'freetext'
+                        ? // Same table, different trust: a freetext row is a lead for
+                          // a human, never a promise the publish gate checks for.
+                          'From what you pasted — material for the story, not something we promised to include. '
+                        : 'Something the finished book is checked for. '}
+                      {fact.chapters.length > 0
+                        ? `Used in ${listChapters(fact.chapters)}.`
+                        : 'Which chapters use it was not recorded.'}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <aside className="split__side">
+      {!chosen && facts.length > 0 && (
+        <div className="panel">
+          <h2>Change it to</h2>
+          <p className="muted">Choose a detail on the list to correct it here.</p>
+        </div>
       )}
 
       {chosen && (
@@ -164,6 +187,8 @@ export function ChangeView(props: Props) {
           </p>
         </div>
       )}
+        </aside>
+      </div>
     </>
   )
 }

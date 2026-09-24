@@ -29,41 +29,51 @@ export function App() {
   const openRun = 'id' in place ? place.id : null
 
   return (
-    <main>
-      <nav aria-label="Sections">
-        <button
-          type="button"
-          className={place.at === 'library' ? 'active' : ''}
-          onClick={home}
-        >
-          Library
-        </button>
-        <button
-          type="button"
-          className={place.at === 'interview' ? 'active' : ''}
-          onClick={() => setPlace({ at: 'interview' })}
-        >
-          New novel
-        </button>
-        {/* The premise-only path that predates the interview. Kept because it
-            is how a three-chapter test run is started without answering nine
-            questions about an imaginary child. */}
-        <button
-          type="button"
-          className={place.at === 'quick' ? 'active' : ''}
-          onClick={() => setPlace({ at: 'quick' })}
-        >
-          Quick run
-        </button>
-      </nav>
+    <>
+      <header className="topbar">
+        <div className="topbar__inner">
+          <button type="button" className="link brand" onClick={home} aria-label="storyMaker, go to the library">
+            <span className="brand__name">storyMaker<span className="brand__dot">.</span></span>
+            <span className="brand__by">by Qaracter</span>
+          </button>
+          <nav aria-label="Sections" className="topnav">
+            <button
+              type="button"
+              className={place.at === 'library' ? 'active' : ''}
+              onClick={home}
+            >
+              Library
+            </button>
+            <button
+              type="button"
+              className={place.at === 'interview' ? 'active' : ''}
+              onClick={() => setPlace({ at: 'interview' })}
+            >
+              New novel
+            </button>
+            {/* The premise-only path that predates the interview. Kept because it
+                is how a short test run is started without answering nine
+                questions about an imaginary child. */}
+            <button
+              type="button"
+              className={place.at === 'quick' ? 'active' : ''}
+              onClick={() => setPlace({ at: 'quick' })}
+            >
+              Quick run
+            </button>
+          </nav>
+        </div>
+      </header>
 
+    <main>
       {openRun && (
-        <nav aria-label="This novel">
+        <nav aria-label="This novel" className="tabs">
           {OF_A_NOVEL.map(([at, label]) => (
             <button
               key={at}
               type="button"
               className={place.at === at ? 'active' : ''}
+              aria-current={place.at === at ? 'page' : undefined}
               onClick={() => setPlace({ at, id: openRun })}
             >
               {label}
@@ -99,5 +109,6 @@ export function App() {
         )}
       </Boundary>
     </main>
+    </>
   )
 }
