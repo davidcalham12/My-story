@@ -54,3 +54,16 @@ def test_the_pdf_opens_inline_unless_a_download_is_asked_for(client):
 def test_a_version_with_no_html_is_a_404_not_an_empty_page(client):
     assert client.get("/api/runs/r1/versions/2/html").status_code == 404
     assert client.get("/api/runs/nope/versions/1/html").status_code == 404
+
+
+def test_the_download_is_named_after_the_book(client, tmp_path):
+    """Owner, 2026-09-24: every download was called novel-v1.pdf."""
+    outline = "# The Keeper: Light / Dark? — Outline" + chr(10)
+    (tmp_path / "the-keeper" / "outline.md").write_text(outline, encoding="utf-8")
+    r = client.get("/api/runs/r1/versions/1/pdf?download=true")
+    # Starlette sends a non-plain name as RFC 5987 `filename*=utf-8''...`.
+    from urllib.parse import unquote
+    cd = unquote(r.headers["content-disposition"])
+    assert "The Keeper" in cd and "v1" in cd
+    # Characters a file system refuses never reach the name.
+    assert "/" not in cd.split("filename", 1)[1] and "?" not in cd.split("filename", 1)[1]

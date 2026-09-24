@@ -9,6 +9,7 @@ defended.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -16,6 +17,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 import backend.versions as versions_repo
+from backend.commons.title import title_of
 from backend.runs.router import get_service
 from backend.runs.service import RunService
 from backend.versions import change as change_mod
@@ -55,6 +57,14 @@ def list_versions(run_id: str, svc: RunService = Depends(get_service)) -> list[d
             for v in versions_repo.published(svc.conn, run_id)]
 
 
+def _file_name(run_dir: Path, n: int) -> str:
+    """`The Other Side of the Hill - v1.pdf`: the book's title (owner,
+    2026-09-24), without the characters a file system refuses."""
+    title = re.sub(r'[\\/:*?"<>|]+', " ", title_of(run_dir))
+    title = re.sub(r"\s+", " ", title).strip() or "novel"
+    return f"{title} - v{n}.pdf"
+
+
 @router.get("/{run_id}/versions/{n}/pdf")
 def version_pdf(run_id: str, n: int, download: bool = False,
                 svc: RunService = Depends(get_service)):
@@ -67,7 +77,7 @@ def version_pdf(run_id: str, n: int, download: bool = False,
         raise HTTPException(status.HTTP_404_NOT_FOUND,
                             f"version {n} of run {run_id} has no printed PDF")
     return FileResponse(path, media_type="application/pdf",
-                        filename=f"novel-v{n}.pdf",
+                        filename=_file_name(_run_dir(svc, run_id), n),
                         content_disposition_type="attachment" if download else "inline")
 
 
