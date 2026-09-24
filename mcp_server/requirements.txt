@@ -1,0 +1,4 @@
+# The MCP server's own environment (mcp_server/.venv), never the backend's.
+# Versions as installed and tested on 2026-09-24.
+fastmcp==4.0.9
+pytest==9.1.1
