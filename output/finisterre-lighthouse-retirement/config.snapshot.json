@@ -1,0 +1,65 @@
+{
+  "_comment": "Merged config for this run: config/novel.config.json with config/profiles/eval.json overlaid key by key. The bible block is the profile's entire block, per CFG-2a.",
+  "_comment_privacy": "The recipient's name is NOT written by any model. Under the organisation's data-protection policy and docs/spec.md §8 (decision of 2026-09-24), every prompt and every generated file carries the token [NOMBRE_ANONIMIZADO] where the recipient's name goes; backend/publish/personalise.py substitutes the alias from the brief at publication.",
+  "profile": "eval",
+  "slug": "finisterre-lighthouse-retirement",
+  "novel": {
+    "chapters": 1,
+    "tone": "warm literary fiction, a life looked back on — coastal, domestic, gently elegiac, with a working man's plain competence at its centre; no magic, no mystery-thriller machinery, no science fiction",
+    "names": "familiar",
+    "author": "NovaForge",
+    "language": "en",
+    "words_per_chapter": { "min": 300, "target": 420, "max": 550 },
+    "tolerance_pct": 25,
+    "paragraphs_per_chapter": { "min": 5, "max": 24 },
+    "sentences_per_paragraph": { "min": 1, "max": 5 },
+    "lines_per_chapter": { "min": 25, "max": 95 },
+    "chars_per_line": { "max": 64 },
+    "beats_per_chapter": { "min": 3, "max": 5 },
+    "promises": { "min": 3, "max": 5 }
+  },
+  "bible": {
+    "world_min_words": 500,
+    "world_max_words": 900,
+    "technology_entries": { "min": 4, "max": 6 },
+    "factions": { "min": 3, "max": 4 },
+    "world_rules": { "min": 5, "max": 8 },
+    "characters": { "min": 5, "max": 7 },
+    "timeline_rows": { "min": 10, "max": 14 },
+    "mysteries": { "min": 4, "max": 5 }
+  },
+  "context": {
+    "max_summary_words": 120,
+    "forbid_prior_chapter_prose": true,
+    "max_concurrent_tokens": 100000,
+    "max_summary_facts": 40
+  },
+  "quality_gate": {
+    "critics": ["continuity", "science", "outline", "length", "chatter", "prose"],
+    "threshold": 8,
+    "max_revisions": 2,
+    "aggregate": "min",
+    "on_fail": "patch_then_halt"
+  },
+  "feedback": {
+    "sheet_template": "specs/loops/LOOP-003/sheet_template/v01.md",
+    "validate_before_sending": true,
+    "escalate_to_literal_at_attempt": 3,
+    "keep_attempt_drafts": true,
+    "late_finding_blocks": false
+  },
+  "style": { "word_count_tolerance_pct": 0 },
+  "models": { "orchestrator": null },
+  "budget": { "max_cost_usd": 25.0, "max_calls": 200 },
+  "outputs": {
+    "formats": ["markdown"],
+    "synopsis": { "words": { "min": 150, "max": 250 }, "comparables": { "min": 2, "max": 3 } },
+    "markdown": {
+      "filename": "book.md",
+      "single_file": true,
+      "include_bible_appendix": false,
+      "include_synopsis": true
+    }
+  },
+  "word_band_applied": { "min": 225, "max": 688, "note": "words_per_chapter.min/max widened by tolerance_pct 25" }
+}

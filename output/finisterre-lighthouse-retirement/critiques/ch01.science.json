@@ -1,0 +1,34 @@
+{
+  "critic": "science",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 2,
+  "note": "`science` is the world critic under a historical name. This is literary fiction; it audits the draft against the bullets under `## Rules` in bible/world.md, which here are the rules of a keeper's trade and a family's habits.",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "rule": "R8",
+          "clause": "at the hour his watch formally ends",
+          "severity": "high",
+          "quote": "His watch had ended yesterday.",
+          "claim": "R8 admits a watch object leaving the tower only when the outgoing keeper passes it in person and by hand to a named heir at the hour his watch formally ends. The draft satisfies every part of that clause except the hour, and fails the hour only because of this sentence.",
+          "fix": "The same correction as the continuity finding on the same sentence.",
+          "arbitration": "UPHELD. The same defect the continuity critic found, reached independently from the rule rather than from the timeline. One fault scored by two characteristics, not two faults; the `min` aggregate charges it once."
+        }
+      ],
+      "notes_from_critic": "R1-R7 all obeyed; one high-severity R8 violation.",
+      "arithmetic_checked": "the critic did not state its subtraction; one high finding against a score of 8 is consistent with its reasoning and is recorded as given"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes_from_critic": "All eight rules satisfied. R8 now satisfied: the key is passed in person and by hand to Manuel, the named heir, in the lamp room at dusk, the hour the watch formally ends.",
+      "arithmetic_checked": "no findings, score 10, consistent"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "critic": "continuity",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 6,
+      "findings": [
+        {
+          "kind": "timeline-math",
+          "severity": "high",
+          "quote": "His watch had ended yesterday.",
+          "claim": "Puts the formal end of the watch on Saturday. The chapter is set on the Sunday the watch formally ends, and that hour is the only hour at which the key may lawfully leave the tower, so the handover in beat 5 happens a day late.",
+          "fix": "One sentence in the same place saying the watch ends today and the hour has not yet come.",
+          "reference": "bible/timeline.md row 11; bible/world.md R8",
+          "arbitration": "UPHELD. The defect is real and it is the one the chapter cannot survive: beat 5 is the chapter's ending and this sentence makes it unlawful."
+        },
+        {
+          "kind": "timeline-math",
+          "severity": "medium",
+          "quote": "He told it in the same words he had told it every Sunday for thirty years.",
+          "claim": "Thirty years reaches back to 1996; the Sunday rhythm settles in 1998, twenty-eight years before this chapter.",
+          "fix": "A figure the timeline supports, or no figure at all.",
+          "reference": "bible/timeline.md row 8",
+          "arbitration": "UPHELD. The critic's arithmetic is right. The correction asked for prefers removing the number to correcting it, which is a smaller change and a better sentence."
+        }
+      ],
+      "notes_from_critic": "10 - 3 (high) - 1 (medium) = 6",
+      "arithmetic_checked": "correct: two findings, both quoted literally, and the score matches the severities listed"
+    },
+    {
+      "iteration": 2,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "timeline-math",
+          "severity": "high",
+          "late": true,
+          "quote": "the light turning through the pattern his hand had traced for four decades, now without him",
+          "claim": "Four decades is 40 years; his service is 44 (1982 to September 2026).",
+          "fix": "Forty-four years, or a phrase that does not put a number on it.",
+          "reference": "bible/timeline.md rows 1 and 11",
+          "arbitration": "UPHELD as a defect and MARKED LATE. The clause is present word for word in the attempt-1 draft, which this same critic scored without raising it; it was not introduced by the correction. Under LOOP-003 a late finding is recorded, may be patched, and does NOT block the chapter — otherwise the three-attempt guarantee does not exist, because something new can always appear. Recorded in specs/loops/LOOP-003/late_findings.jsonl."
+        }
+      ],
+      "notes_from_critic": "One high-severity finding yields score 8.",
+      "arithmetic_checked": "consistent with the single finding listed. Both attempt-1 findings are resolved: neither quoted string appears in the attempt-2 draft, verified by search rather than by judgement."
+    }
+  ]
+}

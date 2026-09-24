@@ -1,0 +1,11 @@
+{
+  "critic": "chatter",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": null,
+  "drafts": 2,
+  "iterations": [
+    {"iteration": 1, "score": 10, "first_line": "# Chapter 1 — The Key", "findings": []},
+    {"iteration": 2, "score": 10, "first_line": "# Chapter 1 — The Key", "findings": []}
+  ]
+}

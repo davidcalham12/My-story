@@ -1,0 +1,36 @@
+{
+  "critic": "outline",
+  "chapter": 1,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "beats": [
+        {"beat": 1, "present": true, "position": 1},
+        {"beat": 2, "present": true, "position": 2},
+        {"beat": 3, "present": true, "position": 3},
+        {"beat": 4, "present": true, "position": 4},
+        {"beat": 5, "present": true, "position": 5}
+      ],
+      "arbitration": "UPHELD 10. The critic's arithmetic is correct - five beats present, none missing, none out of order, 10 minus 0 minus 0. Its `findings` array was misused: it held four entries of kind `promise-landed` describing promises that WERE landed, each marked severity high. Those are not defects and none is counted against the score. Recorded here as an empty findings list, which is what the critic's own arithmetic says. The attempt-2 prompt was corrected to say `findings` is for defects only, and the critic then returned an empty array."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "beats": [
+        {"beat": 1, "present": true, "position": 1},
+        {"beat": 2, "present": true, "position": 2},
+        {"beat": 3, "present": true, "position": 3},
+        {"beat": 4, "present": true, "position": 4},
+        {"beat": 5, "present": true, "position": 5}
+      ],
+      "notes_from_critic": "10 - 0 (all five beats present) - 0 (all in correct order) = 10. All four promises planted and landed.",
+      "arithmetic_checked": "correct"
+    }
+  ]
+}

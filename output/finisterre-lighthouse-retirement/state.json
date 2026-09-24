@@ -1,0 +1,30 @@
+{
+  "slug": "finisterre-lighthouse-retirement",
+  "profile": "eval",
+  "started": "2026-09-24T15:58:20Z",
+  "finished": "2026-09-24T16:28:22Z",
+  "premise": "A gentle literary novel written as a retirement gift for [NOMBRE_ANONIMIZADO], 65, the buyer's father: a retired lighthouse engineer who grows tomatoes and tells the same joke every Sunday. He kept the Finisterre lighthouse lamp running through the storm of 1987. Every Sunday he tells the joke about the octopus and the accountant. The book must contain the Finisterre lighthouse, the storm of 1987, and the tomatoes.",
+  "tone": "warm literary fiction, a life looked back on — coastal, domestic, gently elegiac",
+  "recipient_token": "[NOMBRE_ANONIMIZADO]",
+  "stage": "complete",
+  "chapters": [
+    {
+      "n": 1,
+      "title": "The Key",
+      "accepted_attempt": 2,
+      "attempts": 2,
+      "scores": {"continuity": 8, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 8},
+      "aggregate": 8,
+      "verdict": "accept",
+      "patched": false,
+      "words": 447,
+      "style_pass": "kept"
+    }
+  ],
+  "open_items": [
+    "ch01.summary.md is 139 words against the 120-word cap, 16% over. The rule is to trim the NEXT summary and never truncate one already written; this run has no next chapter, so the overshoot stands on the record rather than being corrected.",
+    "One late finding from the continuity critic on attempt 2 (`four decades` where the service is 44 years), recorded in specs/loops/LOOP-003/late_findings.jsonl. It did not block, and the chapter shipped with it.",
+    "One prose finding survived into the accepted draft: `His watch ends today.` is present tense in a past-tense chapter. It was introduced by the writer's own replacement sentence, applied literally as redraft rule 2 requires. The chapter reached the threshold with it and decide returned accept.",
+    "The recipient's name is not in any file. backend/publish/personalise.py substitutes the alias from the brief for [NOMBRE_ANONIMIZADO] at publication, keeping a .anon copy of the gate-approved text."
+  ]
+}

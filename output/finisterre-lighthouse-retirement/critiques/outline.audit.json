@@ -1,0 +1,29 @@
+{
+  "stage": "FLOW-3",
+  "agent": "science-critic",
+  "ts": "2026-09-24T16:10:56Z",
+  "verdict": "defects",
+  "violations": [
+    {
+      "chapter": 1,
+      "beat": 5,
+      "rule": "R8",
+      "clause": "at the hour his watch formally ends",
+      "severity": "high",
+      "claim": "The beat has the lamp room key produced from a jacket pocket and set on the kitchen table on a Sunday after the retirement. R8 admits exactly one way for a watch object to leave the tower: the outgoing keeper passing it in person and by hand, at the hour his watch formally ends. The beat satisfies 'in person and by hand' and satisfies 'to a named heir' — Manuel — but satisfies neither the hour nor the place: the key has already left the tower in his pocket before the passing happens, and the passing is weeks late.",
+      "fix": "The chapter is set on the day the watch formally ends, and the key passes inside the lighthouse rather than at the table: after the meal, [NOMBRE_ANONIMIZADO] and Manuel walk up to the tower at dusk and the key changes hands in the lamp room. Every clause of R8 is then satisfied at once, the joke stays at the table where R4 requires it, and the chapter ends in the tower rather than on a tablecloth.",
+      "arbitration": "UPHELD — the critic read the clause correctly and the violation is real. Its own proposed fix is OVERRULED in part: moving the handover to September detaches it from the Sunday the chapter is built on and would cost beat 4 the family table. The fix commissioned instead moves the chapter's date onto the day the watch ends and moves the handover into the tower, which satisfies the same clause without losing a beat."
+    }
+  ],
+  "ambiguities": [
+    {
+      "rule": "R7",
+      "clause": "The storm of 1987 is not spoken of in the house",
+      "reading_a": "The clause governs speech between characters inside the house. A man reading his own log in the tower, and a narrator telling the reader what he remembers, are outside its scope.",
+      "reading_b": "The clause governs the storm's appearance in the house-set narrative at all, including the narration of what a character reads or remembers.",
+      "outline_assumes": "a",
+      "arbitration": "UPHELD reading A. Reading B cannot be right: the buyer's brief requires the storm of 1987 to appear in the book, and a rule read so as to forbid the book its own commission is a rule that has been misread. R7 is a rule about a family's silence, not about a narrator's. The danger the audit identifies is real all the same — under reading B a critic would score beat 2 as a violation while another scored its absence as a missing beat, and two critics pulling opposite ways on the same draft is how a chapter fails three attempts with nothing to arbitrate.",
+      "applied": "R7 amended in bible/world.md before FLOW-4 to name its own scope: the prohibition is on speech between people inside the house, and it explicitly does not reach the watch log, a keeper's private memory in the tower, or what is said outside the house. The ambiguity is removed at the source rather than left for the gate to discover."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "_note": "Verbatim output of `python -m backend.chapters.check_prose`, one entry per attempt. It does not gate; its count feeds the `prose` characteristic, which does. Kept even though it is clean: a clean file is the evidence the check ran at all.",
+  "attempts": [
+    {
+      "attempt": 1,
+      "file": "chapters/ch01.attempt1.md",
+      "defects": [],
+      "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"],
+      "verdict": "clean"
+    },
+    {
+      "attempt": 2,
+      "file": "chapters/ch01.attempt2.md",
+      "defects": [],
+      "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"],
+      "verdict": "clean"
+    }
+  ],
+  "not_checked": [
+    "whether a fact stated here contradicts one stated elsewhere",
+    "voice, pacing, dialogue, originality",
+    "whether any sentence earns its place",
+    "canonical names - no characters.md was given to compare against"
+  ]
+}

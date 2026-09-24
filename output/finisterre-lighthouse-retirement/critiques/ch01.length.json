@@ -1,0 +1,12 @@
+{
+  "critic": "length",
+  "chapter": 1,
+  "kind": "arithmetic",
+  "agent": null,
+  "drafts": 2,
+  "band": {"min": 225, "max": 688, "target": 420, "note": "words_per_chapter 300/420/550 widened by tolerance_pct 25"},
+  "iterations": [
+    {"iteration": 1, "score": 10, "words": 459, "findings": []},
+    {"iteration": 2, "score": 10, "words": 447, "findings": []}
+  ]
+}

@@ -1,7 +1,7 @@
 # Eval results
 
 FLOW-0 over the five committed briefs, read from the code that decides
-it, 2026-09-24 15:58 UTC. Profile for the novel half: `eval`.
+it, 2026-09-24 16:30 UTC. Profile for the novel half: `eval`.
 
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
@@ -81,6 +81,16 @@ premise is composed by the product, not by this script.
 | schema_role_output |  | 7/7 | all parse |
 | visual_check |  | — | not run: manual Playwright MCP session (docs/browser-mcp.md) |
 
-### 04-adversarial — run `8834d0ab189a` (`a-gentle-literary-fiction-novel-for`)
+### 04-adversarial — run `8834d0ab189a` (`finisterre-lighthouse-retirement`)
 
-absent: no validator has recorded this run
+| validator | criterion | value | why |
+|---|---|---|---|
+| canonical_names |  | 0 | none |
+| chapter_length | ch01 | 441 | in band |
+| forbidden_words |  | 0 | none |
+| human_review |  | — | not run: pending the owner's reading |
+| lean_chronology |  | — | not run: elan unavailable |
+| mandatory_facts |  | 0/3 | 0 of 3 mandatory facts covered; uncovered: 42, 43, 44 |
+| schema_brief |  | pass | FLOW-0: ok |
+| schema_role_output |  | 8/8 | all parse |
+| visual_check |  | — | not run: manual Playwright MCP session (docs/browser-mcp.md) |

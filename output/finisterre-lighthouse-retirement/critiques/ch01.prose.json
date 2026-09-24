@@ -1,0 +1,45 @@
+{
+  "critic": "prose",
+  "chapter": 1,
+  "kind": "model+arithmetic",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "note": "The critic returns quoted findings and no score. The score is computed by `backend.chapters.score_prose`, which runs the mechanical check itself: prose = 10 - 3*mechanical - 2*major - 1*minor, floored at 0. The mechanical term is not supplied by the critic; the verbatim output of `backend.chapters.check_prose` is kept in ch01.prose.mechanical.json.",
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "why": "10 - 3x0 - 2x1 - 1x0 = 8",
+      "mechanical": 0,
+      "major": 1,
+      "minor": 0,
+      "findings": [
+        {
+          "severity": "major",
+          "quote": "and understood: this is the witnessing that someone kept the light",
+          "claim": "The chapter trusts objects and actions to carry the feeling for four hundred words, then the final clause tells the reader what the moment means. It is the one place the chapter explains itself, at the point of greatest weight.",
+          "fix": "End on what can be seen: the silence and the closing hand, or something physical and particular in their place.",
+          "arbitration": "UPHELD, and worth recording why. The phrase came verbatim out of the writer's own outline entry, which ends `Manuel closes his hand around it and understands: this is the witnessing that someone kept the light`. The writer transcribed the commission instead of dramatising it. That is a defect in the prose and not in the outline."
+        }
+      ]
+    },
+    {
+      "iteration": 2,
+      "score": 8,
+      "why": "10 - 3x0 - 2x1 - 1x0 = 8",
+      "mechanical": 0,
+      "major": 1,
+      "minor": 0,
+      "findings": [
+        {
+          "severity": "major",
+          "quote": "His watch ends today.",
+          "claim": "Present tense in a chapter written in the past tense throughout.",
+          "fix": "The same sentence in the past tense.",
+          "arbitration": "UPHELD, and this one was introduced by the correction rather than found late. The attempt-1 sentence it replaced, `His watch had ended yesterday.`, was past tense and correct in tense while wrong in fact; the writer's proposed replacement fixed the fact and broke the tense. The orchestrator applied the writer's own replacement literally, as the procedure requires, and the cost of that literalness is visible here. The chapter reached the threshold with the defect in it, and `decide` returned `accept` on an aggregate of 8; it was not patched afterwards, because reopening an accepted chapter is the orchestrator overriding `decide` in the other direction."
+        }
+      ],
+      "notes_from_critic": "1 major, 0 minor. Judged the chapter accomplished otherwise, and judged the absence of dialogue to be doing work rather than to be an absence."
+    }
+  ]
+}
