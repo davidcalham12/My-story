@@ -261,6 +261,21 @@ def _dedication(run_dir: Path) -> str | None:
     return None
 
 
+def _brief_dedication(conn: sqlite3.Connection, run_id: str) -> str | None:
+    """The stored brief's dedication, for a run started from a brief. Nothing
+    wrote `dedication.md` for those, so the cover said "no dedication" while the
+    order carried one. Printed, never written by a model."""
+    try:
+        row = conn.execute("SELECT b.payload FROM runs r JOIN briefs b ON b.id = r.brief_id "
+                           "WHERE r.id = ?", (run_id,)).fetchone()
+    except sqlite3.OperationalError:              # a database before 017
+        return None
+    if row is None:
+        return None
+    value = json.loads(row[0]).get("dedication")
+    return str(value).strip() if value else None
+
+
 def _entries(conn: sqlite3.Connection, run_id: str, table: str,
              detail_column: str) -> list[Entry] | None:
     """The sheet's rows, or `None` when the table is not there yet.
@@ -311,7 +326,7 @@ def read_novel(conn: sqlite3.Connection, run_dir: Path, run_id: str, *,
         chapters=chapters,
         sheet=Sheet(characters=_entries(conn, run_id, "characters", "role"),
                     places=_entries(conn, run_id, "places", "note")),
-        dedication=_dedication(run_dir),
+        dedication=_dedication(run_dir) or _brief_dedication(conn, run_id),
         synopsis=synopsis,
         change=change,
     )

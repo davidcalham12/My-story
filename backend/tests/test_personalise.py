@@ -76,3 +76,17 @@ def test_release_prints_the_personalised_book(db, tmp_path, monkeypatch):
     release.release(db, d)
     html = (d / "dist" / "v1" / "novel.html").read_text(encoding="utf-8")
     assert TOKEN not in html and alias in html
+
+
+def test_a_run_from_a_brief_prints_the_briefs_dedication(db, tmp_path, monkeypatch):
+    """Nothing wrote `dedication.md` for a run started from a brief, so the cover
+    said "no dedication" while the brief carried one."""
+    from backend.publish import pdf, release
+
+    d, _ = _setup(db, tmp_path)
+    dedication = json.loads((domain.EXAMPLES / "01-hijo.json").read_text(
+        encoding="utf-8"))["dedication"]
+    monkeypatch.setattr(pdf, "print_pdf", lambda h, p: p.write_bytes(b"%PDF") or p)
+    release.release(db, d)
+    html = (d / "dist" / "v1" / "novel.html").read_text(encoding="utf-8")
+    assert dedication.split(",")[0] in html
