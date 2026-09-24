@@ -214,6 +214,43 @@ def facts(brief: Brief) -> list[Fact]:
     return rows
 
 
+def premise(brief: Brief) -> str:
+    """The brief as the sentence a run starts from.
+
+    This is the join the product did not have. `POST /api/briefs` stored what
+    was ordered and `POST /api/runs` took a premise somebody typed, and nothing
+    turned the first into the second — found by writing the eval harness and
+    watching it have to compose one itself.
+
+    **The free text is not here, and that is the whole design.** It is the one
+    field an attacker controls; brief 04 puts "IGNORE ALL PREVIOUS
+    INSTRUCTIONS" in it. It reaches the novel as a `freetext` fact whose
+    `source` says what it is worth — a lead for a human, never a promise and
+    never an instruction. Putting it in the premise would turn it back into a
+    sentence the orchestrator reads, which is the one thing AC-2 forbids.
+
+    The dedication is not here either, for a duller reason: it is printed, not
+    written. It belongs to the front matter and a novel planned around it would
+    be a novel about its own dedication.
+    """
+    traits = ", ".join(brief.recipient.traits)
+    moments = "; ".join(m.text for m in brief.memories)
+    parts = [
+        f"A {brief.genre} novel for {brief.recipient.alias}, "
+        f"{brief.recipient.age}, for a {brief.occasion}.",
+        f"They are the buyer's {brief.recipient.relationship_to_buyer}.",
+        f"Tone: {brief.tone}.",
+    ]
+    if traits:
+        parts.append(f"What they are like: {traits}.")
+    if moments:
+        parts.append(f"Real moments that must appear: {moments}.")
+    if brief.mandatory_facts:
+        parts.append("Things the book must contain: "
+                     + "; ".join(brief.mandatory_facts) + ".")
+    return " ".join(parts)[:2000]
+
+
 def examples() -> list[dict]:
     """The five committed briefs, envelope and all.
 

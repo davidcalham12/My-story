@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
 from backend.runs.models import RunCreated, StartRun
-from backend.runs.service import AlreadyRunning, NotFound, NotLive, RunService
+from backend.runs.service import (AlreadyRunning, BriefNotReady, NotFound, NotLive,
+                                  RunService)
 
 router = APIRouter()
 
@@ -19,10 +20,21 @@ def get_service() -> RunService:  # overridden in tests and at startup
 
 @router.post("", response_model=RunCreated, status_code=status.HTTP_201_CREATED)
 def start_run(body: StartRun, svc: RunService = Depends(get_service)) -> RunCreated:
+    """Start a run from a premise, or from a brief that already passed FLOW-0.
+
+    404 for a brief that is not there and 422 for one that no longer passes:
+    a brief the buyer has not finished is not a server error, and the run it
+    would start costs money.
+    """
     try:
-        created = svc.start(body.premise, body.profile, body.tone)
+        created = (svc.start_from_brief(body.brief_id, body.profile) if body.brief_id
+                   else svc.start(body.premise, body.profile, body.tone))
     except AlreadyRunning as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
+    except NotFound as exc:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
+    except BriefNotReady as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
     return RunCreated(**created)
 
 

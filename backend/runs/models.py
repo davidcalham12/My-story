@@ -2,15 +2,30 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class StartRun(BaseModel):
-    premise: str = Field(min_length=10, max_length=2000)
+    """Either a premise, or the id of a brief that already passed FLOW-0.
+
+    Exactly one. A request carrying both is a request with two ideas of what
+    the book is about, and picking one silently is how a buyer gets a novel
+    for somebody else's father.
+    """
+
+    premise: str | None = Field(default=None, min_length=10, max_length=2000)
+    brief_id: str | None = None
     profile: str = "tiny"
     # Empty means: read the genre off the premise. No agent declares one, and a
-    # default here would put the welded genre back where it was.
+    # default here would put the welded genre back where it was. Ignored when
+    # `brief_id` is given: the brief's own tone is the buyer's answer.
     tone: str = ""
+
+    @model_validator(mode="after")
+    def one_of(self) -> "StartRun":
+        if bool(self.premise) == bool(self.brief_id):
+            raise ValueError("give either premise or brief_id, and not both")
+        return self
 
 
 class RunCreated(BaseModel):

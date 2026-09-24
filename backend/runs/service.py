@@ -24,6 +24,8 @@ from typing import Iterator
 
 from backend.commons.config import loader
 from backend.commons.config.settings import Settings
+from backend.brief import domain as brief_domain
+from backend.policy import forbidden
 from backend.commons.db import repository as write_repo
 from backend.commons.log.calls import CallRow, write_call
 from backend.commons.runner.process import ReplayProcess, RunProcess
@@ -43,6 +45,13 @@ from backend.runs.archive import archive_run
 
 class AlreadyRunning(Exception):
     """A queue of one: a single `claude -p` alive at a time."""
+
+
+class BriefNotReady(Exception):
+    """The brief no longer passes FLOW-0, so no run is started.
+
+    Free to refuse, expensive to discover halfway through a novel.
+    """
 
 
 class NotLive(Exception):
@@ -137,7 +146,59 @@ class RunService:
 
     # ------------------------------------------------------------ starting
 
-    def start(self, premise: str, profile: str, tone: str) -> dict:
+    def brief_of(self, brief_id: str) -> "Brief":
+        """The stored brief, or `NotFound`. Re-validated on the way out.
+
+        It was checked before it was stored, so this cannot normally fail —
+        which is exactly why it is worth doing. A payload that stopped parsing
+        means the schema moved under a brief somebody is still waiting on, and
+        finding that here beats finding it in the middle of a paid run.
+        """
+        row = self.conn.execute(
+            "SELECT payload FROM briefs WHERE id = ?", (brief_id,)).fetchone()
+        if row is None:
+            raise NotFound(f"no brief {brief_id}")
+        return brief_domain.parse(json.loads(row["payload"]))
+
+    def start_from_brief(self, brief_id: str, profile: str) -> dict:
+        """The join: what was ordered becomes what is running.
+
+        Three things travel, and each lands somewhere the rest of the pipeline
+        already reads, rather than in a prompt nobody can check afterwards:
+
+        - the **premise**, composed by `brief.domain.premise` — recipient,
+          occasion, tone, traits, memories and the mandatory facts, and
+          deliberately not the free text;
+        - the **forbidden terms**, into `forbidden_words` at level `client`,
+          which is the level 011_policy.sql reserves for a brief's own terms.
+          A term that lived only in the writer's prompt is a term the writer
+          sometimes still writes and nothing downstream notices;
+        - the **facts**, into `facts` — the buyer's promises as `mandatory`
+          rows the publish gate counts one by one, and the free text as a
+          single `freetext` row that is a lead and never an instruction.
+
+        The brief is re-checked first. A brief that no longer passes FLOW-0
+        must not start a run: the run costs money and the refusal is free.
+        """
+        brief = self.brief_of(brief_id)
+        verdict = brief_domain.check(json.loads(json.dumps(brief.model_dump())))
+        if verdict.status != "ok":
+            raise BriefNotReady(
+                f"brief {brief_id} does not pass FLOW-0 ({verdict.status}); "
+                "nothing is started")
+
+        started = self.start(brief_domain.premise(brief), profile,
+                             brief.tone or "", brief_id=brief_id)
+
+        with self.conn:
+            for term in brief.forbidden_terms:
+                forbidden.add_term(self.conn, "client", term)
+        write_repo.save_brief_facts(self.conn, started["id"],
+                                    brief_domain.facts(brief))
+        return started | {"brief_id": brief_id}
+
+    def start(self, premise: str, profile: str, tone: str,
+              brief_id: str | None = None) -> dict:
         with self._lock:
             if self._live and not self._live.done:
                 raise AlreadyRunning("a run is already in flight; the queue is one")
@@ -148,7 +209,7 @@ class RunService:
                 self.conn, run_id=run_id, slug=slug, premise=premise, profile=profile,
                 # None means the orchestrator reads the genre off the premise and
                 # records what it decided. A default here would weld it shut.
-                tone=tone.strip() or None, snapshot=cfg,
+                tone=tone.strip() or None, snapshot=cfg, brief_id=brief_id,
             )
             write_repo.save_skill_sha(self.conn, run_id, at_start=self._skill_sha())
             live = Live(run_id=run_id)

@@ -25,13 +25,46 @@ def now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def create_run(conn, *, run_id, slug, premise, profile, tone, snapshot) -> None:
+def create_run(conn, *, run_id, slug, premise, profile, tone, snapshot,
+               brief_id=None) -> None:
+    """`brief_id` stays optional and NULL stays meaningful: a run from a bare
+    premise is the demo and the stress profile, not a degraded order."""
     with tx(conn):
         conn.execute(
             "INSERT INTO runs (id, slug, premise, profile, tone, config_snapshot, "
-            "stage, source, started_at) VALUES (?,?,?,?,?,?,?, 'v2', ?)",
-            (run_id, slug, premise, profile, tone, json.dumps(snapshot), "FLOW-1", now()),
+            "stage, source, started_at, brief_id) VALUES (?,?,?,?,?,?,?, 'v2', ?,?)",
+            (run_id, slug, premise, profile, tone, json.dumps(snapshot), "FLOW-1",
+             now(), brief_id),
         )
+
+
+def save_brief_facts(conn, run_id: str, facts) -> int:
+    """What the buyer asked for, as rows the gate can count against.
+
+    `mandatory_facts` become `mandatory` rows the publish gate checks one by
+    one; the free text becomes a single `freetext` row, verbatim and whole.
+    Neither is summarised or split here — a paraphrase would be a model reading
+    the untrusted string, and a filter clever enough to drop brief 04's attack
+    would have to be trusted not to drop the gift hidden in the same paragraph.
+
+    `OR IGNORE` on `(run_id, source, text)`, so starting the same brief twice
+    is not an error and re-running it adds nothing.
+    """
+    written = 0
+    with tx(conn):
+        for fact in facts:
+            # `Fact.kind` is the brief's vocabulary ("mandatory" / "freetext");
+            # the table's is the Bible's. A promise the buyer made about the
+            # person the book is for is a `recipient` fact there, and the
+            # translation happens here rather than by widening the CHECK, which
+            # would let the two vocabularies drift into one muddle.
+            kind = "freetext" if fact.source == "freetext" else "recipient"
+            cur = conn.execute(
+                "INSERT OR IGNORE INTO facts (run_id, kind, text, source, mandatory) "
+                "VALUES (?,?,?,?,?)",
+                (run_id, kind, fact.text, fact.source, 1 if fact.mandatory else 0))
+            written += cur.rowcount or 0
+    return written
 
 
 def set_stage(conn, run_id: str, stage: str) -> None:
