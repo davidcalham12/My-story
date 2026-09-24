@@ -22,6 +22,7 @@ const run = (over: Partial<Run>): Run => ({
   resume_from: 'outline-audit', resume_stage: 'FLOW-3',
   spent_usd: 25.8, spent_provenance: 'measured',
   ceiling_usd: 25, context_refusal: null,
+  published_chapters: null, chapters_planned: 10, published_versions: [],
   ...over,
 })
 
@@ -29,6 +30,7 @@ const STOPPED = run({ id: 'stopped' })
 const COMPLETE = run({
   id: 'done', slug: 'the-other-side', title: 'The Other Side', halted: null, stage: 'complete',
   complete: true, stopped: false, resume_from: null, resume_stage: null,
+  published_chapters: 10, published_versions: [1, 2, 3],
 })
 const LIVE = run({
   id: 'live', slug: 'being-written', halted: null, stage: 'FLOW-4', live: true, stopped: false,
@@ -42,8 +44,6 @@ const props = (over: Partial<Props> = {}): Props => ({
   view: 'library',
   runs: [STOPPED, COMPLETE, LIVE],
   binned: [BINNED],
-  published: { done: true },
-  versions: { done: [1, 2, 3] },
   confirming: null,
   notice: null,
   error: null,
@@ -121,6 +121,24 @@ describe('AC-6: a stopped card offers both; §8: every novel but a live one can 
     const onContinue = vi.fn()
     button(LibraryView(props({ onContinue })), 'Continue', 'stopped').props.onClick()
     expect(onContinue).toHaveBeenCalledWith(STOPPED)
+  })
+})
+
+describe('the card says what the book holds, from the list alone', () => {
+  it('shows a stopped novel with a one-chapter v1 as stopped with a partial book, never ready', () => {
+    const partial = run({ id: 'partial', halted: 'user', published_chapters: 1, published_versions: [1] })
+    const html = renderToStaticMarkup(<LibraryView {...props({ runs: [partial] })} />)
+    expect(card(html, 'partial')).toContain('Stopped · partial book readable (1 of 10 chapters)')
+    expect(card(html, 'partial')).not.toContain('Ready to read')
+    expect(html).toContain('0 being written · 0 ready · 1 stopped')
+  })
+
+  it('shows "Checking…" while the server has not said, rather than a state it may leave', () => {
+    const unknown = run({ id: 'unknown', halted: null, stage: 'complete', stopped: false, published_chapters: undefined })
+    const html = renderToStaticMarkup(<LibraryView {...props({ runs: [unknown] })} />)
+    expect(card(html, 'unknown')).toContain('Checking…')
+    expect(card(html, 'unknown')).not.toContain('Ready to read')
+    expect(card(html, 'unknown')).not.toContain('Stopped')
   })
 })
 

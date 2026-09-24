@@ -69,6 +69,14 @@ export interface Run {
   ceiling_usd?: number | null
   /** Why a continuation would halt again on the 100k ceiling (estimated). */
   context_refusal?: string | null
+  /* --- what the reader can open, in the list itself ---------------------- */
+  /** Chapters in the latest published version; `null` when nothing is
+   *  published. `undefined` (an older server): not known — never a guess. */
+  published_chapters?: number | null
+  /** The chapters the run planned (its snapshot's `novel.chapters`). */
+  chapters_planned?: number | null
+  /** Every published version's number, oldest first. */
+  published_versions?: number[]
 }
 
 export interface Attempt {

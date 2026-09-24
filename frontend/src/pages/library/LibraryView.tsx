@@ -23,9 +23,6 @@ export function LibraryView(p: {
   runs: Run[]
   /** The bin, or null while it is being read. */
   binned: Run[] | null
-  published: Record<string, boolean>
-  /** The version numbers each run has published, when known. */
-  versions: Record<string, number[]>
   /** The run whose move to the bin is waiting for its one confirmation. */
   confirming: string | null
   notice: string | null
@@ -39,10 +36,10 @@ export function LibraryView(p: {
   onCancelTrash: () => void
   onRestore: (run: Run) => void
 }) {
-  const { runs, binned, published } = p
-  const status = (run: Run) => plainStatus(run, run.live === true, published[run.id])
+  const { runs, binned } = p
+  const status = (run: Run) => plainStatus(run, run.live === true)
   const count = (tone: string) => runs.filter((r) => status(r).tone === tone).length
-  const order = { live: 0, ok: 1, halt: 2 } as const
+  const order = { live: 0, ok: 1, halt: 2, unknown: 3 } as const
   const sorted = [...runs].sort((x, y) => order[status(x).tone] - order[status(y).tone])
 
   const tabs = (
@@ -145,7 +142,7 @@ export function LibraryView(p: {
           const s = status(run)
           const asking = p.confirming === run.id
           const binnable = run.live !== true && s.tone !== 'live'
-          const vs = p.versions[run.id] ?? []
+          const vs = run.published_versions ?? []
           return (
             <article key={run.id} data-run={run.id} className="card card--action">
               <div className="row">

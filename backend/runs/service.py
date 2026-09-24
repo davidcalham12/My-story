@@ -42,6 +42,7 @@ from backend.commons.runner.watch import (
 from backend.runs import conductor
 from backend.runs import repository as read_repo
 from backend.runs import conformance
+from backend import versions as versions_repo
 from backend.runs.archive import archive_run
 
 
@@ -224,6 +225,30 @@ class RunService:
             "ceiling_usd": ceiling,
             "context_refusal": (self._context_refusal(run, snapshot, missing, run_dir)
                                 if stopped else None),
+        } | self._book(run["id"], run_dir, snapshot)
+
+    def _book(self, run_id: str, run_dir: Path, snapshot: dict) -> dict:
+        """What the reader can open, in the list itself, so the library asks
+        nothing per run and a card never flips from one state to another.
+
+        `published_chapters` counts the chapter sections of the latest
+        version's `novel.html`: None when nothing is published (or its page is
+        unreadable), never 0 for "none". `chapters_planned` is the snapshot's
+        `novel.chapters`, None for imported history that never recorded one.
+        """
+        ns = [v["n"] for v in versions_repo.published(self.conn, run_id)]
+        chapters = None
+        if ns:
+            try:
+                page = (run_dir / "dist" / f"v{ns[-1]}" / "novel.html").read_text(encoding="utf-8")
+                chapters = page.count('<section id="chapter-')
+            except OSError:
+                chapters = None
+        planned = (snapshot.get("novel") or {}).get("chapters")
+        return {
+            "published_versions": ns,
+            "published_chapters": chapters,
+            "chapters_planned": int(planned) if isinstance(planned, (int, float)) else None,
         }
 
     def _context_refusal(self, run: dict, cfg: dict, unit, run_dir: Path) -> str | None:

@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'
 import { useRun } from '@/features/watch-progress/useRun'
-import { api } from '@/shared/api/client'
 import { haltReason } from '@/entities/run/lib'
 import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
@@ -15,20 +13,14 @@ export function RunPage({ runId, onRead, onChange }: {
   onChange?: () => void
 }) {
   const { detail, progress, live, error } = useRun(runId)
-  const [published, setPublished] = useState<boolean | undefined>(undefined)
-  const finished = detail ? detail.run.stage === 'complete' || detail.run.halted !== null : false
-  useEffect(() => {
-    let alive = true
-    if (finished) api.versions(runId).then((v) => alive && setPublished(v.length > 0), () => undefined)
-    return () => { alive = false }
-  }, [runId, finished])
 
   if (error) return <p className="panel panel--bad">{error}</p>
   if (!detail) return <p className="muted">Reading the run…</p>
 
   const { run, cost, warnings, completeness, conformance } = detail
   const halted = haltReason(run)
-  const status = plainStatus(run, live, published)
+  // What the book holds comes with the run itself, as in the library.
+  const status = plainStatus(run, live)
 
   return (
     <>
@@ -38,7 +30,7 @@ export function RunPage({ runId, onRead, onChange }: {
         <p className="lede">{status.detail}</p>
         {live && progress && <p className="hint">Last step: {progress.detail}</p>}
         <div className="row">
-          {status.tone === 'ok' && onRead && (
+          {status.readable && onRead && (
             <button type="button" className="primary" onClick={onRead}>Read the book</button>
           )}
           {status.tone === 'ok' && onChange && (

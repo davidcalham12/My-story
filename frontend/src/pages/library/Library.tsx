@@ -17,10 +17,6 @@ export function Library({ onOpen, onNew }: {
   const [runs, setRuns] = useState<Run[] | null>(null)
   const [binned, setBinned] = useState<Run[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
-  // Which runs actually published a book: a "complete" row is not proof there
-  // is anything to read, and a stopped one may still have published.
-  // The version numbers too: binning a novel names the ones it takes along.
-  const [versions, setVersions] = useState<Record<string, number[]>>({})
   const [view, setView] = useState<LibraryPlace>('library')
   const [confirming, setConfirming] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
@@ -32,16 +28,9 @@ export function Library({ onOpen, onNew }: {
 
   const load = useCallback((alive: () => boolean = () => true) => {
     api.list().then(
-      (r) => {
-        if (!alive()) return
-        setRuns(r)
-        r.forEach((run) =>
-          api.versions(run.id).then(
-            (v) => alive() && setVersions((p) => ({ ...p, [run.id]: v.map((row) => row.n).sort((a, b) => a - b) })),
-            () => undefined,
-          ),
-        )
-      },
+      // What each book holds comes with the list: no request per run, so no
+      // card is drawn in one state and then flipped to another.
+      (r) => alive() && setRuns(r),
       (e) => alive() && setLoadError(String(e)),
     )
     // An older server has no bin; the library still works without it.
@@ -55,8 +44,6 @@ export function Library({ onOpen, onNew }: {
       alive = false
     }
   }, [load])
-
-  const published = Object.fromEntries(Object.entries(versions).map(([id, v]) => [id, v.length > 0]))
 
   if (loadError) return <p className="panel panel--bad">{loadError}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
@@ -97,8 +84,6 @@ export function Library({ onOpen, onNew }: {
         view={view}
         runs={runs}
         binned={binned}
-        published={published}
-        versions={versions}
         confirming={confirming}
         notice={notice}
         error={error}

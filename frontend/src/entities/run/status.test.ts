@@ -9,7 +9,7 @@ const run = (over: Partial<Run>): Run => ({
 
 describe('plainStatus — the answer first, in words anyone reads', () => {
   it('says a finished novel is ready to read', () => {
-    const s = plainStatus(run({ stage: 'complete' }), false)
+    const s = plainStatus(run({ stage: 'complete', published_chapters: 3, chapters_planned: 3 }), false)
     expect(s.tone).toBe('ok')
     expect(s.headline).toMatch(/ready/i)
   })
@@ -26,7 +26,7 @@ describe('plainStatus — the answer first, in words anyone reads', () => {
   })
 
   it('says a stopped novel kept its work', () => {
-    const s = plainStatus(run({ halted: 'budget' }), false)
+    const s = plainStatus(run({ halted: 'budget', published_chapters: null }), false)
     expect(s.tone).toBe('halt')
     expect(s.detail).toMatch(/kept/i)
   })
@@ -36,14 +36,40 @@ describe('plainStatus — the answer first, in words anyone reads', () => {
   })
 
   it('does not call a finished run ready when it published no book', () => {
-    const s = plainStatus(run({ stage: 'complete' }), false, false)
+    const s = plainStatus(run({ stage: 'complete', published_chapters: null, chapters_planned: 3 }), false)
     expect(s.tone).toBe('halt')
     expect(s.headline).not.toMatch(/ready/i)
     expect(s.label).toMatch(/no book/i)
   })
 
-  it('calls a stopped run ready when it did publish a book', () => {
-    expect(plainStatus(run({ halted: 'user' }), false, true).tone).toBe('ok')
+  // The owner saw "Ready to read" on 8834d0ab189a (budget) and 8ab6c57af9f6
+  // (user), each with a one-chapter v1.
+  it('(a) never calls a halted run ready, even when it published something', () => {
+    for (const halted of ['budget', 'user']) {
+      const s = plainStatus(run({ halted, published_chapters: 1, chapters_planned: 10 }), false)
+      expect(s.tone).toBe('halt')
+      expect(s.label).toBe('Stopped · partial book readable (1 of 10 chapters)')
+      expect(s.headline).not.toMatch(/ready/i)
+      expect(s.readable).toBe(true)
+    }
+  })
+
+  it('(b) calls a finished run ready only when its latest version holds every planned chapter', () => {
+    const eight = plainStatus(run({ stage: 'complete', published_chapters: 8, chapters_planned: 10 }), false)
+    expect(eight.tone).not.toBe('ok')
+    expect(eight.label).toBe('Stopped · partial book readable (8 of 10 chapters)')
+    const ten = plainStatus(run({ stage: 'complete', published_chapters: 10, chapters_planned: 10 }), false)
+    expect(ten.tone).toBe('ok')
+    expect(ten.label).toBe('Ready to read')
+  })
+
+  it('(c) says "Checking…" while it does not know what was published, never a guess', () => {
+    for (const over of [{ stage: 'complete' }, { halted: 'budget' }] as Partial<Run>[]) {
+      const s = plainStatus(run(over), false)
+      expect(s.label).toBe('Checking…')
+      expect(s.tone).toBe('unknown')
+      expect(s.readable).toBe(false)
+    }
   })
 })
 
