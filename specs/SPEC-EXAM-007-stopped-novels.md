@@ -4,10 +4,12 @@ title: A stopped novel can be continued, cheaper and to the same gate, or put in
 status: approved
 owner: David Calderon
 requested_by: David Calderon — in chat to the coordinating session, 2026-09-24: "las novelas que se pararon quiero tener la opcion de eliminarlas o que continue su proceso y quiero que todo este funcionando bien de una manera que gaste menos y que tenga la misma calidad"
-decisions: chosen by the owner in the same session — deleting is "Papelera recuperable"; continuing uses "La más barata vigente"; a run stopped by its budget continues only after "Pedir un techo nuevo"
+decisions: chosen by the owner in the same session — deleting is "Papelera recuperable"; continuing uses "La más barata vigente". His first choice for the budget case, "Pedir un techo nuevo", was withdrawn by him at ~21:45 UTC (§8): Continue never asks for a figure. In the build session he then chose "Tope automático por novela" (SR-05). The interface is in English ("Todo en inglés").
 approved_by: David Calderon — in chat to the coordinating session, 2026-09-24: "apruebo el SPEC-EXAM-007"
 approved_on: 2026-09-24
-names_protected_value: the budget ceiling — the mechanism is unchanged (the CLI's --max-budget-usd plus the watcher). What is new is that a continued run carries a ceiling the owner types for that continuation, as he did for the example novel (75 USD, spec §8). Nothing else in AGENTS.md §6 is touched: the gate that judges a continued chapter is the same gate.
+names_protected_value: the budget ceiling — the mechanism is unchanged (the CLI's --max-budget-usd plus the watcher). What is new:
+  - each continuation carries the profile's ceiling, fresh for that segment and recorded as `ceiling_by = 'profile'`;
+  - a novel's total known spend is capped at `budget.novel_ceiling_multiple` (2, in the config) × the profile's ceiling, and past that Continue is refused with the reason (SR-05). Nothing else in AGENTS.md §6 is touched: the gate that judges a continued chapter is the same gate.
 depends_on: backend/runs/service.py::resume, backend/runs/router.py, the conductor (SPEC-EXAM-003), SPEC-EXAM-006, frontend pages library and read
 ---
 
@@ -36,7 +38,7 @@ orchestrator, the expensive one.
 
 ## 2. Continue
 
-**In the panel.** A stopped novel shows **"Continuar"**. Before anything
+**In the panel.** A stopped novel shows **"Continue"**. Before anything
 starts, the panel shows:
 - why it stopped;
 - what it has spent (measured, or absent);
@@ -56,16 +58,18 @@ what each segment ran under.
 and patch_then_halt come from the same code for a continued chapter as for a
 new one. Chapters already promoted are not redone.
 
-**The ceiling.**
-- **Stopped by its budget:** "Continuar" asks for a new ceiling in USD, for
-  this continuation. Without a figure it does not start. The figure and who
-  typed it are recorded.
-- **Any other reason:** the ceiling is the profile's, minus what the run has
-  already spent (measured). If nothing is left, the panel asks for a figure as
-  above.
+**The ceiling (as changed by the owner, §8).**
+- Continue **never asks for a figure**, whatever the reason the run stopped
+  (budget, absent spend, anything else).
+- Each continuation runs under the profile's ceiling, fresh for that segment,
+  recorded as `ceiling_by = 'profile'`. The modal shows it as information.
+- **Per-novel cap (SR-05, the owner's "Tope automático por novela").** Once the
+  novel's known spend reaches `budget.novel_ceiling_multiple` × the profile's
+  ceiling (2 in the config), Continue is refused with that reason.
 
 **Refusals, each with its reason on screen:**
-- the run is complete (as today);
+- the run is complete (every unit done);
+- the per-novel cap is reached;
 - another run is live (as today: the queue is one);
 - the run stopped on the 100k ceiling and the continuation would dispatch the
   same unit with the same packet. The panel says so and does not spend on a
@@ -74,42 +78,45 @@ new one. Chapters already promoted are not redone.
 
 ## 3. The bin (papelera)
 
-- A stopped novel shows **"Mover a la papelera"**. It asks for one
-  confirmation.
+- **Every novel** except a live one shows **"Move to bin"** (§8). It asks for
+  one confirmation, and for a complete novel the confirmation names its
+  versions.
 - **What moves.** The run's row gets `trashed_at`, and its directory moves to
   `output/_papelera/<slug>/`. Nothing is deleted.
 - **The library** hides binned runs from its list and its counts. A
-  **"Papelera"** view lists them, each with **"Restaurar"**, which moves the
-  directory back and clears `trashed_at`.
+  **"Bin (N)"** view lists them, each with **"Restore"**, which moves the
+  directory back and clears `trashed_at`. The directory on disk keeps the name
+  `output/_papelera/`; it is never shown in the interface.
 - **Langfuse is not touched.** A binned novel's traces stay, because what it
   cost was spent.
-- **Refused:** a live run, and a complete novel. A published book is not a
-  stopped novel, and removing one is a different decision.
+- **Refused:** a live run only (§8). A complete novel can be binned; the PDFs
+  already in `ejemplos/` are not touched.
 - **Permanent deletion is out of scope.** The owner chose a recoverable bin.
 
 ## 4. Interfaces
 
 | method | path | body | effect |
 |---|---|---|---|
-| POST | `/api/runs/{id}/resume` | `{ceiling_usd?}` | as today, plus §2: current models and orchestration, the ceiling rules, the `resumed` record |
+| POST | `/api/runs/{id}/resume` | — (no figure) | as today, plus §2: current models and orchestration, the profile's ceiling fresh for the segment, the per-novel cap, a `changes` row with `kind = 'continue'` |
 | POST | `/api/runs/{id}/trash` | — | §3 |
 | POST | `/api/runs/{id}/restore` | — | §3 |
 | GET | `/api/runs?trashed=true` | — | the bin |
 
-A migration adds `runs.trashed_at` and a `run_segments` table (or rows in an
-existing table, whichever the plan finds already fits) holding each
-continuation's time, models, orchestration and ceiling.
+Migration 019 adds `runs.trashed_at` and the table `changes`, shared with
+SPEC-EXAM-008. The original launch is `kind = 'generate'` and each
+continuation is `kind = 'continue'`, with its time, models, orchestration and
+ceiling. There is no `run_segments` table.
 
 ## 5. Acceptance criteria
 
 | id | criterion | letter |
 |---|---|---|
 | AC-1 | A continued run launches with the profile's current `models.orchestrator` (a test pins `--model sonnet` for a run whose snapshot says null) and records the segment | T |
-| AC-2 | A run stopped by `budget` is not continued without `ceiling_usd`; with it, `--max-budget-usd` is that figure | T |
+| AC-2 | Continue takes no figure. `--max-budget-usd` is the profile's ceiling for the segment, recorded as `ceiling_by = 'profile'`, also for a run stopped by `budget` or with absent spend. At `novel_ceiling_multiple` × that ceiling, Continue is refused with the reason | T |
 | AC-3 | Promoted chapters are not redone after continuing (fake runner) | T |
 | AC-4 | Trash and restore move the directory and back, byte-identical; the bin and the library counts are right | T |
-| AC-5 | Trash refuses a live run and a complete novel; resume refuses a complete run and a second live one, each with its reason | T |
-| AC-6 | In the panel: the stopped cards show both buttons; the bin view restores; the budget case asks for the figure (component tests) | T |
+| AC-5 | Trash refuses only a live run and bins a complete novel, naming its versions; resume refuses a complete run, a second live one and a novel at its cap, each with its reason | T |
+| AC-6 | In the panel, in English: stopped cards show Continue and Move to bin, and complete ones show Move to bin. The Bin view restores. The Continue modal shows the ceiling and has no input. A stopped novel is never "Ready to read" (component tests) | T |
 | AC-7 | **Demonstration:** the owner continues one stopped novel from the web, with its measured cost and minutes recorded in from-build.md | D |
 
 ## 6. Gaps
@@ -138,12 +145,12 @@ the owner approved.
    and `budget_left` start at 0 in every new process. "Profile ceiling minus
    spent" therefore subtracts the sum of the earlier segments' measured
    `result` costs.
-4. **Storage.** Migration 019 adds `runs.trashed_at` and a table
-   `run_segments(run_id, n, started_at, finished_at, orchestrator_model,
-   chapter_loop, ceiling_usd, ceiling_by, cost_usd, cost_provenance)`.
-   - `n = 1` is the original launch.
-   - The hand-made `resume` block in the example novel's `cost.json` becomes
-     its segment 2.
+4. **Storage.** Migration 019 adds `runs.trashed_at` and the table `changes`,
+   shared with SPEC-EXAM-008, instead of the `run_segments` first proposed
+   here.
+   - The original launch is `kind = 'generate'`.
+   - The hand-made `resume` block in the example novel's `cost.json` becomes a
+     `kind = 'continue'` row.
 5. **The 100k refusal.**
    - With `chapter_loop = python` the packet is measured before launch, so the
      check is exact.
