@@ -1,6 +1,6 @@
 # PLAN-EXAM-007 — stopped novels: continue them or bin them
 
-status: draft — written by the building agent; the coordinating session asked for it to be built in the same pass. Awaiting the owner's approval in this header.
+status: approved — the owner, 2026-09-24 (~21:35 UTC, dictated to the coordinating session): "Sí, apruebo el PLAN-EXAM-007"
 date: 2026-09-24
 implements: SPEC-EXAM-007 (approved 2026-09-24), including its §7 precisions from the build review
 

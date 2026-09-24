@@ -92,17 +92,17 @@ const card = (html: string, id: string) => {
 }
 
 describe('AC-6: a stopped card offers both, and nothing else does', () => {
-  it('shows "Continuar" and "Mover a la papelera" on a stopped novel', () => {
+  it('shows "Continue" and "Move to bin" on a stopped novel', () => {
     const html = renderToStaticMarkup(<LibraryView {...props()} />)
-    expect(card(html, 'stopped')).toContain('Continuar')
-    expect(card(html, 'stopped')).toContain('Mover a la papelera')
+    expect(card(html, 'stopped')).toContain('Continue')
+    expect(card(html, 'stopped')).toContain('Move to bin')
   })
 
   it('offers neither on a complete novel or a live one', () => {
     const html = renderToStaticMarkup(<LibraryView {...props()} />)
     for (const id of ['done', 'live']) {
-      expect(card(html, id)).not.toContain('Continuar')
-      expect(card(html, id)).not.toContain('Mover a la papelera')
+      expect(card(html, id)).not.toContain('Continue')
+      expect(card(html, id)).not.toContain('Move to bin')
     }
   })
 
@@ -110,12 +110,12 @@ describe('AC-6: a stopped card offers both, and nothing else does', () => {
     // The example novel stopped itself at 8/10 with stage = complete (§7.1).
     const eightOfTen = run({ id: 'eight', halted: null, stage: 'complete', stopped: true, resume_from: 'chapter 9', resume_stage: 'FLOW-4' })
     const html = renderToStaticMarkup(<LibraryView {...props({ runs: [eightOfTen] })} />)
-    expect(card(html, 'eight')).toContain('Continuar')
+    expect(card(html, 'eight')).toContain('Continue')
   })
 
-  it('"Continuar" opens the continuation for that run', () => {
+  it('"Continue" opens the continuation for that run', () => {
     const onContinue = vi.fn()
-    button(LibraryView(props({ onContinue })), 'Continuar', 'stopped').props.onClick()
+    button(LibraryView(props({ onContinue })), 'Continue', 'stopped').props.onClick()
     expect(onContinue).toHaveBeenCalledWith(STOPPED)
   })
 })
@@ -124,33 +124,33 @@ describe('AC-6: the bin asks once, and restores', () => {
   it('asks for one confirmation before moving anything', () => {
     const onTrash = vi.fn()
     const onConfirmTrash = vi.fn()
-    button(LibraryView(props({ onTrash, onConfirmTrash })), 'Mover a la papelera', 'stopped').props.onClick()
+    button(LibraryView(props({ onTrash, onConfirmTrash })), 'Move to bin', 'stopped').props.onClick()
     expect(onTrash).toHaveBeenCalledWith(STOPPED)
     expect(onConfirmTrash).not.toHaveBeenCalled()
 
     const asking = props({ confirming: 'stopped', onConfirmTrash })
-    expect(card(renderToStaticMarkup(<LibraryView {...asking} />), 'stopped')).toMatch(/papelera\?/)
-    button(LibraryView(asking), 'Sí, mover', 'stopped').props.onClick()
+    expect(card(renderToStaticMarkup(<LibraryView {...asking} />), 'stopped')).toMatch(/to the bin\?/)
+    button(LibraryView(asking), 'Yes, move', 'stopped').props.onClick()
     expect(onConfirmTrash).toHaveBeenCalledWith(STOPPED)
   })
 
-  it('has a "Papelera" view that lists binned runs, and only those', () => {
+  it('has a "Bin" view that lists binned runs, and only those', () => {
     const html = renderToStaticMarkup(<LibraryView {...props({ view: 'bin' })} />)
     expect(html).toContain('Leo and Bruno')
     expect(html).not.toContain('Finisterre')
-    expect(card(html, 'binned')).toContain('Restaurar')
-    expect(card(html, 'binned')).not.toContain('Continuar')
+    expect(card(html, 'binned')).toContain('Restore')
+    expect(card(html, 'binned')).not.toContain('Continue')
   })
 
-  it('"Restaurar" restores that run', () => {
+  it('"Restore" restores that run', () => {
     const onRestore = vi.fn()
-    button(LibraryView(props({ view: 'bin', onRestore })), 'Restaurar', 'binned').props.onClick()
+    button(LibraryView(props({ view: 'bin', onRestore })), 'Restore', 'binned').props.onClick()
     expect(onRestore).toHaveBeenCalledWith(BINNED)
   })
 
   it('opens the bin from the library, and says how many are in it', () => {
     const onView = vi.fn()
-    const tab = button(LibraryView(props({ onView })), 'Papelera (1)')
+    const tab = button(LibraryView(props({ onView })), 'Bin (1)')
     tab.props.onClick()
     expect(onView).toHaveBeenCalledWith('bin')
   })
@@ -191,11 +191,11 @@ describe('AC-6: before anything starts, the panel says what it knows', () => {
     const html = renderToStaticMarkup(<ContinueDialog {...dialog()} />)
     expect(html).toContain('type="number"')
     expect(html).toContain('USD')
-    expect(button(ContinueDialog(dialog()), 'Continuar').props.disabled).toBe(true)
-    expect(button(ContinueDialog(dialog({ ceiling: '0' })), 'Continuar').props.disabled).toBe(true)
+    expect(button(ContinueDialog(dialog()), 'Continue').props.disabled).toBe(true)
+    expect(button(ContinueDialog(dialog({ ceiling: '0' })), 'Continue').props.disabled).toBe(true)
 
     const onConfirm = vi.fn()
-    const ready = button(ContinueDialog(dialog({ ceiling: '40', onConfirm })), 'Continuar')
+    const ready = button(ContinueDialog(dialog({ ceiling: '40', onConfirm })), 'Continue')
     expect(ready.props.disabled).toBe(false)
     ready.props.onClick()
     expect(onConfirm).toHaveBeenCalled()
@@ -206,14 +206,14 @@ describe('AC-6: before anything starts, the panel says what it knows', () => {
     const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: roomy })} />)
     expect(html).not.toContain('type="number"')
     expect(html).toContain('$15.00')
-    expect(button(ContinueDialog(dialog({ run: roomy })), 'Continuar').props.disabled).toBe(false)
+    expect(button(ContinueDialog(dialog({ run: roomy })), 'Continue').props.disabled).toBe(false)
   })
 
   it('refuses, and says why, a run that would stop on the 100k ceiling again', () => {
     const again = run({ halted: 'context', asks_for_figure: false, context_refusal: 'chapter 1 would be sent the same packet again: estimated 104,000 tokens' })
     const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: again })} />)
     expect(html).toContain('estimated 104,000 tokens')
-    expect(button(ContinueDialog(dialog({ run: again })), 'Continuar').props.disabled).toBe(true)
+    expect(button(ContinueDialog(dialog({ run: again })), 'Continue').props.disabled).toBe(true)
   })
 
   it('shows the backend’s refusal as it came', () => {

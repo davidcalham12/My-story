@@ -5,7 +5,7 @@ import { haltReason } from '@/entities/run/lib'
 import { stepOf, titleOf } from '@/entities/run/status'
 
 /**
- * "Continuar", before anything is spent (SPEC-EXAM-007 §2).
+ * "Continue", before anything is spent (SPEC-EXAM-007 §2).
  *
  * Three things are shown first: why the novel stopped, what it has spent —
  * measured, or absent, never $0 — and where it continues from. A run stopped by
@@ -38,7 +38,7 @@ export function ContinueDialog({ run, ceiling, busy, error, onCeiling, onConfirm
         aria-labelledby="continue-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="eyebrow eyebrow--brand">Continuar</p>
+        <p className="eyebrow eyebrow--brand">Continue</p>
         <h2 id="continue-title">{titleOf(run)}</h2>
 
         <dl className="facts">
@@ -88,9 +88,9 @@ export function ContinueDialog({ run, ceiling, busy, error, onCeiling, onConfirm
         {error && <p className="panel panel--bad">{error}</p>}
 
         <div className="dialog__actions">
-          <button type="button" onClick={onCancel}>Cancelar</button>
+          <button type="button" onClick={onCancel}>Cancel</button>
           <button type="button" className="primary" disabled={!ready} onClick={onConfirm}>
-            Continuar
+            Continue
           </button>
         </div>
       </div>

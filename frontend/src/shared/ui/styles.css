@@ -388,7 +388,7 @@ a.button.primary:hover { background: var(--primary-pressed); border-color: var(-
 .reader__actions { margin: var(--s3) 0; }
 .reader__page { background: var(--page); height: 80vh; }
 
-/* --- a dialog (SPEC-EXAM-007: "Continuar") ------------------------------- */
+/* --- a dialog (SPEC-EXAM-007: "Continue") ------------------------------- */
 .scrim {
   position: fixed;
   inset: 0;

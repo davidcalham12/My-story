@@ -10,7 +10,7 @@ export type LibraryPlace = 'library' | 'bin'
  * a different set of characteristics, so a pass rate over them does not measure
  * what it claims. Evidence, not sample.
  *
- * A stopped novel offers "Continuar" and "Mover a la papelera". Stopped is the
+ * A stopped novel offers "Continue" and "Move to bin". Stopped is the
  * server's word (`run.stopped`: units missing, no process live), not the
  * stage's — the example novel stopped at 8/10 with `stage = complete`.
  *
@@ -57,7 +57,7 @@ export function LibraryView(p: {
         aria-current={p.view === 'bin' ? 'page' : undefined}
         onClick={() => p.onView('bin')}
       >
-        {binned === null ? 'Papelera' : `Papelera (${binned.length})`}
+        {binned === null ? 'Bin' : `Bin (${binned.length})`}
       </button>
     </nav>
   )
@@ -74,11 +74,11 @@ export function LibraryView(p: {
     return (
       <>
         <section className="hero hero--halt">
-          <p className="eyebrow">Papelera</p>
+          <p className="eyebrow">Bin</p>
           <h1>{inBin.length} novel{inBin.length === 1 ? '' : 's'} in the bin</h1>
           <p className="lede">
             Nothing here was deleted. Each one’s files are kept under <code>output/_papelera/</code>,
-            and "Restaurar" puts them back exactly as they were.
+            and "Restore" puts them back exactly as they were.
           </p>
         </section>
         {tabs}
@@ -96,7 +96,7 @@ export function LibraryView(p: {
               <p className="muted clamp">{run.premise}</p>
               <div className="card__foot">
                 <span className="hint">{run.id}</span>
-                <button type="button" className="primary" onClick={() => p.onRestore(run)}>Restaurar</button>
+                <button type="button" className="primary" onClick={() => p.onRestore(run)}>Restore</button>
               </div>
             </article>
           ))}
@@ -155,11 +155,11 @@ export function LibraryView(p: {
               <p className="muted clamp">{run.premise}</p>
               {run.stopped && asking && (
                 <div className="confirm" role="alert">
-                  <p>¿Mover «{titleOf(run)}» a la papelera?</p>
-                  <p className="hint">Nothing is deleted; it can be restored from the Papelera.</p>
+                  <p>Move «{titleOf(run)}» to the bin?</p>
+                  <p className="hint">Nothing is deleted; it can be restored from the Bin.</p>
                   <div className="card__actions">
-                    <button type="button" className="primary" onClick={() => p.onConfirmTrash(run)}>Sí, mover</button>
-                    <button type="button" onClick={p.onCancelTrash}>Cancelar</button>
+                    <button type="button" className="primary" onClick={() => p.onConfirmTrash(run)}>Yes, move</button>
+                    <button type="button" onClick={p.onCancelTrash}>Cancel</button>
                   </div>
                 </div>
               )}
@@ -168,8 +168,8 @@ export function LibraryView(p: {
                 <div className="card__actions">
                   {run.stopped && !asking && (
                     <>
-                      <button type="button" onClick={() => p.onTrash(run)}>Mover a la papelera</button>
-                      <button type="button" onClick={() => p.onContinue(run)}>Continuar</button>
+                      <button type="button" onClick={() => p.onTrash(run)}>Move to bin</button>
+                      <button type="button" onClick={() => p.onContinue(run)}>Continue</button>
                     </>
                   )}
                   <button type="button" className="primary" onClick={() => p.onOpen(run.id)}>

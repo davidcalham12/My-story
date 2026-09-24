@@ -114,7 +114,7 @@ export function Library({ onOpen, onNew }: {
         onCancelTrash={() => setConfirming(null)}
         onConfirmTrash={(run) => {
           setConfirming(null)
-          act(api.trash(run.id), `«${titleOf(run)}» is in the Papelera. Nothing was deleted.`)
+          act(api.trash(run.id), `«${titleOf(run)}» is in the Bin. Nothing was deleted.`)
         }}
         onRestore={(run) => act(api.restore(run.id), `«${titleOf(run)}» is back in the library.`)}
       />
