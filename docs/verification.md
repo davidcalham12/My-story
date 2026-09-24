@@ -1173,6 +1173,9 @@ counts the maximum of what was reported and what was estimated.
 passed silently.
 **How we would find out:** the subscription's own usage page against the sum
 of `cost.json` files.
+**Also absent:** the judge's cost. `backend.publish.run_judge` reads the
+rubric out of the `--output-format json` reply and drops its `total_cost_usd`;
+the v2 judge call (2 min, Haiku) has no recorded cost.
 
 ## 4. Code before agent
 

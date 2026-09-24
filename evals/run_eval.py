@@ -284,22 +284,24 @@ def _eval_id_of(payload_json: str) -> str | None:
 
 
 def novel_half(db_path: Path = ROOT / "novaforge.db") -> list[str]:
-    """The `validations` rows of every eval-profile run started from a brief."""
+    """The `validations` rows of every eval run and the example novel (profile
+    `exam`) started from a brief, at each run's latest validated version."""
     if not db_path.is_file():
         return ["## Novel half", "", "absent: no database", ""]
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     runs = conn.execute(
         "SELECT r.id, r.slug, b.payload FROM runs r JOIN briefs b ON b.id = r.brief_id "
-        "WHERE r.profile = ? ORDER BY r.started_at", (PROFILE,)).fetchall()
+        "WHERE r.profile IN (?, 'exam') ORDER BY r.started_at", (PROFILE,)).fetchall()
     out = ["## Novel half", ""]
     if not runs:
         return out + ["absent: no eval run has been recorded yet", ""]
     for run in runs:
         rows = conn.execute(
             "SELECT validator, criterion, value, justification FROM validations "
-            "WHERE run_id = ? AND version = 1 ORDER BY validator, criterion",
-            (run["id"],)).fetchall()
+            "WHERE run_id = ? AND version = (SELECT MAX(version) FROM validations "
+            "WHERE run_id = ?) ORDER BY validator, criterion",
+            (run["id"], run["id"])).fetchall()
         out += [f"### {_eval_id_of(run['payload']) or '?'} — run `{run['id']}` "
                 f"(`{run['slug']}`)", ""]
         if not rows:
