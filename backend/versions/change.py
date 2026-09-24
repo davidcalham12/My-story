@@ -92,6 +92,12 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
                   + f"\nReader change: wherever the Bible or the outline once said "
                     f"{(old or fact_id)!r}, it now says {to!r}. "
                     f"Write the chapter so it holds.\n")
+        # NOVAFORGE_CHANGE_PROCEDURE_REV: run the change on the procedure the
+        # book was written with, not the current one (owner, 2026-09-24).
+        import os as _os
+        if _os.environ.get("NOVAFORGE_CHANGE_PROCEDURE_REV"):
+            prompt = pin_procedure(workspace, _os.environ["NOVAFORGE_CHANGE_PROCEDURE_REV"],
+                                   prompt)
         process = RunProcess.for_prompt(prompt=prompt, cwd=settings.repo_root,
                                         max_budget_usd=15.0)
         process.start()
@@ -107,6 +113,32 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
             promoted.write_text(text.replace(personalise.TOKEN, alias),
                                 encoding="utf-8", newline="\n")
     return verdicts
+
+
+PROCEDURE = ".claude/skills/storymaker/units/chapter.md"
+SKILL = ".claude/skills/storymaker/SKILL.md"
+
+
+def pin_procedure(workspace: Path, rev: str, prompt: str) -> str:
+    """Write the chapter procedure and the skill of revision `rev` into
+    `<workspace>/procedure/`, and point the prompt at those copies."""
+    import subprocess
+
+    from backend.commons.config.settings import load_settings as _settings
+
+    root = _settings().repo_root
+    target = workspace / "procedure"
+    target.mkdir(parents=True, exist_ok=True)
+
+    def show(path: str) -> str:
+        return subprocess.run(["git", "show", f"{rev}:{path}"], cwd=root, check=True,
+                              capture_output=True, text=True, encoding="utf-8").stdout
+
+    (target / "SKILL.md").write_text(show(SKILL), encoding="utf-8", newline="\n")
+    (target / "chapter.md").write_text(
+        show(PROCEDURE).replace(SKILL, str(target / "SKILL.md")),
+        encoding="utf-8", newline="\n")
+    return prompt.replace(PROCEDURE, str(target / "chapter.md"))
 
 
 def prepare_workspace(run_dir: Path, workspace: Path, chapters: tuple[int, ...],

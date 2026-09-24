@@ -36,3 +36,18 @@ def test_the_workspace_carries_the_change_and_never_the_name(tmp_path):
     assert (ws / "chapters" / "ch02.summary.md").is_file()
     assert not (ws / "chapters" / "ch03.md").exists(), "v1's prose is not handed over"
     assert not (ws / "bible" / "world.anon.md").exists()
+
+
+def test_a_pinned_procedure_is_written_into_the_workspace(tmp_path):
+    """The demo runs on the system the book was written with (owner, 2026-09-24):
+    the chapter procedure and the skill are taken from a named revision, and the
+    prompt points at the pinned copies."""
+    ws = tmp_path / "v3"
+    ws.mkdir()
+    prompt = change.pin_procedure(ws, "c35fdc9^",
+                                  "procedure: .claude/skills/storymaker/units/chapter.md\n")
+    pinned = ws / "procedure" / "chapter.md"
+    assert pinned.is_file() and (ws / "procedure" / "SKILL.md").is_file()
+    assert "bible-critic" not in pinned.read_text(encoding="utf-8")
+    assert str(pinned) in prompt and "units/chapter.md" not in prompt
+    assert str(ws / "procedure" / "SKILL.md") in pinned.read_text(encoding="utf-8")
