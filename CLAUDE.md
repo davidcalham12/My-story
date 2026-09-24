@@ -58,9 +58,10 @@ holds the guarantee that rests on it.
 
 ## Models
 
-The twelve agents run on Haiku. The orchestrator runs on the session's model:
-on Haiku it stopped dispatching the project's agents and the writer's
-isolation disappeared (`docs/iterations.md`).
+The twelve agents run on Haiku. The orchestrator runs on Sonnet in the `exam`
+and `eval` profiles (owner's decision, spec §8): cheaper and faster than the
+session model, and not Haiku, on which it stopped dispatching the project's
+agents and the writer's isolation disappeared (`docs/iterations.md`).
 
 ## Where to read next
 

@@ -352,3 +352,12 @@ def test_the_orchestrator_model_is_read_from_the_resolved_config_not_a_literal(d
     overlaid = {**base, "models": {**base["models"], "orchestrator": "haiku"}}
     cmd = svc._process("A premise long enough.", "tiny", "", overlaid).command
     assert cmd[cmd.index("--model") + 1] == "haiku"
+
+
+def test_the_exam_and_eval_orchestrator_runs_on_sonnet():
+    """Owner, 2026-09-24 ("baja el orquestador"): cheaper and faster than the
+    session model, and not Haiku — on Haiku the orchestrator stopped using the
+    project's agents (docs/iterations.md). Profiles only; the base stays null."""
+    from backend.commons.config import loader
+    for profile in ("exam", "eval"):
+        assert loader.resolve(profile)["models"]["orchestrator"] == "sonnet", profile

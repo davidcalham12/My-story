@@ -61,5 +61,7 @@
       "min": 4,
       "max": 5
     }
-  }
+  },
+  "_comment_models": "Owner, 2026-09-24 (spec §8): the orchestrator on Sonnet - cheaper and faster than the session model; never Haiku, on which it stopped dispatching the project's agents.",
+  "models": { "orchestrator": "sonnet" }
 }
