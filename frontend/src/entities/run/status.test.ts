@@ -34,4 +34,15 @@ describe('plainStatus — the answer first, in words anyone reads', () => {
   it('falls back to the raw stage it does not know rather than inventing one', () => {
     expect(plainStatus(run({ stage: 'FLOW-9' }), true).step).toContain('FLOW-9')
   })
+
+  it('does not call a finished run ready when it published no book', () => {
+    const s = plainStatus(run({ stage: 'complete' }), false, false)
+    expect(s.tone).toBe('halt')
+    expect(s.headline).not.toMatch(/ready/i)
+    expect(s.label).toMatch(/no book/i)
+  })
+
+  it('calls a stopped run ready when it did publish a book', () => {
+    expect(plainStatus(run({ halted: 'user' }), false, true).tone).toBe('ok')
+  })
 })

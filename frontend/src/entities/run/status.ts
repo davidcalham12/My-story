@@ -32,7 +32,10 @@ export function stepOf(stage: string): string {
   return STEPS[stage] ?? `step ${stage}`
 }
 
-export function plainStatus(run: Run, live: boolean): PlainStatus {
+/** `published` is whether a version of the book exists: `undefined` when not
+ *  asked, `false` when asked and there is none. A run can end "complete" with
+ *  no book — case 10 closed one under budget pressure without its last chapter. */
+export function plainStatus(run: Run, live: boolean, published?: boolean): PlainStatus {
   // A live stream is proof of life; a halted row can be stale (red-team case 13).
   if (live || (!run.halted && run.stage !== 'complete')) {
     const step = stepOf(run.stage)
@@ -44,13 +47,23 @@ export function plainStatus(run: Run, live: boolean): PlainStatus {
       detail: `Right now: ${step}. This page updates by itself.`,
     }
   }
-  if (run.halted) {
+  // A published book is the answer a buyer wants, whatever the row says after.
+  if (run.halted && published !== true) {
     return {
       tone: 'halt',
       label: 'Stopped',
       headline: 'This novel stopped before the end',
       step: null,
       detail: `Why: ${haltReason(run)}. Everything it wrote is kept and readable.`,
+    }
+  }
+  if (published === false) {
+    return {
+      tone: 'halt',
+      label: 'No book',
+      headline: 'This run ended without publishing a book',
+      step: null,
+      detail: 'Its last chapter never passed the checks, so there is nothing to read. The drafts are kept under Technical details.',
     }
   }
   return {

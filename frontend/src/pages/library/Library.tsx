@@ -16,11 +16,23 @@ export function Library({ onOpen, onNew }: {
 }) {
   const [runs, setRuns] = useState<Run[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Which runs actually published a book: a "complete" row is not proof there
+  // is anything to read, and a stopped one may still have published.
+  const [published, setPublished] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     let alive = true
     api.list().then(
-      (r) => alive && setRuns(r),
+      (r) => {
+        if (!alive) return
+        setRuns(r)
+        r.forEach((run) =>
+          api.versions(run.id).then(
+            (v) => alive && setPublished((p) => ({ ...p, [run.id]: v.length > 0 })),
+            () => undefined,
+          ),
+        )
+      },
       (e) => alive && setError(String(e)),
     )
     return () => {
@@ -31,7 +43,7 @@ export function Library({ onOpen, onNew }: {
   if (error) return <p className="panel panel--bad">{error}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
 
-  const status = (run: Run) => plainStatus(run, false)
+  const status = (run: Run) => plainStatus(run, false, published[run.id])
   const count = (tone: string) => runs.filter((r) => status(r).tone === tone).length
   const order = { live: 0, ok: 1, halt: 2 } as const
   const sorted = [...runs].sort((x, y) => order[status(x).tone] - order[status(y).tone])
