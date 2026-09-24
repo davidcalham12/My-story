@@ -117,7 +117,7 @@ def test_the_eval_profile_is_the_exam_pipeline_at_a_smaller_size():
 
     ev, exam, tiny = (loader.resolve(n) for n in ("eval", "exam", "tiny"))
 
-    assert ev["novel"]["chapters"] == 3, "three chapters, so four briefs are affordable"
+    assert ev["novel"]["chapters"] == 1, "one chapter (owner, 2026-09-24): every validator, a fraction of the cost"
     assert ev["bible"] == exam["bible"], "the same canon the exam novel carries"
     assert ev["bible"] != tiny["bible"]
     assert ev["budget"]["max_cost_usd"] < exam["budget"]["max_cost_usd"]

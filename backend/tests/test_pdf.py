@@ -434,3 +434,29 @@ def test_the_example_run_renders_into_a_book_a_reader_could_open(db, tmp_path):
     assert 'id="chapter-3"' in html
     assert "Ada Rowe" in html
     assert "Corbie Light" in html
+
+
+# ------------------------------------------------------------ the release
+
+
+def test_release_publishes_v1_prints_it_and_records_the_validators(db, run, monkeypatch):
+    """v1 had no way out of the archive: only a reader change called publish."""
+    from backend.publish import release, validations
+
+    printed = []
+    monkeypatch.setattr(pdf, "print_pdf",
+                        lambda h, p: printed.append((h, p)) or p.write_bytes(b"%PDF") or p)
+    n = release.release(db, run)
+    assert n == 1
+    assert printed and printed[0][1] == run / "dist" / "v1" / "novel.pdf"
+    names = {r["validator"] for r in validations.for_version(db, "r1", 1)}
+    assert {"chapter_length", "mandatory_facts", "lean_chronology"} <= names
+
+
+def test_release_refuses_a_second_v1(db, run, monkeypatch):
+    from backend.publish import release
+
+    monkeypatch.setattr(pdf, "print_pdf", lambda h, p: p.write_bytes(b"%PDF") or p)
+    release.release(db, run)
+    with pytest.raises(release.AlreadyReleased):
+        release.release(db, run)
