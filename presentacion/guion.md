@@ -1,77 +1,143 @@
-# Guion del deck — storyMaker
+# Guion — presentación al cliente y demo en directo
 
-Para montar en Claude Design sobre el sistema **Qaracter design FRM** (PLAN-001 E11).
-Cada slide: título, lo que se dice y la evidencia que la respalda. Las cifras
-marcadas `PENDIENTE` se rellenan desde los runs de hoy; las marcadas
-`estimado` son análisis, no medición, y así se escriben en la slide.
+**Mañana, 25-09-2026.** Primero la presentación: es para un cliente, así que
+va **resumen primero y puntos clave en detalle después**. Después, la
+herramienta **en directo**. Entrega: vídeo, código y presentación.
 
-Estado: borrador 2026-09-24, 14:40 UTC, escrito antes de la novela de ejemplo.
+El deck es el artifact *storyMaker — Qaracter proposal*, con 13 slides y la
+identidad Qaracter design FRM. Aquí va lo que se dice en cada slide y la
+evidencia que lo respalda. Cada cifra lleva su procedencia; lo que no está
+medido dice **supuesto** o **estimado**.
+
+Actualizado: 2026-09-24, 18:50 UTC, con la novela de 10 capítulos terminada.
 
 ---
 
-## 1. Portada
-- Qaracter → cliente ficticio · *storyMaker: novelas personalizadas para regalar* · 25-09-2026 · el dueño.
+## Parte 1 — Presentación (unos 12 minutos)
 
-## 2. El problema
-- Diez capítulos de 1.000–1.500 palabras en los que el destinatario reconoce su nombre, su historia y sus detalles, y que se leen de principio a fin sin tropiezos.
-- Se evalúa el razonamiento y las evals con números, no la prosa.
-- **La decisión:** no es un sistema nuevo. Es NovaForge v2 adaptado: gate de seis características, tres intentos, Story Bible, archivo en SQLite, procedencia en cada cifra. (spec §0)
+### 1. Portada
+Qaracter presenta a un cliente ficticio (*Páginas de Regalo S.L.*):
+*storyMaker, novelas personalizadas para regalar*.
 
-## 3. Configuración y lectura
-- Entrevista (FLOW-0) → `Brief` validado por schema; faltan datos o hay contradicción → se decide **en código**, el agente sólo extrae y pregunta.
-- El texto libre del comprador nunca es instrucción: queda como fila `facts.source = freetext` (brief 04).
-- Lectura en **PDF**: portada personalizada, dedicatoria, índice enlazado, ficha de personajes y lugares con enlace a su primer capítulo.
-- Evidencia: `evals/results.md` (FLOW-0, 5 de 5 como se esperaba), `ejemplos/novela-ejemplo.pdf` `PENDIENTE`.
+### 2. Resumen: la slide que hay que dejar clara
+Cuatro puntos, uno por tarjeta:
+1. **Qué hace.** Una entrevista de diez minutos se convierte en una novela de
+   hasta 10 capítulos, que se lee en línea o en PDF. Un cambio reescribe solo
+   los capítulos afectados.
+2. **Calidad comprobada.** Cada capítulo supera seis criterios con nota mínima
+   de 8. En la novela de ejemplo, 8 de 10 capítulos se corrigieron solos antes
+   de aprobar (medido).
+3. **Seguro por diseño.**
+   - Resultado: la inyección del brief 04 no llegó al libro, y hay 0 palabras
+     prohibidas.
+   - Por qué: el texto del comprador nunca es una orden, y el modelo nunca ve el
+     nombre del destinatario, que lo pone el código al publicar.
+4. **Coste bajo control.** Novela de 10 capítulos: **74,20 USD medidos**, por
+   debajo de su techo.
 
-## 4. Arquitectura del harness
-- Diagrama: `docs/diagrams/harness.md`.
-- **Conductor por etapas** (SPEC-EXAM-003): Python lanza un proceso de Claude Code nuevo por unidad (mundo, reparto, guion, cada capítulo, cierre); el estado vive en disco. Nada en un run pasa de 100.000 tokens concurrentes.
-- El escritor de capítulos no lee capítulos anteriores: sólo la Bible, su entrada del guion y el resumen acumulado. El contexto no crece con el libro.
-- Roles: planificador (`plot-architect`), escritor (`chapter-writer`), editor (cuatro críticos + `style-editor`), más `interviewer` y `judge`; agentes en Haiku, el orquestador en el modelo de sesión (spec §8, con el porqué medido).
+### 3. Problema y cliente
+Las plantillas cambian el nombre y poco más. Un modelo solo se contradice,
+repite frases y olvida lo que se le pidió.
 
-## 5. Validación, evals y observabilidad
-- Tabla de validadores por tipo (a/b/c/d): `docs/diagrams/validators.md`.
-- Tabla brief × validador: `evals/results.md` — FLOW-0 medido; mitad novela `PENDIENTE` (evals de 3 capítulos, declarado: spec §8).
-- `judge_rubric`: seis criterios 0–10 con justificación; frente a la revisión humana de una novela `PENDIENTE`.
-- Métodos formales: **TLA+ con TLC en verde, 18.253 estados**, cuatro propiedades de seguridad y terminación (`tla/README.md`). Lean: `PENDIENTE` o declarado con motivo.
-- Iteración de ajuste: brief 01 antes/después con la versión del prompt `PENDIENTE`.
-- Una traza de Langfuse: sesión por novela, traza por versión, span por llamada, scores por validador.
+### 4. Configuración y lectura
+- Entrevista → brief validado. Lo que falta o se contradice lo decide el
+  código.
+- El comprador elige de 1 a 10 capítulos.
+- El libro se lee en línea o se descarga en PDF con el título del libro.
+- La ficha de personajes y lugares enlaza con cada capítulo.
 
-## 6. Guardarraíles
-- Palabras prohibidas a tres niveles (global, cliente, novela), normalizadas (mayúsculas, tildes, plural simple); un acierto devuelve el capítulo por la hoja de feedback; agotados los intentos → `halted: policy`; cada decisión en `audit_log`.
-- Dos hooks `PostToolUse` sobre escrituras en `output/*/chapters/`: `validate-chapter` y `policy`.
-- Datos personales: el alias del destinatario sustituye al nombre real antes de exportar a Langfuse.
-- Red-team: `docs/red-team-log.md` — incluye los fallos propios (orquestadores huérfanos facturando; una novela cerrada como completa sin libro).
+### 5–6. Arquitectura: la idea central
+- **El escritor nunca puede leer los capítulos anteriores.** No es una
+  instrucción, es una capacidad: su única herramienta devuelve rutas, nunca
+  contenido.
+- Doce agentes, un orquestador, la Story Bible en SQLite y la puerta de
+  calidad.
 
-## 7. Presupuesto
-Todo lo medido sale de `output/*/cost.json` (evento `result` de Claude Code).
+### 7. Validadores
+- Programáticos: schema, nombres, longitud, hechos, palabras prohibidas y
+  revisión visual.
+- Semánticos: seis características y el juez con rúbrica.
+- Formales: TLA+ y Lean.
+- Humano: revisión del dueño.
+
+### 8. Evals, con números (`evals/results.md`, tabla de validaciones)
+- 01 y 04 pasan. 03 y 05 se rechazan en la entrevista **sin gastar nada**: 05
+  por un recuerdo de 1983 en alguien nacido en 1986. 02 no se generó, por
+  presupuesto (declarado).
+- **Juez sobre la novela completa: media 8,33** (continuidad 8, tono 9, arco 8,
+  coherencia de personajes 9, ritmo 8, personalización natural 8), cada nota
+  con su justificación (medido).
+- Hechos obligatorios: 1 de 3, porque la comprobación es literal ("tomato
+  plants" frente a "the tomatoes"). Es un límite declarado.
+
+### 9. Formal y observabilidad
+- TLA+ con TLC: 18.253 estados, sin errores.
+- Lean no se ejecutó (elan necesita permisos de administrador), y se declara.
+- Langfuse: una traza por novela, spans por agente y 100 scores.
+- El registro delató dos desobediencias reales del orquestador.
+
+### 10. Guardrails
+Palabras prohibidas en tres niveles, inyección, datos personales (el nombre lo
+pone el código) y audit log.
+
+### 11. Presupuesto
 
 | concepto | cifra | procedencia |
 |---|---|---|
-| novela de ejemplo, orquestador único: 3 de 10 capítulos, 127 turnos, 49 min | **14,86 $** | medido (`leo-and-the-other-side-of-the-hill`) |
-| → por capítulo con orquestador único | ~4,95 $ | medido / 3 |
-| conductor, unidades mundo + reparto, 25 turnos, 3,3 min | **1,40 $** | medido (`leo-and-bruno-cross-the-hill`) |
-| novela de ejemplo completa, 10 capítulos | `PENDIENTE` | medido hoy |
-| cada eval de 3 capítulos | `PENDIENTE` | medido hoy |
-| novela de 10 extrapolada desde las evals de 3 | `PENDIENTE` | **estimado**, se marca así |
-| techo por novela | 60 $ | decisión del dueño, spec §8 |
+| novela de ejemplo, 10 capítulos (468 turnos, 169 min) | **74,20 USD** | medido: 53,17 + 21,03 |
+| muestra de 1 capítulo (eval 04) | 25,80 USD | medido |
+| juez sobre una versión | 2 min | medido; coste no registrado (declarado) |
+| infraestructura por novela | 6 USD | **supuesto** |
+| precio de venta | 129 USD | **supuesto**, a validar con el cliente |
+| margen por novela | 38 % | calculado sobre los supuestos |
+| desarrollo | ~54 h × 50 USD/h ≈ 2.700 USD | **supuesto** |
 
-**Sensibilidad** (estimado, desde `config/pricing.json`): los agentes van en Haiku 4.5 (1 $/5 $ por Mtok). Si el cliente exige el modelo premium para los agentes, la parte de agentes se multiplica por **×2 con Sonnet 5** y **×5 con Opus 5** con las mismas tarifas; el orquestador ya va en el modelo de sesión y no cambia. Se calcula con los tokens medidos de la novela de ejemplo y se etiqueta `estimado`.
+**Mensaje:** un techo por debajo de lo que cuesta el trabajo no ahorra, compra
+un libro roto (red-team, caso 10). Ya está construida la palanca para bajar el
+coste: el orquestador en Sonnet y tres críticos unidos en uno (SPEC-EXAM-004),
+que deja cada capítulo con la mitad de llamadas. Está pendiente de medir.
 
-Mensaje de la slide: *un techo por debajo de lo que cuesta el trabajo no ahorra dinero, compra un libro roto* (el techo de 15 $ se agotó en el capítulo 3; red-team caso 10).
+### 12. Demo y riesgos
+El cambio del lector ("el perro se llama Nala") y los riesgos declarados:
+- el coste depende del orquestador;
+- el juez no es reproducible;
+- los hechos se comprueban por texto, no por significado.
 
-## 8. Demo: el lector pide un cambio
-- Un dato del brief 01 cambia (`python -m backend.versions.change <slug> --fact <id> --to "…"`).
-- `fact_usage` dice qué capítulos lo usan; sólo esos se regeneran, por el mismo gate.
-- `dist/v2/novel.pdf` abre con la página de **novedades** que enlaza a cada capítulo cambiado; `dist/v1/` queda intacto.
-- Es el vídeo.
+### 13. Contraportada
 
-## 9. Cierre
-- La frase de diseño (la misma del email, ver `README.md`).
-- Lo que queda fuera, declarado: servidor MCP, login, linters de prosa, lector web con selección (spec §5).
+---
 
-## 10. Contraportada
-- Qaracter · contacto.
+## Parte 2 — Demo en directo (unos 8 minutos)
 
-## Anexos (primer recorte si falta tiempo, PLAN-001 Parte 6 punto 5)
-- A. Arquitectura · B. Máquina de estados TLA+ (`docs/diagrams/state-machine.md`) · C. Tabla de evals · D. Esquema SQLite (`docs/diagrams/sqlite-schema.md`) · E. Red-team log.
+Panel en `http://localhost:5191`, con el servidor en `:8000`. **Antes de
+empezar,** comprueba que no hay ningún orquestador vivo y que la biblioteca
+carga.
+
+1. **Biblioteca.** Arriba, el resumen: listos, en curso y parados. Las
+   tarjetas llevan el título del libro, sin guiones.
+2. **Abrir *The Other Side of the Hill*** → *Progress*: "Your novel is ready",
+   el coste y el detalle técnico plegado. Despliégalo y enseña la puerta de
+   calidad: notas por capítulo e intentos.
+3. **Read:**
+   - el libro dentro de la página, con portada, dedicatoria e índice;
+   - pulsa "chapter 9" en la ficha y salta al capítulo;
+   - elige la versión 1 (8 capítulos) y luego la 2 (10): las dos siguen ahí;
+   - **Download PDF** baja el archivo con el título del libro.
+4. **Ask for a change:** elige el dato del perro, escribe el nuevo nombre y
+   enseña qué capítulos se reescribirían **antes de gastar nada**. Si la v3 ya
+   está generada, ábrela y enseña su página de novedades.
+5. **New novel:**
+   - pulsa "Fill this in with the example brief";
+   - enseña los pasos, la longitud de 1 a 10 y la comprobación de lo que falta;
+   - **no pulses Order en directo**, porque cuesta dinero de verdad y tarda.
+6. **Langfuse:** una traza de la novela, con sus spans y sus scores.
+
+**Si algo falla en directo:** el PDF está en `ejemplos/novela-ejemplo.pdf`,
+y el vídeo muestra el recorrido completo.
+
+---
+
+## Entrega
+- **Código:** https://github.com/davidcalham12/StoryMaker (rama `main`).
+- **Presentación:** el deck (compártelo desde su menú Share).
+- **Vídeo:** el recorrido de la Parte 2, grabado por el dueño.
