@@ -377,3 +377,10 @@ def test_a_real_exam_run_launches_claude_with_model_sonnet(tmp_path):
                                     use_recorded_stream=False))
     process = svc._process("a premise long enough", "exam", "", loader.resolve("exam"))
     assert process.command[process.command.index("--model") + 1] == "sonnet"
+
+
+def test_the_tiny_orchestrator_runs_on_sonnet():
+    """Owner, 2026-09-24 (~21:00 UTC, "Sonnet"): the profile the owner launches
+    from the panel does not fall back to the CLI default (Opus)."""
+    from backend.commons.config import loader
+    assert loader.resolve("tiny")["models"]["orchestrator"] == "sonnet"

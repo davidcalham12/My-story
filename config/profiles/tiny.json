@@ -59,5 +59,7 @@
       "min": 2,
       "max": 3
     }
-  }
+  },
+  "_comment_models": "Owner, 2026-09-24 (~21:00 UTC), choosing \"Sonnet\" for the orchestrator of the profile launched from the panel: cheaper than the CLI default (Opus), never Haiku, on which it stopped dispatching the project's agents.",
+  "models": { "orchestrator": "sonnet" }
 }
