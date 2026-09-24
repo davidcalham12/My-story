@@ -185,6 +185,9 @@ def test_no_route_takes_a_path_and_reads_a_file():
         "/api/runs/{run_id}",
         "/api/runs/{run_id}/bible/characters",
         "/api/runs/{run_id}/bible/places",
+        # Reads chNN.md headings from the folder named by the run's slug in the
+        # database, never by the URL; traversal test in test_reader_contents.py.
+        "/api/runs/{run_id}/chapters",
         "/api/runs/{run_id}/changes",
         "/api/runs/{run_id}/facts",
         "/api/runs/{run_id}/facts/{fact_id}/impact",

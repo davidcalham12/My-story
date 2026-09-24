@@ -15,7 +15,9 @@ that decides which database an app talks to.
 
 from __future__ import annotations
 
+import re
 import sqlite3
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -117,3 +119,28 @@ def places(run_id: str, svc=Depends(get_service)) -> list[dict]:
         "SELECT canonical_name, note, first_chapter FROM places "
         "WHERE run_id = ? ORDER BY first_chapter IS NULL, first_chapter, "
         "canonical_name", (run_id,))]
+
+
+#: `# Chapter 3 — The Supply Boat`, with an em dash, an en dash or a hyphen.
+_TITLE = re.compile(r"^#\s*Chapter\s+\d+\s*[—–-]\s*(.+?)\s*$", re.M)
+
+
+@router.get("/{run_id}/chapters")
+def chapters(run_id: str, svc=Depends(get_service)) -> list[dict]:
+    """The promoted chapters, by number and title, for *Read*'s contents.
+
+    Read from the files the book was assembled from — `chNN.md`, never an
+    attempt — because that is the text the reader has. A chapter with no
+    heading is listed by number with an empty title, not left out.
+    """
+    conn = _conn(svc)
+    row = conn.execute("SELECT slug FROM runs WHERE id = ?", (run_id,)).fetchone()
+    if not row:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f"no run {run_id}")
+    folder = Path(svc.settings.output_dir) / row["slug"] / "chapters"
+    out = []
+    for path in sorted(folder.glob("ch[0-9][0-9].md")):
+        head = path.read_text(encoding="utf-8")[:400]
+        match = _TITLE.search(head)
+        out.append({"n": int(path.stem[2:]), "title": match.group(1) if match else ""})
+    return out

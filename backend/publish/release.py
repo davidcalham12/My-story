@@ -14,11 +14,26 @@ import sys
 from pathlib import Path
 
 from backend.chapters import fact_usage
+from backend.bible import ingest
 from backend.publish import pdf, personalise, record_all
 
 
 class AlreadyReleased(Exception):
     """v1 exists. A later version is a reader change, never a second v1."""
+
+
+def ensure_bible_rows(conn: sqlite3.Connection, run_dir: Path) -> None:
+    """Ingest the Story Bible if nothing did.
+
+    The ingest belongs to the conductor's cast unit; a novel written by the
+    single orchestrator (the approved fallback) never ran it, and published
+    with no characters and no places for *Read* to show. Run on the
+    personalised files, so the rows carry the names the reader sees.
+    """
+    run_id = record_all._run_id(conn, run_dir)
+    if conn.execute("SELECT 1 FROM characters WHERE run_id = ?", (run_id,)).fetchone():
+        return
+    ingest.ingest(conn, run_dir)
 
 
 def release(conn: sqlite3.Connection, run_dir: Path) -> int:
@@ -28,6 +43,7 @@ def release(conn: sqlite3.Connection, run_dir: Path) -> int:
     # Personalised first, so fact usage, the validators and the PDF all read
     # the text the reader gets (owner's decision B, 2026-09-24).
     personalise.personalise(conn, run_dir)
+    ensure_bible_rows(conn, run_dir)
     for chapter in sorted((run_dir / "chapters").glob("ch[0-9][0-9].md")):
         fact_usage.record(conn, run_dir, int(chapter.stem[2:]))
     n = pdf.publish(conn, run_dir, run_id, reason="first publication")
