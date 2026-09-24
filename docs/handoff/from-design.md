@@ -248,3 +248,48 @@ candidatas en `My-story/docs/EXAM-PLAN.md` §10.
 ### 9. Sobre `b864fed` — evals en 3 capítulos
 
 Decisión razonable para el jueves. Dos cosas para que no cueste nota: (a) que `evals/results.md` abra diciendo que las cinco evaluaciones corren con 3 capítulos por coste y tiempo, y que la novela de ejemplo (brief 01) sí es de 10 — el examen pide novelas de 10 y un lector externo buscará la razón; (b) que la slide de presupuesto extrapole el coste por novela de 10 desde los 3 **como estimación marcada**, y use el único run de 10 (la de ejemplo) como el dato medido. Orquestador en el modelo de sesión: de acuerdo; retiro la sugerencia del run `tiny-haiku` previo.
+
+
+---
+
+## Dueño → construcción — 2026-09-24, 14:10 UTC (leído `3aa0c43`) · ORDEN PARA HOY
+
+Escrito por la sesión de documentación a instrucción del dueño ("si si aplica").
+El último commit es de ayer 21:36 UTC; desde entonces el repo no dice nada. Si
+hay trabajo sin commitear en la VM, **commitéalo ya** aunque esté a medias.
+
+### Estado que se ve desde el repo
+
+- Hecho: E2–E6 en código (`854df0f`, 656 tests); TLA+ con TLC pasando
+  (18.253 estados); Playwright MCP; `CLAUDE.md`; `.env.example`; `/docs` en
+  buena parte; techo 60 en el perfil; conductor por etapas (SPEC/PLAN-EXAM-003).
+- **No hecho y obligatorio:** novela de ejemplo de 10 capítulos (el run del
+  conductor `leo-and-bruno-cross-the-hill` está en FLOW-1, sólo `world`); mitad
+  "novela" de las evals (sólo FLOW-0 en `evals/results.md`; 2 de 11 validadores
+  escriben en `validations`); ningún PDF en `dist/` ni `ejemplos/`; demo del
+  cambio del lector (E8); deck.
+- `from-build.md` sin actualizar desde ayer 19:22.
+
+### Orden, por prioridad
+
+1. **Ahora mismo:** comprobar si el run del conductor sigue vivo y en qué
+   capítulo va. Escribirlo en `from-build.md` en el mismo commit.
+2. **Fallback adelantado.** Si el conductor no va a cerrar los 10 capítulos
+   antes de las **18:00 UTC**, no esperar a esa hora: lanzar ya la novela de
+   ejemplo con un solo orquestador y techo 60 (spec §8). Aviso: a ~5 $/capítulo
+   medidos, 10 capítulos rozan el techo; si salta, se publica con los capítulos
+   promovidos y se declara.
+3. **En paralelo, mientras corre la novela:** evals de 3 capítulos (perfil
+   `eval`) sobre **01, 04 y 05**; 02 sólo si sobra presupuesto. Que cada
+   validador escriba su fila en `validations`, para que `results.md` salga de ahí.
+4. **Brief 05:** quitar `recipient.birth_date` del fixture o declararlo en el
+   schema, para que el brief llegue a la cronología y pruebe lo que debe
+   probar. Sin `lean_chronology`, el hueco se declara tal cual.
+5. **Con la novela terminada:** PDF v1 → `ejemplos/novela-ejemplo.pdf`; cambio
+   del lector → v2 con la página de novedades enlazada (criterio 5b).
+   **Grabable esta noche.**
+6. **Recortes de PLAN-001 Parte 6, ya aplicados:** Lean queda en "export
+   escrito o no, `lake build` no ejecutado, motivo"; el tuning se reduce a
+   antes/después de la nota del judge sobre el brief 01, o se declara.
+7. Al cerrar cada bloque: `from-build.md` con coste, minutos y commit. El dueño
+   sigue el avance desde aquí.
