@@ -70,14 +70,78 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
     The contract, which the tests hold a stand-in to: write each named chapter
     to `<workspace>/chapters/chNN.md` and return the gate's verdict per chapter.
     """
-    prompt = (f"Rewrite chapters {', '.join(str(c) for c in chapters)} of the "
-              f"novel in {run_dir} so that fact {fact_id} now reads: {to}\n"
-              f"Write each chapter to {workspace / 'chapters'} and run the "
-              f"ordinary gate on it.")
-    raise NotImplementedError(
-        "the reader change dispatches Claude Code and is demonstrated, not "
-        "tested (PLAN-001 E6). The prompt is built and the workspace is ready:\n"
-        + prompt)
+    import shutil as _shutil
+
+    from backend.commons.config.settings import load_settings as _settings
+    from backend.commons.db.connection import connect
+    from backend.commons.runner.process import RunProcess
+    from backend.publish import personalise
+    from backend.runs.conductor import Unit, prompt_for
+
+    settings = _settings()
+    conn = connect(settings.db_path)
+    fact = conn.execute("SELECT text FROM facts WHERE id = ?", (fact_id,)).fetchone()
+    old = fact[0] if fact else ""
+    run = conn.execute("SELECT brief_id FROM runs WHERE slug = ?", (run_dir.name,)).fetchone()
+    alias = personalise.alias_for(conn, run[0] if run else None)
+    prepare_workspace(run_dir, workspace, chapters, old=old, to=to)
+
+    verdicts: dict[int, bool] = {}
+    for n in chapters:
+        prompt = (prompt_for(Unit("chapter", n), slug=run_dir.name, run_dir=workspace)
+                  + f"\nReader change: wherever the Bible or the outline once said "
+                    f"{(old or fact_id)!r}, it now says {to!r}. "
+                    f"Write the chapter so it holds.\n")
+        process = RunProcess.for_prompt(prompt=prompt, cwd=settings.repo_root,
+                                        max_budget_usd=15.0)
+        process.start()
+        for _ in process.lines():
+            pass
+        promoted = workspace / "chapters" / f"ch{n:02d}.md"
+        verdicts[n] = promoted.is_file()
+        if promoted.is_file() and alias:
+            # The same mechanical step as v1 (owner's decision B): the model
+            # wrote the token, code puts the alias in its place.
+            _shutil.copyfile(promoted, promoted.with_name(f"ch{n:02d}.anon.md"))
+            text = promoted.read_text(encoding="utf-8")
+            promoted.write_text(text.replace(personalise.TOKEN, alias),
+                                encoding="utf-8", newline="\n")
+    return verdicts
+
+
+def prepare_workspace(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
+                      *, old: str, to: str) -> None:
+    """What the chapter unit rewrites from: the anonymised Bible and outline with
+    the fact changed, the config, the state and the summaries before each named
+    chapter. Never v1's prose — the writer is never given an earlier chapter's
+    prose, and a rewrite is no exception."""
+    import shutil as _shutil
+
+    def anon(path: Path) -> Path:
+        twin = path.with_name(f"{path.stem}.anon{path.suffix}")
+        return twin if twin.is_file() else path
+
+    def changed(path: Path) -> str:
+        body = anon(path).read_text(encoding="utf-8")
+        return body.replace(old, to) if old else body
+
+    (workspace / "bible").mkdir(parents=True, exist_ok=True)
+    for sub in ("chapters", "critiques", "logs"):
+        (workspace / sub).mkdir(exist_ok=True)
+    for src in sorted((run_dir / "bible").glob("*.md")):
+        if not src.stem.endswith(".anon"):
+            (workspace / "bible" / src.name).write_text(
+                changed(src), encoding="utf-8", newline="\n")
+    if (run_dir / "outline.md").is_file():
+        (workspace / "outline.md").write_text(
+            changed(run_dir / "outline.md"), encoding="utf-8", newline="\n")
+    for name in ("config.snapshot.json", "state.json"):
+        if (run_dir / name).is_file():
+            _shutil.copyfile(run_dir / name, workspace / name)
+    for n in chapters:
+        summary = run_dir / "chapters" / f"ch{n - 1:02d}.summary.md"
+        if summary.is_file():
+            _shutil.copyfile(summary, workspace / "chapters" / summary.name)
 
 
 def _run_id(conn: sqlite3.Connection, slug: str) -> str | None:
