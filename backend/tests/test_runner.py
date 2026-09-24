@@ -345,7 +345,8 @@ def test_the_orchestrator_model_is_read_from_the_resolved_config_not_a_literal(d
     from backend.commons.config import loader
     from backend.commons.config.settings import Settings
     from backend.runs.service import RunService
-    base = loader.resolve("tiny")
+    # The base config, not a profile: tiny now sets Sonnet (owner, 2026-09-24).
+    base = loader.load_base()
     assert "models" in base and base["models"]["orchestrator"] is None, "the knob exists and is null by default"
     svc = RunService(db, Settings(db_path=Path(":memory:"), output_dir=tmp_path, use_recorded_stream=False))
     assert "--model" not in svc._process("A premise long enough.", "tiny", "", base).command
