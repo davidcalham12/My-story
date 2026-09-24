@@ -83,7 +83,7 @@ premise is composed by the product, not by this script.
 | chapter_length | ch09 | 934 | outside 1000-1500 |
 | chapter_length | ch10 | 1039 | in band |
 | forbidden_words |  | 0 | none |
-| human_review |  | 8 | The owner read the complete ten-chapter book (v2) on 2026-09-24 and scored it a solid 8 overall. He gave one overall score, not one per criterion; the six-crite |
+| human_review |  | 8 | The owner read the complete ten-chapter book (v2) on 2026-09-24 and scored it a solid 8 overall. The owner gave one overall score, not one per criterion; the co |
 | judge_rubric | character_coherence | 9 | Every character maintains consistent personality and behavior across all appearances. The protagonist develops believably—introduced claiming fearlessness (Ch1) |
 | judge_rubric | continuity | 8 | The book maintains consistent facts and timeline across all ten chapters—the protagonist's birthday (Ch1) leads to the quest (Ch5), the overnight visit to Elena |
 | judge_rubric | mean | 8.333333333333334 | mean over all 6 criteria |
