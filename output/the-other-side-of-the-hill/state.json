@@ -4,155 +4,63 @@
   "premise": "A warm, funny children's adventure novel for [NOMBRE_ANONIMIZADO], who turns ten today. [NOMBRE_ANONIMIZADO] is curious, collects smooth stones, and is afraid of the dark though he will not admit it. His scruffy terrier Bruno sleeps at the foot of his bed. The summer before this one he found a fossil on the beach at Cadaques and named it Captain Crunch. In the garden stands the cardboard observatory he built with his grandfather. [NOMBRE_ANONIMIZADO] has always wondered what is on the other side of the hill behind the house. This is the summer he goes to find out.",
   "tone": "a warm, funny children's adventure - a read-aloud summer quest told close to the ground, brave and kind; small real wonders rather than magic, a dog who is a character, and a fear of the dark taken seriously and gently",
   "chapters_planned": 10,
-  "stage": "FLOW-4",
+  "stage": "FLOW-6",
   "started_utc": "2026-09-24T15:24:29Z",
+  "resumed_utc": "2026-09-24T17:41:17Z",
   "privacy": "The buyer's child's given name is withheld under the organisation's data-protection policy and appears in every artefact as the literal token [NOMBRE_ANONIMIZADO]. One find-and-replace restores it locally.",
+  "budget": {
+    "ceiling_usd": 75.0,
+    "authority": "docs/spec.md §8, the owner's decision; the profile's own ceiling of 60.00 in config.snapshot.json is superseded by it for this run",
+    "spent_before_resume_usd": 53.17,
+    "available_to_this_resumption_usd": 21.83
+  },
   "chapters": [
-    {
-      "n": 1,
-      "title": "Ten Years Old",
-      "attempts": 1,
-      "accepted_attempt": 1,
-      "scores": {
-        "continuity": 8,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 9
-      },
-      "aggregate": 8
-    },
-    {
-      "n": 2,
-      "title": "What's Beyond",
-      "attempts": 1,
-      "accepted_attempt": 1,
-      "scores": {
-        "continuity": 8,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 8
-      },
-      "aggregate": 8
-    },
-    {
-      "n": 3,
-      "title": "The Hill Will Teach",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 8
-      },
-      "aggregate": 8,
-      "first_attempt_aggregate": 5
-    },
-    {
-      "n": 4,
-      "title": "The Lower Path",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 10
-      },
-      "aggregate": 10,
-      "first_attempt_aggregate": 7
-    },
-    {
-      "n": 5,
-      "title": "The Climb",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 9
-      },
-      "aggregate": 9,
-      "first_attempt_aggregate": 0
-    },
-    {
-      "n": 6,
-      "title": "On the Other Side",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 9
-      },
-      "aggregate": 9,
-      "first_attempt_aggregate": 4
-    },
-    {
-      "n": 7,
-      "title": "The Return",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 9,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 10
-      },
-      "aggregate": 9,
-      "first_attempt_aggregate": 0
-    },
-    {
-      "n": 8,
-      "title": "Marcos Knew",
-      "attempts": 2,
-      "accepted_attempt": 2,
-      "scores": {
-        "continuity": 10,
-        "science": 10,
-        "outline": 10,
-        "length": 10,
-        "chatter": 10,
-        "prose": 10
-      },
-      "aggregate": 10,
-      "first_attempt_aggregate": 1
-    }
-  ],
-  "halted_utc": "2026-09-24T17:20:30Z",
-  "halt_reason": "Budget. 51.80 USD of the exam profile's 60.00 ceiling was spent through chapter 8. A gated chapter in this run cost 3-5 USD, so chapters 9 and 10 plus FLOW-5 and FLOW-6 would not fit. The gate was not reduced to fit it. Halted by the orchestrator, not by `decide`.",
-  "chapters_remaining": [
+    {"n": 1, "title": "Ten Years Old", "attempts": 1, "accepted_attempt": 1, "scores": {"continuity": 8, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 9}, "aggregate": 8},
+    {"n": 2, "title": "What's Beyond", "attempts": 1, "accepted_attempt": 1, "scores": {"continuity": 8, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 8}, "aggregate": 8},
+    {"n": 3, "title": "The Hill Will Teach", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 8}, "aggregate": 8, "first_attempt_aggregate": 5},
+    {"n": 4, "title": "The Lower Path", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 10}, "aggregate": 10, "first_attempt_aggregate": 7},
+    {"n": 5, "title": "The Climb", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 9}, "aggregate": 9, "first_attempt_aggregate": 0},
+    {"n": 6, "title": "On the Other Side", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 9}, "aggregate": 9, "first_attempt_aggregate": 4},
+    {"n": 7, "title": "The Return", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 9, "outline": 10, "length": 10, "chatter": 10, "prose": 10}, "aggregate": 9, "first_attempt_aggregate": 0},
+    {"n": 8, "title": "Marcos Knew", "attempts": 2, "accepted_attempt": 2, "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 10}, "aggregate": 10, "first_attempt_aggregate": 1},
     {
       "n": 9,
       "title": "The Question Answered",
-      "status": "not written"
+      "attempts": 3,
+      "accepted_attempt": 3,
+      "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 8},
+      "aggregate": 8,
+      "first_attempt_aggregate": 7,
+      "second_attempt_aggregate": 7,
+      "words": 941,
+      "note": "Went to the third attempt on the prose-versus-outline disagreement this run has had before: the prose critic charged the paragraph that named what Bruno's calm meant as the book explaining itself, and when it was cut the outline critic charged beat 2 as missing. Neither was overruled. The outline critic was asked for its level-2 replacement under the constraint that it carry the beat without the abstraction, and the result passes at exactly 8 because the prose critic still charges one major against that text. Both scores stand as given."
     },
     {
       "n": 10,
       "title": "The Other Side Now",
-      "status": "not written",
-      "note": "carries the cardboard observatory scene and R3; the commission requires it"
+      "attempts": 2,
+      "accepted_attempt": 2,
+      "scores": {"continuity": 10, "science": 10, "outline": 10, "length": 10, "chatter": 10, "prose": 10},
+      "aggregate": 10,
+      "first_attempt_aggregate": 6,
+      "words": 1047,
+      "note": "The first draft put the striped grey stone on his shelf, which he had given to Elena. Six findings went on the sheet, five from critics and one from the orchestrator that no critic caught - Marcos's two taps fired twice in the scene, the first time before any question was asked."
     }
   ],
-  "stages_not_run": [
-    "FLOW-5 style",
-    "FLOW-6 publish and dist/book.md"
+  "gate": {
+    "threshold": 8,
+    "characteristics": ["continuity", "science", "outline", "length", "chatter", "prose"],
+    "aggregate": "min",
+    "max_attempts": 3,
+    "on_fail": "patch_then_halt",
+    "chapters_that_passed_on_their_first_draft": [1, 2],
+    "chapters_that_needed_a_redraft": [3, 4, 5, 6, 7, 8, 9, 10],
+    "chapters_that_needed_the_patch_exit": [],
+    "halts": 0
+  },
+  "known_defects": [
+    "Six of the ten chapter summaries are over the 260-word cap: ch02 by 10, ch05 by 16, ch06 by 17, ch07 by 30, ch08 by 14, ch10 by 5. Five of those were written before this resumption. None was truncated, because the rule is to trim the next summary rather than cut one already written, and ch10's has no next chapter to protect. Reported by backend.checks FLOW-6.",
+    "logs/agents.jsonl is not monotonic in ts. Fourteen of the fifteen out-of-order rows pre-date this resumption: that run stamped rows out to 19:13Z while the real clock was around 17:20Z. The rows appended by this resumption carry measured clock readings, which is why they sort earlier than the rows above them. The file is honest from row 94 onward and estimated before it."
   ],
-  "resume_from": "Chapter 9. Everything it needs is on disk: bible/, outline.md, and chapters/ch08.summary.md as the rolling summary. No chapter prose is required to continue."
+  "stages_run_in_this_resumption": ["FLOW-4 chapters 9 and 10", "FLOW-5 style", "FLOW-6 synopsis and dist/book.md"]
 }

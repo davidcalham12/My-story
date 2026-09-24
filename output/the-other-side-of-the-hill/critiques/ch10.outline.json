@@ -1,0 +1,30 @@
+{
+  "critic": "outline",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 9,
+      "findings": [
+        {
+          "kind": "beat-incomplete",
+          "severity": "high",
+          "quote": "[NOMBRE_ANONIMIZADO] took a breath.",
+          "claim": "Beat 2 requires an inward movement before the question: he thinks of showing Elena the observatory, then remembers it is half Marcos's. That remembering is why he asks rather than simply deciding, and neither the thinking nor the remembering is in the draft.",
+          "fix": "Two or three sentences between the breath and the question, in his own head.",
+          "reference": "outline.md, this entry, beat 2"
+        }
+      ],
+      "notes": "Beats 1, 2 and 3 all present and in order; beat 2 incompletely delivered. 10 - 1 = 9. Tension at 2/10 confirmed appropriate; the ending was checked against the commission's 'Ends on' field and matches; the chapter was judged to close the book."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "Beat 2 now complete: the thinking and the remembering both appear before the question, then the question aloud, then the two taps and the plain yes. 10 - 0 - 0 = 10. The critic confirmed that removing the pre-question tap did not damage the beat and that the ending is unchanged in substance."
+    }
+  ]
+}

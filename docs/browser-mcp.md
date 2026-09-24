@@ -44,4 +44,5 @@ replacement for the test.
 | date | version | file | result | notes |
 |---|---|---|---|---|
 | 2026-09-24 | v1 | `output/the-other-side-of-the-hill/dist/v1/novel.html` | **fail** (check 1) | driven with Playwright from Python by the build session, not through the MCP client. 1 cover: no dedication and no alias — nothing wrote `dedication.md` for a run started from a brief; fixed for later versions in `4cf8a8e`, v1 left as published. 2 index: 8 entries, 8 links land. 3 sheet: 5 characters link to their first chapter; the one place has none recorded. 5 no leftovers: no Markdown, `TODO` or placeholder. Recorded in `validations` |
-| pending | v2 | `dist/v2/novel.html` | — | after the reader-change demo (E8) |
+| 2026-09-24 | v2 | `output/the-other-side-of-the-hill/dist/v2/novel.html` | **pass** | the completed book (10 chapters, after the resumed run), same method as v1. 1 cover: title and dedication with the alias. 2 index: 10 entries, 15 links land. 3 sheet: characters link; the one place has no first chapter recorded. 5 no leftovers. Recorded in `validations` |
+| pending | v3 | `dist/v3/novel.html` | — | after the reader-change demo (E8), check 4 |

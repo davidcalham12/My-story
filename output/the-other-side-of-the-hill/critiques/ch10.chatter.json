@@ -1,0 +1,21 @@
+{
+  "critic": "chatter",
+  "chapter": 10,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "first line is '# Chapter 10 — The Other Side Now'; no preamble, no trailing commentary"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "unchanged; none of the seven substitutions touched the first line"
+    }
+  ]
+}

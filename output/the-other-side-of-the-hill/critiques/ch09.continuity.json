@@ -1,0 +1,36 @@
+{
+  "critic": "continuity",
+  "chapter": 9,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "character-habit-misused",
+          "severity": "high",
+          "quote": "Marcos was silent, tapping his stick twice against the leg of his chair—not tapping it to say something, just tapping it the way he did when he was thinking.",
+          "claim": "Canon gives the two taps one trigger: about to tell the truth. The draft spends them on idle thinking and says so outright, which tells the reader the signal is not a signal.",
+          "fix": "Remove the tapping from this scene, or restructure it so Marcos taps in a context consistent with canon.",
+          "reference": "bible/characters.md, Marcos — 'taps his walking stick twice against the ground when about to tell the truth'"
+        }
+      ],
+      "notes": "One high-severity contradiction. Everything else canon-compliant: names, Day 5 afternoon/evening, Bruno's three circles and the foot of the bed, R5 supper, the notebook given Day 1 with its first entry a question never answered, the fossil and the stone."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "The Marcos contradiction is resolved: 'Marcos was silent in his corner, one hand resting on his walking stick, his eyes on [NOMBRE_ANONIMIZADO]' keeps him present and watchful with the signal unspent. The two prose replacements introduce no canon conflict."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "notes": "The restored beat-2 paragraph describes Bruno as tail straight, ears forward, body no longer coiled — consistent with characters.md. Bruno still circles three times and sleeps at the foot of the bed. No name drift, no timeline conflict, all four mysteries remain closed."
+    }
+  ]
+}

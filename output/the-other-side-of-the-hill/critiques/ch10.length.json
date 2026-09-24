@@ -1,0 +1,30 @@
+{
+  "critic": "length",
+  "chapter": 10,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 2,
+  "band": {
+    "min": 1000,
+    "max": 1500,
+    "tolerance_pct": 10,
+    "effective_min": 900,
+    "effective_max": 1650
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 1040,
+      "findings": [],
+      "notes": "inside the band"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "words": 1047,
+      "findings": [],
+      "notes": "inside the band. The seven substitutions added 45 words and removed 38; the sheet said so on purpose, because four of the six corrections were additions."
+    }
+  ]
+}

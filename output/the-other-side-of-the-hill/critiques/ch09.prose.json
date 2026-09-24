@@ -1,0 +1,80 @@
+{
+  "critic": "prose",
+  "chapter": 9,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "book-explains-itself",
+          "severity": "high",
+          "quote": "[NOMBRE_ANONIMIZADO] could feel the difference. Bruno knew something that [NOMBRE_ANONIMIZADO]'s own body was only just learning: that the danger was over. That the dark had been survived. That the world was still the same shape it had always been.",
+          "claim": "The paragraph before it has already shown Bruno calm; this one tells the reader what that means, in adult abstractions that are not a ten-year-old's thought.",
+          "fix": "Keep the boy noticing, lose the explanation.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "narrator-through-the-dog",
+          "severity": "low",
+          "quote": "No unease held in his body. He was circling because that was what Bruno did, the same way a person might take a particular path to a familiar place.",
+          "claim": "Three translations of Bruno's behaviour inside one paragraph make him a device the narrator speaks through rather than a character doing things.",
+          "fix": "Keep the physical actions, cut the interpretation to at most one clause.",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "1 major, 1 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x1 - 1x1 = 7",
+      "major": 1,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "0 major, 0 minor. Both findings resolved. The critic was asked specifically whether the cuts had left a bare seam after Bruno settles and whether the chapter still lands, and cleared both.",
+      "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"]
+      }
+    },
+    {
+      "iteration": 3,
+      "score": 8,
+      "findings": [
+        {
+          "kind": "book-explains-itself",
+          "severity": "high",
+          "quote": "And his whole body—it wasn't coiled and ready anymore, waiting for something to happen. He was just Bruno, settling in to sleep the way he always did when nothing was wrong. The night was the same as any other night for him. So it was the same for [NOMBRE_ANONIMIZADO] too.",
+          "claim": "The passage interprets what Bruno's state means and then draws the conclusion for the reader: the dog is calm, so the night is normal, so the boy is safe.",
+          "fix": "Keep the observable details and end where observation ends.",
+          "reference": "prose characteristic, major"
+        }
+      ],
+      "notes": "1 major, 0 minor; check_prose clean. ORCHESTRATOR NOTE: this finding is charged against text the OUTLINE critic wrote as its level-2 replacement, to carry a beat it had scored as missing. It is the standing disagreement between these two critics, and it was not arbitrated away: both scores are recorded as given, and the chapter passes at 8 because that is what the arithmetic says, not because either critic was overruled. A reader deciding which was right should read the paragraph beginning 'When Bruno lay down at the foot of the bed'.",
+      "why": "10 - 3x0 - 2x1 - 1x0 = 8",
+      "major": 1,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"]
+      }
+    }
+  ]
+}

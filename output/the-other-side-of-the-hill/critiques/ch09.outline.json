@@ -1,0 +1,36 @@
+{
+  "critic": "outline",
+  "chapter": 9,
+  "kind": "model",
+  "agent": "outline-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "All three beats present and in order. 10 - 0 - 0 = 10. Tension quiet and low-stakes; the chapter ends precisely on the pencil and the words taking their place; beat 3's sentence appears in the notebook in the outline's exact wording."
+    },
+    {
+      "iteration": 2,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "beat-missing",
+          "severity": "high",
+          "quote": "[NOMBRE_ANONIMIZADO] lay in the dark beside Bruno, feeling the steady rise and fall of the dog's ribs with each breath, the warmth of him against the foot of the bed.",
+          "claim": "Beat 2 asks for two things: Bruno settling as he always does, and [NOMBRE_ANONIMIZADO] feeling the difference — that Bruno knows the danger has passed. The first survives; the second was removed with the abstract paragraph. The replacement is touch and warmth only: he feels the dog, not the difference.",
+          "fix": "Restore the boy's perception of the difference, in his own register, without the narrator's abstraction.",
+          "reference": "outline.md, this entry, beat 2"
+        }
+      ],
+      "notes": "Beats 1 and 3 intact. 10 - 3 (beat 2 missing) - 0 = 7. ORCHESTRATOR ARBITRATION: this is the same prose-versus-outline disagreement this run had at chapters 3 and 8 — the prose critic charged the cut paragraph as the book explaining itself, and both readings are defensible. It was NOT resolved by overruling one critic. The outline critic was asked for its level-2 replacement under the explicit constraint that it carry beat 2 in a ten-year-old's register with no abstraction about survival, the dark or the world; the text it wrote was put in the attempt-3 sheet and applied. Both critics then scored the result at or above the threshold."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "notes": "All three beats present and in order. 10 - 0 - 0 = 10. Beat 2 now carries its full content through the observable difference in Bruno's body and the boy's own conclusion from it. The chapter still ends on the pencil and the words taking their place."
+    }
+  ]
+}

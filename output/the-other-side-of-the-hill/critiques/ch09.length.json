@@ -1,0 +1,37 @@
+{
+  "critic": "length",
+  "chapter": 9,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 3,
+  "band": {
+    "min": 1000,
+    "max": 1500,
+    "tolerance_pct": 10,
+    "effective_min": 900,
+    "effective_max": 1650
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "words": 933,
+      "findings": [],
+      "notes": "inside the band, 33 words above the floor"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "words": 905,
+      "findings": [],
+      "notes": "inside the band but 5 words above the floor: the three substitutions removed 28 words net. The attempt-3 sheet was written to add words rather than trade them."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "words": 941,
+      "findings": [],
+      "notes": "inside the band. Still 309 words under the 1250 target and the shortest chapter in the book; the gate admits it because the band is what the gate measures, and that is recorded here rather than treated as a pass on merit."
+    }
+  ]
+}

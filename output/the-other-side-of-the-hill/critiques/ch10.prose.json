@@ -1,0 +1,56 @@
+{
+  "critic": "prose",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "prose-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 7,
+      "findings": [
+        {
+          "kind": "book-explains-itself",
+          "severity": "high",
+          "quote": "and the weight of that directness was heavier and kinder than any story could have been.",
+          "claim": "Marcos answering straight, when he has circled every question in the book, is the whole of the moment; the narrator then tells the reader what it was worth.",
+          "fix": "Cut the phrase; end the paragraph at what actually happened.",
+          "reference": "prose characteristic, major"
+        },
+        {
+          "kind": "repetition-inside-a-sentence",
+          "severity": "low",
+          "quote": "he meant it the way he meant it on the day he first asked",
+          "claim": "'meant it' twice in nine words pulls the ear onto the construction and trips the read-aloud voice.",
+          "fix": "Say it once.",
+          "reference": "prose characteristic, minor"
+        }
+      ],
+      "notes": "1 major, 1 minor; check_prose clean.",
+      "why": "10 - 3x0 - 2x1 - 1x1 = 7",
+      "major": 1,
+      "minor": 1,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"]
+      }
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "0 major, 0 minor; check_prose clean. Both findings resolved. The critic was asked three specific questions about new seams and cleared all three: the interior paragraph before the question shows rather than explains; the amber stone does not read badly against the list of river stones two lines later; and the ending lands better without the deleted paragraph than with it. It flagged 'the thyme that rose in a smell when you trod on it' as slightly nonstandard but judged the rhythm to carry it, and did not raise it as a finding.",
+      "why": "10 - 3x0 - 2x0 - 1x0 = 10",
+      "major": 0,
+      "minor": 0,
+      "mechanical_check": {
+        "script": "backend.chapters.check_prose",
+        "verdict": "clean",
+        "defects": [],
+        "checked": ["duplicate-sentence", "heading-without-a-blank-line", "echoed-opening"]
+      }
+    }
+  ]
+}

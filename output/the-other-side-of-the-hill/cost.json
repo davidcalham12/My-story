@@ -1,12 +1,21 @@
 {
-  "_comment": "From Claude Code's own result events, summed over the run's units. The orchestrator turns are included \u2014 which is most of it.",
-  "total_cost_usd": 53.174548899999984,
-  "turns": 275,
-  "duration_ms": 7118940,
+  "_comment": "From Claude Code's own result events, summed over the run's units. The orchestrator turns are included — which is most of it.",
+  "total_cost_usd": 74.2047088,
+  "turns": 468,
+  "duration_ms": 10162482,
   "subagent_dispatches": 44,
   "units_run": null,
   "units_that_reported": 1,
   "units_stopped_before_reporting": 0,
   "provenance": "measured",
-  "_comment_provenance": null
+  "_comment_provenance": null,
+  "first_run_usd": 53.174548899999984,
+  "resume": {
+    "total_cost_usd": 21.0301599,
+    "turns": 193,
+    "duration_ms": 3043542,
+    "provenance": "measured",
+    "source": "logs/resume.stream.jsonl result event",
+    "why": "chapters 9-10, FLOW-5 and FLOW-6 after the owner raised this run's ceiling to 75 USD (docs/spec.md §8)"
+  }
 }

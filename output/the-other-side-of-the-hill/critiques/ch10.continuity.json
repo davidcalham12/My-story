@@ -1,0 +1,38 @@
+{
+  "critic": "continuity",
+  "chapter": 10,
+  "kind": "model",
+  "agent": "continuity-critic",
+  "drafts": 2,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 6,
+      "findings": [
+        {
+          "kind": "object-in-two-places",
+          "severity": "high",
+          "quote": "The striped grey stone he had left for Elena glowed where it caught the light.",
+          "claim": "He gave that stone to Elena at the foot of the hill and it is hers. The draft puts it back in his jar and on his shelf, and the last paragraph looks at it again.",
+          "fix": "Use a stone he still has; he took six and brought five home.",
+          "reference": "bible/world.md, The Stone Collection, and the run's record of Day 5 dawn"
+        },
+        {
+          "kind": "promise-not-kept",
+          "severity": "medium",
+          "quote": "So he told her. About the path that got harder to see. About Bruno pressed against his leg, whining. About reaching the crest and seeing the valley spread out below like a secret the hill had been keeping.",
+          "claim": "Rosa extracted a promise for the colour of the stones, whether it is steep, whether there are birds and what it smells like. The account answers none of those four.",
+          "fix": "Put two or three of her four questions into what he tells her.",
+          "reference": "bible/characters.md, Rosa, and the run's record of Day 3"
+        }
+      ],
+      "notes": "One high contradiction and one medium omission. Bruno's three circles, Marcos's slow walk, Rosa's tumbling words and flour-brushing, and the observatory's description are all canon-correct. ORCHESTRATOR NOTE: a third defect was raised by the orchestrator and by no critic — Marcos's two taps fire twice in this scene, the first time before any question has been asked, which is the identical defect the continuity critic charged in chapter 9. It lowered no score. It was put on the attempt-2 sheet and corrected."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "Both findings closed: the stone is now one he still holds, and Rosa is told about the thyme, the birds and the steepness. The meaningless first tap is gone, leaving only the canonical one before he answers. The critic volunteered, outside its findings, that 'The amber river stone glowed where it caught the light' sits in a different register from the sentence two lines later listing the river stones as white and rust and amber — it called this a stylistic seam and not a continuity breach, and did not raise it as a finding. The prose critic was asked the same question directly and cleared it. Recorded here rather than acted on."
+    }
+  ]
+}

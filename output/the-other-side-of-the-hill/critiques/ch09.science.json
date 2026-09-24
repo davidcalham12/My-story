@@ -1,0 +1,27 @@
+{
+  "critic": "science",
+  "chapter": 9,
+  "kind": "model",
+  "agent": "science-critic",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "All seven rules examined. R2, R4 and R5 are the rules the outline puts in play and all three are correctly represented — Bruno's relaxed body read as the absence of a warning, the night survived at home rather than navigated, and 'the rhythm that had held his place all night while he was gone' for R5. R1, R3, R6 and R7 are not tested: the chapter is indoors and nobody travels or asks Marcos a question. No ambiguous rule reported."
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "Re-examined against all seven rules after the three substitutions. None touches a rule: Marcos resting a hand on the stick is not a rule-bearing act, Bruno's redescribed circling still carries no R2 warning, and the boy lying in his own bed in twilight is not R4 navigation."
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "notes": "Re-examined after the beat-2 restoration. 'The night was the same as any other night for him' was checked specifically against R4 and judged an emotional response while stationary at home, not a claim about how distance behaves when navigating in the dark. No violations."
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "critic": "chatter",
+  "chapter": 9,
+  "kind": "arithmetic",
+  "agent": "orchestrator (arithmetic)",
+  "drafts": 3,
+  "iterations": [
+    {
+      "iteration": 1,
+      "score": 10,
+      "findings": [],
+      "notes": "first line is '# Chapter 9 — The Question Answered'; no preamble, no trailing commentary"
+    },
+    {
+      "iteration": 2,
+      "score": 10,
+      "findings": [],
+      "notes": "unchanged; patches were applied by literal substitution and did not touch the first line"
+    },
+    {
+      "iteration": 3,
+      "score": 10,
+      "findings": [],
+      "notes": "unchanged"
+    }
+  ]
+}
