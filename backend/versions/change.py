@@ -441,9 +441,14 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         if any(v["n"] == n for v in parent):
             print(f"change: REFUSED — v{n} is already published", file=sys.stderr)
             return 1
+        # The chapters kept from the earlier pass are still part of the change:
+        # they are checked below and listed on the "what changed" page.
+        kept = {c: True for c in chapters if args.only and c not in args.only
+                and (workspace / "chapters" / f"ch{c:02d}.md").is_file()}
         chapters = tuple(c for c in chapters if not args.only or c in args.only)
         _set_aside(workspace, chapters)
     else:
+        kept = {}
         n = versions_repo.next_number(conn, run_id, run_dir / "dist")
         workspace = run_dir / "dist" / f"v{n}"
         workspace.mkdir(parents=True, exist_ok=False)
@@ -462,6 +467,8 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         print(f"change: halted: {cut.reason} at chapter {cut.chapter}; "
               f"v{parent_n} stands", file=sys.stderr)
         return 1
+    verdicts = {**kept, **verdicts}
+    chapters = tuple(sorted(set(chapters) | set(kept)))
     # A change that does not arrive is not a change (docs/spec.md §8): every
     # accepted chapter must carry the new text and no variant of the old one.
     old_text = _fact_text(conn, args.fact)

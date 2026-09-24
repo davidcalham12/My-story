@@ -183,3 +183,28 @@ def test_another_cardboard_object_is_not_the_old_fact():
     fact is the phrase, not the word."""
     text = f"She raised the cardboard telescope toward {NEW}."
     assert change.arrival(text, new=NEW, old=OLD) is None
+
+
+def test_a_redo_publishes_every_changed_chapter_and_checks_the_kept_ones(db, tmp_path):
+    """--only 3 rewrites chapter 3; chapter 10, already promoted in the workspace,
+    is still part of the change: it is checked and listed on the "what changed"
+    page."""
+    d = _published_run(db, tmp_path)
+    with db:
+        db.execute("INSERT INTO fact_usage (fact_id, version_id, chapter, matched) "
+                   "VALUES (1, 1, 10, 'x')")
+    ws = d / "dist" / "v2"
+    (ws / "chapters").mkdir(parents=True)
+    (ws / "chapters" / "ch10.md").write_text(f"# Chapter 10\n\nBack to {NEW}.\n",
+                                             encoding="utf-8")
+
+    def redo(run_dir, workspace, chapters, fact, to):
+        (workspace / "chapters" / "ch03.md").write_text(f"# Chapter 3\n\n{NEW}.\n",
+                                                        encoding="utf-8")
+        return {3: True}
+
+    rc = change.main(["change", "gift", "--fact", "1", "--to", NEW, "--workspace", "v2",
+                      "--only", "3"], conn=db, output_dir=tmp_path, regenerate=redo)
+    html = (ws / "novel.html").read_text(encoding="utf-8")
+    page = html[html.index('id="what-changed"'):html.index('id="cover"')]
+    assert rc == 0 and "chapter 3" in page and "chapter 10" in page
