@@ -47,12 +47,13 @@ export const api = {
   /**
    * Start the run this brief describes. The brief alone: the route composes the
    * premise from it, and refuses a request that carries both (`StartRun`).
-   * `profile` decides the length (`LENGTHS` in entities/brief/model.ts).
+   * Always the `exam` profile; `chapters` is the length the buyer chose, which
+   * the route bounds by what that profile was priced for.
    */
-  startFromBrief: (brief_id: string, profile: string) =>
+  startFromBrief: (brief_id: string, chapters: number | null) =>
     json<{ id: string; slug: string }>('/api/runs', {
       method: 'POST',
-      body: JSON.stringify({ brief_id, profile }),
+      body: JSON.stringify({ brief_id, profile: 'exam', chapters }),
     }),
 
   /* --- reading and changing (FLOW-6) ------------------------------------- */

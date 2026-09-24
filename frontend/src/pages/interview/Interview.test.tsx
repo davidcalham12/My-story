@@ -62,12 +62,15 @@ describe('AC-1: the form is the Brief model, exactly', () => {
     expect(legends).toEqual(['The person', 'Memories', 'The story', 'Limits and must-haves'])
   })
 
-  it('offers the full novel by default and a one-chapter sample (owner, 2026-09-24)', () => {
-    const block = blockFor(render(emptyBrief()), 'length_chapters')
-    expect(block).toContain('</select>')
-    expect(block).toContain('10 chapters')
-    expect(block).toContain('1 chapter')
-    expect(block).not.toContain('readonly')
+  it('lets the buyer type any length from 1 to 10 chapters (owner, 2026-09-24)', () => {
+    const html = render(emptyBrief())
+    const input = html.slice(html.lastIndexOf('<input', html.indexOf('id="length_chapters"')))
+    const tag = input.slice(0, input.indexOf('>'))
+    expect(tag).toContain('type="number"')
+    expect(tag).toContain('min="1"')
+    expect(tag).toContain('max="10"')
+    expect(tag).toContain('value="10"')
+    expect(tag).not.toContain('readonly')
   })
 })
 

@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Brief, CheckResult, Memory, Recipient } from '@/shared/api/types'
 import {
-  LENGTHS,
+  MAX_CHAPTERS,
+  MIN_CHAPTERS,
   fieldOfQuestion,
   fieldsOfContradiction,
 } from '@/entities/brief/model'
@@ -405,19 +406,25 @@ export function InterviewForm(props: Props) {
           field="length_chapters"
           label="How long is it?"
           check={check}
-          hint="The full novel is the gift. The short sample writes only the first chapter, to try it for less."
+          hint={`Any number from ${MIN_CHAPTERS} to ${MAX_CHAPTERS}. Ten is the full gift; fewer chapters cost less and are quicker.`}
         >
           {() => (
-            <select
+            <input
               id="length_chapters"
+              type="number"
               data-field="length_chapters"
-              value={brief.length_chapters}
-              onChange={(e) => props.onChange({ ...brief, length_chapters: Number(e.target.value) })}
-            >
-              {LENGTHS.map((l) => (
-                <option key={l.chapters} value={l.chapters}>{l.label}</option>
-              ))}
-            </select>
+              min={MIN_CHAPTERS}
+              max={MAX_CHAPTERS}
+              step={1}
+              value={brief.length_chapters ?? MAX_CHAPTERS}
+              onChange={(e) => {
+                const n = Math.round(Number(e.target.value))
+                props.onChange({
+                  ...brief,
+                  length_chapters: Math.min(MAX_CHAPTERS, Math.max(MIN_CHAPTERS, Number.isFinite(n) ? n : MAX_CHAPTERS)),
+                })
+              }}
+            />
           )}
         </Field>
       </fieldset>

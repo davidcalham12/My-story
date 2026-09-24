@@ -27,7 +27,7 @@ def start_run(body: StartRun, svc: RunService = Depends(get_service)) -> RunCrea
     would start costs money.
     """
     try:
-        created = (svc.start_from_brief(body.brief_id, body.profile) if body.brief_id
+        created = (svc.start_from_brief(body.brief_id, body.profile, body.chapters) if body.brief_id
                    else svc.start(body.premise, body.profile, body.tone))
     except AlreadyRunning as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc

@@ -160,7 +160,8 @@ class RunService:
             raise NotFound(f"no brief {brief_id}")
         return brief_domain.parse(json.loads(row["payload"]))
 
-    def start_from_brief(self, brief_id: str, profile: str) -> dict:
+    def start_from_brief(self, brief_id: str, profile: str,
+                         chapters: int | None = None) -> dict:
         """The join: what was ordered becomes what is running.
 
         Three things travel, and each lands somewhere the rest of the pipeline
@@ -187,8 +188,19 @@ class RunService:
                 f"brief {brief_id} does not pass FLOW-0 ({verdict.status}); "
                 "nothing is started")
 
+        # The length is the buyer's, within what the profile was priced for:
+        # its budget ceiling was sized for its own chapter count, and a longer
+        # book under the same ceiling stops half-written (owner, 2026-09-24).
+        # `chapters` is asked for explicitly by the panel; without it the
+        # profile decides, which is what the eval harness relies on.
+        priced_for = int(loader.resolve(profile)["novel"]["chapters"])
+        if chapters is not None and not 1 <= chapters <= priced_for:
+            raise BriefNotReady(
+                f"a novel of {chapters} chapters: this profile writes between 1 "
+                f"and {priced_for}; nothing is started")
+
         started = self.start(brief_domain.premise(brief), profile,
-                             brief.tone or "", brief_id=brief_id)
+                             brief.tone or "", brief_id=brief_id, chapters=chapters)
 
         with self.conn:
             for term in brief.forbidden_terms:
@@ -198,13 +210,16 @@ class RunService:
         return started | {"brief_id": brief_id}
 
     def start(self, premise: str, profile: str, tone: str,
-              brief_id: str | None = None) -> dict:
+              brief_id: str | None = None, chapters: int | None = None) -> dict:
         with self._lock:
             if self._live and not self._live.done:
                 raise AlreadyRunning("a run is already in flight; the queue is one")
             run_id = uuid.uuid4().hex[:12]
             slug = unique_slug(self.conn, slugify(premise))
             cfg = loader.resolve(profile)
+            if chapters is not None:
+                # Into the snapshot, which is what every stage reads.
+                cfg["novel"]["chapters"] = chapters
             write_repo.create_run(
                 self.conn, run_id=run_id, slug=slug, premise=premise, profile=profile,
                 # None means the orchestrator reads the genre off the premise and

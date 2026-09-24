@@ -231,3 +231,35 @@ def test_the_column_is_nullable_so_every_run_recorded_before_today_still_reads(d
     cols = {r[1]: r for r in db.execute("PRAGMA table_info(runs)")}
     assert "brief_id" in cols
     assert cols["brief_id"][3] == 0, "notnull must be 0"
+
+
+# ------------------------------------------------------------- the length
+
+
+def snapshot_chapters(db, run_id: str) -> int:
+    row = db.execute("SELECT config_snapshot FROM runs WHERE id = ?", (run_id,)).fetchone()
+    return json.loads(row["config_snapshot"])["novel"]["chapters"]
+
+
+def test_the_buyer_chooses_how_many_chapters(svc, db):
+    """Owner, 2026-09-24: the buyer sets the length. It travels in the run's
+    snapshot, which is what every stage reads — never in a prompt."""
+    started = svc.start_from_brief(store(db, "01-hijo"), profile="exam", chapters=4)
+    assert snapshot_chapters(db, started["id"]) == 4
+
+
+def test_no_length_asked_for_means_the_profile_decides(svc, db):
+    """The eval harness starts briefs that say ten chapters on a one-chapter
+    profile; the profile must keep winning there."""
+    from backend.commons.config import loader
+    started = svc.start_from_brief(store(db, "01-hijo"), profile="eval")
+    assert snapshot_chapters(db, started["id"]) == loader.resolve("eval")["novel"]["chapters"]
+
+
+@pytest.mark.parametrize("chapters", [0, 11])
+def test_a_length_outside_what_the_profile_is_priced_for_starts_nothing(svc, db, chapters):
+    """The profile's budget was sized for its own chapter count; a longer book
+    under the same ceiling is a book that stops half-written."""
+    with pytest.raises(BriefNotReady):
+        svc.start_from_brief(store(db, "01-hijo"), profile="exam", chapters=chapters)
+    assert db.execute("SELECT COUNT(*) FROM runs").fetchone()[0] == 0

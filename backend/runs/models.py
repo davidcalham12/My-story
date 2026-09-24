@@ -20,6 +20,9 @@ class StartRun(BaseModel):
     # default here would put the welded genre back where it was. Ignored when
     # `brief_id` is given: the brief's own tone is the buyer's answer.
     tone: str = ""
+    # How many chapters the buyer asked for, with a brief. Absent: the profile
+    # decides. Bounded by the profile in the service, where its budget is known.
+    chapters: int | None = Field(default=None, ge=1)
 
     @model_validator(mode="after")
     def one_of(self) -> "StartRun":

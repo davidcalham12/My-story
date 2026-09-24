@@ -17,18 +17,11 @@ import type { Brief, Memory } from '@/shared/api/types'
 /** The default: the exam's novel is ten chapters (`config/profiles/exam.json`). */
 export const LENGTH_CHAPTERS = 10
 
-/** The lengths a buyer may choose, each written by one profile. The chapter
- *  counts mirror `config/profiles/exam.json` and `eval.json`; the backend reads
- *  the count from the profile, never from here. Owner's decision, 2026-09-24:
- *  a one-chapter sample to try the product without paying for ten. */
-export const LENGTHS = [
-  { chapters: LENGTH_CHAPTERS, profile: 'exam', label: `Full novel — ${LENGTH_CHAPTERS} chapters` },
-  { chapters: 1, profile: 'eval', label: 'Short sample — 1 chapter' },
-] as const
-
-export function profileFor(chapters: number): string {
-  return LENGTHS.find((l) => l.chapters === chapters)?.profile ?? 'exam'
-}
+/** The buyer chooses the length, from one chapter up to the ten the `exam`
+ *  profile's budget was priced for (owner, 2026-09-24). The backend checks the
+ *  same bound against the profile; this is only what the field offers. */
+export const MIN_CHAPTERS = 1
+export const MAX_CHAPTERS = LENGTH_CHAPTERS
 
 export function emptyBrief(): Brief {
   return {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { InterviewForm } from './InterviewForm'
-import { emptyBrief, forApi, fromExample, profileFor } from '@/entities/brief/model'
+import { emptyBrief, forApi, fromExample } from '@/entities/brief/model'
 import { api } from '@/shared/api/client'
 import type { Brief, CheckResult } from '@/shared/api/types'
 
@@ -51,7 +51,7 @@ export function Interview({ onStarted }: { onStarted: (runId: string) => void })
     setError(null)
     try {
       const { id: briefId } = await api.createBrief(forApi(brief))
-      const { id } = await api.startFromBrief(briefId, profileFor(brief.length_chapters))
+      const { id } = await api.startFromBrief(briefId, brief.length_chapters ?? null)
       onStarted(id)
     } catch (e) {
       const text = e instanceof Error ? e.message : String(e)
