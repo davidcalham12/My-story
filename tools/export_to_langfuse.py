@@ -153,7 +153,8 @@ def _agent_log(path: Path) -> list[dict]:
 def _calls_from_db(conn, run_id: str) -> list[dict]:
     rows = conn.execute(
         "SELECT stage, agent, model, chapter, attempt, input_tokens, output_tokens, "
-        "cost_usd, provenance, duration_ms, ts, note FROM calls "
+        "cache_creation_input_tokens, cache_read_input_tokens, cost_usd, "
+        "cost_provenance, provenance, duration_ms, ts, note FROM calls "
         "WHERE run_id = ? ORDER BY ts, id", (run_id,)).fetchall()
     return [dict(r, source="calls") for r in rows]
 
@@ -460,6 +461,8 @@ def plan(run: Run, scrub: Scrubber | None = None) -> list[dict]:
 
         usage = {k: v for k, v in
                  (("input", call.get("input_tokens")), ("output", call.get("output_tokens")),
+                  ("cache_creation_input_tokens", call.get("cache_creation_input_tokens")),
+                  ("cache_read_input_tokens", call.get("cache_read_input_tokens")),
                   ("total", call.get("total_tokens"))) if v}
         op = {
             "op": "observation", "key": key, "parent": trace_keys[version["n"]],

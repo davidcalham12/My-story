@@ -6,10 +6,12 @@
   "_comment_estimate": "The orchestrator records ONE token figure per subagent call, because that is all the harness reports — there is no input/output split. Cost therefore cannot be computed, only bounded. assumed_input_share is the knob: 0.85 says treat 85% of a call's tokens as input, which is roughly right for this workload because every prompt carries the whole Story Bible and every reply is a few hundred words. The exporter sends the resulting estimate AND both bounds, so a reader can see how much of the number is arithmetic and how much is this assumption.",
   "assumed_input_share": 0.85,
 
+  "_comment_cache": "Cache write (5-minute) is 1.25x input and cache read 0.1x input, the published multipliers. Used by backend/commons/log/agent_usage.py to estimate each agent call from its four usage figures; a resolved id like claude-haiku-4-5-20251001 takes the rates of the longest key it starts with.",
+
   "models": {
-    "claude-opus-5":   { "input_per_mtok": 5.0,  "output_per_mtok": 25.0 },
-    "claude-sonnet-5": { "input_per_mtok": 2.0,  "output_per_mtok": 10.0 },
-    "claude-haiku-4-5": { "input_per_mtok": 1.0, "output_per_mtok": 5.0 }
+    "claude-opus-5":   { "input_per_mtok": 5.0,  "output_per_mtok": 25.0, "cache_write_per_mtok": 6.25, "cache_read_per_mtok": 0.5 },
+    "claude-sonnet-5": { "input_per_mtok": 2.0,  "output_per_mtok": 10.0, "cache_write_per_mtok": 2.5, "cache_read_per_mtok": 0.2 },
+    "claude-haiku-4-5": { "input_per_mtok": 1.0, "output_per_mtok": 5.0, "cache_write_per_mtok": 1.25, "cache_read_per_mtok": 0.1 }
   },
 
   "_comment_unknown": "A model with no entry here is exported with its token count and no cost, rather than with a guessed rate. An absent cost is a gap a reader can see; a wrong one is not."

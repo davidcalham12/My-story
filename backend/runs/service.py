@@ -28,6 +28,7 @@ from backend.commons.config.settings import Settings
 from backend.brief import domain as brief_domain
 from backend.policy import forbidden
 from backend.commons.db import repository as write_repo
+from backend.commons.log import agent_usage
 from backend.commons.log.calls import CallRow, write_call
 from backend.commons.runner.process import ReplayProcess, RunProcess
 from backend.commons.runner.watch import (
@@ -450,30 +451,14 @@ class RunService:
         if state.stage:
             write_repo.set_stage(self.conn, run_id, state.stage)
 
-        if event.get("type") == "system" and event.get("subtype") == "task_progress":
-            raw = event.get("usage")
-            usage = raw if isinstance(raw, dict) else {}
-            size = context_size(usage)
-            # `task_progress` reports the subagent's `total_tokens` — input and
-            # output together, the only per-subagent figure the CLI emits — not
-            # the three input fields an orchestrator turn carries (SPEC-010 W2).
-            from_total = size > 0 and "total_tokens" in usage and "input_tokens" not in usage
-            write_call(self.conn, CallRow(
-                run_id=run_id, stage=state.stage or "unknown",
-                agent=str(event.get("subagent_type") or "unknown"),
-                # There is no model id to record: the call went through the
-                # Claude Code session, and naming a model would be inventing one.
-                model="claude-code-session",
-                ts=_now(), chapter=state.chapter, attempt=state.attempt,
-                # `absent` rather than zero: a zero would say the packet was
-                # tiny, which is a different claim from "not reported".
-                input_tokens=size or None,
-                output_tokens=int(usage.get("output_tokens") or 0) or None,
-                provenance="measured" if size else "absent",
-                note=("total_tokens: the subagent's whole usage, input and output "
-                      "together, as the CLI reports it; an upper bound on the packet")
-                     if from_total else None,
-            ))
+        # One row per finished agent call, from the Agent tool's own result:
+        # four usage figures, the resolved model, the duration; cost estimated
+        # from config/pricing.json. `task_progress` gave one blended total and
+        # no output, and is no longer written here (backend/commons/log/agent_usage.py).
+        usage = agent_usage.from_event(event)
+        if usage is not None:
+            write_call(self.conn, agent_usage.row(
+                run_id, state, usage, loader.load_pricing(), _now()))
 
     def _finish(self, live: Live, state: State, halted: tuple[str, str] | None) -> None:
         """Close the run, and **always** release whoever is following it.

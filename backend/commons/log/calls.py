@@ -30,6 +30,9 @@ class CallRow:
     wait_ms: int | None = None
     duration_ms: int | None = None
     note: str | None = None
+    cache_creation_input_tokens: int | None = None
+    cache_read_input_tokens: int | None = None
+    cost_provenance: str | None = None
 
 
 def write_call(conn: sqlite3.Connection, row: CallRow) -> int:

@@ -386,3 +386,22 @@ def test_the_trace_id_this_tool_mints_is_the_one_the_sdk_would_mint():
 
 def _no_sockets(*args, **kwargs):
     raise AssertionError("the export opened a socket")
+
+
+def test_a_call_ships_its_four_usage_figures_and_its_estimated_cost(db, tmp_path):
+    """usage_details carries input, output and both cache figures; cost_details
+    the per-call estimate, with its provenance in metadata."""
+    seed(db)
+    db.execute("UPDATE calls SET cache_creation_input_tokens = 300, "
+               "cache_read_input_tokens = 40, cost_provenance = 'estimated' "
+               "WHERE agent = 'worldbuilder'")
+    client = exported(db, workspace(tmp_path, cost={"total_cost_usd": 1.0,
+                                                    "provenance": "measured"}))
+    span = next(s for s in client.spans("generation")
+                if s.kwargs["name"].startswith("FLOW-1:worldbuilder"))
+    usage = span.kwargs["usage_details"]
+    assert usage["input"] == 1000 and usage["output"] == 200
+    assert usage["cache_creation_input_tokens"] == 300
+    assert usage["cache_read_input_tokens"] == 40
+    assert span.kwargs["cost_details"] == {"total": 0.5}
+    assert span.kwargs["metadata"]["cost_provenance"] == "estimated"
