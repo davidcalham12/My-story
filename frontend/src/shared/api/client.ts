@@ -11,8 +11,13 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
   })
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}))
-    throw new Error((body as { detail?: string }).detail ?? `HTTP ${response.status}`)
+    const body = (await response.json().catch(() => ({}))) as { detail?: unknown }
+    // FastAPI's validation errors are a list of objects; a thrown object
+    // printed as "[object Object]" tells the buyer nothing.
+    const detail = Array.isArray(body.detail)
+      ? body.detail.map((d) => (d as { msg?: string }).msg ?? JSON.stringify(d)).join('; ')
+      : typeof body.detail === 'string' ? body.detail : null
+    throw new Error(detail ?? `HTTP ${response.status}`)
   }
   return (await response.json()) as T
 }
@@ -40,19 +45,14 @@ export const api = {
   briefExamples: () => json<Record<string, unknown>[]>('/api/briefs/examples'),
 
   /**
-   * Start the run this brief describes.
-   *
-   * `brief_id` is what PLAN-EXAM-002 §B.3 specifies and what the route will
-   * take once E2 lands. `premise` and `profile` go with it because the route as
-   * it stands today requires a premise of at least ten characters and would
-   * answer 422 to `{brief_id}` alone — the buyer would press the only button on
-   * the screen and be told nothing. The premise is composed from the brief and
-   * is what the Library shows as the novel's line.
+   * Start the run this brief describes. The brief alone: the route composes the
+   * premise from it, and refuses a request that carries both (`StartRun`).
+   * `profile` decides the length (`LENGTHS` in entities/brief/model.ts).
    */
-  startFromBrief: (brief_id: string, premise: string, tone: string) =>
+  startFromBrief: (brief_id: string, profile: string) =>
     json<{ id: string; slug: string }>('/api/runs', {
       method: 'POST',
-      body: JSON.stringify({ brief_id, premise, profile: 'exam', tone }),
+      body: JSON.stringify({ brief_id, profile }),
     }),
 
   /* --- reading and changing (FLOW-6) ------------------------------------- */

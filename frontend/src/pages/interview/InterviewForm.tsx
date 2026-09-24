@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Brief, CheckResult, Memory, Recipient } from '@/shared/api/types'
 import {
-  LENGTH_CHAPTERS,
+  LENGTHS,
   fieldOfQuestion,
   fieldsOfContradiction,
 } from '@/entities/brief/model'
@@ -405,16 +405,19 @@ export function InterviewForm(props: Props) {
           field="length_chapters"
           label="How long is it?"
           check={check}
-          hint="Every storyMaker novel is ten chapters. This one is not a choice yet."
+          hint="The full novel is the gift. The short sample writes only the first chapter, to try it for less."
         >
           {() => (
-            <input
+            <select
               id="length_chapters"
-              type="text"
               data-field="length_chapters"
-              readOnly
-              value={`${LENGTH_CHAPTERS} chapters`}
-            />
+              value={brief.length_chapters}
+              onChange={(e) => props.onChange({ ...brief, length_chapters: Number(e.target.value) })}
+            >
+              {LENGTHS.map((l) => (
+                <option key={l.chapters} value={l.chapters}>{l.label}</option>
+              ))}
+            </select>
           )}
         </Field>
       </fieldset>
@@ -474,7 +477,7 @@ export function InterviewForm(props: Props) {
         <p>
           A {brief.genre.trim() || 'story'} for {who}
           {brief.occasion.trim() ? `, for ${brief.occasion.trim()}` : ''}, in{' '}
-          {LENGTH_CHAPTERS} chapters.
+          {brief.length_chapters} chapter{brief.length_chapters === 1 ? '' : 's'}.
         </p>
         <p className="muted">What novels like this one have cost:</p>
         {projection ? (

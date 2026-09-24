@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  profileFor,
   BRIEF_FIELDS,
   LENGTH_CHAPTERS,
   emptyBrief,
@@ -36,11 +37,12 @@ describe('the form collects the brief and nothing else', () => {
     ])
   })
 
-  it('fixes the length at ten chapters', () => {
-    // Shown, not editable: the exam's novel is ten chapters and the `exam`
-    // profile is the only one that writes that many.
+  it('defaults to the ten-chapter novel, and maps each length to the profile that writes it', () => {
     expect(LENGTH_CHAPTERS).toBe(10)
     expect(emptyBrief().length_chapters).toBe(10)
+    expect(profileFor(10)).toBe('exam')
+    expect(profileFor(1)).toBe('eval')
+    expect(profileFor(7)).toBe('exam')
   })
 })
 
