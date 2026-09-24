@@ -35,3 +35,6 @@ Each action corresponds to a state or transition of the per-stage conductor (SPE
 | `Crash` | the unit's process dies without a result event |
 | `Resume` | the conductor skips every unit whose accepted output exists and restarts at the first that has none |
 | `ReaderChange` | `python -m backend.versions.change`: `fact_usage` names the chapters, a new version regenerates only those, earlier versions untouched |
+
+## Two servers on one database — `TwoServers.tla`
+A second spec (SPEC-EXAM-005 O4) for what `Harness.tla` cannot see: two backend servers sharing one SQLite file, each running `sweep_orphans` at start-up. `TwoServers.cfg` (the sweep as written) makes TLC find red-team case 13 in 4 states: a live run marked `halted: process`. `TwoServersGuardOnly.cfg` (sweep only runs whose process is dead) holds every safety property but leaves an orphan un-swept. `TwoServersGuarded.cfg` (guard + re-sweep while up) passes everything on 398 distinct states. The mapping to code, the traces and the limits are in [`TwoServers.md`](TwoServers.md). The guard is specified, not implemented.
