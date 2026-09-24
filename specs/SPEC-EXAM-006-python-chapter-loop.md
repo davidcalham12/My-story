@@ -61,7 +61,22 @@ claude -p --agent <name> --output-format stream-json --verbose
   chapter, the same unit `U4.n` is today.
 - A switch in the config, `orchestration.chapter_loop: "claude" | "python"`,
   **default `"claude"`**: nothing that runs today changes unless the owner turns
-  it on. Read by the conductor and by the reader-change path.
+  it on.
+- **Where the switch acts.** Only two paths have per-chapter units:
+  - the conductor (SPEC-EXAM-003);
+  - the reader change (`backend/runs/change.py`). There the loop runs on the
+    version workspace that `prepare_workspace` already builds (anonymised
+    Bible, outline, summaries) and replaces `dispatch` for each affected
+    chapter; nothing else in `change.py` changes.
+
+  The single-orchestrator path (`NOVAFORGE_ORCHESTRATOR=single`, the path of
+  the example novel) has no units. There, `chapter_loop = "python"` **implies
+  the conductor**, and a run that asks for both `single` and `python` is
+  refused at start with that sentence, rather than silently ignoring the
+  switch.
+- With the loop, the procedure pin of the reader change (`c35fdc9^`,
+  `NOVAFORGE_CHANGE_PROCEDURE_REV`) no longer governs FLOW-4. The loop's
+  behaviour is pinned by its tests. The pin stays for `chapter_loop = "claude"`.
 
 **Scope: FLOW-4 only.** FLOW-0 to FLOW-3, FLOW-5 and FLOW-6 stay with Claude
 Code. They run once per novel and are not where the money goes.
@@ -85,20 +100,36 @@ For chapter *n*, attempt *k* = 1, 2, 3:
 2. **Measure the packet before dispatch** against the 100,000-token ceiling.
    Over the ceiling → halt with the figure, never truncate.
 3. **Dispatch `chapter-writer`.** Write `chapters/chNN.attemptK.md` before scoring.
-4. **Run the hooks' checks in code**: `validate-chapter` (length, canonical
-   names) and the forbidden-words `policy`. They are Claude Code hooks on
-   `Write`; the loop writes with Python, so it calls the same functions. It
-   never keeps a second copy of them.
+4. **Run the hooks' checks in code.** The hooks fire on Claude Code's `Write`,
+   and the loop writes with Python, so it calls the functions the hooks
+   themselves call: `chapters.domain.score_length`, `chapters.names.check` and
+   `policy.forbidden.check`. The hook files cannot be imported (the hyphen in
+   `validate-chapter.py`) and are not copied.
 5. **Score `length` and `chatter` by arithmetic.** `chatter` = 0 → redraft
    without calling the critics (chapter.md §3).
 6. **Dispatch the four critics in parallel**: continuity, science, outline and
    prose (plus `bible-critic` where the profile enables it). Each one runs with
    `--json-schema` for its envelope, so a malformed verdict is a schema failure
    rather than a parsing guess.
+   - **Budget, reserved before launch.** The remaining budget
+     (ceiling − measured spent) is divided among the processes about to start,
+     and each gets its share as `--max-budget-usd`. Four critics launched on
+     the whole remainder could overshoot it four times over. The overshoot
+     stays bounded by one call, as `verification.md` promises today.
+   - **Live processes.** The critics are the only moment more than one process
+     is alive, and they are children of the loop. If the loop halts, raises or
+     is interrupted, it kills every sibling still running before it returns
+     (red-team case 9, orphans). The start-up floor each process pays is
+     measured in AC-6.
 7. **Keep only findings that quote the draft verbatim.** Score `prose` with
    `score_prose` and `outline` with `score_outline`. Aggregate with `min` and
    ask `decide`.
-8. **Act on the decision:**
+8. **Act on the decision.** The loop writes each critique to
+   `critiques/chNN.<characteristic>.json` in the shape the orchestrator writes
+   today, because `promote` reads them from disk.
+   - `promote` and `check_summary` are CLIs (`main(argv)`), not functions. The
+     plan either calls `main` or extracts the function first, test first; it
+     does not reimplement them.
    - **accept** → `promote`;
    - **retry** → `build_sheet` at the level `decide` names, `validate_sheet`, next attempt;
    - **patch** → `apply_patches` with the critics' replacement sentences, then rescore with `patched: true`;
@@ -141,6 +172,9 @@ For chapter *n*, attempt *k* = 1, 2, 3:
 | AC-3 | No packet the loop builds contains text from another chapter's `chNN.md` or `chNN.attemptK.md` (fixture with sentinel strings) | T |
 | AC-4 | A packet over 100,000 tokens is not dispatched; the run halts with the figure | T |
 | AC-5 | Every `calls` row has input, cache_creation, cache_read, output and a cost with provenance `measured` | T |
+| AC-5b | With parallel critics, the sum of the `--max-budget-usd` handed out never exceeds the remaining budget | T |
+| AC-5c | A halt or an exception inside the loop leaves no child process alive (fake runner with slow processes) | T |
+| AC-5d | A run with `NOVAFORGE_ORCHESTRATOR=single` and `chapter_loop = "python"` is refused at start with the reason | T |
 | AC-6 | **The spike:** one real chapter, profile `eval`, ceiling 3 USD, measured cost, minutes, attempts and scores, set beside the orchestrated eval-04 chapter and v3 ch03 | D |
 | AC-7 | The spike's chapter passes through `promote`, and its critiques and sheet are on disk in the same shape as an orchestrated chapter | I |
 
