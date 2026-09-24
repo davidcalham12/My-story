@@ -101,8 +101,11 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
         process = RunProcess.for_prompt(prompt=prompt, cwd=settings.repo_root,
                                         max_budget_usd=15.0)
         process.start()
-        for _ in process.lines():
-            pass
+        # The stream is the record: its `result` event is the unit's measured cost.
+        with (workspace / "logs" / f"ch{n:02d}.stream.jsonl").open(
+                "w", encoding="utf-8") as log:
+            for raw, _ in process.lines():
+                log.write(raw.rstrip("\n") + "\n")
         promoted = workspace / "chapters" / f"ch{n:02d}.md"
         verdicts[n] = promoted.is_file()
         if promoted.is_file() and alias:
