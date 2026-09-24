@@ -1,31 +1,37 @@
 # presentacion/
 
-Lo que se entrega aquí (spec AC-13): el deck en **PDF y PPTX** con la identidad
-Qaracter, la slide de presupuesto con los costes medidos, y el vídeo o su enlace.
+**Idioma: castellano**, con los términos técnicos en inglés.
 
-| fichero | estado |
+Presentación formal al cliente ficticio *Páginas de Regalo S.L.*, con la
+identidad de Qaracter (DM Sans, naranja #FF7932, azul #1E2D3D).
+
+## Contenido
+
+| fichero | qué es |
 |---|---|
-| `guion.md` | borrador del contenido slide a slide, con las cifras y su procedencia |
-| `storymaker.pdf`, `storymaker.pptx` | pendiente — se montan en Claude Design desde `guion.md` |
-| vídeo o enlace | pendiente — lo graba el dueño (spec §5) |
+| `storymaker-deck.pdf` | el deck principal, 13 slides, en PDF |
+| `storymaker-deck.pptx` | el mismo deck en formato editable |
+| `guion.md` | qué se dice en cada slide y la demo en directo, paso a paso, con la procedencia de cada cifra |
+| `anexo-a-arquitectura-harness.pdf` | diagrama del harness: agentes, orquestador, Story Bible, puerta de calidad |
+| `anexo-b-tla-spec.pdf` | especificación TLA+ (`tla/Harness.tla`), su correspondencia con el código y el resultado de TLC: 18.253 estados, sin errores, y el contraejemplo corregido |
+| `anexo-c-maquina-estados.pdf` | la máquina de estados del harness |
+| `anexo-d-evals-tabla.pdf` | la tabla de evals: cinco briefs × validadores, con números |
+| `anexo-e-esquema-sqlite.pdf` | el esquema SQLite de la Story Bible |
+| `anexo-f-validadores.pdf` | los validadores por tipo y dónde actúa cada uno |
+| `anexo-g-red-team-log.pdf` | casos adversariales probados, quién los detectó y cómo se resolvió |
+| `anexo-h-iteraciones.pdf` | qué cambió tras cada eval o contraejemplo, y por qué |
+| vídeo | la demo grabada; el enlace se añade aquí al subirla |
 
-## Guion del vídeo (demo del cambio del lector, E8)
-
-1. `dist/v1/novel.pdf` abierto: portada con la dedicatoria, índice, ficha de personajes (un clic lleva al primer capítulo).
-2. El comprador cambia un dato del brief 01. Se muestra el comando y la fila de `fact_usage` que dice qué capítulos lo usan.
-3. Sólo esos capítulos pasan otra vez por el gate (se ve en el panel o en `validations`).
-4. `dist/v2/novel.pdf`: abre con la página de novedades; un clic en cada enlace lleva al capítulo cambiado, con el dato nuevo en el texto.
-5. `dist/v1/` sigue ahí, sin tocar.
-6. Cierre: coste medido de la regeneración frente al de la novela.
-
-Tiene que poder grabarse el jueves por la noche.
+La novela de ejemplo (10 capítulos, brief 01) está en
+`../ejemplos/novela-ejemplo.pdf`, y su versión de 8 capítulos, conservada, en
+`../ejemplos/novela-ejemplo-v1-8-capitulos.pdf`.
 
 ## Email de entrega
 
-Dos enlaces a commits (los dos repositorios) y una frase de diseño de tres líneas como máximo. Candidata, actualizada con el conductor por etapas:
+Asunto: `[Harness Engineering] Entrega final — David Calderon Hamui`
 
-> El escritor de cada capítulo no lee los anteriores y cada etapa arranca en un proceso limpio, así que nada pasa de 100.000 tokens y el capítulo 10 cuesta lo mismo que el 1; toda la continuidad pasa por una story bible en SQLite que sabe qué capítulo usa cada dato.
+- Commit final de storyMaker: `https://github.com/davidcalham12/StoryMaker/commit/<hash>`
+- Commit final de MyFactory: `https://github.com/davidcalham12/my-factory/commit/<hash>`
+- La decisión de diseño, en tres líneas como máximo:
 
-Alternativa más corta:
-
-> La continuidad no está en el contexto del modelo sino en una story bible en SQLite que sabe qué capítulo usa cada dato; por eso un cambio del lector regenera sólo esos capítulos.
+> El escritor de cada capítulo no puede leer los anteriores: su única herramienta devuelve rutas, no contenido. Toda la continuidad pasa por una story bible en SQLite que sabe qué capítulo usa cada dato, y por eso un cambio del lector reescribe solo esos capítulos.
