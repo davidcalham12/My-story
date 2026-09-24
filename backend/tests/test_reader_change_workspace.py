@@ -98,3 +98,88 @@ def test_main_reports_a_cut_unit_as_budget(db, tmp_path, capsys):
                      output_dir=tmp_path, regenerate=cut)
     out = capsys.readouterr()
     assert rc == 1 and '"halted": "budget"' in out.out and "gate" not in out.err
+
+
+# ------------------------- a change that does not arrive is not a change (§8)
+
+OLD, NEW = "the cardboard observatory", "the wooden treehouse observatory"
+
+
+def test_arrival_needs_the_new_text_and_no_variant_of_the_old():
+    assert change.arrival(f"He climbed into {NEW} at dusk.", new=NEW, old=OLD) is None
+    assert "missing" in change.arrival("He climbed the hill.", new=NEW, old=OLD)
+    both = f"He left {NEW} and the Cardboard Observatories behind."
+    assert "still" in change.arrival(both, new=NEW, old=OLD)
+
+
+def test_the_workspace_replaces_the_old_texts_variants(tmp_path):
+    d = _run_dir(tmp_path)
+    (d / "bible" / "characters.md").write_text(
+        "Marcos, a builder of cardboard observatories. The Cardboard Observatory.\n",
+        encoding="utf-8")
+    ws = d / "dist" / "v2"; ws.mkdir(parents=True)
+    change.prepare_workspace(d, ws, (3,), old=OLD, to=NEW)
+    text = (ws / "bible" / "characters.md").read_text(encoding="utf-8").lower()
+    assert "cardboard" not in text and "wooden treehouse observator" in text
+
+
+def _published_run(db, tmp_path):
+    from backend.commons.db import repository
+    repository.create_run(db, run_id="r1", slug="gift", premise="p", profile="exam",
+                          tone=None, snapshot="{}")
+    d = tmp_path / "gift"
+    (d / "chapters").mkdir(parents=True)
+    with db:
+        db.execute("INSERT INTO facts (id, run_id, kind, text, source) VALUES "
+                   "(1, 'r1', 'recipient', ?, 'brief')", (OLD,))
+        db.execute("INSERT INTO fact_usage (fact_id, version_id, chapter, matched) "
+                   "VALUES (1, 1, 3, 'x')")
+        db.execute("INSERT INTO versions (run_id, n, parent, reason, created_at) "
+                   "VALUES ('r1', 1, NULL, 'first', 't')")
+    return d
+
+
+def test_a_promoted_chapter_without_the_new_fact_is_not_published(db, tmp_path, capsys):
+    d = _published_run(db, tmp_path)
+
+    def promotes_without_the_fact(run_dir, ws, chapters, fact, to):
+        (ws / "chapters").mkdir(parents=True, exist_ok=True)
+        (ws / "chapters" / "ch03.md").write_text("# Chapter 3\n\nNo observatory here.\n",
+                                                 encoding="utf-8")
+        return {3: True}
+
+    rc = change.main(["change", "gift", "--fact", "1", "--to", NEW], conn=db,
+                     output_dir=tmp_path, regenerate=promotes_without_the_fact)
+    out = capsys.readouterr().out
+    assert rc == 1 and '"halted": "fact"' in out
+    assert not (d / "dist" / "v2" / "chapters" / "ch03.md").exists()
+    assert list((d / "dist" / "v2" / "chapters").glob("ch03.rejected-*.md"))
+
+
+def test_redo_reuses_the_workspace_and_sets_the_old_chapter_aside(db, tmp_path):
+    d = _published_run(db, tmp_path)
+    ws = d / "dist" / "v2"
+    (ws / "chapters").mkdir(parents=True)
+    (ws / "chapters" / "ch03.md").write_text("old promoted", encoding="utf-8")
+    (ws / "chapters" / "ch03.attempt1.md").write_text("old draft", encoding="utf-8")
+    seen = {}
+
+    def redo(run_dir, workspace, chapters, fact, to):
+        seen["ws"], seen["chapters"] = workspace, chapters
+        assert not (workspace / "chapters" / "ch03.attempt1.md").exists()
+        (workspace / "chapters" / "ch03.md").write_text(f"# Chapter 3\n\n{NEW}.\n",
+                                                        encoding="utf-8")
+        return {3: True}
+
+    rc = change.main(["change", "gift", "--fact", "1", "--to", NEW, "--workspace", "v2",
+                      "--only", "3"], conn=db, output_dir=tmp_path, regenerate=redo)
+    assert seen == {"ws": ws, "chapters": (3,)}
+    assert any(p.is_dir() for p in (ws / "chapters").glob("_redo-*"))
+    assert rc == 0 and (ws / "novel.html").is_file()
+
+
+def test_another_cardboard_object_is_not_the_old_fact():
+    """ch10 of v3 keeps 'the cardboard telescope', a different object: the old
+    fact is the phrase, not the word."""
+    text = f"She raised the cardboard telescope toward {NEW}."
+    assert change.arrival(text, new=NEW, old=OLD) is None

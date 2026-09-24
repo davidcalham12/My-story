@@ -33,6 +33,7 @@ import argparse
 import json
 import sqlite3
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 from backend.commons.config.settings import load_settings
@@ -121,7 +122,8 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
         prompt = (prompt_for(Unit("chapter", n), slug=run_dir.name, run_dir=workspace)
                   + f"\nReader change: wherever the Bible or the outline once said "
                     f"{(old or fact_id)!r}, it now says {to!r}. "
-                    f"Write the chapter so it holds.\n")
+                    f"Write the chapter so it holds.\n"
+                  + _mandatory(workspace, n, old=old, to=to))
         # NOVAFORGE_CHANGE_PROCEDURE_REV: run the change on the procedure the
         # book was written with, not the current one (owner, 2026-09-24).
         import os as _os
@@ -251,6 +253,87 @@ def pin_procedure(workspace: Path, rev: str, prompt: str) -> str:
     return prompt.replace(PROCEDURE, str(target / "chapter.md"))
 
 
+ARTICLES = ("the ", "a ", "an ")
+
+
+def _core(phrase: str) -> str:
+    low = phrase.strip()
+    for article in ARTICLES:
+        if low.lower().startswith(article):
+            return low[len(article):]
+    return low
+
+
+def _plural(word: str) -> str:
+    return word[:-1] + "ies" if word.endswith("y") and word[-2:-1] not in "aeiou" else word + "s"
+
+
+def _pattern(phrase: str):
+    """The phrase without its article, any case, singular or plural."""
+    import re
+
+    words = _core(phrase).rstrip(".,;:!?").split()
+    last = words[-1]
+    tail = f"(?:{re.escape(last)}|{re.escape(_plural(last))})"
+    return re.compile(r"\b" + r"\s+".join([*(re.escape(w) for w in words[:-1]), tail]) + r"\b",
+                      re.IGNORECASE)
+
+
+def replace_variants(text: str, old: str, new: str) -> str:
+    """Every variant of `old` (case, plural, with or without its article)
+    becomes the matching variant of `new`. The literal replace missed
+    "cardboard observatories" in the cast sheet (v3, 2026-09-24)."""
+    new_core = _core(new)
+    new_words = new_core.split()
+
+    def swap(match) -> str:
+        found = match.group(0)
+        plural = not found.lower().endswith(_core(old).split()[-1].lower())
+        out = " ".join([*new_words[:-1], _plural(new_words[-1]) if plural else new_words[-1]])
+        return out[0].upper() + out[1:] if found[0].isupper() else out
+
+    return _pattern(old).sub(swap, text)
+
+
+def _fact_text(conn: sqlite3.Connection, fact_id: str) -> str:
+    row = conn.execute("SELECT text FROM facts WHERE id = ?", (fact_id,)).fetchone()
+    return row[0] if row else ""
+
+
+def _set_aside(workspace: Path, chapters: tuple[int, ...]) -> None:
+    """Move a redo's earlier files for these chapters into chapters/_redo-<stamp>/,
+    so the unit starts at attempt 1 without overwriting the evidence."""
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    target = workspace / "chapters" / f"_redo-{stamp}"
+    for c in chapters:
+        for path in (workspace / "chapters").glob(f"ch{c:02d}.*"):
+            target.mkdir(parents=True, exist_ok=True)
+            path.rename(target / path.name)
+
+
+def _mandatory(workspace: Path, n: int, *, old: str, to: str) -> str:
+    """The changed fact as a requirement the unit checks before it promotes."""
+    draft = workspace / "chapters" / f"ch{n:02d}.attempt<K>.md"
+    return (f"\nMANDATORY for this reader change: the chapter must contain {to!r} "
+            f"(or its plural) and must not contain {old!r} in any form. Before you "
+            f"run promote, check the draft with:\n"
+            f"  python -m backend.versions.change --arrival {draft} --to {to!r} --old {old!r}\n"
+            f"If it prints FAIL, the attempt failed: put that reason in the sheet "
+            f"and redraft, exactly as for a failed characteristic.\n")
+
+
+def arrival(text: str, *, new: str, old: str) -> str | None:
+    """None when the change arrived: the new text is there and no variant of the
+    old one is. Otherwise the reason, for the sheet. The reader change's
+    acceptance condition (docs/spec.md §8, "Rehacer el cap. 3 con control") —
+    arithmetic like `chatter`, not a seventh characteristic."""
+    if not _pattern(new).search(text):
+        return f"the changed fact is missing: {new!r} does not appear"
+    if _pattern(old).search(text):
+        return f"the old fact is still there: {old!r} (or a variant) appears"
+    return None
+
+
 def prepare_workspace(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
                       *, old: str, to: str) -> None:
     """What the chapter unit rewrites from: the anonymised Bible and outline with
@@ -265,7 +348,7 @@ def prepare_workspace(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
 
     def changed(path: Path) -> str:
         body = anon(path).read_text(encoding="utf-8")
-        return body.replace(old, to) if old else body
+        return replace_variants(body, old, to) if old else body
 
     (workspace / "bible").mkdir(parents=True, exist_ok=True)
     for sub in ("chapters", "critiques", "logs"):
@@ -293,10 +376,25 @@ def _run_id(conn: sqlite3.Connection, slug: str) -> str | None:
 
 def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
          output_dir: Path | None = None, regenerate=dispatch) -> int:
+    if len(argv) > 1 and argv[1] == "--arrival":
+        # The unit's own check before promote (see `_mandatory`).
+        check = argparse.ArgumentParser(prog="backend.versions.change --arrival")
+        check.add_argument("draft", type=Path)
+        check.add_argument("--to", required=True)
+        check.add_argument("--old", required=True)
+        a = check.parse_args(argv[2:])
+        why = arrival(a.draft.read_text(encoding="utf-8"), new=a.to, old=a.old)
+        print(f"FAIL: {why}" if why else "OK")
+        return 1 if why else 0
+
     parser = argparse.ArgumentParser(prog="backend.versions.change")
     parser.add_argument("slug")
     parser.add_argument("--fact", required=True)
     parser.add_argument("--to", required=True)
+    parser.add_argument("--workspace", help="redo inside an unpublished version's "
+                        "workspace (e.g. v3) instead of allocating a new one")
+    parser.add_argument("--only", type=int, nargs="+",
+                        help="with --workspace: the chapters to write again")
     args = parser.parse_args(argv[1:])
 
     if conn is None:  # pragma: no cover - the CLI's own wiring
@@ -335,9 +433,20 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         return 1
     parent_n = parent[-1]["n"]
 
-    n = versions_repo.next_number(conn, run_id, run_dir / "dist")
-    workspace = run_dir / "dist" / f"v{n}"
-    workspace.mkdir(parents=True, exist_ok=False)
+    if args.workspace:
+        # A redo in a workspace that never published: the chapters named in
+        # --only are set aside (kept, not deleted) and written again.
+        n = int(args.workspace.lstrip("v"))
+        workspace = run_dir / "dist" / f"v{n}"
+        if any(v["n"] == n for v in parent):
+            print(f"change: REFUSED — v{n} is already published", file=sys.stderr)
+            return 1
+        chapters = tuple(c for c in chapters if not args.only or c in args.only)
+        _set_aside(workspace, chapters)
+    else:
+        n = versions_repo.next_number(conn, run_id, run_dir / "dist")
+        workspace = run_dir / "dist" / f"v{n}"
+        workspace.mkdir(parents=True, exist_ok=False)
 
     try:
         verdicts = regenerate(run_dir, workspace, chapters, args.fact, args.to)
@@ -353,7 +462,24 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         print(f"change: halted: {cut.reason} at chapter {cut.chapter}; "
               f"v{parent_n} stands", file=sys.stderr)
         return 1
-    refused =sorted(c for c, accepted in verdicts.items() if not accepted)
+    # A change that does not arrive is not a change (docs/spec.md §8): every
+    # accepted chapter must carry the new text and no variant of the old one.
+    old_text = _fact_text(conn, args.fact)
+    for c in [c for c, accepted in verdicts.items() if accepted]:
+        promoted = workspace / "chapters" / f"ch{c:02d}.md"
+        why = (arrival(promoted.read_text(encoding="utf-8"), new=args.to, old=old_text)
+               if promoted.is_file() else "no promoted chapter")
+        if why:
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            if promoted.is_file():
+                promoted.rename(promoted.with_name(f"ch{c:02d}.rejected-{stamp}.md"))
+            print(json.dumps({"slug": args.slug, "fact": args.fact, "chapter": c,
+                              "halted": "fact", "why": why, "published": False,
+                              "workspace": str(workspace),
+                              "note": f"v{parent_n} is untouched"}, indent=2))
+            print(f"change: halted: fact — chapter {c}: {why}", file=sys.stderr)
+            return 1
+    refused = sorted(c for c, accepted in verdicts.items() if not accepted)
     if refused or set(chapters) - set(verdicts):
         # The accepted gap, behaving as the spec says it will. Nothing is
         # published: the reader keeps the novel they have.

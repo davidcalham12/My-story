@@ -64,7 +64,7 @@ claude -p --agent <name> --output-format stream-json --verbose
   it on.
 - **Where the switch acts.** Only two paths have per-chapter units:
   - the conductor (SPEC-EXAM-003);
-  - the reader change (`backend/runs/change.py`). There the loop runs on the
+  - the reader change (`backend/versions/change.py`). There the loop runs on the
     version workspace that `prepare_workspace` already builds (anonymised
     Bible, outline, summaries) and replaces `dispatch` for each affected
     chapter; nothing else in `change.py` changes.
@@ -183,6 +183,9 @@ For chapter *n*, attempt *k* = 1, 2, 3:
 | gap | level | why accepted |
 |---|---|---|
 | No arbitration of a false finding | important | measured twice on the stress run as a re-examination that changed a score. The loop may therefore retry where the orchestrator would not have; the cost of that retry is measured in AC-6 |
+| The loop writes no `validations` rows, exports nothing to Langfuse and records no `fact_usage` after promotion | important | the build review, 2026-09-24: the loop writes `calls`, `logs/agents.jsonl`, the critiques, sheets and late findings; the rest stays with the release step |
+| The 100k check is estimated (words × 1.35, no tokenizer) and covers the packet, not the agent's start-up floor | important | the halt message says "estimated"; AC-6 measures the floor |
+| `--json-schema`, `--permission-mode dontAsk` and reading `structured_output` are untested against the real CLI | important | AC-6 is the first real call and tests them |
 | Each agent process pays Claude Code's start-up floor | incidental | the measured ~48,800 tokens were the orchestrator's; an agent's floor is measured in AC-6, not assumed |
 | FLOW-0 to FLOW-3, FLOW-5 and FLOW-6 stay orchestrated | incidental | they run once per novel; moving them is a later spec if AC-6 justifies it |
 | The loop is new code the night before delivery | important | the switch defaults to the current behaviour; the example novel and the evals are not re-run on it |

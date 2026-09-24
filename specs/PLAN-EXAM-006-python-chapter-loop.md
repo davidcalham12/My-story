@@ -1,6 +1,6 @@
 # PLAN-EXAM-006 — the chapter loop in Python
 
-status: draft for review
+status: approved — the owner, 2026-09-24 (~21:15 UTC, dictated to the coordinating session): "Sí, apruebo el plan y el override". The spike runs with chapter_loop=python and NOVAFORGE_BUDGET=3 for that run only; the eval profile is not changed. Critics for the spike: "4 críticos, como hoy" (bible_critic=false).
 date: 2026-09-24
 implements: SPEC-EXAM-006 (approved 2026-09-24, "apruebo el SPEC-EXAM-006, techo 3 USD para la prueba")
 scope: AC-1 to AC-5d at $0. AC-6 and AC-7 (the real spike) are out of this plan: they are run later, by someone else, with the owner's go.
