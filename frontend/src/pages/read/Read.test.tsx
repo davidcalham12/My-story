@@ -57,7 +57,9 @@ describe('read online, download on request (owner, 2026-09-24)', () => {
     const html = render({ versions: [version({ n: 1, pdf: true, html: true } as never)], chosen: 1 })
     expect(html).toContain('/api/runs/r1/versions/1/html')
     expect(html).toContain('<iframe')
-    expect(html).toContain('sandbox=""')
+    // Same origin so it renders and chapter links can scroll it; never scripts.
+    expect(html).toContain('sandbox="allow-same-origin"')
+    expect(html).not.toContain('allow-scripts')
   })
 
   it('downloads only through a button that asks for it', () => {

@@ -44,8 +44,21 @@ export function ReadView(props: Props) {
   const { runId, versions, chosen, chapters, characters, places, changed, error } = props
   const open = versions.find((v) => v.n === chosen) ?? null
 
+  // "chapter 3" beside the book jumps inside the book: the page in the frame
+  // carries `id="chapter-3"`, and the frame is same-origin (no scripts in it).
+  const jump = (e: React.MouseEvent) => {
+    const a = (e.target as HTMLElement).closest('a')
+    const href = a?.getAttribute('href') ?? ''
+    if (!href.startsWith('#chapter-')) return
+    const frame = document.querySelector<HTMLIFrameElement>('iframe.reader__page')
+    const target = frame?.contentDocument?.getElementById(href.slice(1))
+    if (!target) return
+    e.preventDefault()
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
-    <div className="reader">
+    <div className="reader" onClick={jump}>
       <div>
         <section className="hero">
           <p className="eyebrow eyebrow--brand">Read</p>
@@ -129,21 +142,17 @@ export function ReadView(props: Props) {
                 Download PDF
               </a>
             )}
-            {open.pdf && (
-              <a className="button" href={pdfUrl(runId, chosen)} target="_blank" rel="noreferrer">
-                Open PDF in a new tab
-              </a>
-            )}
           </div>
         )}
 
         {open && open.html && chosen !== null && (
-          // The book in the page, from the HTML the PDF was printed from. An
-          // empty sandbox: the page is ours and escaped, and it needs no script.
+          // The book in the page, from the HTML the PDF was printed from. The
+          // sandbox allows the same origin and nothing else: no script ever runs
+          // in it. An empty sandbox rendered blank in the desktop app's browser.
           <iframe
             className="reader__viewer reader__page"
             src={htmlUrl(runId, chosen)}
-            sandbox=""
+            sandbox="allow-same-origin"
             title={`The novel, version ${chosen}`}
           />
         )}
