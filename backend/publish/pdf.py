@@ -355,7 +355,7 @@ def write_version(run_dir: Path, novel: Novel) -> Path:
 
 def publish(conn: sqlite3.Connection, run_dir: Path, run_id: str, *, reason: str,
             change: Change | None = None, chapters_from: Path | None = None,
-            n: int | None = None) -> int:
+            n: int | None = None, parent: int | None = None) -> int:
     """Render the next version and record it. Returns its number.
 
     `n` is passed in by a reader change, which allocated the number before it
@@ -368,7 +368,7 @@ def publish(conn: sqlite3.Connection, run_dir: Path, run_id: str, *, reason: str
     novel = read_novel(conn, run_dir, run_id, version=n, change=change,
                        chapters_from=chapters_from)
     write_version(run_dir, novel)
-    versions_repo.record(conn, run_id, n=n, parent=change.parent if change else None,
+    versions_repo.record(conn, run_id, n=n, parent=change.parent if change else parent,
                          reason=reason)
     return n
 

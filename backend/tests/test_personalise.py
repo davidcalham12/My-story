@@ -90,3 +90,21 @@ def test_a_run_from_a_brief_prints_the_briefs_dedication(db, tmp_path, monkeypat
     release.release(db, d)
     html = (d / "dist" / "v1" / "novel.html").read_text(encoding="utf-8")
     assert dedication.split(",")[0] in html
+
+
+def test_the_completed_book_is_the_next_version_and_v1_stays(db, tmp_path, monkeypatch):
+    """Chapters added after v1 (the resumed run, spec §8) publish as v2; v1's
+    files are not touched."""
+    from backend.publish import pdf, release
+
+    d, alias = _setup(db, tmp_path)
+    monkeypatch.setattr(pdf, "print_pdf", lambda h, p: p.write_bytes(b"%PDF") or p)
+    release.release(db, d)
+    v1 = (d / "dist" / "v1" / "novel.html").read_text(encoding="utf-8")
+    (d / "chapters" / "ch02.md").write_text(f"# Chapter 2\n\n{TOKEN} returns.\n",
+                                            encoding="utf-8")
+    assert release.release_next(db, d, reason="the completed book") == 2
+    v2 = (d / "dist" / "v2" / "novel.html").read_text(encoding="utf-8")
+    assert f"{alias} returns." in v2 and TOKEN not in v2
+    assert (d / "dist" / "v1" / "novel.html").read_text(encoding="utf-8") == v1
+    assert (d / "dist" / "v2" / "novel.pdf").is_file()
