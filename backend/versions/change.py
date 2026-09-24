@@ -85,6 +85,13 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
     run = conn.execute("SELECT brief_id FROM runs WHERE slug = ?", (run_dir.name,)).fetchone()
     alias = personalise.alias_for(conn, run[0] if run else None)
     prepare_workspace(run_dir, workspace, chapters, old=old, to=to)
+    profile = conn.execute("SELECT profile FROM runs WHERE slug = ?",
+                           (run_dir.name,)).fetchone()
+    model = orchestrator_model(profile[0]) if profile else None
+    import os as _os
+    total_budget = (float(_os.environ["NOVAFORGE_CHANGE_BUDGET_USD"])
+                    if _os.environ.get("NOVAFORGE_CHANGE_BUDGET_USD") else None)
+    spent = 0.0
 
     verdicts: dict[int, bool] = {}
     for n in chapters:
@@ -98,15 +105,27 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
         if _os.environ.get("NOVAFORGE_CHANGE_PROCEDURE_REV"):
             prompt = pin_procedure(workspace, _os.environ["NOVAFORGE_CHANGE_PROCEDURE_REV"],
                                    prompt)
-        process = RunProcess.for_prompt(prompt=prompt, cwd=settings.repo_root,
-                                        max_budget_usd=15.0)
+        # The remaining budget, so one ceiling covers the whole change
+        # (NOVAFORGE_CHANGE_BUDGET_USD, the owner's figure; 15 per chapter if unset).
+        left = (total_budget - spent) if total_budget is not None else 15.0
+        process = unit_process(prompt, model=model, max_budget_usd=round(max(left, 0.0), 2),
+                               cwd=settings.repo_root)
         process.start()
         # The stream is the record: its `result` event is the unit's measured cost.
+        events: list[dict] = []
         with (workspace / "logs" / f"ch{n:02d}.stream.jsonl").open(
                 "w", encoding="utf-8") as log:
-            for raw, _ in process.lines():
+            for raw, event in process.lines():
                 log.write(raw.rstrip("\n") + "\n")
+                events.append(event)
+        spent += sum(float(e.get("total_cost_usd") or 0) for e in events
+                     if e.get("type") == "result")
         promoted = workspace / "chapters" / f"ch{n:02d}.md"
+        if not promoted.is_file():
+            reason = cut_reason(events)
+            if reason:
+                # Not the gate: the CLI or the API stopped the unit.
+                raise UnitCut(reason, n)
         verdicts[n] = promoted.is_file()
         if promoted.is_file() and alias:
             # The same mechanical step as v1 (owner's decision B): the model
@@ -116,6 +135,47 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
             promoted.write_text(text.replace(personalise.TOKEN, alias),
                                 encoding="utf-8", newline="\n")
     return verdicts
+
+
+class UnitCut(Exception):
+    """A chapter unit the CLI or the API stopped — not a gate refusal."""
+
+    def __init__(self, reason: str, chapter: int):
+        super().__init__(f"{reason} at chapter {chapter}")
+        self.reason, self.chapter = reason, chapter
+
+
+LIMIT_WORDS = ("spend limit", "usage limit", "usage-credits", "credit balance",
+               "rate limit")
+
+
+def cut_reason(events: list[dict]) -> str | None:
+    """`budget` or `api` when the unit's `result` says it was stopped, else None."""
+    for event in events:
+        if event.get("type") != "result":
+            continue
+        text = str(event.get("result") or "").lower()
+        if event.get("subtype") == "error_max_budget_usd" or any(w in text for w in LIMIT_WORDS):
+            return "budget"
+        if event.get("is_error"):
+            return "api"
+    return None
+
+
+def orchestrator_model(profile: str) -> str | None:
+    """The orchestrator model the profile says now. A run's snapshot can predate
+    `models.orchestrator`, and None there meant the CLI default — Opus."""
+    from backend.commons.config import loader
+
+    return (loader.resolve(profile).get("models") or {}).get("orchestrator")
+
+
+def unit_process(prompt: str, *, model: str | None, max_budget_usd: float,
+                 cwd: Path | None = None):
+    from backend.commons.runner.process import RunProcess
+
+    return RunProcess.for_prompt(prompt=prompt, cwd=cwd or Path.cwd(),
+                                 max_budget_usd=max_budget_usd, model=model)
 
 
 PROCEDURE = ".claude/skills/storymaker/units/chapter.md"
@@ -232,8 +292,21 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
     workspace = run_dir / "dist" / f"v{n}"
     workspace.mkdir(parents=True, exist_ok=False)
 
-    verdicts = regenerate(run_dir, workspace, chapters, args.fact, args.to)
-    refused = sorted(c for c, accepted in verdicts.items() if not accepted)
+    try:
+        verdicts = regenerate(run_dir, workspace, chapters, args.fact, args.to)
+    except UnitCut as cut:
+        # The CLI or the API stopped a unit. Saying "gate" here would blame the
+        # critics for a spend limit (the v3 of 2026-09-24).
+        print(json.dumps({
+            "slug": args.slug, "fact": args.fact, "chapters": list(chapters),
+            "halted": cut.reason, "at_chapter": cut.chapter,
+            "published": False, "workspace": str(workspace),
+            "note": f"v{parent_n} is untouched",
+        }, indent=2))
+        print(f"change: halted: {cut.reason} at chapter {cut.chapter}; "
+              f"v{parent_n} stands", file=sys.stderr)
+        return 1
+    refused =sorted(c for c, accepted in verdicts.items() if not accepted)
     if refused or set(chapters) - set(verdicts):
         # The accepted gap, behaving as the spec says it will. Nothing is
         # published: the reader keeps the novel they have.

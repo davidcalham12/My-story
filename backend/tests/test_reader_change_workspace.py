@@ -51,3 +51,50 @@ def test_a_pinned_procedure_is_written_into_the_workspace(tmp_path):
     assert "bible-critic" not in pinned.read_text(encoding="utf-8")
     assert str(pinned) in prompt and "units/chapter.md" not in prompt
     assert str(ws / "procedure" / "SKILL.md") in pinned.read_text(encoding="utf-8")
+
+
+# ------------------------------------------- the model, and why a change stopped
+
+
+def test_a_reader_change_runs_on_the_profiles_orchestrator_model():
+    """The novel's snapshot predates `models.orchestrator`; the change takes the
+    model its profile says NOW, so exam runs on sonnet, not the CLI default."""
+    assert change.orchestrator_model("exam") == "sonnet"
+    process = change.unit_process("prompt", model="sonnet", max_budget_usd=12.5)
+    assert process.command[process.command.index("--model") + 1] == "sonnet"
+    assert process.command[process.command.index("--max-budget-usd") + 1] == "12.5"
+
+
+def test_a_cut_by_the_org_limit_is_budget_not_gate():
+    limit = {"type": "result", "is_error": True, "subtype": "success",
+             "result": "You've hit your org's monthly spend limit · run /usage-credits"}
+    assert change.cut_reason([limit]) == "budget"
+    assert change.cut_reason([{"type": "result", "subtype": "error_max_budget_usd",
+                               "is_error": True}]) == "budget"
+    assert change.cut_reason([{"type": "result", "is_error": True,
+                               "result": "API Error: 529 overloaded"}]) == "api"
+    assert change.cut_reason([{"type": "result", "is_error": False,
+                               "result": "done"}]) is None
+
+
+def test_main_reports_a_cut_unit_as_budget(db, tmp_path, capsys):
+    from backend.commons.db import repository
+    repository.create_run(db, run_id="r1", slug="gift", premise="p", profile="exam",
+                          tone=None, snapshot="{}")
+    d = tmp_path / "gift"
+    (d / "chapters").mkdir(parents=True)
+    with db:
+        db.execute("INSERT INTO facts (id, run_id, kind, text, source) VALUES "
+                   "(1, 'r1', 'recipient', 'the cardboard observatory', 'brief')")
+        db.execute("INSERT INTO fact_usage (fact_id, version_id, chapter, matched) "
+                   "VALUES (1, 1, 3, 'x')")
+        db.execute("INSERT INTO versions (run_id, n, parent, reason, created_at) "
+                   "VALUES ('r1', 1, NULL, 'first', 't')")
+
+    def cut(*a, **k):
+        raise change.UnitCut("budget", 3)
+
+    rc = change.main(["change", "gift", "--fact", "1", "--to", "x"], conn=db,
+                     output_dir=tmp_path, regenerate=cut)
+    out = capsys.readouterr()
+    assert rc == 1 and '"halted": "budget"' in out.out and "gate" not in out.err

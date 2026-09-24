@@ -361,3 +361,19 @@ def test_the_exam_and_eval_orchestrator_runs_on_sonnet():
     from backend.commons.config import loader
     for profile in ("exam", "eval"):
         assert loader.resolve(profile)["models"]["orchestrator"] == "sonnet", profile
+
+
+def test_a_real_exam_run_launches_claude_with_model_sonnet(tmp_path):
+    """The profile's figure reaches argv: the novel's orchestrator ran on Opus
+    because its snapshot predated models.orchestrator, not because the flag was lost."""
+    from backend.commons.config import loader
+    from backend.commons.config.settings import Settings
+    from backend.commons.db.connection import memory
+    from backend.commons.db.migrate import migrate
+    from backend.runs.service import RunService
+
+    conn = memory(); migrate(conn)
+    svc = RunService(conn, Settings(db_path=tmp_path / "x.db", output_dir=tmp_path,
+                                    use_recorded_stream=False))
+    process = svc._process("a premise long enough", "exam", "", loader.resolve("exam"))
+    assert process.command[process.command.index("--model") + 1] == "sonnet"
