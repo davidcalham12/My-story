@@ -246,6 +246,7 @@ changes, the row says so.
 | `science-critic` | FLOW-4 gate + FLOW-3 audit | haiku | — |
 | `outline-critic` | FLOW-4 gate | haiku | — |
 | `prose-critic` | FLOW-4 gate | haiku | — |
+| `bible-critic` | FLOW-4 gate | haiku | — |
 | `style-editor` | FLOW-5 | haiku | — |
 | `publisher` | FLOW-6 | haiku | — |
 | `interviewer` | FLOW-0 | haiku | — |
@@ -462,6 +463,21 @@ once, on a finished book, and there is no attempt 2.
 **Nothing redrafts the book on its verdict.** It is the measurement, not a gate.
 
 ---
+
+
+### 4.13 bible-critic — FLOW-4 gate, haiku
+
+**Receives:** the four Bible files, this chapter's outline entry with its beats
+numbered, and the draft.
+**Returns:** one JSON object with the keys `continuity`, `science` and
+`outline`, each the object the separate critic returned, scored by its rule.
+
+SPEC-EXAM-004, the owner's decision to lower cost: it replaces §4.5, §4.6 and
+§4.7 **at the chapter gate**, so an attempt costs two model critics instead of
+four. The six characteristics, the threshold and the attempts are unchanged. A
+missing key is that characteristic unscored, never a pass. `science-critic`
+still runs the FLOW-3 outline audit; the three separate critics stay on disk for
+the runs made before.
 
 ## 5. Memory management — short and long term
 

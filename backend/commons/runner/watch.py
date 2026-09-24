@@ -31,6 +31,8 @@ AGENTS = {
     # storyMaker (SPEC-EXAM-001 §3): the interviewer at FLOW-0 and the judge at
     # the publish gate. Neither writes canon; both hold `Glob`.
     "interviewer", "judge",
+    # SPEC-EXAM-004: continuity, science and outline scored in one reading.
+    "bible-critic",
 }
 
 

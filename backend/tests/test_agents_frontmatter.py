@@ -35,6 +35,9 @@ EXPECTED = {
     # SPEC-006. It judges the writing, so it needs the draft and nothing else —
     # the same tool list as the critics it joins.
     "prose-critic": {"Glob"},
+    # SPEC-EXAM-004. Scores continuity, science and outline in one reading;
+    # the critics' tool list, because it is a critic.
+    "bible-critic": {"Glob"},
     "style-editor": {"Glob"},
     "publisher": {"Glob"},
     # SPEC-EXAM-001 §3. FLOW-0: it extracts what the buyer said and asks for what

@@ -53,24 +53,31 @@ Count with a command, never by eye. The band is `words_per_chapter.min` to
 `.max`, widened by `tolerance_pct`.
 
 If `chatter` scores 0 — the draft does not begin with `# Chapter`, so it is not a
-chapter yet — redraft on that alone and do not spend four model calls judging the
+chapter yet — redraft on that alone and do not spend two model calls judging the
 prose of something that has to be rebuilt anyway. **Do not take the same
 shortcut when only `length` fails:** an off-band draft is still a chapter, and
 the continuity, science, outline and prose findings are what the redraft is
 steered by. Skipping them there buys a minute and spends it on a worse second
 draft.
 
-**Then dispatch the four model critics in the same message**, as four tool calls
-in one reply — subject to the concurrency sum in SKILL.md §7. Not "one after the
-other quickly": in the same reply. They are independent, they judge a text that
-is already fixed, and nothing either returns changes what the others are asked.
+**Then dispatch the two model critics in the same message**, as two tool calls
+in one reply — subject to the concurrency sum in SKILL.md §7:
 
-This is the easiest minute in the run to lose, and it keeps being lost. Two runs
-were measured: the first ran them in series in two chapters out of four, the
-second in three out of four, with continuity and science starting fifty seconds
-apart on chapter 2. Check yourself afterwards by subtracting the two `ts` values
-you logged; if they are more than a few seconds apart they ran in series, and
-that belongs in the gate row's `note` rather than left for whoever reads the log.
+- **`bible-critic`**, given the four Bible files, this chapter's outline entry
+  with its beats numbered, and the draft. It returns one JSON object with the
+  keys `continuity`, `science` and `outline` (SPEC-EXAM-004). Write each key's
+  object to `critiques/chNN.<characteristic>.json` — `chNN.continuity.json`,
+  `chNN.science.json`, `chNN.outline.json` — as the three separate critics'
+  replies were. **A missing key, or one whose score is not a number, is that
+  characteristic unscored**: excluded from the `min`, noted in the gate row,
+  never a pass. Do not dispatch the three separate critics it replaces
+  (continuity, science, outline); they are kept only for the runs made before.
+- **`prose-critic`**, given the draft.
+
+They are independent, they judge a text that is already fixed, and nothing
+either returns changes what the other is asked. Check yourself afterwards by
+subtracting the two `ts` values you logged; if they are more than a few seconds
+apart they ran in series, and that belongs in the gate row's `note`.
 
 ### Scoring `prose`
 
@@ -128,7 +135,7 @@ you:
 
 - **`patch`** — apply the critics' own replacement sentences by literal
   substitution, then rescore with `"patched": true`. For `length` and `chatter`
-  this is trivial — trim words, fix the first line. For the four model
+  this is trivial — trim words, fix the first line. For the four model-scored
   characteristics it is the sentence the critic proposed, which you **arbitrate
   before applying**: a false finding has been overruled before, and a replacement
   built on one would write the error into the book by hand.

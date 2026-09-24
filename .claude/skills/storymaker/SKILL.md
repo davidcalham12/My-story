@@ -109,18 +109,29 @@ are.
 
 ## 3. The gate
 
-Six characteristics, from `quality_gate.critics`. Four are subagents; two are
-arithmetic you run in the shell, which is why those two reproduce and the other
-four do not.
+Six characteristics, from `quality_gate.critics`. **Two model critics score
+four of them**; two are arithmetic you run in the shell, which is why those two
+reproduce and the other four do not.
 
 | characteristic | who runs it | against what |
 |---|---|---|
-| `continuity` | `continuity-critic` | the Bible |
-| `science` | `science-critic` | `## Rules` in `bible/world.md` |
-| `outline` | `outline-critic` | this chapter's outline entry, beats numbered |
+| `continuity` | `bible-critic`, key `continuity` | the Bible |
+| `science` | `bible-critic`, key `science` | `## Rules` in `bible/world.md` |
+| `outline` | `bible-critic`, key `outline` | this chapter's outline entry, beats numbered |
 | `prose` | `prose-critic` | the writing itself — quoted findings, **no score** |
 | `length` | you | `wc -w`, inside the band 10, outside 0 |
 | `chatter` | you | 0 if the draft does not begin with `# Chapter` |
+
+**`bible-critic` reads the draft once and answers three questions** (SPEC-EXAM-004,
+the owner's decision to lower cost): one JSON object with the keys `continuity`,
+`science` and `outline`, each scored by the rule the separate critic used to
+follow. Give it the four Bible files, this chapter's outline entry and the
+draft. Write each key's object to `critiques/chNN.<characteristic>.json`, as the
+separate critics' replies were. **A missing key, or a key whose score is not a
+number, is that characteristic unscored** — excluded from the `min` and noted in
+the gate row, exactly like a critic that returned nothing, and never a pass.
+The three separate critics are still in `.claude/agents/` for the runs made
+before; do not dispatch them.
 
 `outline` exists because the others all ask whether the draft is *correct* and
 none asked whether it was *the chapter the outline commissioned*: a draft that
@@ -244,7 +255,7 @@ question that can no longer be asked.
 
   ```json
   {"critic": "continuity", "chapter": 2, "kind": "model",
-   "agent": "continuity-critic", "drafts": 2,
+   "agent": "bible-critic", "drafts": 2,
    "iterations": [
      {"iteration": 1, "score": 4, "findings": [
        {"kind": "timeline-math", "severity": "high",
@@ -307,8 +318,8 @@ send:
 - **The ceiling is enforced on every orchestrator turn.** A turn whose context
   exceeds 100,000 tokens halts the run with `halted: context`, naming the unit.
   The agents' packets keep their existing check.
-- **Concurrency.** Dispatch the four model critics in parallel only if your last
-  measured context plus four critic packets — estimated at **words × 1.35** —
+- **Concurrency.** Dispatch the two model critics in parallel only if your last
+  measured context plus two critic packets — estimated at **words × 1.35** —
   fits under 100,000; otherwise send them in two rounds. The sum before dispatch
   is `estimated`, the figure after it is `measured`, and nothing is reserved:
   Python does not assemble your prompts and cannot reserve on your behalf.
