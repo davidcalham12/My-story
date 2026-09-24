@@ -83,3 +83,16 @@ describe('titleOf — the book, not the slug', () => {
     expect(titleOf(run({ slug: 'the-other-side-of-the-hill' }))).toBe('The Other Side of the Hill')
   })
 })
+
+describe('plainStatus — a complete run that published nothing', () => {
+  it('is "No book", never "Ready to read" nor "Checking…" (leo-and-the-other-side-of-the-hill)', () => {
+    const run = {
+      id: '8dc162a1d8ec', slug: 'leo-and-the-other-side-of-the-hill', premise: 'p',
+      profile: 'exam', tone: null, stage: 'complete', halted: null, halted_detail: null,
+      published_chapters: null, chapters_planned: 10, published_versions: [],
+    } as unknown as Run
+    const status = plainStatus(run, false)
+    expect(status.label).toBe('No book')
+    expect(status.readable).toBe(false)
+  })
+})
