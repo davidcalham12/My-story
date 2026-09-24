@@ -64,6 +64,12 @@ class NotFound(Exception):
     pass
 
 
+class OrchestrationRefused(BriefNotReady):
+    """The config asks for a combination that cannot run as asked (SPEC-EXAM-006
+    AC-5d). A `BriefNotReady` so the router answers it as it answers any refusal
+    to start: nothing was created, and the sentence says why."""
+
+
 def slugify(premise: str) -> str:
     """A fallback only.
 
@@ -223,6 +229,9 @@ class RunService:
             run_id = uuid.uuid4().hex[:12]
             slug = unique_slug(self.conn, slugify(premise))
             cfg = loader.resolve(profile)
+            refused = conductor.refusal(cfg, single=self.settings.single_orchestrator)
+            if refused:
+                raise OrchestrationRefused(refused)
             if chapters is not None:
                 # Into the snapshot, which is what every stage reads.
                 cfg["novel"]["chapters"] = chapters
@@ -282,6 +291,9 @@ class RunService:
             cfg = json.loads(self.conn.execute(
                 "SELECT config_snapshot FROM runs WHERE id = ?", (run_id,)
             ).fetchone()["config_snapshot"])
+            refused = conductor.refusal(cfg, single=self.settings.single_orchestrator)
+            if refused:
+                raise OrchestrationRefused(refused)
             # The halt that is being resumed past stops being the run's state.
             # It stays in `events` and in the warnings; the row says running.
             with self.conn:
@@ -322,6 +334,7 @@ class RunService:
             cfg=cfg, on_event=on_event, process_factory=factory,
             max_budget_usd=self.ceiling_for(cfg),
             seq=self._last_seq(live.run_id),
+            chapter_loop=self._chapter_loop(live, run_dir, cfg),
         )
         live.process = maestro             # `halt` stops the unit in flight
         try:
@@ -335,6 +348,26 @@ class RunService:
             halted = ("interrupted", str(exc)[:500])
         finally:
             self._finish(live, state, halted)
+
+    def _chapter_loop(self, live: Live, run_dir: Path, cfg: dict):
+        """SPEC-EXAM-006: the Python loop for chapter units, or None on the
+        default path. The conductor hands it what the run has left to spend."""
+        if conductor.chapter_loop_mode(cfg) != "python":
+            return None
+        from backend.chapters import loop
+
+        runner = getattr(self, "_loop_runner", None) or loop.real_runner(
+            Path(self.settings.repo_root))
+
+        stop = threading.Event()
+
+        def run_one(n: int, left: float | None):
+            return loop.run_chapter(run_dir, n, runner=runner, conn=self.conn,
+                                    run_id=live.run_id, ceiling_usd=left, stop=stop)
+
+        # `halt` reaches the conductor, and through this the loop's processes.
+        run_one.stop = stop.set
+        return run_one
 
     def _last_seq(self, run_id: str) -> int:
         """Where this run's stream got to, so a resumed one carries on counting.

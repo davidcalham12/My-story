@@ -92,9 +92,32 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
     total_budget = (float(_os.environ["NOVAFORGE_CHANGE_BUDGET_USD"])
                     if _os.environ.get("NOVAFORGE_CHANGE_BUDGET_USD") else None)
     spent = 0.0
+    looped = bool(profile) and chapter_loop_mode(profile[0]) == "python"
+    run_id = _run_id(conn, run_dir.name)
 
     verdicts: dict[int, bool] = {}
     for n in chapters:
+        if looped:
+            # SPEC-EXAM-006: the loop on the version workspace instead of a unit
+            # process. The procedure pin does not govern it; its tests do.
+            from backend.chapters import loop
+
+            outcome = loop.run_chapter(
+                workspace, n, runner=loop.real_runner(settings.repo_root), conn=conn,
+                run_id=run_id,
+                ceiling_usd=total_budget if total_budget is not None else 15.0,
+                spent_usd=spent if total_budget is not None else 0.0,
+                change_note=(f"Reader change: wherever the Bible or the outline once said "
+                             f"{(old or fact_id)!r}, it now says {to!r}. "
+                             f"Write the chapter so it holds."),
+                slug=f"{run_dir.name}/{workspace.name}")
+            spent += outcome.cost_usd
+            if outcome.halted and outcome.halted[0] in ("budget", "api"):
+                raise UnitCut(outcome.halted[0], n)
+            promoted = workspace / "chapters" / f"ch{n:02d}.md"
+            verdicts[n] = promoted.is_file()
+            _personalise(promoted, alias)
+            continue
         prompt = (prompt_for(Unit("chapter", n), slug=run_dir.name, run_dir=workspace)
                   + f"\nReader change: wherever the Bible or the outline once said "
                     f"{(old or fact_id)!r}, it now says {to!r}. "
@@ -137,6 +160,21 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
     return verdicts
 
 
+def _personalise(promoted: Path, alias: str | None) -> None:
+    """The loop path's copy of the step above: the model wrote the token, code
+    puts the alias in its place, and the anonymised text is kept beside it."""
+    import shutil as _shutil
+
+    from backend.publish import personalise
+
+    if not promoted.is_file() or not alias:
+        return
+    _shutil.copyfile(promoted, promoted.with_name(f"{promoted.stem}.anon.md"))
+    text = promoted.read_text(encoding="utf-8")
+    promoted.write_text(text.replace(personalise.TOKEN, alias),
+                        encoding="utf-8", newline="\n")
+
+
 class UnitCut(Exception):
     """A chapter unit the CLI or the API stopped — not a gate refusal."""
 
@@ -168,6 +206,15 @@ def orchestrator_model(profile: str) -> str | None:
     from backend.commons.config import loader
 
     return (loader.resolve(profile).get("models") or {}).get("orchestrator")
+
+
+def chapter_loop_mode(profile: str) -> str:
+    """`orchestration.chapter_loop` as the profile says now, like
+    `orchestrator_model`: a v1 snapshot predates the switch."""
+    from backend.chapters.loop import mode
+    from backend.commons.config import loader
+
+    return mode(loader.resolve(profile))
 
 
 def unit_process(prompt: str, *, model: str | None, max_budget_usd: float,

@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator
 
+from backend.chapters.loop import mode as chapter_loop_mode
 from backend.commons.db import repository as write_repo
 from backend.commons.runner.process import RunProcess
 from backend.commons.runner.watch import ContextWatcher, State, WatchTripped, apply
@@ -160,6 +161,22 @@ class Outcome:
     largest_turn: dict[str, int] = field(default_factory=dict)
 
 
+def refusal(cfg: dict, *, single: bool) -> str | None:
+    """The sentence a run is refused with, or None.
+
+    The single orchestrator writes the whole novel in one process and has no
+    chapter units to hand the loop. Ignoring the switch there would run a novel
+    the owner asked to run otherwise, so the pair is refused before anything
+    starts (SPEC-EXAM-006 §2, AC-5d).
+    """
+    if single and chapter_loop_mode(cfg) == "python":
+        return ('orchestration.chapter_loop = "python" needs the conductor, and '
+                "NOVAFORGE_ORCHESTRATOR=single runs the whole novel in one process with "
+                "no chapter units to hand the loop; unset one of the two. Nothing was "
+                "started.")
+    return None
+
+
 #: `(unit, prompt, budget_left)`. The third argument is what the **run** has
 #: left to spend, not what the unit may have: a factory that makes a child has
 #: to know what the child may spend, so the signature says so.
@@ -184,6 +201,13 @@ class Conductor:
     #: Set by `run()` so whoever owns the conductor can stop the live child.
     process: object | None = None
     seq: int = 0
+    #: SPEC-EXAM-006: `(chapter, budget_left) -> chapters.loop.Outcome`. Used for
+    #: chapter units only when the config's `orchestration.chapter_loop` is
+    #: `"python"`; otherwise never called.
+    chapter_loop: Callable[[int, "float | None"], object] | None = None
+    #: What the loop's own processes cost. Their `result` events never reach this
+    #: conductor's stream, and the run's ceiling has to count them.
+    loop_spent: float = 0.0
 
     def _spawn(self, unit: Unit, budget_left: float | None) -> object:
         return self.process_factory(
@@ -204,7 +228,7 @@ class Conductor:
         """
         if self.max_budget_usd is None:
             return None
-        return max(0.0, self.max_budget_usd - (spent or 0.0))
+        return max(0.0, self.max_budget_usd - (spent or 0.0) - self.loop_spent)
 
     def prepare(self) -> None:
         """Make the workspace the units are told to write into.
@@ -249,6 +273,10 @@ class Conductor:
             # half an hour on 2026-09-23 after their servers were killed
             # (red-team case 9). One child, owned, at a time.
             raise RuntimeError("a unit of this run is already in flight")
+        looped = chapter_loop_mode(self.cfg) == "python"
+        if looped and self.chapter_loop is None:
+            raise RuntimeError('orchestration.chapter_loop is "python" and no chapter '
+                               "loop was handed to the conductor")
         self.prepare()
         outcome = Outcome()
         ceiling = int(self.cfg["context"]["max_concurrent_tokens"])
@@ -266,6 +294,20 @@ class Conductor:
                 outcome.halted = ("budget", f"{unit.name}: the run's ceiling of "
                                             f"${self.max_budget_usd:.2f} is spent")
                 return outcome
+
+            if looped and unit.key == "chapter":
+                outcome.units_run.append(unit)
+                result = self.chapter_loop(unit.chapter, left)
+                self.loop_spent += float(getattr(result, "cost_usd", 0.0) or 0.0)
+                halted = getattr(result, "halted", None)
+                if halted is None and not is_done(unit, self.run_dir):
+                    missing = [rel for rel in unit.outputs
+                               if not (self.run_dir / rel).is_file()]
+                    halted = ("process", f"ended without: {', '.join(missing)}")
+                if halted:
+                    outcome.halted = (halted[0], f"{unit.name}: {halted[1]}")
+                    return outcome
+                continue
 
             watcher = ContextWatcher(ceiling=ceiling, halt_on_orchestrator_turn=True)
             process = self._spawn(unit, left)
@@ -326,6 +368,9 @@ class Conductor:
         process = self.process
         if process is not None:
             process.stop()
+        stop_loop = getattr(self.chapter_loop, "stop", None)
+        if stop_loop is not None:
+            stop_loop()
 
 
 def real_process(run_dir: Path, *, cwd: Path, max_budget_usd: float | None,
