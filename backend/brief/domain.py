@@ -20,6 +20,7 @@ buyer writes freely, so it is the only field an attacker controls; brief 04 puts
 from __future__ import annotations
 
 import json
+from datetime import date
 import unicodedata
 from pathlib import Path
 from typing import Literal
@@ -158,6 +159,35 @@ def _contradictions(brief: Brief) -> list[str]:
     return found
 
 
+def _temporal(brief: Brief, today: date | None = None) -> list[str]:
+    """Dates that cannot all be true, compared as ISO strings.
+
+    Two checks, both arithmetic: a dated memory earlier than the birth date,
+    and an age more than a year away from what the birth date gives. No birth
+    date, no claim — absent is never zero, and an invented date is an invented
+    contradiction. Whether a man married at nine is a judgement, not a date
+    comparison, and is left to the chronology validator.
+    """
+    born = brief.recipient.birth_date
+    if not born:
+        return []
+    found = []
+    for memory in brief.memories:
+        if memory.date and memory.date[:len(born)] < born[:len(memory.date)]:
+            found.append(
+                f"memory {memory.text!r} is dated {memory.date}, before "
+                f"recipient.birth_date {born}. Correct the date or the birth date.")
+    age = brief.recipient.age
+    if age is not None and born[:4].isdigit():
+        today = today or date.today()
+        expected = today.year - int(born[:4])
+        if abs(expected - age) > 1:
+            found.append(
+                f"recipient.age is {age} and recipient.birth_date is {born} "
+                f"(about {expected} today). Correct one of them.")
+    return found
+
+
 def check(payload: dict) -> CheckResult:
     """FLOW-0's verdict on a brief, before a token is spent.
 
@@ -178,7 +208,7 @@ def check(payload: dict) -> CheckResult:
 
     questions = [question for field, question in REQUIRED.items()
                  if not _present(brief, field)]
-    contradictions = _contradictions(brief)
+    contradictions = _contradictions(brief) + _temporal(brief)
     status: Status = ("contradiction" if contradictions
                       else "incomplete" if questions else "ok")
     return CheckResult(status=status, questions=questions,
@@ -205,6 +235,11 @@ def facts(brief: Brief) -> list[Fact]:
     """
     rows = [Fact(text=text, kind="mandatory", source="brief", mandatory=True)
             for text in brief.mandatory_facts]
+    # Dated memories go to the chronology, date first so the ingest can sort
+    # them. Not mandatory: the memory's text is already promised elsewhere.
+    rows += [Fact(text=f"{m.date} — {m.text}", kind="chronology", source="brief",
+                  mandatory=False)
+             for m in brief.memories if m.date]
     if brief.free_text.strip():
         # Not split, not summarised, not paraphrased — a fact about nothing is
         # what an empty box would otherwise produce, and a paraphrase is a model

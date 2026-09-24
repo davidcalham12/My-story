@@ -76,17 +76,13 @@ EXPECTED: dict[str, dict] = {
                "source=freetext, verbatim and whole.",
     },
     "05-incoherencia-temporal": {
-        "expect_status": "invalid",
-        "why": "and the reason is not the one the file was written for. The "
-               "fixture carries `recipient.birth_date`, a twelfth key the "
-               "schema does not declare, and the brief is refused rather than "
-               "having it silently dropped — a birth date accepted and "
-               "discarded is the temporal validator reading a brief that never "
-               "said when the man was born. Remove that key and the brief is "
-               "`ok`: the memories put Iker at university three years before he "
-               "was born and at his own wedding aged nine, and **nothing in "
-               "FLOW-0 looks at a date**. That is what this brief is for, and "
-               "this table is not where it is answered.",
+        "expect_status": "contradiction",
+        "why": "for the reason the file was written: `recipient.birth_date` is "
+               "declared (owner's order, 2026-09-24) and FLOW-0 compares every "
+               "dated memory with it. The paella at university is dated three "
+               "years before the birth, and the refusal names that memory. The "
+               "wedding aged nine is a judgement, not a date comparison, and is "
+               "left to `lean_chronology`, which is not run (elan unavailable)."
     },
 }
 
@@ -225,37 +221,14 @@ def table(rows: list[dict]) -> str:
 
     temporal = next((r for r in rows if r["id"] == "05-incoherencia-temporal"), None)
     if temporal:
-        stripped = load(BRIEFS / "05-incoherencia-temporal.json")
-        stripped["recipient"] = {k: v for k, v in stripped["recipient"].items()
-                                 if k != "birth_date"}
-        after = domain.check(stripped).status
         out += [
             "## Brief 05, and the limit of this table",
             "",
-            "As committed it is `invalid`, and for a schema reason rather than "
-            "the one",
-            "it was written for: it declares `recipient.birth_date` and the "
-            "schema has",
-            "no such field. Refusing beats dropping it — a birth date accepted "
-            "and",
-            "discarded is the temporal validator reading a brief that never "
-            "said when",
-            "the man was born.",
-            "",
-            f"With that one key removed the same brief reads **{after}**. The "
-            "memories",
-            "still put Iker at university three years before he was born and at "
-            "his own",
-            "wedding aged nine. FLOW-0 does not look at a date, so it cannot "
-            "see any of",
-            "it, and this is the brief that says so out loud.",
-            "",
-            "`lean_chronology` is the validator written to fail it, and it has "
-            "no writer",
-            "yet: two of eleven validators reach the `validations` table today.",
-            "So the incoherence in this brief is currently caught by **nothing**,"
-            " and",
-            "that sentence is the finding.",
+            "FLOW-0 now reads dates: a dated memory before `recipient.birth_date`,",
+            "or an age more than a year off the birth date, is a contradiction",
+            "named on both sides. What it cannot see is a date that is possible",
+            "but implausible (a wedding at nine): that is `lean_chronology`'s",
+            "job, and `lean_chronology` is **not run: elan unavailable**.",
             "",
         ]
 

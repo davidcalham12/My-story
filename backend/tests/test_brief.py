@@ -159,7 +159,7 @@ def test_a_fact_from_the_brief_is_not_a_fact_from_the_free_text():
     brief = domain.parse(example("01-hijo.json"))
     facts = domain.facts(brief)
     assert {f.source for f in facts} == {"brief", "freetext"}
-    mandatory = [f for f in facts if f.source == "brief"]
+    mandatory = [f for f in facts if f.kind == "mandatory"]
     assert len(mandatory) == 3 and all(f.mandatory for f in mandatory)
     assert not any(f.mandatory for f in facts if f.source == "freetext")
 
@@ -200,7 +200,7 @@ def test_the_model_has_exactly_the_keys_the_spec_names():
     }
     from backend.brief.models import Memory, Recipient
     assert set(Recipient.model_fields) == {
-        "alias", "age", "pronouns", "traits", "relationship_to_buyer"}
+        "alias", "age", "pronouns", "birth_date", "traits", "relationship_to_buyer"}
     assert set(Memory.model_fields) == {"text", "date"}
 
 
@@ -251,32 +251,43 @@ def test_brief_03_is_both_missing_data_and_a_contradiction():
     assert any("memor" in q.lower() for q in result.questions)
 
 
-def test_brief_05_holds_a_field_this_contract_does_not_declare():
-    """`recipient.birth_date`, and it is reported rather than swallowed.
+def test_brief_05_declares_a_birth_date_and_the_schema_accepts_it():
+    """`recipient.birth_date` is declared (owner's order, 2026-09-24), so the
+    brief is parsed whole instead of refused for an undeclared key."""
+    brief = domain.parse(example("05-incoherencia-temporal.json"))
+    assert brief.recipient.birth_date == "1986-04-12"
 
-    The five files are the contract and this one asks for a twelfth key. Two
-    honest outcomes exist — widen `Recipient` or drop the key from the fixture —
-    and both are the owner's to choose, so what this phase does is refuse
-    silently dropping it: a birth date accepted and discarded is the temporal
-    validator reading a brief that never said when the man was born.
-    """
+
+def test_brief_05_is_temporally_incoherent_and_flow0_now_sees_it():
+    """Which is the whole reason the file exists: the memories put Iker at
+    university three years before he was born. FLOW-0 compares every dated
+    memory with the birth date and names the one that cannot be."""
     result = domain.check(example("05-incoherencia-temporal.json"))
-    assert result.status == "invalid"
-    assert any("birth_date" in e for e in result.errors), result.errors
+    assert result.status == "contradiction", result
+    assert any("1983-10" in c and "1986-04-12" in c for c in result.contradictions)
 
 
-def test_brief_05_is_temporally_incoherent_and_this_phase_cannot_see_it():
-    """Which is the whole reason the file exists.
-
-    With the undeclared key removed it is a complete, contradiction-free brief:
-    the memories put Iker at university three years before he was born and at
-    his own wedding aged nine, and nothing in E2 looks at a date. It passes
-    here, and `lean_chronology` is what it is written to fail.
-    """
+def test_an_age_that_does_not_match_the_birth_date_is_a_contradiction():
     payload = example("05-incoherencia-temporal.json")
-    payload["recipient"] = {k: v for k, v in payload["recipient"].items()
-                            if k != "birth_date"}
+    payload["memories"] = []
+    payload["recipient"]["age"] = 12
+    result = domain.check(payload)
+    assert any("birth_date" in c and "age" in c for c in result.contradictions)
+
+
+def test_no_birth_date_means_no_temporal_claim():
+    """Absent is never zero: without a birth date nothing is compared."""
+    payload = example("05-incoherencia-temporal.json")
+    payload["recipient"].pop("birth_date")
     assert domain.check(payload).status == "ok"
+
+
+def test_dated_memories_become_chronology_facts():
+    rows = domain.facts(domain.parse(example("05-incoherencia-temporal.json")))
+    chrono = [r for r in rows if r.kind == "chronology"]
+    assert len(chrono) == 3
+    assert any(r.text.startswith("1983-10") for r in chrono)
+    assert not any(r.mandatory for r in chrono)
 
 
 def test_the_five_briefs_are_served_whole_including_the_ones_that_fail():

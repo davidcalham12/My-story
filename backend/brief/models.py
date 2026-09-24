@@ -56,6 +56,9 @@ class Recipient(BaseModel):
     alias: str | None = None
     age: int | None = None
     pronouns: str | None = None
+    # ISO date, "YYYY-MM" or "YYYY-MM-DD". Declared on the owner's order of
+    # 2026-09-24 so brief 05 reaches the temporal check. `None` claims nothing.
+    birth_date: str | None = None
     traits: list[str] = Field(default_factory=list)
     relationship_to_buyer: str | None = None
 

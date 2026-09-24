@@ -69,13 +69,8 @@ def test_two_of_the_five_do_not_pass_and_that_is_the_point():
 
     assert set(refused) == {"03-faltan-datos", "05-incoherencia-temporal"}, statuses
     assert refused["03-faltan-datos"] == "contradiction"
-    assert refused["05-incoherencia-temporal"] == "invalid"
-
-    stripped = brief("05-incoherencia-temporal")
-    stripped["recipient"] = {k: v for k, v in stripped["recipient"].items()
-                             if k != "birth_date"}
-    assert domain.check(stripped).status == "ok", (
-        "with the undeclared key gone, FLOW-0 cannot see the incoherence at all")
+    assert refused["05-incoherencia-temporal"] == "contradiction", (
+        "since birth_date is declared, 05 is refused for the reason it was written")
 
 
 def test_the_injection_is_a_row_and_never_an_instruction():

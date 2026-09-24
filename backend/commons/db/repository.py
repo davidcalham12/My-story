@@ -58,7 +58,9 @@ def save_brief_facts(conn, run_id: str, facts) -> int:
             # person the book is for is a `recipient` fact there, and the
             # translation happens here rather than by widening the CHECK, which
             # would let the two vocabularies drift into one muddle.
-            kind = "freetext" if fact.source == "freetext" else "recipient"
+            # A dated memory is already the Bible's vocabulary: `chronology`.
+            kind = ("freetext" if fact.source == "freetext" else
+                    "chronology" if fact.kind == "chronology" else "recipient")
             cur = conn.execute(
                 "INSERT OR IGNORE INTO facts (run_id, kind, text, source, mandatory) "
                 "VALUES (?,?,?,?,?)",

@@ -1,7 +1,7 @@
 # Eval results
 
 FLOW-0 over the five committed briefs, read from the code that decides
-it, 2026-09-23 21:29 UTC. Profile for the novel half: `eval`.
+it, 2026-09-24 15:27 UTC. Profile for the novel half: `eval`.
 
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
@@ -16,7 +16,7 @@ phase -- see below.
 | `02-pareja` | ok | ok | 0 | 0 | as expected |
 | `03-faltan-datos` | contradiction | contradiction | 2 | 1 | as expected |
 | `04-adversarial` | ok | ok | 0 | 0 | as expected |
-| `05-incoherencia-temporal` | invalid | invalid | 0 | 0 | as expected |
+| `05-incoherencia-temporal` | contradiction | contradiction | 0 | 1 | as expected |
 
 ## What each row is for
 
@@ -29,25 +29,16 @@ phase -- see below.
 
 **`04-adversarial`** — the injection is in the free text, so the brief is valid. What is on trial is what the free text BECOMES: one row, source=freetext, verbatim and whole.
 
-**`05-incoherencia-temporal`** — and the reason is not the one the file was written for. The fixture carries `recipient.birth_date`, a twelfth key the schema does not declare, and the brief is refused rather than having it silently dropped — a birth date accepted and discarded is the temporal validator reading a brief that never said when the man was born. Remove that key and the brief is `ok`: the memories put Iker at university three years before he was born and at his own wedding aged nine, and **nothing in FLOW-0 looks at a date**. That is what this brief is for, and this table is not where it is answered.
+**`05-incoherencia-temporal`** — for the reason the file was written: `recipient.birth_date` is declared (owner's order, 2026-09-24) and FLOW-0 compares every dated memory with it. The paella at university is dated three years before the birth, and the refusal names that memory. The wedding aged nine is a judgement, not a date comparison, and is left to `lean_chronology`, which is not run (elan unavailable).
+  > memory 'He cooked his first paella at university in Bilbao' is dated 1983-10, before recipient.birth_date 1986-04-12. Correct the date or the birth date.
 
 ## Brief 05, and the limit of this table
 
-As committed it is `invalid`, and for a schema reason rather than the one
-it was written for: it declares `recipient.birth_date` and the schema has
-no such field. Refusing beats dropping it — a birth date accepted and
-discarded is the temporal validator reading a brief that never said when
-the man was born.
-
-With that one key removed the same brief reads **ok**. The memories
-still put Iker at university three years before he was born and at his own
-wedding aged nine. FLOW-0 does not look at a date, so it cannot see any of
-it, and this is the brief that says so out loud.
-
-`lean_chronology` is the validator written to fail it, and it has no writer
-yet: two of eleven validators reach the `validations` table today.
-So the incoherence in this brief is currently caught by **nothing**, and
-that sentence is the finding.
+FLOW-0 now reads dates: a dated memory before `recipient.birth_date`,
+or an age more than a year off the birth date, is a contradiction
+named on both sides. What it cannot see is a date that is possible
+but implausible (a wedding at nine): that is `lean_chronology`'s
+job, and `lean_chronology` is **not run: elan unavailable**.
 
 ## Brief 04, in detail
 

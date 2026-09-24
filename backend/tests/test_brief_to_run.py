@@ -142,7 +142,7 @@ def test_the_buyers_promises_become_mandatory_rows_and_the_free_text_does_not(sv
     rows = db.execute(
         "SELECT kind, text, source, mandatory FROM facts WHERE run_id = ?",
         (started["id"],)).fetchall()
-    promises = [r for r in rows if r["source"] == "brief"]
+    promises = [r for r in rows if r["kind"] == "recipient"]
     freetext = [r for r in rows if r["source"] == "freetext"]
 
     assert len(promises) == 3 and all(r["mandatory"] == 1 for r in promises)
