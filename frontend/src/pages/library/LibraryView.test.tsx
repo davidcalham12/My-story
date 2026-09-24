@@ -21,8 +21,7 @@ const run = (over: Partial<Run>): Run => ({
   trashed_at: null, live: false, complete: false, stopped: true,
   resume_from: 'outline-audit', resume_stage: 'FLOW-3',
   spent_usd: 25.8, spent_provenance: 'measured',
-  asks_for_figure: true, figure_reason: 'this novel stopped on its budget ceiling',
-  ceiling_left_usd: null, context_refusal: null,
+  ceiling_usd: 25, context_refusal: null,
   ...over,
 })
 
@@ -44,6 +43,7 @@ const props = (over: Partial<Props> = {}): Props => ({
   runs: [STOPPED, COMPLETE, LIVE],
   binned: [BINNED],
   published: { done: true },
+  versions: { done: [1, 2, 3] },
   confirming: null,
   notice: null,
   error: null,
@@ -91,19 +91,23 @@ const card = (html: string, id: string) => {
   return html.slice(start, next === -1 ? undefined : next)
 }
 
-describe('AC-6: a stopped card offers both, and nothing else does', () => {
+describe('AC-6: a stopped card offers both; §8: every novel but a live one can be binned', () => {
   it('shows "Continue" and "Move to bin" on a stopped novel', () => {
     const html = renderToStaticMarkup(<LibraryView {...props()} />)
     expect(card(html, 'stopped')).toContain('Continue')
     expect(card(html, 'stopped')).toContain('Move to bin')
   })
 
-  it('offers neither on a complete novel or a live one', () => {
+  it('offers "Move to bin" but not "Continue" on a complete novel', () => {
     const html = renderToStaticMarkup(<LibraryView {...props()} />)
-    for (const id of ['done', 'live']) {
-      expect(card(html, id)).not.toContain('Continue')
-      expect(card(html, id)).not.toContain('Move to bin')
-    }
+    expect(card(html, 'done')).toContain('Move to bin')
+    expect(card(html, 'done')).not.toContain('Continue')
+  })
+
+  it('offers neither on a live one', () => {
+    const html = renderToStaticMarkup(<LibraryView {...props()} />)
+    expect(card(html, 'live')).not.toContain('Continue')
+    expect(card(html, 'live')).not.toContain('Move to bin')
   })
 
   it('treats a run that ended "complete" with units missing as stopped', () => {
@@ -132,6 +136,16 @@ describe('AC-6: the bin asks once, and restores', () => {
     expect(card(renderToStaticMarkup(<LibraryView {...asking} />), 'stopped')).toMatch(/to the bin\?/)
     button(LibraryView(asking), 'Yes, move', 'stopped').props.onClick()
     expect(onConfirmTrash).toHaveBeenCalledWith(STOPPED)
+  })
+
+  it('names a complete novel’s versions before binning it', () => {
+    const onConfirmTrash = vi.fn()
+    const asking = props({ confirming: 'done', onConfirmTrash })
+    const html = card(renderToStaticMarkup(<LibraryView {...asking} />), 'done')
+    expect(html).toMatch(/to the bin\?/)
+    expect(html).toContain('v1, v2, v3 will be moved to the bin')
+    button(LibraryView(asking), 'Yes, move', 'done').props.onClick()
+    expect(onConfirmTrash).toHaveBeenCalledWith(COMPLETE)
   })
 
   it('has a "Bin" view that lists binned runs, and only those', () => {
@@ -164,8 +178,8 @@ describe('AC-6: the bin asks once, and restores', () => {
 type DialogProps = Parameters<typeof ContinueDialog>[0]
 
 const dialog = (over: Partial<DialogProps> = {}): DialogProps => ({
-  run: STOPPED, ceiling: '', busy: false, error: null,
-  onCeiling: () => {}, onConfirm: () => {}, onCancel: () => {},
+  run: STOPPED, busy: false, error: null,
+  onConfirm: () => {}, onCancel: () => {},
   ...over,
 })
 
@@ -187,30 +201,27 @@ describe('AC-6: before anything starts, the panel says what it knows', () => {
     expect(html).not.toContain('$0.00')
   })
 
-  it('asks for a ceiling in USD when the halt was budget, and waits for it', () => {
-    const html = renderToStaticMarkup(<ContinueDialog {...dialog()} />)
-    expect(html).toContain('type="number"')
-    expect(html).toContain('USD')
-    expect(button(ContinueDialog(dialog()), 'Continue').props.disabled).toBe(true)
-    expect(button(ContinueDialog(dialog({ ceiling: '0' })), 'Continue').props.disabled).toBe(true)
-
+  it('never asks for a figure, even after a budget halt: it shows the ceiling as information', () => {
+    const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: run({ halted_detail: null, ceiling_usd: 25 }) })} />)
+    expect(html).not.toContain('<input')
+    expect(html).toMatch(/Ceiling for this continuation: <strong>\$25\.00<\/strong>/)
+    expect(html).toContain('the profile’s, fresh for this continuation')
     const onConfirm = vi.fn()
-    const ready = button(ContinueDialog(dialog({ ceiling: '40', onConfirm })), 'Continue')
-    expect(ready.props.disabled).toBe(false)
-    ready.props.onClick()
+    const go = button(ContinueDialog(dialog({ onConfirm })), 'Continue')
+    expect(go.props.disabled).toBe(false)
+    go.props.onClick()
     expect(onConfirm).toHaveBeenCalled()
   })
 
-  it('does not ask when the profile still has room, and says how much', () => {
-    const roomy = run({ halted: 'user', asks_for_figure: false, figure_reason: null, ceiling_left_usd: 15, spent_usd: 10 })
-    const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: roomy })} />)
-    expect(html).not.toContain('type="number"')
-    expect(html).toContain('$15.00')
-    expect(button(ContinueDialog(dialog({ run: roomy })), 'Continue').props.disabled).toBe(false)
+  it('does not ask either when the spend was never measured', () => {
+    const unmeasured = run({ halted: 'user', spent_usd: null, spent_provenance: 'absent' })
+    const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: unmeasured })} />)
+    expect(html).not.toContain('<input')
+    expect(button(ContinueDialog(dialog({ run: unmeasured })), 'Continue').props.disabled).toBe(false)
   })
 
   it('refuses, and says why, a run that would stop on the 100k ceiling again', () => {
-    const again = run({ halted: 'context', asks_for_figure: false, context_refusal: 'chapter 1 would be sent the same packet again: estimated 104,000 tokens' })
+    const again = run({ halted: 'context', context_refusal: 'chapter 1 would be sent the same packet again: estimated 104,000 tokens' })
     const html = renderToStaticMarkup(<ContinueDialog {...dialog({ run: again })} />)
     expect(html).toContain('estimated 104,000 tokens')
     expect(button(ContinueDialog(dialog({ run: again })), 'Continue').props.disabled).toBe(true)

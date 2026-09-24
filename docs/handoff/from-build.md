@@ -136,14 +136,15 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
 - Migration 019: `runs.trashed_at` and a `changes` table (the coordinating session's design,
   shared with SPEC-EXAM-008). The launch is `kind='generate'`, each continuation
   `kind='continue'`; there is no `run_segments` table. The 008 cost columns stay NULL.
-- `POST /api/runs/{id}/resume {ceiling_usd?}`, `/trash`, `/restore`, `GET /api/runs?trashed=true`.
+- `POST /api/runs/{id}/resume` (no body since spec §8: the ceiling is the profile's, fresh per continuation), `/trash`, `/restore`, `GET /api/runs?trashed=true`.
   Stopped = units missing (`conductor.first_missing`), not `stage`. Models and orchestration
   come from today's profile for the segment only. `error_max_budget_usd` → `halted='budget'`.
-- Panel: "Continuar" (dialog: why, spent measured or absent, where from, USD figure when
-  asked), "Mover a la papelera" (one confirmation), "Papelera" tab with "Restaurar".
+- Panel: "Continue" (dialog: why, spent measured or absent, where from, and the ceiling as
+  information; since spec §8 it never asks for a figure), "Move to bin" on every novel but a
+  live one (one confirmation; a published one names its versions), "Bin" tab with "Restore".
   Screenshot: `docs/screenshots/007-library.png` (fixture data).
 - Tests: backend 809 → 833 passed (5 skipped); frontend 104 → 119.
-- AC-7 (a real continuation from the web) waits for the owner's go and his ceiling.
+- AC-7 (a real continuation from the web) waits for the owner's go (no figure to type since spec §8).
 
 ## Build session — 2026-09-24, ~21:45 UTC · v3 published (the reader change)
 

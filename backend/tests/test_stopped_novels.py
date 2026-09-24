@@ -131,7 +131,7 @@ def test_the_continuation_is_recorded_as_a_segment(db, tmp_path, argv):
     seg = rows[-1]
     assert seg["orchestrator_model"] == "sonnet"
     assert seg["chapter_loop"] == "claude"
-    assert seg["ceiling_usd"] == pytest.approx(20.0), "tiny's 25 minus the 5 spent"
+    assert seg["ceiling_usd"] == pytest.approx(25.0), "tiny's 25, fresh for this segment (§8)"
     assert seg["ceiling_by"] == "profile"
     assert seg["started_at"] and seg["finished_at"]
     # Two units at $0.40 each (chapters 2, 3) and the finish.
@@ -169,7 +169,7 @@ def test_the_hand_made_resume_block_becomes_segment_two(db, tmp_path, argv):
     }), encoding="utf-8")
     svc = _svc(db, tmp_path)
 
-    svc.resume(RUN_ID, ceiling_usd=10.0, _wait=True)
+    svc.resume(RUN_ID, _wait=True)
 
     rows = [dict(r) for r in db.execute(
         "SELECT n, kind, total_usd, provenance, started_at, note FROM changes "
@@ -187,54 +187,66 @@ def test_the_hand_made_resume_block_becomes_segment_two(db, tmp_path, argv):
 # ------------------------------------------------------------------ AC-2
 
 
-def test_a_budget_halt_is_not_continued_without_a_figure(db, tmp_path, argv):
-    _make_run(db, tmp_path, halted=("budget", "spent $25.80 against a ceiling of $25.00"))
-    svc = _svc(db, tmp_path)
+@pytest.mark.parametrize("halted,spent", [
+    (("budget", "spent $25.80 against a ceiling of $25.00"), 25.8),
+    (("budget", "spent $25.80"), None),
+    (("user", "halted by the user"), 10.0),
+    (("user", "halted by the user"), 25.0),
+    (("user", "halted by the user"), None),
+    (None, 5.0),
+])
+def test_every_continuation_gets_the_profiles_ceiling_fresh(db, tmp_path, argv, halted, spent):
+    """§8: Continue never asks for a figure. Whatever stopped the novel — its
+    budget included — and whether its spend was measured or not, the segment
+    runs under the profile's ceiling, fresh, recorded as the profile's."""
+    _make_run(db, tmp_path, halted=halted, upto=3, spent=spent,
+              stage="FLOW-4" if halted else "complete")
 
-    with pytest.raises(S.CeilingRequired, match="budget"):
-        svc.resume(RUN_ID, _wait=True)
-
-    assert argv == [], "nothing was launched"
-    row = db.execute("SELECT halted FROM runs WHERE id = ?", (RUN_ID,)).fetchone()
-    assert row["halted"] == "budget", "a refusal leaves the halt as it was"
-
-
-def test_with_a_figure_the_cli_ceiling_is_that_figure(db, tmp_path, argv):
-    _make_run(db, tmp_path, halted=("budget", "spent $25.80"), upto=3)
-
-    _svc(db, tmp_path).resume(RUN_ID, ceiling_usd=40.0, _wait=True)
+    out = _svc(db, tmp_path).resume(RUN_ID, _wait=True)
 
     assert [a["unit"] for a in argv] == ["finish"]
-    assert float(_flag(argv[0]["command"], "--max-budget-usd")) == pytest.approx(40.0)
+    assert float(_flag(argv[0]["command"], "--max-budget-usd")) == pytest.approx(25.0)
+    assert out["ceiling_usd"] == pytest.approx(25.0) and out["ceiling_by"] == "profile"
     seg = db.execute("SELECT kind, ceiling_usd, ceiling_by FROM changes "
                      "WHERE run_id = ? ORDER BY n DESC", (RUN_ID,)).fetchone()
     assert seg["kind"] == "continue"
-    assert seg["ceiling_usd"] == pytest.approx(40.0)
-    assert seg["ceiling_by"] == "owner"
+    assert seg["ceiling_usd"] == pytest.approx(25.0)
+    assert seg["ceiling_by"] == "profile"
 
 
-def test_other_halts_get_the_profile_ceiling_minus_the_measured_spend(db, tmp_path, argv):
-    _make_run(db, tmp_path, halted=("user", "halted by the user"), upto=3, spent=10.0)
+def test_novaforge_budget_still_lowers_the_continuations_ceiling(db, tmp_path, argv):
+    _make_run(db, tmp_path, halted=("budget", "spent $25.80"), upto=3, spent=25.8)
 
-    _svc(db, tmp_path).resume(RUN_ID, _wait=True)
+    _svc(db, tmp_path, budget_ceiling_usd=7.0).resume(RUN_ID, _wait=True)
 
-    # tiny's ceiling is 25; the first segment measured 10.
-    assert float(_flag(argv[0]["command"], "--max-budget-usd")) == pytest.approx(15.0)
+    assert float(_flag(argv[0]["command"], "--max-budget-usd")) == pytest.approx(7.0)
 
 
-@pytest.mark.parametrize("spent", [25.0, None])
-def test_nothing_left_or_unmeasured_asks_for_a_figure(db, tmp_path, argv, spent):
-    """Nothing left, or a spend nobody measured: the panel asks, as for budget.
-    An absent spend is not a zero spend, so it cannot be subtracted as one."""
-    _make_run(db, tmp_path, halted=("user", "halted by the user"), upto=3, spent=spent)
-    svc = _svc(db, tmp_path)
+def test_continue_takes_no_figure(db, tmp_path):
+    """No figure is asked for, so none can be passed: not to the service, not in
+    the standing the panel reads, and there is no refusal that wants one."""
+    import inspect
+    assert "ceiling_usd" not in inspect.signature(RunService.resume).parameters
+    assert not hasattr(S, "CeilingRequired")
 
-    with pytest.raises(S.CeilingRequired):
-        svc.resume(RUN_ID, _wait=True)
-    assert argv == []
-    standing = svc.get(RUN_ID)
-    assert standing["asks_for_figure"] is True
-    assert standing["spent_usd"] == spent
+    _make_run(db, tmp_path, halted=("budget", "spent $25.80"), upto=1, spent=None)
+    standing = _svc(db, tmp_path).get(RUN_ID)
+    assert "asks_for_figure" not in standing and "figure_reason" not in standing
+    assert standing["ceiling_usd"] == pytest.approx(25.0), "shown as information"
+    assert standing["spent_usd"] is None, "absent, never 0"
+
+
+def test_the_resume_route_takes_no_body(db, tmp_path, client_for, monkeypatch):
+    client, svc = client_for(db, tmp_path)
+    _make_run(db, tmp_path, halted=("budget", "x"), upto=1)
+    calls = []
+    monkeypatch.setattr(svc, "resume", lambda run_id, **kw: calls.append((run_id, kw)) or
+                        {"id": run_id, "ceiling_usd": 25.0, "ceiling_by": "profile"})
+
+    r = client.post(f"/api/runs/{RUN_ID}/resume")
+
+    assert r.status_code == 200
+    assert calls == [(RUN_ID, {})], "nothing but the run id reaches the service"
 
 
 def test_error_max_budget_usd_ends_as_a_budget_halt(db, run_budget_error):
@@ -304,7 +316,7 @@ def test_stopped_means_units_missing_not_stage(db, tmp_path, argv):
     assert standing["resume_from"] == "chapter 3"
     assert standing["resume_stage"] == "FLOW-4"
 
-    svc.resume(RUN_ID, ceiling_usd=5.0, _wait=True)
+    svc.resume(RUN_ID, _wait=True)
     assert argv[0]["unit"] == "chapter 3"
 
 
@@ -328,30 +340,44 @@ def test_the_refusals_reach_the_panel_with_their_reasons(db, tmp_path, client_fo
     _complete(run_dir, _snapshot())
     r = client.post(f"/api/runs/{RUN_ID}/resume", json={})
     assert r.status_code == 409 and "complete" in r.json()["detail"]
-    r = client.post(f"/api/runs/{RUN_ID}/trash")
-    assert r.status_code == 409 and "complete" in r.json()["detail"]
 
     _make_run(db, tmp_path, run_id="b1", slug="budget-novel", halted=("budget", "x"))
-    r = client.post("/api/runs/b1/resume", json={})
-    assert r.status_code == 422 and "ceiling" in r.json()["detail"]
-
     svc._live = S.Live(run_id="b1")
     r = client.post("/api/runs/b1/trash")
     assert r.status_code == 409 and "live" in r.json()["detail"]
 
 
-def test_trash_refuses_a_live_run_and_a_complete_novel(db, tmp_path):
+def test_trash_refuses_only_a_live_run(db, tmp_path):
     run_dir = _make_run(db, tmp_path, upto=3)
     svc = _svc(db, tmp_path)
     svc._live = S.Live(run_id=RUN_ID)
     with pytest.raises(S.Refused, match="live"):
         svc.trash(RUN_ID)
-
-    svc._live = None
-    _complete(run_dir, _snapshot())
-    with pytest.raises(S.Refused, match="complete"):
-        svc.trash(RUN_ID)
     assert run_dir.is_dir()
+
+
+def test_a_complete_novel_goes_to_the_bin_and_comes_back(db, tmp_path, client_for):
+    """§8.3: every novel can be binned, the complete ones too. Only its
+    `output/<slug>/` moves; the PDFs already copied to `ejemplos/` stay."""
+    client, _ = client_for(db, tmp_path)
+    run_dir = _make_run(db, tmp_path, upto=3, halted=None, stage="complete")
+    _complete(run_dir, _snapshot())
+    ejemplos = tmp_path / "ejemplos"
+    ejemplos.mkdir()
+    (ejemplos / "a-stopped-novel-v1.pdf").write_bytes(b"%PDF-1.7 v1")
+    before, pdfs = _tree(run_dir), _tree(ejemplos)
+
+    r = client.post(f"/api/runs/{RUN_ID}/trash")
+
+    assert r.status_code == 200, r.text
+    assert not run_dir.exists()
+    assert _tree(tmp_path / "_papelera" / SLUG) == before
+    assert _tree(ejemplos) == pdfs, "ejemplos/ is not touched"
+    assert [x["id"] for x in client.get("/api/runs?trashed=true").json()] == [RUN_ID]
+
+    assert client.post(f"/api/runs/{RUN_ID}/restore").status_code == 200
+    assert _tree(run_dir) == before
+    assert _tree(ejemplos) == pdfs
 
 
 def test_the_100k_refusal_is_estimated_and_only_for_the_unit_that_halted(db, tmp_path, argv):

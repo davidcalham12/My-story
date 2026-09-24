@@ -53,7 +53,8 @@ export interface Run {
   /** Set when the run is in the bin (`output/_papelera/<slug>/`). */
   trashed_at?: string | null
   live?: boolean
-  /** Every unit's outputs are on disk: nothing to continue, nothing to bin. */
+  /** Every unit's outputs are on disk: nothing to continue. It can still be
+   *  moved to the bin (§8). */
   complete?: boolean
   /** Units are missing and no process is live — whatever `stage` says. */
   stopped?: boolean
@@ -63,11 +64,9 @@ export interface Run {
   /** Across every segment. `null` when any segment was not measured: never 0. */
   spent_usd?: number | null
   spent_provenance?: Provenance
-  /** Continuing needs a ceiling in USD typed for it, and why. */
-  asks_for_figure?: boolean
-  figure_reason?: string | null
-  /** The profile's ceiling minus the spend, when no figure is asked for. */
-  ceiling_left_usd?: number | null
+  /** The ceiling a continuation runs under: the profile's, fresh for that
+   *  segment (SPEC-EXAM-007 §8). Shown as information; nobody types it. */
+  ceiling_usd?: number | null
   /** Why a continuation would halt again on the 100k ceiling (estimated). */
   context_refusal?: string | null
 }

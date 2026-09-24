@@ -19,14 +19,14 @@ export function Library({ onOpen, onNew }: {
   const [loadError, setLoadError] = useState<string | null>(null)
   // Which runs actually published a book: a "complete" row is not proof there
   // is anything to read, and a stopped one may still have published.
-  const [published, setPublished] = useState<Record<string, boolean>>({})
+  // The version numbers too: binning a novel names the ones it takes along.
+  const [versions, setVersions] = useState<Record<string, number[]>>({})
   const [view, setView] = useState<LibraryPlace>('library')
   const [confirming, setConfirming] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  // The continuation being prepared, and what has been typed for it.
+  // The continuation being prepared. Nothing is typed for it (§8).
   const [continuing, setContinuing] = useState<Run | null>(null)
-  const [ceiling, setCeiling] = useState('')
   const [busy, setBusy] = useState(false)
   const [dialogError, setDialogError] = useState<string | null>(null)
 
@@ -37,7 +37,7 @@ export function Library({ onOpen, onNew }: {
         setRuns(r)
         r.forEach((run) =>
           api.versions(run.id).then(
-            (v) => alive() && setPublished((p) => ({ ...p, [run.id]: v.length > 0 })),
+            (v) => alive() && setVersions((p) => ({ ...p, [run.id]: v.map((row) => row.n).sort((a, b) => a - b) })),
             () => undefined,
           ),
         )
@@ -55,6 +55,8 @@ export function Library({ onOpen, onNew }: {
       alive = false
     }
   }, [load])
+
+  const published = Object.fromEntries(Object.entries(versions).map(([id, v]) => [id, v.length > 0]))
 
   if (loadError) return <p className="panel panel--bad">{loadError}</p>
   if (!runs) return <p className="muted">Reading the library…</p>
@@ -76,7 +78,7 @@ export function Library({ onOpen, onNew }: {
     if (!continuing) return
     setBusy(true)
     setDialogError(null)
-    api.resume(continuing.id, continuing.asks_for_figure ? Number(ceiling) : null).then(
+    api.resume(continuing.id).then(
       () => {
         setBusy(false)
         setContinuing(null)
@@ -96,6 +98,7 @@ export function Library({ onOpen, onNew }: {
         runs={runs}
         binned={binned}
         published={published}
+        versions={versions}
         confirming={confirming}
         notice={notice}
         error={error}
@@ -107,7 +110,6 @@ export function Library({ onOpen, onNew }: {
         onNew={onNew}
         onContinue={(run) => {
           setContinuing(run)
-          setCeiling('')
           setDialogError(null)
         }}
         onTrash={(run) => setConfirming(run.id)}
@@ -121,10 +123,8 @@ export function Library({ onOpen, onNew }: {
       {continuing && (
         <ContinueDialog
           run={continuing}
-          ceiling={ceiling}
           busy={busy}
           error={dialogError}
-          onCeiling={setCeiling}
           onConfirm={confirmContinue}
           onCancel={() => setContinuing(null)}
         />

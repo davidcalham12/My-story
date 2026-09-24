@@ -8,25 +8,21 @@ import { stepOf, titleOf } from '@/entities/run/status'
  * "Continue", before anything is spent (SPEC-EXAM-007 §2).
  *
  * Three things are shown first: why the novel stopped, what it has spent —
- * measured, or absent, never $0 — and where it continues from. A run stopped by
- * its budget does not start without a ceiling typed for this continuation, and
- * one that would stop on the 100k ceiling again is refused with the reason.
+ * measured, or absent, never $0 — and where it continues from. Nothing is asked
+ * (§8): the ceiling is the profile's, fresh for this continuation, and is shown
+ * as information. A run that would stop on the 100k ceiling again is refused
+ * with the reason.
  *
  * Pure: every value and every action comes in as a prop.
  */
-export function ContinueDialog({ run, ceiling, busy, error, onCeiling, onConfirm, onCancel }: {
+export function ContinueDialog({ run, busy, error, onConfirm, onCancel }: {
   run: Run
-  /** What the owner has typed so far, as typed. */
-  ceiling: string
   busy: boolean
   error: string | null
-  onCeiling: (value: string) => void
   onConfirm: () => void
   onCancel: () => void
 }) {
-  const asks = run.asks_for_figure === true
-  const typed = Number(ceiling)
-  const ready = !busy && !run.context_refusal && (!asks || (ceiling.trim() !== '' && typed > 0))
+  const ready = !busy && !run.context_refusal
   const why = haltReason(run) ?? 'it ended before its last chapters were written'
 
   return (
@@ -63,25 +59,10 @@ export function ContinueDialog({ run, ceiling, busy, error, onCeiling, onConfirm
 
         {run.context_refusal ? (
           <p className="panel panel--bad">{run.context_refusal}</p>
-        ) : asks ? (
-          <div className="field">
-            <label htmlFor="continue-ceiling">Ceiling for this continuation (USD)</label>
-            <input
-              id="continue-ceiling"
-              className="asked"
-              type="number"
-              min="0"
-              step="0.01"
-              inputMode="decimal"
-              value={ceiling}
-              onChange={(e) => onCeiling(e.target.value)}
-            />
-            {run.figure_reason && <p className="hint">Asked because {run.figure_reason}.</p>}
-          </div>
         ) : (
           <p>
-            Ceiling for this continuation: <strong>{usd(run.ceiling_left_usd)}</strong>
-            <span className="hint"> — the profile’s, minus what it has already spent.</span>
+            Ceiling for this continuation: <strong>{usd(run.ceiling_usd)}</strong>
+            <span className="hint"> — the profile’s, fresh for this continuation. A safety net: it stops the run if reached.</span>
           </p>
         )}
 

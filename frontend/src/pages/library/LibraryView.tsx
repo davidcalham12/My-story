@@ -10,9 +10,11 @@ export type LibraryPlace = 'library' | 'bin'
  * a different set of characteristics, so a pass rate over them does not measure
  * what it claims. Evidence, not sample.
  *
- * A stopped novel offers "Continue" and "Move to bin". Stopped is the
- * server's word (`run.stopped`: units missing, no process live), not the
- * stage's — the example novel stopped at 8/10 with `stage = complete`.
+ * A stopped novel offers "Continue". Every novel but a live one offers "Move
+ * to bin" (§8), and the confirmation names the versions it would take along.
+ * Stopped is the server's word (`run.stopped`: units missing, no process
+ * live), not the stage's — the example novel stopped at 8/10 with
+ * `stage = complete`.
  *
  * Pure: the page owns the state, this only draws it.
  */
@@ -22,6 +24,8 @@ export function LibraryView(p: {
   /** The bin, or null while it is being read. */
   binned: Run[] | null
   published: Record<string, boolean>
+  /** The version numbers each run has published, when known. */
+  versions: Record<string, number[]>
   /** The run whose move to the bin is waiting for its one confirmation. */
   confirming: string | null
   notice: string | null
@@ -140,6 +144,8 @@ export function LibraryView(p: {
         {sorted.map((run) => {
           const s = status(run)
           const asking = p.confirming === run.id
+          const binnable = run.live !== true && s.tone !== 'live'
+          const vs = p.versions[run.id] ?? []
           return (
             <article key={run.id} data-run={run.id} className="card card--action">
               <div className="row">
@@ -153,9 +159,10 @@ export function LibraryView(p: {
                 <p className="hint">Stopped at: {stepOf(run.resume_stage)} ({run.resume_from})</p>
               )}
               <p className="muted clamp">{run.premise}</p>
-              {run.stopped && asking && (
+              {binnable && asking && (
                 <div className="confirm" role="alert">
                   <p>Move «{titleOf(run)}» to the bin?</p>
+                  {vs.length > 0 && <p>{vs.map((n) => `v${n}`).join(', ')} will be moved to the bin.</p>}
                   <p className="hint">Nothing is deleted; it can be restored from the Bin.</p>
                   <div className="card__actions">
                     <button type="button" className="primary" onClick={() => p.onConfirmTrash(run)}>Yes, move</button>
@@ -166,11 +173,11 @@ export function LibraryView(p: {
               <div className="card__foot">
                 <span className="hint">{run.id}</span>
                 <div className="card__actions">
+                  {binnable && !asking && (
+                    <button type="button" onClick={() => p.onTrash(run)}>Move to bin</button>
+                  )}
                   {run.stopped && !asking && (
-                    <>
-                      <button type="button" onClick={() => p.onTrash(run)}>Move to bin</button>
-                      <button type="button" onClick={() => p.onContinue(run)}>Continue</button>
-                    </>
+                    <button type="button" onClick={() => p.onContinue(run)}>Continue</button>
                   )}
                   <button type="button" className="primary" onClick={() => p.onOpen(run.id)}>
                     Open

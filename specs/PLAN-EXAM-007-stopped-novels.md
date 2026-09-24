@@ -35,3 +35,7 @@ Tests first, seen red. $0 throughout: fake processes, tmp dirs, no `claude`.
 ## Docs
 
 `docs/handoff/from-build.md` gets the block; the spec is unchanged except for §7 already folded in. AC-7 (real demo) is out of scope here. Screenshot: `docs/screenshots/007-library.png`.
+
+## §8 (the owner's change, 2026-09-24)
+
+Continue never asks for a figure: every continuation runs under the profile's ceiling, fresh for its segment (`ceiling_by = 'profile'`), budget halts and unmeasured spends included; `CeilingRequired`, the 422 and `ResumeRun.ceiling_usd` are gone, and the dialog shows the ceiling as information. `--max-budget-usd`, the watcher and `NOVAFORGE_BUDGET` are unchanged. Every novel but a live one can go to the bin, complete ones too; only `output/<slug>/` moves, and the confirmation names the versions ("v1, v2, v3 will be moved to the bin"). This supersedes the AC-2 and AC-5 trash rows above: `test_every_continuation_gets_the_profiles_ceiling_fresh`, `test_novaforge_budget_still_lowers_the_continuations_ceiling`, `test_continue_takes_no_figure`, `test_the_resume_route_takes_no_body`, `test_trash_refuses_only_a_live_run`, `test_a_complete_novel_goes_to_the_bin_and_comes_back`, and the matching `LibraryView.test.tsx` cases.

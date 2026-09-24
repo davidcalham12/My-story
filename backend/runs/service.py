@@ -78,14 +78,6 @@ class Refused(Exception):
     """
 
 
-class CeilingRequired(Exception):
-    """A continuation that needs a ceiling in USD typed for it (SPEC-EXAM-007 §2).
-
-    A run stopped by its budget, one with nothing left of its profile's
-    ceiling, or one whose spend was never measured, does not start without one.
-    """
-
-
 #: Where a binned run's directory goes, under the output directory. Nothing in
 #: it is deleted; `restore` moves it back (SPEC-EXAM-007 §3).
 BIN = "_papelera"
@@ -214,10 +206,9 @@ class RunService:
 
         spent, provenance = _spent(self._segments(run["id"], run_dir))
         try:
-            left = self._left(run, self._segment_config(run["profile"], snapshot), spent)
-            asks, why = False, None
-        except CeilingRequired as exc:
-            left, asks, why = None, True, str(exc)
+            ceiling = self.ceiling_for(self._segment_config(run["profile"], snapshot))
+        except (KeyError, TypeError, ValueError):
+            ceiling = None
 
         return {
             "live": live,
@@ -228,9 +219,9 @@ class RunService:
             # Across every segment; None when any of them is unmeasured.
             "spent_usd": spent,
             "spent_provenance": provenance,
-            "asks_for_figure": asks,
-            "figure_reason": why,
-            "ceiling_left_usd": left,
+            # What a continuation would run under: the profile's ceiling,
+            # fresh for that segment (§8). Information, never a question.
+            "ceiling_usd": ceiling,
             "context_refusal": (self._context_refusal(run, snapshot, missing, run_dir)
                                 if stopped else None),
         }
@@ -321,34 +312,6 @@ class RunService:
             if key in today:
                 cfg[key] = today[key]
         return cfg
-
-    def _left(self, run: dict, cfg: dict, spent: float | None) -> float:
-        """What a continuation may spend when nobody types a figure (§2).
-
-        The profile's ceiling minus what the run has spent across all its
-        segments. A spend nobody measured cannot be subtracted — absent is not
-        zero — so the panel asks for a figure instead.
-        """
-        if run.get("halted") == "budget":
-            raise CeilingRequired(
-                "this novel stopped on its budget ceiling; continuing needs a new "
-                "ceiling in USD for this continuation")
-        try:
-            ceiling = self.ceiling_for(cfg)
-        except (KeyError, TypeError, ValueError):
-            raise CeilingRequired("this run's profile has no budget ceiling on "
-                                  "record; type a ceiling in USD") from None
-        if spent is None:
-            raise CeilingRequired(
-                f"what this novel has spent is not measured, so the profile's "
-                f"ceiling of ${ceiling:.2f} cannot be reduced by it; type a "
-                f"ceiling in USD")
-        left = ceiling - spent
-        if left <= 0:
-            raise CeilingRequired(
-                f"it has spent ${spent:.2f} of the profile's ceiling of "
-                f"${ceiling:.2f}; nothing is left, so type a ceiling in USD")
-        return left
 
     def detail(self, run_id: str) -> dict:
         return {
@@ -484,8 +447,7 @@ class RunService:
 
         self._conduct(live, cfg, self.get(live.run_id)["slug"])
 
-    def resume(self, run_id: str, *, ceiling_usd: float | None = None,
-               _wait: bool = False) -> dict:
+    def resume(self, run_id: str, *, _wait: bool = False) -> dict:
         """Continue a run that stopped, in the directory it stopped in.
 
         The first real conductor run halted at `cast` with its four Bible files
@@ -500,9 +462,11 @@ class RunService:
 
         SPEC-EXAM-007 adds what a continuation runs under: `models` and
         `orchestration` from the profile as it is today, for this segment only
-        (§7.2), and a ceiling that is the owner's typed figure, or the profile's
-        minus the measured spend (§2). Each continuation is a `changes` row of
-        kind `continue`, in the table SPEC-EXAM-008 shares.
+        (§7.2), and the profile's ceiling, fresh for this segment (§8: the
+        owner types nothing, whatever stopped the novel). The ceiling stays as
+        the safety net it is — `--max-budget-usd` and the watcher both get it,
+        and `NOVAFORGE_BUDGET` still lowers it. Each continuation is a
+        `changes` row of kind `continue`, in the table SPEC-EXAM-008 shares.
         """
         run = self.get(run_id)
         if run.get("trashed_at"):
@@ -520,15 +484,13 @@ class RunService:
             if refused:
                 raise OrchestrationRefused(refused)
             prior = self._segments(run_id, self._dir_of(run))
-            if ceiling_usd is not None:
-                # The owner's figure for this continuation, lowered — never
-                # raised — by NOVAFORGE_BUDGET, as the profile's is.
-                env = self.settings.budget_ceiling_usd
-                ceiling = float(ceiling_usd) if env is None else min(float(ceiling_usd), env)
-                ceiling_by = "owner"
-            else:
-                ceiling = self._left(run, cfg, _spent(prior)[0])
-                ceiling_by = "profile"
+            try:
+                ceiling = self.ceiling_for(cfg)
+            except (KeyError, TypeError, ValueError):
+                raise Refused(f"run {run_id} has no budget ceiling on record in its "
+                              "profile or its snapshot, and a run never starts "
+                              "without one") from None
+            ceiling_by = "profile"
 
             if not read_repo.segments(self.conn, run_id):
                 # Recorded before segments existed: write the ones its row and
@@ -563,15 +525,15 @@ class RunService:
     # -------------------------------------------------------------- the bin
 
     def trash(self, run_id: str) -> dict:
-        """Move a stopped novel to the bin. Nothing is deleted (§3)."""
+        """Move a novel to the bin — any novel, the complete ones too (§8.3).
+
+        Only `output/<slug>/` moves; the PDFs already copied to `ejemplos/` are
+        not touched. Nothing is deleted. Only a live run is refused."""
         run = self.get(run_id)
         if run.get("trashed_at"):
             raise Refused(f"run {run_id} is already in the bin")
         if run["live"]:
             raise Refused(f"run {run_id} is live; halt it before moving it to the bin")
-        if run["complete"]:
-            raise Refused(f"run {run_id} is a complete novel: a published book is not "
-                          "a stopped novel, and removing one is a different decision")
         out = Path(self.settings.output_dir)
         _relocate(run["slug"], out / run["slug"], out / BIN / run["slug"],
                   f"{BIN}/{run['slug']}/ already exists in the bin; nothing was moved")

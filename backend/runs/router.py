@@ -7,9 +7,9 @@ import json
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
-from backend.runs.models import ResumeRun, RunCreated, StartRun
-from backend.runs.service import (AlreadyRunning, BriefNotReady, CeilingRequired,
-                                  NotFound, NotLive, Refused, RunService)
+from backend.runs.models import RunCreated, StartRun
+from backend.runs.service import (AlreadyRunning, BriefNotReady, NotFound, NotLive,
+                                  Refused, RunService)
 
 router = APIRouter()
 
@@ -65,27 +65,25 @@ def halt(run_id: str, svc: RunService = Depends(get_service)) -> dict:
 
 
 @router.post("/{run_id}/resume", status_code=status.HTTP_200_OK)
-def resume(run_id: str, body: ResumeRun | None = None,
-           svc: RunService = Depends(get_service)) -> dict:
+def resume(run_id: str, svc: RunService = Depends(get_service)) -> dict:
     """Continue a run that stopped, in the directory it stopped in.
 
-    Every refusal carries its reason in `detail`, and the panel shows it as it
-    is: 409 for a run that cannot be continued now, 422 for one that needs a
-    ceiling typed for it (SPEC-EXAM-007 §2).
+    No body: the ceiling is the profile's, fresh for this continuation, and
+    nobody types it (SPEC-EXAM-007 §8). Every refusal carries its reason in
+    `detail` as a 409, and the panel shows it as it is.
     """
     try:
-        return svc.resume(run_id, ceiling_usd=body.ceiling_usd if body else None)
+        return svc.resume(run_id)
     except NotFound as exc:
         raise HTTPException(status.HTTP_404_NOT_FOUND, str(exc)) from exc
     except (NotLive, AlreadyRunning, Refused) as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, str(exc)) from exc
-    except CeilingRequired as exc:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from exc
 
 
 @router.post("/{run_id}/trash", status_code=status.HTTP_200_OK)
 def trash(run_id: str, svc: RunService = Depends(get_service)) -> dict:
-    """Move a stopped novel to `output/_papelera/`. Nothing is deleted."""
+    """Move a novel — stopped or complete — to `output/_papelera/`. Nothing
+    is deleted; only a live run is refused (SPEC-EXAM-007 §8.3)."""
     try:
         return svc.trash(run_id)
     except NotFound as exc:
