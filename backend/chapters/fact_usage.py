@@ -103,6 +103,12 @@ def record(conn: sqlite3.Connection, run_dir: Path, chapter: int,
     are, which is what "`dist/v1/` is untouched" (AC-7) means in the archive.
     """
     run_id = run_dir.name
+    # A v2 run's id is not its slug; resolve it the way the ingest does, or a
+    # v2 run finds no facts and every mandatory one reads uncovered.
+    if not conn.execute("SELECT 1 FROM runs WHERE id = ?", (run_id,)).fetchone():
+        by_slug = conn.execute("SELECT id FROM runs WHERE slug = ?", (run_id,)).fetchone()
+        if by_slug:
+            run_id = by_slug[0]
     prose = promoted_text(run_dir, chapter)
     if prose is None:
         raise FileNotFoundError(

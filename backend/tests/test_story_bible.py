@@ -334,3 +334,23 @@ def test_ingest_finds_a_v2_run_by_its_slug_not_only_by_its_id(db, tmp_path):
 
     rows = db.execute("SELECT COUNT(*) FROM facts WHERE run_id = 'db2fed5bd97a'").fetchone()[0]
     assert rows > 0, "the facts belong to the run's id, which is not its directory name"
+
+
+def test_usage_finds_a_v2_runs_facts_by_slug(db, tmp_path):
+    """A v2 run's id is not its slug. The ingest resolves the directory name to
+    the id; the usage recorder did not, so a v2 run found no facts and every
+    mandatory fact came out uncovered."""
+    db.execute(
+        "INSERT INTO runs (id, slug, premise, profile, config_snapshot, stage, "
+        "started_at) VALUES (?,?,?,?,?,?,?)",
+        ("a1b2c3d4e5f6", "v2-slug", "p", "exam", "{}", "FLOW-4",
+         "2026-09-24T00:00:00Z"))
+    db.execute("INSERT INTO facts (run_id, kind, text, source, mandatory) "
+               "VALUES ('a1b2c3d4e5f6', 'recipient', 'the dog is called Bruno', "
+               "'brief', 1)")
+    db.commit()
+    run_dir = tmp_path / "v2-slug"
+    (run_dir / "chapters").mkdir(parents=True)
+    (run_dir / "chapters" / "ch01.md").write_text(
+        "# Chapter 1\n\nAnd the dog is called Bruno, of course.\n", encoding="utf-8")
+    assert record(db, run_dir, 1), "a v2 run's facts must be found by its slug"
