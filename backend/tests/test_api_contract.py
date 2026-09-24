@@ -192,6 +192,7 @@ def test_no_route_takes_a_path_and_reads_a_file():
         "/api/runs/{run_id}/facts",
         "/api/runs/{run_id}/facts/{fact_id}/impact",
         "/api/runs/{run_id}/versions",
+        "/api/runs/{run_id}/versions/{n}/html",
         "/api/runs/{run_id}/versions/{n}/judge",
         "/api/runs/{run_id}/versions/{n}/pdf",
         "/api/runs/{run_id}/versions/{n}/validations",

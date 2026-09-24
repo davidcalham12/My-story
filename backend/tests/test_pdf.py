@@ -406,6 +406,8 @@ def test_no_route_of_this_module_takes_a_filesystem_path():
     paths = set(app.openapi()["paths"])
     assert paths == {"/api/runs/{run_id}/versions",
                      "/api/runs/{run_id}/versions/{n}/pdf",
+                     # the page the PDF was printed from, to read online
+                     "/api/runs/{run_id}/versions/{n}/html",
                      "/api/runs/{run_id}/changes"}, sorted(paths)
     for path in paths:
         assert "{path" not in path and "{name" not in path

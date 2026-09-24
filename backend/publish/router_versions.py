@@ -49,12 +49,17 @@ def list_versions(run_id: str, svc: RunService = Depends(get_service)) -> list[d
     download for a file nobody printed is a 404 the reader gets to discover.
     """
     run_dir = _run_dir(svc, run_id)
-    return [{**v, "pdf": (run_dir / "dist" / f"v{v['n']}" / "novel.pdf").is_file()}
+    return [{**v,
+             "pdf": (run_dir / "dist" / f"v{v['n']}" / "novel.pdf").is_file(),
+             "html": (run_dir / "dist" / f"v{v['n']}" / "novel.html").is_file()}
             for v in versions_repo.published(svc.conn, run_id)]
 
 
 @router.get("/{run_id}/versions/{n}/pdf")
-def version_pdf(run_id: str, n: int, svc: RunService = Depends(get_service)):
+def version_pdf(run_id: str, n: int, download: bool = False,
+                svc: RunService = Depends(get_service)):
+    """Inline by default, so opening a novel shows it; an attachment only when
+    the reader pressed the button that asks for one (owner, 2026-09-24)."""
     path = _run_dir(svc, run_id) / "dist" / f"v{n}" / "novel.pdf"
     if not path.is_file():
         # Said as absent, not as an empty document: the version may well exist
@@ -62,7 +67,24 @@ def version_pdf(run_id: str, n: int, svc: RunService = Depends(get_service)):
         raise HTTPException(status.HTTP_404_NOT_FOUND,
                             f"version {n} of run {run_id} has no printed PDF")
     return FileResponse(path, media_type="application/pdf",
-                        filename=f"novel-v{n}.pdf")
+                        filename=f"novel-v{n}.pdf",
+                        content_disposition_type="attachment" if download else "inline")
+
+
+@router.get("/{run_id}/versions/{n}/html")
+def version_html(run_id: str, n: int, svc: RunService = Depends(get_service)):
+    """The version as the page the PDF was printed from, to read online.
+
+    The same file the PDF came from, so reading here and reading the download
+    are one text. Written by `publish.pdf` with every string escaped; the panel
+    frames it sandboxed all the same.
+    """
+    path = _run_dir(svc, run_id) / "dist" / f"v{n}" / "novel.html"
+    if not path.is_file():
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            f"version {n} of run {run_id} has no readable page")
+    return FileResponse(path, media_type="text/html; charset=utf-8",
+                        content_disposition_type="inline")
 
 
 @router.post("/{run_id}/changes", status_code=status.HTTP_202_ACCEPTED)

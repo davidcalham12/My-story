@@ -76,5 +76,9 @@ export const api = {
 /** The PDF, by run and version. Never by a path: no route takes one, so the
  *  traversal surface does not exist rather than being defended. */
 export const pdfUrl = (id: string, n: number) => `/api/runs/${id}/versions/${n}/pdf`
+/** The same PDF as an attachment: only behind the button that asks for it. */
+export const downloadUrl = (id: string, n: number) => `${pdfUrl(id, n)}?download=true`
+/** The page the PDF was printed from, to read in the panel. */
+export const htmlUrl = (id: string, n: number) => `/api/runs/${id}/versions/${n}/html`
 
 export const eventsUrl = (id: string) => `/api/runs/${id}/events`

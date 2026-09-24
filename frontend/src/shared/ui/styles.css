@@ -368,3 +368,22 @@ details.more > summary {
   align-items: center;
 }
 details.more[open] > summary { color: var(--ink); border-bottom: 1px solid var(--line); margin-bottom: var(--s3); }
+
+/* A link that is an action looks like one. */
+a.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 500;
+}
+a.button:hover { border-color: var(--primary); }
+a.button.primary { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 700; }
+a.button.primary:hover { background: var(--primary-pressed); border-color: var(--primary-pressed); }
+.reader__actions { margin: var(--s3) 0; }
+.reader__page { background: var(--page); height: 80vh; }

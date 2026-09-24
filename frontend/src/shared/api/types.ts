@@ -231,6 +231,9 @@ export interface VersionRow {
   /** Read off the disk, not assumed from the row: the print needs a browser and
    *  can fail where the publish did not. */
   pdf: boolean
+  /** Whether the page the PDF was printed from exists, to read online. Absent
+   *  on an older server. */
+  html?: boolean
 }
 
 export interface ChapterEntry {

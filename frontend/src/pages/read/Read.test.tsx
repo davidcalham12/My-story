@@ -52,6 +52,21 @@ const render = (over: Partial<Parameters<typeof ReadView>[0]> = {}) =>
     />,
   )
 
+describe('read online, download on request (owner, 2026-09-24)', () => {
+  it('shows the book in the page from its HTML, framed sandboxed', () => {
+    const html = render({ versions: [version({ n: 1, pdf: true, html: true } as never)], chosen: 1 })
+    expect(html).toContain('/api/runs/r1/versions/1/html')
+    expect(html).toContain('<iframe')
+    expect(html).toContain('sandbox=""')
+  })
+
+  it('downloads only through a button that asks for it', () => {
+    const html = render({ versions: [version({ n: 1, pdf: true, html: true } as never)], chosen: 1 })
+    expect(html).toContain('/api/runs/r1/versions/1/pdf?download=true')
+    expect(html).toContain('Download PDF')
+  })
+})
+
 describe('AC-4: the book, as a book', () => {
   it('shows the chosen version in the browser’s own viewer', () => {
     // No PDF library: `<object>` is the browser's viewer, and the URL is by run

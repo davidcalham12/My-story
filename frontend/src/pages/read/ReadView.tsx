@@ -2,7 +2,7 @@ import type {
   ChapterEntry, CharacterEntry, PlaceEntry, VersionRow,
 } from '@/shared/api/types'
 import type { Changed } from '@/entities/version/lib'
-import { pdfUrl } from '@/shared/api/client'
+import { downloadUrl, htmlUrl, pdfUrl } from '@/shared/api/client'
 
 /**
  * The novel, as a book, with its apparatus beside it.
@@ -113,7 +113,7 @@ export function ReadView(props: Props) {
           </p>
         )}
 
-        {open && !open.pdf && (
+        {open && !open.pdf && !open.html && (
           <p className="panel panel--halt">
             Version {open.n} was published, but its PDF <strong>was not printed</strong>.
             Printing needs a browser of its own and can fail where the writing did not, so
@@ -122,7 +122,33 @@ export function ReadView(props: Props) {
           </p>
         )}
 
-        {open && open.pdf && chosen !== null && (
+        {open && chosen !== null && (open.pdf || open.html) && (
+          <div className="row reader__actions">
+            {open.pdf && (
+              <a className="button primary" href={downloadUrl(runId, chosen)} download>
+                Download PDF
+              </a>
+            )}
+            {open.pdf && (
+              <a className="button" href={pdfUrl(runId, chosen)} target="_blank" rel="noreferrer">
+                Open PDF in a new tab
+              </a>
+            )}
+          </div>
+        )}
+
+        {open && open.html && chosen !== null && (
+          // The book in the page, from the HTML the PDF was printed from. An
+          // empty sandbox: the page is ours and escaped, and it needs no script.
+          <iframe
+            className="reader__viewer reader__page"
+            src={htmlUrl(runId, chosen)}
+            sandbox=""
+            title={`The novel, version ${chosen}`}
+          />
+        )}
+
+        {open && open.pdf && !open.html && chosen !== null && (
           <object
             className="reader__viewer"
             data={pdfUrl(runId, chosen)}
