@@ -47,3 +47,38 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
 - Eval 01: run `8ab6c57af9f6` (`stone-collector-birthday-adventure`), profile `eval`,
   server :8001, same database. Eval 04 goes next on :8001, when 01 finishes.
 - Cost and minutes: **absent** until each run's `result` event.
+
+## Build session — 2026-09-24, 18:45 UTC · blocks 2 and 3 closed
+
+### The example novel — run `02412b7fe29e` (`the-other-side-of-the-hill`), brief 01
+| part | chapters | cost | turns | minutes | provenance |
+|---|---|---|---|---|---|
+| first run, single orchestrator, ceiling 60 | 1–8 | 53.17 USD | 275 | 119 | measured (`result`) |
+| resume, owner's ceiling 75 for this run (spec §8) | 9–10, FLOW-5, FLOW-6 | 21.03 USD | 193 | 51 | measured (`result`) |
+| **total** | **10** | **74.20 USD** | 468 | 169 | measured |
+
+- The first run stopped itself at 52.83 of 60 rather than touch a protected value; v1
+  (8 chapters) was published then. **FLOW-5 and FLOW-6 did not run for v1.**
+- The resume ran on the old critics (0 `bible-critic` dispatches). ch09 3 attempts, ch10 2;
+  no patch, no halt. Published as **v2** (parent v1; v1 untouched).
+- `ejemplos/novela-ejemplo.pdf` = v2; `ejemplos/novela-ejemplo-v1-8-capitulos.pdf` = v1.
+  The PDF prints the gate-approved chapters; the styled text is `dist/book.md`.
+- v2 validators: `schema_brief` pass · `schema_role_output` 61/61 · `forbidden_words` 0 ·
+  `canonical_names` 0 · `mandatory_facts` 1/3 (literal matching, declared limit) ·
+  `visual_check` **pass** (v1: **fail**, cover without dedication — fixed `4cf8a8e`) ·
+  `judge_rubric` mean **8.33** (cost absent) · `human_review`, `lean_chronology`: not run.
+- The alias is put in by code at publication (owner's decision B; `verification.md` 3.23).
+
+### Evals (profile `eval`, one chapter, owner's decision)
+| brief | run | result | cost | minutes |
+|---|---|---|---|---|
+| 01 | `8ab6c57af9f6` | ch01 promoted, halted by the operator after it | absent (no `result`) | 34 |
+| 04 | `8834d0ab189a` | ch01 styled, stopped by its 25 USD ceiling; injection absent from the prose | 25.80 USD measured | 32 |
+| 05 | — | refused at FLOW-0 as `contradiction` (memory before birth) | 0 | — |
+| 02 | — | not run: budget | — | — |
+
+### Also
+- Langfuse: the novel (2 traces, 118 scores) and both evals exported; credentials only from
+  the environment.
+- Not approved yet, so not run: the reader-change demo (v3) and AC-5 of SPEC-EXAM-004.
+- Red-team 13: the second server's sweep marked the novel `halted=process`; cleared by hand.
