@@ -82,3 +82,14 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
   the environment.
 - Not approved yet, so not run: the reader-change demo (v3) and AC-5 of SPEC-EXAM-004.
 - Red-team 13: the second server's sweep marked the novel `halted=process`; cleared by hand.
+
+## Build session — 2026-09-24, 19:25 UTC · reader-change demo (v3) did not publish
+
+- Fact 36 → "the wooden treehouse observatory"; `impacted` named ch03 and ch10 (v2's usage).
+  Owner approved 30 USD (15 per chapter), procedure pinned to `c35fdc9^`.
+- **Not the gate: the organisation's monthly spend limit.** Both chapter units ended with
+  "You've hit your org's monthly spend limit". ch03: 3 drafts, then cut — 7.52 USD, 66 turns,
+  26 min (measured); ch10: 1 turn, 0 USD. Nothing promoted, nothing published, v2 stands.
+  The workspace `dist/v3/` is kept as the evidence.
+- `change.py` reported this as `halted: gate`; that label is wrong for a unit the CLI cut —
+  to be fixed. The owner has since switched accounts. v3 and AC-5 await a new approval.
