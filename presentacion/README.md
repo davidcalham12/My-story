@@ -38,6 +38,8 @@ La novela de ejemplo (10 capítulos, brief 01) está en
 (un hecho cambiado, propagado solo a los capítulos 3 y 10, con su página de
 novedades) es la v3: `../ejemplos/novela-ejemplo-v3-cambio-del-lector.pdf`.
 
+El índice de los anexos, con cómo se generan, está en `anexos/README.md`.
+
 ## Email de entrega
 
 Asunto: `[Harness Engineering] Entrega final — David Calderon Hamui`
@@ -47,5 +49,3 @@ Asunto: `[Harness Engineering] Entrega final — David Calderon Hamui`
 - La decisión de diseño, en tres líneas como máximo:
 
 > El escritor de cada capítulo no puede leer los anteriores: su única herramienta devuelve rutas, no contenido. Toda la continuidad pasa por una story bible en SQLite que sabe qué capítulo usa cada dato, y por eso un cambio del lector reescribe solo esos capítulos.
-
-El índice de los anexos, con cómo se generan, está en `anexos/README.md`.

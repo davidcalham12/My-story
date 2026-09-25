@@ -14,7 +14,7 @@ by `decide`:
 |---|---|
 | `events_in_order` | the thirteen events of the timeline are in chronological order (day, then moment of the day) |
 | `story_within_one_week` | the whole story happens within one week, so no stated age changes between events |
-| `ages_possible` | every stated age (Leo 10, Rosa 10, Elena 12) is between 0 and 120 |
+| `ages_possible` | every stated age (el destinatario 10, Rosa 10, Elena 12) is between 0 and 120 |
 
 The events and ages are transcribed from the run's own Story Bible,
 `output/the-other-side-of-the-hill/bible/timeline.md` and `characters.md`.

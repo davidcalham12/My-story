@@ -15,14 +15,14 @@ con su justificación. Un criterio sin justificación se rechaza.
 | pacing | 8 | The ten chapters are well-proportioned to their narrative weight. Setup chapters (Ch1-4) build appropriately toward the turning point; the climb itself (Ch5) is the longest chapter and carries both the physical climax and the emotional turning point. The night away (Ch6) moves quickly, serving its f |
 | tone | 9 | The book achieves and sustains the requested warm, funny, and gentle tone throughout all ten chapters. Ch1 establishes intimate coziness (honey on tables, Bruno sleeping without permission). Ch3 demonstrates humor through Marcos's evasive storytelling and the protagonist's frustrated response. Ch5's |
 
-**Media: 8.33** sobre los seis criterios.
+**Media: 8,33** sobre los seis criterios.
 
 ## La lectura humana
 
 - **Nota del dueño: 8** — una nota global, no por criterio.
 - The owner read the complete ten-chapter book (v2) on 2026-09-24 and scored it a solid 8 overall. The owner gave one overall score, not one per criterion; the comparison is therefore overall against the judge mean: human 8, judge 8.33, a difference of 0.33 in the same direction.
-- Juez 8.33 frente a lectura humana 8: la diferencia
-  es de 0.33 puntos.
+- Juez 8,33 frente a lectura humana 8: la diferencia
+  es de 0,33 puntos.
 
 ## Lo que el juez vio y el gate no
 
