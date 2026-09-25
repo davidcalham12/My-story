@@ -142,9 +142,10 @@ the owner approved.
    `orchestration` overlaid from the profile as it is today, for this segment
    only. The snapshot row is not rewritten.
 3. **Spent is the run's measured spend across all segments.** `ceiling_for`
-   and `budget_left` start at 0 in every new process. "Profile ceiling minus
-   spent" therefore subtracts the sum of the earlier segments' measured
-   `result` costs.
+   and `budget_left` start at 0 in every new process. The known spend is the
+   sum of the earlier segments' measured `result` costs. Since §8 it is no
+   longer subtracted from the segment's ceiling; it is compared with the
+   per-novel cap (SR-05).
 4. **Storage.** Migration 019 adds `runs.trashed_at` and the table `changes`,
    shared with SPEC-EXAM-008, instead of the `run_segments` first proposed
    here.
