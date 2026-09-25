@@ -18,6 +18,10 @@ import re
 from dataclasses import dataclass, field
 
 OUTPUT_PATH = re.compile(r"output[/\\]([^/\\]+)[/\\]")
+# What a learned slug must look like before it names a directory (SR-10): no
+# `..`, no separator, no bin. Anything else is ignored and the run keeps the
+# slug it had.
+SLUG = re.compile(r"[a-z0-9][a-z0-9-]{0,79}")
 CHAPTER_FILE = re.compile(r"ch(\d+)\.attempt(\d+)\.md")
 STAGE_HINT = re.compile(r"\bFLOW-[1-6]\b")
 
@@ -213,7 +217,7 @@ def apply(state: State, event: dict) -> State:
                 # it in advance and must not guess: a guessed slug reads the
                 # wrong novel, or none.
                 found = OUTPUT_PATH.search(path)
-                if found:
+                if found and SLUG.fullmatch(found.group(1)):
                     state.slug = found.group(1)
                 chapter = CHAPTER_FILE.search(path)
                 if chapter:

@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
+
+from backend.commons import limits
+from backend.commons.config import loader
 
 
 class StartRun(BaseModel):
@@ -14,15 +17,23 @@ class StartRun(BaseModel):
     """
 
     premise: str | None = Field(default=None, min_length=10, max_length=2000)
-    brief_id: str | None = None
-    profile: str = "tiny"
+    brief_id: str | None = Field(default=None, max_length=limits.ID)
+    # A filename in all but name, so an allowlist of the files that exist
+    # (SR-04): an unknown one is a 422 that lists the real ones, never a 500
+    # and never a path outside config/profiles/.
+    profile: str = Field(default="tiny", max_length=limits.PROFILE)
     # Empty means: read the genre off the premise. No agent declares one, and a
     # default here would put the welded genre back where it was. Ignored when
     # `brief_id` is given: the brief's own tone is the buyer's answer.
-    tone: str = ""
+    tone: str = Field(default="", max_length=limits.SHORT_TEXT)
     # How many chapters the buyer asked for, with a brief. Absent: the profile
     # decides. Bounded by the profile in the service, where its budget is known.
     chapters: int | None = Field(default=None, ge=1)
+
+    @field_validator("profile")
+    @classmethod
+    def known_profile(cls, value: str) -> str:
+        return loader.check_profile(value)
 
     @model_validator(mode="after")
     def one_of(self) -> "StartRun":

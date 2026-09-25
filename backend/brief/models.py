@@ -21,11 +21,20 @@ Two decisions are visible in the field list and are worth stating:
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Annotated
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
+from backend.commons import limits
 
 #: The eleven keys, and no twelfth. Adding one moves SPEC-EXAM-001 §1 row 1, the
 #: interviewer's prompt and the frontend form (SPEC-EXAM-002 AC-1) together.
 STRICT = ConfigDict(extra="forbid")
+
+# Every string the buyer types has a ceiling (SR-11); the figures are in
+# `backend.commons.limits`, one place for the brief, the run and the change.
+Short = Annotated[str, StringConstraints(max_length=limits.SHORT_TEXT)]
+Long = Annotated[str, StringConstraints(max_length=limits.LONG_TEXT)]
 
 
 class Memory(BaseModel):
@@ -38,8 +47,8 @@ class Memory(BaseModel):
 
     model_config = STRICT
 
-    text: str
-    date: str | None = None
+    text: Long
+    date: Short | None = None
 
 
 class Recipient(BaseModel):
@@ -53,14 +62,14 @@ class Recipient(BaseModel):
 
     model_config = STRICT
 
-    alias: str | None = None
+    alias: Short | None = None
     age: int | None = None
-    pronouns: str | None = None
+    pronouns: Short | None = None
     # ISO date, "YYYY-MM" or "YYYY-MM-DD". Declared on the owner's order of
     # 2026-09-24 so brief 05 reaches the temporal check. `None` claims nothing.
-    birth_date: str | None = None
-    traits: list[str] = Field(default_factory=list)
-    relationship_to_buyer: str | None = None
+    birth_date: Short | None = None
+    traits: list[Short] = Field(default_factory=list)
+    relationship_to_buyer: Short | None = None
 
 
 class Brief(BaseModel):
@@ -75,16 +84,16 @@ class Brief(BaseModel):
 
     model_config = STRICT
 
-    occasion: str | None = None
+    occasion: Short | None = None
     recipient: Recipient = Field(default_factory=Recipient)
     memories: list[Memory] = Field(default_factory=list)
-    genre: str | None = None
-    tone: str | None = None
+    genre: Short | None = None
+    tone: Short | None = None
     length_chapters: int | None = None
-    forbidden_terms: list[str] = Field(default_factory=list)
-    mandatory_facts: list[str] = Field(default_factory=list)
-    dedication: str | None = None
-    free_text: str = ""
+    forbidden_terms: list[Short] = Field(default_factory=list)
+    mandatory_facts: list[Long] = Field(default_factory=list)
+    dedication: Long | None = None
+    free_text: str = Field(default="", max_length=limits.FREE_TEXT)
 
 
 class Fact(BaseModel):

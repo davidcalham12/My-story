@@ -8,6 +8,7 @@ comes from `specs/flow.yaml`; every number comes from `config/`.
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -53,10 +54,29 @@ def load_pricing() -> dict[str, Any]:
     return json.loads((CONFIG / "pricing.json").read_text(encoding="utf-8"))
 
 
+PROFILE_NAME = re.compile(r"[a-z0-9-]+")
+
+
+def profile_names() -> list[str]:
+    """The profiles that exist: the stems of `config/profiles/*.json`."""
+    return sorted(p.stem for p in (CONFIG / "profiles").glob("*.json"))
+
+
+def check_profile(name: str) -> str:
+    """`name` if it is a profile on disk, else a `ValueError` a person can read.
+
+    A profile arrives in a request body and becomes a filename (SR-04), so it is
+    an allowlist, not a path: the strict pattern first, so nothing with a
+    separator or a `..` is ever joined into a path, then existence.
+    """
+    if not isinstance(name, str) or not PROFILE_NAME.fullmatch(name)             or name not in profile_names():
+        raise ValueError(f"unknown profile {name!r}; the profiles are: "
+                         f"{', '.join(profile_names())}")
+    return name
+
+
 def load_profile(name: str) -> dict[str, Any]:
-    path = CONFIG / "profiles" / f"{name}.json"
-    if not path.exists():
-        raise ValueError(f"no such profile: {name}")
+    path = CONFIG / "profiles" / f"{check_profile(name)}.json"
     return json.loads(path.read_text(encoding="utf-8"))
 
 

@@ -10,7 +10,7 @@ configuration committed in `1fd3218`.
 servers:
 
 ```json
-{ "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@latest"] } } }
+{ "mcpServers": { "playwright": { "command": "npx", "args": ["@playwright/mcp@0.0.82"] } } }
 ```
 
 No credentials, no network target beyond `file://` pages under `dist/`.

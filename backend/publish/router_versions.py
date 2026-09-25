@@ -17,12 +17,16 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 import backend.versions as versions_repo
+from backend.commons import limits
 from backend.commons.title import title_of
 from backend.runs.router import get_service
 from backend.runs.service import RunService
 from backend.versions import change as change_mod
 
 router = APIRouter()
+
+NOVEL_CSP = ("default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; "
+             "base-uri 'none'; form-action 'none'; frame-ancestors 'self'")
 
 
 class ReaderChange(BaseModel):
@@ -31,8 +35,8 @@ class ReaderChange(BaseModel):
 
     model_config = {"extra": "forbid"}
 
-    fact_id: str = Field(min_length=1)
-    to: str = Field(min_length=1)
+    fact_id: str = Field(min_length=1, max_length=limits.ID)
+    to: str = Field(min_length=1, max_length=limits.CHANGE_TO)
 
 
 def _run_dir(svc: RunService, run_id: str) -> Path:
@@ -93,8 +97,14 @@ def version_html(run_id: str, n: int, svc: RunService = Depends(get_service)):
     if not path.is_file():
         raise HTTPException(status.HTTP_404_NOT_FOUND,
                             f"version {n} of run {run_id} has no readable page")
+    # Defence in depth (SR-13): the page is served from the API's own origin,
+    # so it may load nothing and run nothing. Its inline <style> and in-page
+    # anchors are all it uses. `frame-ancestors 'self'` rather than 'none':
+    # the panel frames it from the same origin (the Vite proxy in dev).
     return FileResponse(path, media_type="text/html; charset=utf-8",
-                        content_disposition_type="inline")
+                        content_disposition_type="inline",
+                        headers={"Content-Security-Policy": NOVEL_CSP,
+                                 "X-Content-Type-Options": "nosniff"})
 
 
 @router.post("/{run_id}/changes", status_code=status.HTTP_202_ACCEPTED)
@@ -109,7 +119,13 @@ def request_change(run_id: str, body: ReaderChange,
     (SPEC-EXAM-002 AC-5). `python -m backend.versions.change` carries it out.
     """
     run_dir = _run_dir(svc, run_id)
-    chapters = change_mod.impacted(svc.conn, body.fact_id)
+    # Scoped to this run (SR-15): a fact of another novel is not a fact here,
+    # and answering with its chapters under this run's version number would be
+    # a plan for the wrong book.
+    if not change_mod.fact_of_run(svc.conn, body.fact_id, run_id):
+        raise HTTPException(status.HTTP_404_NOT_FOUND,
+                            f"run {run_id} has no fact {body.fact_id!r}")
+    chapters = change_mod.impacted(svc.conn, body.fact_id, run_id=run_id)
     if not chapters:
         raise HTTPException(
             status.HTTP_409_CONFLICT,

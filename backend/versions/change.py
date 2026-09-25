@@ -43,17 +43,37 @@ from backend.publish.pdf import Change
 import backend.versions as versions_repo
 
 
-def impacted(conn: sqlite3.Connection, fact_id: str) -> tuple[int, ...]:
+def fact_of_run(conn: sqlite3.Connection, fact_id: str, run_id: str) -> bool:
+    """Whether `fact_id` is one of this run's facts (SR-15)."""
+    try:
+        return conn.execute("SELECT 1 FROM facts WHERE id = ? AND run_id = ?",
+                            (fact_id, run_id)).fetchone() is not None
+    except sqlite3.OperationalError:
+        return False
+
+
+def impacted(conn: sqlite3.Connection, fact_id: str,
+             run_id: str | None = None) -> tuple[int, ...]:
     """The chapters `fact_usage` says this fact reached, in order.
+
+    With `run_id`, only if the fact belongs to that run (SR-15), as the bible
+    router scopes its own lookup.
 
     `fact_usage` arrives with migration 010 (phase E3). Until it does, or if a
     run predates it, this is an empty answer — which the caller refuses to act
     on rather than reading as "no chapter needs changing".
     """
     try:
-        rows = conn.execute(
-            "SELECT DISTINCT chapter FROM fact_usage WHERE fact_id = ? "
-            "ORDER BY chapter", (fact_id,)).fetchall()
+        if run_id is None:
+            rows = conn.execute(
+                "SELECT DISTINCT chapter FROM fact_usage WHERE fact_id = ? "
+                "ORDER BY chapter", (fact_id,)).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT DISTINCT u.chapter FROM fact_usage u "
+                "JOIN facts f ON f.id = u.fact_id "
+                "WHERE u.fact_id = ? AND f.run_id = ? ORDER BY u.chapter",
+                (fact_id, run_id)).fetchall()
     except sqlite3.OperationalError:
         return ()
     return tuple(int(r[0]) for r in rows)
@@ -453,7 +473,7 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         print(f"change: {run_dir} has no chapters to change", file=sys.stderr)
         return 2
 
-    chapters = impacted(conn, args.fact)
+    chapters = impacted(conn, args.fact, run_id=run_id)
     if not chapters:
         # Absent is never zero. "No rows" here means unused *or* unrecorded, and
         # neither is a licence to rewrite the book.
