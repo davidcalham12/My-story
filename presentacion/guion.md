@@ -1,8 +1,8 @@
 # Guion de la presentación — storyMaker
 
 Para el deck de 18 slides (`storymaker-deck.pdf` / `.pptx`, y en Claude Design).
-Duración: unos **15 minutos** de presentación, **8 de demo** y el tiempo que
-quede para preguntas.
+Presenta una sola persona. Duración: unos **15 minutos** de presentación, **8 de
+demo** y el tiempo que quede para preguntas.
 
 Cómo usar este guion:
 - Lo que va entre comillas es **lo que se dice**, casi literal. Léelo en voz alta
@@ -22,28 +22,28 @@ Actualizado: 2026-09-25, con el deck final de 18 slides.
 
 ### Slide 1 · Portada (15 s)
 
-"Buenos días. Desde Qaracter les presentamos storyMaker: novelas personalizadas
-para regalar, escritas por un sistema de agentes que se revisa a sí mismo."
+"Buenos días. Les presento storyMaker, de Qaracter: novelas personalizadas para
+regalar, escritas por un sistema de agentes que se revisa a sí mismo."
 
 **Puente:** "Empiezo por la conclusión."
 
 ### Slide 2 · La respuesta, primero (1 min 15 s)
 
-"Les traemos una respuesta y tres razones.
+"Les traigo una respuesta y tres razones.
 
 La respuesta: **storyMaker entrega una novela personalizada de diez capítulos,
 revisada y con un costo medido.**
 
 Primera razón: **funciona.** Hay una página web donde se pide, se lee y se
 corrige, y una novela de ejemplo real: diez capítulos, un juez automático le dio
-8.33 sobre 10 y la revisión humana un 8. Cuando el lector cambió un dato, solo se
-reescribieron los dos capítulos que lo usaban.
+8.33 sobre 10 y mi revisión humana, un 8. Cuando el lector cambió un dato, solo
+se reescribieron los dos capítulos que lo usaban.
 
 Segunda: **es confiable.** Todo lo que el sistema promete lo revisa alguien que
 no lo escribió. Hay trece agentes con una tarea cada uno, y ningún capítulo entra
 al libro sin sacar por lo menos un 8 en seis criterios.
 
-Tercera: **sabemos cuánto cuesta.** 74.20 dólares medidos por novela, y sabemos
+Tercera: **sé cuánto cuesta.** 74.20 dólares medidos por novela, y sé
 exactamente en qué se va el dinero y cómo bajarlo.
 
 El resto de la presentación demuestra cada una de las tres, en este orden."
@@ -83,7 +83,7 @@ Desde aquí el comprador hace cuatro cosas:
 - y si una novela se detuvo, **continuarla** desde donde se quedó, sin empezar de
   cero, o mandarla a la papelera.
 
-La primera tarjeta es nuestra novela de ejemplo, lista para leer."
+La primera tarjeta es mi novela de ejemplo, lista para leer."
 
 **Si preguntan cómo está hecha:** React en el navegador, un servidor FastAPI en
 Python que lanza el sistema de agentes y guarda todo en SQLite.
@@ -98,7 +98,7 @@ donde aparece por primera vez.
 
 Esa ficha no la escribe un modelo al final: sale de la **story bible**, la base
 de datos donde el sistema guarda cada hecho, cada personaje y en qué capítulo se
-usa. Y lo revisamos en un navegador real: la versión 2 y la 3 pasan la revisión
+usa. Y lo revisé en un navegador real: la versión 2 y la 3 pasan la revisión
 visual."
 
 **Puente:** "Y ahora lo más interesante: qué pasa cuando el lector cambia algo."
@@ -128,7 +128,7 @@ empieza por una decisión."
 "La decisión que sostiene todo: **el escritor nunca puede leer los capítulos
 anteriores.**
 
-No es que se lo pidamos en un prompt: su única herramienta regresa nombres de
+No es que se lo pida en un prompt: su única herramienta regresa nombres de
 archivos, nunca su contenido. Entonces, ¿cómo sabe lo que pasó antes? Por la
 story bible y por un resumen corto de lo que ha ocurrido.
 
@@ -136,7 +136,7 @@ story bible y por un resumen corto de lo que ha ocurrido.
 caro ni más lento, el contexto nunca se llena y nada pasa del límite de 100,000
 tokens. Toda la continuidad pasa por la story bible."
 
-**Puente:** "Veamos el recorrido completo de una novela."
+**Puente:** "Vamos a ver el recorrido completo de una novela."
 
 ### Slide 8 · 2 · Es confiable — el recorrido (1 min 15 s)
 
@@ -204,19 +204,19 @@ es el código**: toma la calificación más baja y la compara con 8."
 mal formada no cuenta como aprobada, la decisión es código, y una auditoría la
 vuelve a calcular después de cada novela."
 
-**Puente:** "Esos son los agentes. Veamos los controles."
+**Puente:** "Esos son los agentes. Ahora, los controles."
 
 ### Slide 11 · 2 · Es confiable — validación (1 min)
 
-"Tenemos cuatro tipos de validadores, y cada uno actúa en un punto fijo:
+"Tengo cuatro tipos de validadores, y cada uno actúa en un punto fijo:
 - **programáticos**, que son código y siempre dan el mismo resultado: el
   formato del pedido, los nombres exactos, la longitud, los hechos obligatorios,
   las palabras prohibidas y la revisión visual;
 - **semánticos**, que juzga un modelo o una persona: los críticos, el juez y la
   revisión humana;
 - **formal sobre la historia**: Lean revisaría la cronología; no se ejecutó
-  porque no se instala sin permisos de administrador, y así lo declaramos;
-- **formal sobre el sistema**: describimos el sistema en TLA+ y el verificador
+  porque no se instala sin permisos de administrador, y así lo declaro;
+- **formal sobre el sistema**: describí el sistema en TLA+ y el verificador
   revisó 18,253 estados sin errores: nada sin validar se publica, reanudar no
   duplica, la versión anterior se conserva y siempre termina.
 
@@ -231,12 +231,12 @@ script**; los modelos solo juzgan donde hace falta criterio."
 falla. Todo queda registrado en SQLite y en Langfuse: cada novela es una sesión,
 cada versión una traza y cada validador una calificación.
 
-Y el registro nos exhibió tres fallas reales, que corregimos:
-- con el orquestador en el modelo barato, dejó de usar nuestros agentes y el
-  escritor perdió su aislamiento; por eso el orquestador no va en Haiku;
+Y el registro me mostró tres fallas reales, que corregí:
+- con el orquestador en el modelo barato, dejó de usar mis agentes y el escritor
+  perdió su aislamiento; por eso el orquestador no va en Haiku;
 - con un tope de gasto demasiado bajo, cerró una novela sin pasar el control de
-  calidad; lo detectó la auditoría y subimos el tope;
-- y la configuración decía un modelo y corrió otro; lo vimos en el registro de
+  calidad; lo detectó la auditoría y subí el tope;
+- y la configuración decía un modelo y corrió otro; lo vi en el registro de
   costos.
 
 Además, la entrevista rechazó un pedido con un recuerdo fechado antes de que la
@@ -251,8 +251,8 @@ persona naciera, sin gastar un centavo."
   esta novela; da igual mayúsculas, acentos o plural; si aparece una, el capítulo
   regresa al escritor. Resultado: cero apariciones en los tres libros
   publicados;
-- **inyección**: el texto libre del comprador nunca es una orden; lo probamos
-  con un pedido trampa que decía 'ignora tus instrucciones' y no llegó al libro;
+- **inyección**: el texto libre del comprador nunca es una orden; lo probé con un
+  pedido trampa que decía 'ignora tus instrucciones' y no llegó al libro;
 - **datos personales**: el modelo nunca ve el nombre real de quien recibe el
   regalo; el código lo pone al publicar, y no hay ninguna clave en el
   repositorio;
@@ -262,7 +262,7 @@ persona naciera, sin gastar un centavo."
 
 ### Slide 14 · 3 · Costo conocido — presupuesto (1 min)
 
-"Aquí siempre separamos lo **medido** de lo **supuesto**.
+"Aquí siempre separo lo **medido** de lo **supuesto**.
 
 Medido: la novela de diez capítulos costó **74.20 dólares**, en 169 minutos. Sale
 del propio registro de Claude Code, no de una estimación.
@@ -290,7 +290,7 @@ mueve la cifra: lo que hay que abaratar es el orquestador.
 Ya se nota: en el cambio del lector, con el orquestador en un modelo más barato,
 un capítulo costó 4.57 dólares contra los 7.52 de antes."
 
-**Puente:** "Y eso nos lleva al siguiente paso, que ya está aprobado."
+**Puente:** "Y eso me lleva al siguiente paso, que ya está aprobado."
 
 ### Slide 16 · 3 · Costo conocido — siguiente paso (45 s)
 
@@ -301,28 +301,28 @@ calificación mínima y reintento. Los agentes son los mismos y la vara no cambi
 8, seis criterios y tres intentos.
 
 Ya está construido y aprobado; falta medirlo en una novela real. Y lo que
-descartamos: poner el orquestador en el modelo barato, porque ya vimos que rompe
-el aislamiento del escritor."
+descarté: poner el orquestador en el modelo barato, porque ya vi que rompe el
+aislamiento del escritor."
 
 **Puente:** "Regreso al principio."
 
 ### Slide 17 · En resumen (1 min)
 
 "La respuesta era: storyMaker entrega una novela personalizada de diez
-capítulos, revisada y con un costo medido. Y lo vimos:
+capítulos, revisada y con un costo medido. Y lo acaban de ver:
 - **funciona**: una novela real, un 8.33 del juez y un cambio que reescribió
   solo dos capítulos;
 - **es confiable**: trece agentes, y quien decide si un capítulo entra es el
   código;
-- **sabemos cuánto cuesta**: 74.20 dólares, el 92 % en el orquestador, y el paso
-  que lo reduce ya está listo.
+- **sé cuánto cuesta**: 74.20 dólares, el 92 % en el orquestador, y el paso que
+  lo reduce ya está listo.
 
 Los riesgos, dichos con claridad: el costo depende del orquestador; el juez es un
 modelo y no siempre da la misma calificación; los hechos obligatorios se buscan
 por texto literal; y tres capítulos quedaron un poco abajo de las 1,000
 palabras.
 
-Además del mínimo hicimos un servidor MCP de solo lectura, una revisión de
+Además del mínimo hice un servidor MCP de solo lectura, una revisión de
 seguridad, un linter de prosa y un segundo modelo TLA+ que encontró una falla
 real. Los siguientes pasos: el ciclo en código por defecto, inicio de sesión y
 un lector web donde se pueda seleccionar el texto."
@@ -350,7 +350,7 @@ revisa que la biblioteca cargue y que no haya ningún orquestador corriendo.
    - **Download PDF**: "y se descarga con el título del libro".
 4. **Ask for a change.** Elige el hecho del observatorio, escribe "a wooden
    treehouse observatory" y muestra que se reescribirían los capítulos 3 y 10
-   **antes de gastar nada**. "Esto ya lo corrimos: es la versión 3." Abre su
+   **antes de gastar nada**. "Esto ya lo corrí: es la versión 3." Abre su
    página de novedades.
 5. **New novel.** Da clic en "Fill this in with the example brief", muestra los
    pasos, la longitud de 1 a 10 y el aviso de datos faltantes. **No des clic en
@@ -368,12 +368,12 @@ o pon el video, que muestra el mismo recorrido.
 |---|---|
 | ¿Por qué no un solo modelo que escriba todo el libro? | Porque se contradice, repite y olvida lo que se le pidió, y cada capítulo le cuesta más que el anterior. Separar escritor y críticos, y darles la story bible, lo evita. |
 | ¿Cómo sabe el escritor lo que pasó antes? | Por la story bible (hechos, personajes, cronología) y un resumen de lo ocurrido de máximo 260 palabras. Nunca por los capítulos anteriores. |
-| ¿Y si el juez o un crítico se equivocan? | Los críticos solo informan; la decisión es código. El juez no bloquea: informa por versión, y lo comparamos con la revisión humana (8.33 contra 8). |
+| ¿Y si el juez o un crítico se equivocan? | Los críticos solo informan; la decisión es código. El juez no bloquea: informa por versión, y lo comparo con mi revisión humana (8.33 contra 8). |
 | ¿Por qué 1 capítulo en las evaluaciones? | Cinco novelas completas costaban unos 250 dólares y no daba el tiempo; cada validador se prueba igual con un capítulo. La novela de ejemplo sí tiene 10. Está declarado. |
-| ¿Por qué no se ejecutó Lean? | Su instalador necesita permisos de administrador en la máquina, que no teníamos. El export está escrito y el motivo, declarado. |
-| ¿Por qué hechos obligatorios da 1 de 3? | La revisión busca el texto literal: "tomato plants" no cuenta como "the tomatoes". Preferimos marcar un hecho como no cubierto antes que darlo por bueno sin estarlo. |
-| ¿Tres capítulos abajo de 1,000 palabras? | Tienen entre 934 y 967. El control acepta un 10 % de tolerancia; el enunciado pide 1,000. Lo declaramos como riesgo. |
-| ¿Por qué el orquestador no va en Haiku, si es más barato? | Lo probamos: dejó de usar nuestros agentes y el escritor tuvo acceso a todo. Por eso el ahorro viene de pasar el ciclo a código, no de un modelo más barato. |
+| ¿Por qué no se ejecutó Lean? | Su instalador necesita permisos de administrador en la máquina, que no tenía. El export está escrito y el motivo, declarado. |
+| ¿Por qué hechos obligatorios da 1 de 3? | La revisión busca el texto literal: "tomato plants" no cuenta como "the tomatoes". Prefiero marcar un hecho como no cubierto antes que darlo por bueno sin estarlo. |
+| ¿Tres capítulos abajo de 1,000 palabras? | Tienen entre 934 y 967. El control acepta un 10 % de tolerancia; el enunciado pide 1,000. Lo declaro como riesgo. |
+| ¿Por qué el orquestador no va en Haiku, si es más barato? | Lo probé: dejó de usar mis agentes y el escritor tuvo acceso a todo. Por eso el ahorro viene de pasar el ciclo a código, no de un modelo más barato. |
 | ¿Cómo se protegen los datos personales? | El modelo nunca ve el nombre real: el código lo pone al publicar. Las credenciales salen del entorno y no hay claves en el repositorio. |
 | ¿Qué pasa si se cae a la mitad? | Cada etapa deja su resultado guardado; se continúa desde la primera sin terminar, sin repetir lo hecho. |
 
