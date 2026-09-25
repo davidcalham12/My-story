@@ -190,7 +190,7 @@ def test_the_service_writes_each_result_as_it_arrives(db, tmp_path):
                            writes={rel: "x" for rel in unit.outputs}, run_dir=run_dir)
 
     svc._conductor_factory = factory
-    out = svc.resume(RUN_ID, ceiling_usd=50.0, _wait=True)
+    out = svc.resume(RUN_ID, _wait=True)
 
     r = row(db, out["segment"])
     units = len(seen)
@@ -213,7 +213,7 @@ def test_a_unit_that_ends_without_a_result_is_counted(db, tmp_path):
                                   use_recorded_stream=False))
     svc._conductor_factory = lambda unit, prompt, budget_left=None: FakeProcess(
         [json.dumps(init(SONNET)), turn(900)], run_dir=tmp_path / SLUG)
-    out = svc.resume(RUN_ID, ceiling_usd=50.0, _wait=True)
+    out = svc.resume(RUN_ID, _wait=True)
 
     r = row(db, out["segment"])
     assert r["total_usd"] is None and r["provenance"] == "absent"

@@ -13,7 +13,7 @@ const run: Run = {
 }
 
 const html = (runs: Run[]) => renderToStaticMarkup(
-  <LibraryView view="library" runs={runs} binned={[]} published={{}} confirming={null}
+  <LibraryView view="library" runs={runs} binned={[]} confirming={null}
     notice={null} error={null} onView={() => {}} onOpen={() => {}} onNew={() => {}}
     onContinue={() => {}} onTrash={() => {}} onConfirmTrash={() => {}}
     onCancelTrash={() => {}} onRestore={() => {}} />)
