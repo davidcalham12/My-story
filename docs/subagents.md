@@ -36,3 +36,13 @@ waits for the owner.**
 | `/reader-change <slug> <fact> "<wording>"` | the reader-change demo: impact first, then only the impacted chapters through the gate, as a new version | exam evidence 3; pins the procedure the book was written with, so v3 reads like v2 |
 | `/publish <run-dir> [--next "<reason>"]` | personalise, ingest, print, record every validator, ask the judge | the three published novels that had no characters and no judge row until this was one step |
 | `/run-eval` | rebuild `evals/results.md` from code and `validations` | the eval table stays a view of the database, never a document typed by hand |
+
+## Project memory (`.claude/memory/`)
+
+`MEMORY.md` indexes seven memories, one file each, with the reason and the evidence:
+the writer's isolation, the orchestrator as most of the bill, absent is never zero,
+the alias put in by code, the reader change's arrival check, the operating rules
+(one server per database, suite alone before a push, prompt on stdin) and who
+approves spending. They are what a new agent needs before it acts, and what
+`CLAUDE.md` cannot say in one screen.
+

@@ -71,3 +71,4 @@ agents and the writer's isolation disappeared (`docs/iterations.md`).
 - `docs/trade-offs.md`, `docs/iterations.md`, `docs/red-team-log.md` — the reasoning
 - `evals/briefs/` — the five evaluation briefs
 - `tla/Harness.tla` — the harness as a state machine
+- `.claude/memory/` — the project memory: seven lessons, each learned from a run that went wrong
