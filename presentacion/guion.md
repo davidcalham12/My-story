@@ -94,11 +94,13 @@ pone el código) y audit log.
 
 **Mensaje:** un techo por debajo de lo que cuesta el trabajo no ahorra, compra
 un libro roto (red-team, caso 10). Ya está construida la palanca para bajar el
-coste: el orquestador en Sonnet y tres críticos unidos en uno (SPEC-EXAM-004),
-que deja cada capítulo con la mitad de llamadas. Está pendiente de medir.
+coste: el orquestador en Sonnet (aplicado el 24-09) y el bucle del capítulo en
+código (SPEC-EXAM-006, aprobado). Los agentes son el 8 % del coste medido; el
+92 % es el orquestador (slide "Dónde se va el dinero").
 
 ### 12. Demo y riesgos
-El cambio del lector ("el perro se llama Nala") y los riesgos declarados:
+El cambio del lector ("el observatorio de cartón pasa a ser una casa del
+árbol", hecho 36, capítulos 3 y 10 → v3, 10,31 $ medidos) y los riesgos declarados:
 - el coste depende del orquestador;
 - el juez no es reproducible;
 - los hechos se comprueban por texto, no por significado.
@@ -123,9 +125,10 @@ carga.
    - pulsa "chapter 9" en la ficha y salta al capítulo;
    - elige la versión 1 (8 capítulos) y luego la 2 (10): las dos siguen ahí;
    - **Download PDF** baja el archivo con el título del libro.
-4. **Ask for a change:** elige el dato del perro, escribe el nuevo nombre y
-   enseña qué capítulos se reescribirían **antes de gastar nada**. Si la v3 ya
-   está generada, ábrela y enseña su página de novedades.
+4. **Ask for a change:** elige el hecho 36 (el observatorio de cartón), escribe
+   "a wooden treehouse observatory" y enseña qué capítulos se reescribirían
+   (3 y 10) **antes de gastar nada**. Luego abre la v3 ya generada y enseña su
+   página de novedades.
 5. **New novel:**
    - pulsa "Fill this in with the example brief";
    - enseña los pasos, la longitud de 1 a 10 y la comprobación de lo que falta;

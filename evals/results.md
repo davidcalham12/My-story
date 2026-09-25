@@ -6,9 +6,9 @@ it, 2026-09-24 21:36 UTC. Profile for the novel half: `eval`.
 Two of these five are refused here, and a table where every row said
 `ok` would be a table that proved nothing. The arithmetic is worth
 stating plainly: **three pass FLOW-0**. `03` is refused for exactly the
-reason it was written. `05` is refused for a *different* reason than the
-one it was written for, and what it was written for is invisible to this
-phase -- see below.
+reason it was written: missing data and an adult genre for a child.
+`05` is refused for the reason it was written too: a memory dated
+before the recipient was born -- see below.
 
 | brief | status | expected | questions | contradictions | verdict |
 |---|---|---|---|---|---|
@@ -68,6 +68,50 @@ premise is composed by the product, not by this script.
 ## Novel half
 
 ### 01-hijo — run `02412b7fe29e` (`the-other-side-of-the-hill`)
+
+> Edited by hand on 2026-09-25, pending a regeneration: the generator showed
+> only the latest version, so v3 (the reader change) hid the judge and the
+> human review of v2, the book they read. `run_eval.py` now prints one table
+> per version. The v2 table below is the generator's own output at `32e22e0`;
+> v1 appears when the file is regenerated from `validations`.
+
+#### version 2
+
+| validator | criterion | value | why |
+|---|---|---|---|
+| canonical_names |  | 0 | none |
+| chapter_length | ch01 | 1241 | in band |
+| chapter_length | ch02 | 1112 | in band |
+| chapter_length | ch03 | 1142 | in band |
+| chapter_length | ch04 | 1200 | in band |
+| chapter_length | ch05 | 1104 | in band |
+| chapter_length | ch06 | 967 | outside 1000-1500 |
+| chapter_length | ch07 | 1072 | in band |
+| chapter_length | ch08 | 950 | outside 1000-1500 |
+| chapter_length | ch09 | 934 | outside 1000-1500 |
+| chapter_length | ch10 | 1039 | in band |
+| forbidden_words |  | 0 | none |
+| human_review |  | 8 | The owner read the complete ten-chapter book (v2) on 2026-09-24 and scored it a solid 8 overall. The owner gave one overall score, not one per criterion; the co |
+| judge_rubric | character_coherence | 9 | Every character maintains consistent personality and behavior across all appearances. The protagonist develops believably—introduced claiming fearlessness (Ch1) |
+| judge_rubric | continuity | 8 | The book maintains consistent facts and timeline across all ten chapters—the protagonist's birthday (Ch1) leads to the quest (Ch5), the overnight visit to Elena |
+| judge_rubric | mean | 8.333333333333334 | mean over all 6 criteria |
+| judge_rubric | narrative_arc | 8 | The book traces a complete arc from curiosity and setup (Ch1-4), through adventure and discovery (Ch5-6), to integration and transformed understanding (Ch7-10). |
+| judge_rubric | natural_personalisation | 8 | Despite the anonymized placeholder name, the protagonist is written as a fully-realized character with distinct consciousness, agency, and specific concrete det |
+| judge_rubric | pacing | 8 | The ten chapters are well-proportioned to their narrative weight. Setup chapters (Ch1-4) build appropriately toward the turning point; the climb itself (Ch5) is |
+| judge_rubric | tone | 9 | The book achieves and sustains the requested warm, funny, and gentle tone throughout all ten chapters. Ch1 establishes intimate coziness (honey on tables, Bruno |
+| lean_chronology |  | — | not run: elan unavailable |
+| mandatory_facts |  | 1/3 | 1 of 3 mandatory facts covered; uncovered: 34, 35 |
+| schema_brief |  | pass | FLOW-0: ok |
+| schema_role_output |  | 61/61 | all parse |
+| visual_check |  | pass | 2026-09-24 build session, Playwright from Python (not the MCP client): 1 cover pass (title, dedication with the alias); 2 index pass (10/10 entries, links land) |
+
+#### version 3
+
+The reader change (fact 36). The judge and the human review were not re-run
+on v3. `mandatory_facts` reads 0/3 because the reader change does not version
+fact texts: fact 36 still holds its old text, which v3 correctly no longer
+contains (declared gap). Chapters 6, 8 and 9 (967, 950, 934 words) are inside
+the gate's 10 % tolerance but under the exam's 1,000 (declared).
 
 | validator | criterion | value | why |
 |---|---|---|---|

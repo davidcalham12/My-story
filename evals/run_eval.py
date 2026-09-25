@@ -200,9 +200,9 @@ def table(rows: list[dict]) -> str:
         "Two of these five are refused here, and a table where every row said",
         "`ok` would be a table that proved nothing. The arithmetic is worth",
         "stating plainly: **three pass FLOW-0**. `03` is refused for exactly the",
-        "reason it was written. `05` is refused for a *different* reason than the",
-        "one it was written for, and what it was written for is invisible to this",
-        "phase -- see below.",
+        "reason it was written: missing data and an adult genre for a child.",
+        "`05` is refused for the reason it was written too: a memory dated",
+        "before the recipient was born -- see below.",
         "",
         "| brief | status | expected | questions | contradictions | verdict |",
         "|---|---|---|---|---|---|",
@@ -285,7 +285,11 @@ def _eval_id_of(payload_json: str) -> str | None:
 
 def novel_half(db_path: Path = ROOT / "novaforge.db") -> list[str]:
     """The `validations` rows of every eval run and the example novel (profile
-    `exam`) started from a brief, at each run's latest validated version."""
+    `exam`) started from a brief, one table per validated version.
+
+    Every version, not only the latest: a reader change publishes a new
+    version that re-runs only some validators, and showing the latest alone
+    hid the judge and the human review of the book they were given."""
     if not db_path.is_file():
         return ["## Novel half", "", "absent: no database", ""]
     conn = sqlite3.connect(db_path)
@@ -297,22 +301,27 @@ def novel_half(db_path: Path = ROOT / "novaforge.db") -> list[str]:
     if not runs:
         return out + ["absent: no eval run has been recorded yet", ""]
     for run in runs:
-        rows = conn.execute(
-            "SELECT validator, criterion, value, justification FROM validations "
-            "WHERE run_id = ? AND version = (SELECT MAX(version) FROM validations "
-            "WHERE run_id = ?) ORDER BY validator, criterion",
-            (run["id"], run["id"])).fetchall()
+        versions = [v[0] for v in conn.execute(
+            "SELECT DISTINCT version FROM validations WHERE run_id = ? ORDER BY version",
+            (run["id"],)).fetchall()]
         out += [f"### {_eval_id_of(run['payload']) or '?'} — run `{run['id']}` "
                 f"(`{run['slug']}`)", ""]
-        if not rows:
+        if not versions:
             out += ["absent: no validator has recorded this run", ""]
             continue
-        out += ["| validator | criterion | value | why |", "|---|---|---|---|"]
-        for r in rows:
-            why = (r["justification"] or "").replace("|", "\\|")[:160]
-            value = r["value"] if r["value"] is not None else "—"
-            out.append(f"| {r['validator']} | {r['criterion'] or ''} | {value} | {why} |")
-        out.append("")
+        for version in versions:
+            rows = conn.execute(
+                "SELECT validator, criterion, value, justification FROM validations "
+                "WHERE run_id = ? AND version IS ? ORDER BY validator, criterion",
+                (run["id"], version)).fetchall()
+            if len(versions) > 1:
+                out += [f"#### version {version}", ""]
+            out += ["| validator | criterion | value | why |", "|---|---|---|---|"]
+            for r in rows:
+                why = (r["justification"] or "").replace("|", "\\|")[:160]
+                value = r["value"] if r["value"] is not None else "—"
+                out.append(f"| {r['validator']} | {r['criterion'] or ''} | {value} | {why} |")
+            out.append("")
     return out
 
 
