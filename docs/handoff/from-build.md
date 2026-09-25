@@ -161,3 +161,24 @@ out of scope: MCP server, login, prose linters, LSP, web reader with text select
 - `mandatory_facts` v3: 0/3 — fact 36 still holds its **old** text in `facts` (the reader change
   does not version fact texts), which v3 correctly no longer contains; the other two as in v2
   (literal matching). Declared gap.
+
+## Build session — 2026-09-25, ~02:25 UTC · SPEC-EXAM-008: the cost of every change
+
+- Merged (`85e30a2`, `28a5572`, `1ab…` backfill fix), 917 backend + 140 frontend green.
+  Backfilled and re-exported to Langfuse (`--replace`); `GET /api/runs/{id}/costs` reads it back.
+- The example novel, one row per change — **all "confirmed in Langfuse"**:
+
+| n | change | total | orchestrator | agents | min |
+|---|---|---|---|---|---|
+| 1 | generate (ch01–08) | 53.17 | Opus 48.79 | Haiku 4.38 | 118.6 |
+| 2 | continue (ch09–10, FLOW-5/6) | 21.03 | Opus 19.34 | Haiku 1.69 | 50.7 |
+| 3 | reader change, first demo (stopped by the operator) | absent | — | — | — |
+| 4 | reader change, cut by the org spend limit | 7.52 | Opus 6.64 | Haiku 0.88 | 25.8 |
+| 5 | reader change v3 (ch10; ch03's stream overwritten) | 4.57 + 1 absent | Sonnet 4.16 | Haiku 0.41 | 19.5 |
+| 6 | redo ch03 (v3) | 1.50 | Sonnet 1.34 | Haiku 0.16 | 6.7 |
+| | **novel total** | **87.80 measured**, 1 change absent, 1 incomplete | | | |
+
+- Minutes are `result.duration_ms` (measured). `finished_at` on backfilled rows is the backfill
+  time, not the change's — declared. The first v3 ch03 (4.24 USD, measured and reported earlier
+  here) has no stream left; the code now keeps set-aside streams in `_redo-*`.
+- Evals: 04 generate 25.80 (orchestrator 11.75, agents 14.05); 01 absent (no `result`).
