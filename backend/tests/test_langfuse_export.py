@@ -69,10 +69,12 @@ class FakeClient:
         self.scores: list[dict] = []
         self.prompts: list[dict] = []
         self.flushes = 0
+        self.tags: list = []
 
     @contextmanager
-    def session(self, *, session_id):
+    def session(self, *, session_id, tags=None):
         self.sessions.append(session_id)
+        self.tags.append(tags)
         yield
 
     def start_observation(self, **kwargs):
@@ -388,9 +390,10 @@ def _no_sockets(*args, **kwargs):
     raise AssertionError("the export opened a socket")
 
 
-def test_a_call_ships_its_four_usage_figures_and_its_estimated_cost(db, tmp_path):
-    """usage_details carries input, output and both cache figures; cost_details
-    the per-call estimate, with its provenance in metadata."""
+def test_a_call_ships_its_four_usage_figures_and_its_estimate_in_metadata(db, tmp_path):
+    """usage_details carries input, output and both cache figures. The per-call
+    estimate, with its input/output/cache split, moves to metadata
+    (`estimated_cost_usd`): SPEC-EXAM-008 §8.4 supersedes 07fe3fb's cost_details."""
     seed(db)
     db.execute("UPDATE calls SET cache_creation_input_tokens = 300, "
                "cache_read_input_tokens = 40, cost_provenance = 'estimated' "
@@ -403,11 +406,85 @@ def test_a_call_ships_its_four_usage_figures_and_its_estimated_cost(db, tmp_path
     assert usage["input"] == 1000 and usage["output"] == 200
     assert usage["cache_creation_input_tokens"] == 300
     assert usage["cache_read_input_tokens"] == 40
-    parts = span.kwargs["cost_details"]
+    assert "cost_details" not in span.kwargs, "an estimate never goes where Langfuse sums"
+    parts = span.kwargs["metadata"]["estimated_cost_usd"]
     assert set(parts) >= {"input", "output", "cache_read_input_tokens",
                           "cache_creation_input_tokens", "total"}
     assert span.kwargs["metadata"]["cost_provenance"] == "estimated"
 
+
+# ------------------------------------------------ SPEC-EXAM-008: one trace per change
+
+
+def seed_changes(db) -> None:
+    db.executemany(
+        "INSERT INTO changes (run_id, n, kind, version, chapters, label, started_at, "
+        "finished_at, total_usd, minutes, orchestrator_model, orchestrator_usd, "
+        "agents_model, agents_usd, provenance, results, unresulted, sources, note) "
+        "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [("r1", 1, "generate", None, None, None, "2026-01-01T08:00:00Z",
+          "2026-01-01T11:00:00Z", 53.1745489, 118.6, "claude-opus-5[1m]", 48.7945489,
+          "claude-haiku-4-5-20251001", 4.38, "measured", 1, 0, '["events seq 2038"]', None),
+         ("r1", 2, "reader_change", 2, "[3, 10]", "dist/v2", "2026-01-02T08:00:00Z",
+          "2026-01-02T09:00:00Z", 8.81, 39.0, "claude-sonnet-5", 8.04,
+          "claude-haiku-4-5-20251001", 0.77, "measured", 2, 0,
+          '["dist/v2/logs/ch10.stream.jsonl"]', None),
+         ("r1", 3, "redo", 2, "[3]", "dist/v2 redo", "2026-01-02T10:00:00Z",
+          None, None, None, None, None, None, None, "absent", 0, 1, "[]",
+          "incomplete: 1 process without a result")])
+
+
+def test_each_change_is_one_trace_with_two_generations_carrying_measured_cost(db, tmp_path):
+    from tools.export_to_langfuse import change_trace_id
+
+    seed(db)
+    seed_changes(db)
+    ops = plan(collect(workspace(tmp_path), db))
+
+    roots = {o["trace_context"]["trace_id"]: o for o in ops
+             if o["op"] == "observation" and o["parent"] is None}
+    first = roots[change_trace_id("r1", 1)]
+    assert first["metadata"]["provenance"] == "measured"
+    assert first["metadata"]["kind"] == "generate"
+    assert first["metadata"]["sources"] == ["events seq 2038"]
+    assert set(first["tags"]) >= {"generate"}
+    change2 = roots[change_trace_id("r1", 2)]
+    assert set(change2["tags"]) >= {"reader_change", "v2", "ch03", "ch10"}
+
+    gens = [o for o in ops if o["op"] == "observation" and o["parent"] == first["key"]]
+    assert sorted(g["name"] for g in gens) == ["agents", "orchestrator"]
+    by = {g["name"]: g for g in gens}
+    assert by["orchestrator"]["as_type"] == "generation"
+    assert by["orchestrator"]["model"] == "claude-opus-5[1m]"
+    assert by["orchestrator"]["cost_details"] == {"total": pytest.approx(48.7945489)}
+    assert by["agents"]["cost_details"] == {"total": pytest.approx(4.38)}
+    assert by["orchestrator"]["cost_details"]["total"] + by["agents"]["cost_details"]["total"]         == pytest.approx(53.1745489)
+
+
+def test_measured_cost_is_only_on_the_change_generations(db, tmp_path):
+    """AC-3, on the ops list: every `cost_details` in the plan is a change's
+    orchestrator or agents generation, and an absent figure sends none."""
+    seed(db)
+    seed_changes(db)
+    ops = plan(collect(workspace(tmp_path), db))
+    costed = [o for o in ops if "cost_details" in o]
+    assert costed and all(o["name"] in ("orchestrator", "agents") for o in costed)
+    assert all(o["metadata"]["provenance"] == "measured" for o in costed)
+    redo = [o for o in ops if o["op"] == "observation"
+            and o.get("metadata", {}).get("change_n") == 3 and o["parent"] is not None]
+    assert redo and not any("cost_details" in o for o in redo), "absent is not $0"
+    total = sum(o["cost_details"]["total"] for o in costed)
+    assert total == pytest.approx(53.1745489 + 8.81)
+
+
+def test_the_change_traces_are_sent_in_the_session_with_their_tags(db, tmp_path):
+    seed(db)
+    seed_changes(db)
+    client = exported(db, workspace(tmp_path))
+    assert set(client.sessions) == {"demo"}
+    assert any("reader_change" in (t or []) for t in client.tags)
+    names = [o.kwargs["name"] for o in client.observations if o.parent is not None]
+    assert names.count("orchestrator") == 3 and names.count("agents") == 3
 
 
 def test_replace_deletes_the_runs_traces_and_waits_until_they_are_gone():

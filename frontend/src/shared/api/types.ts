@@ -1,3 +1,5 @@
+import type { CostTotal } from '@/entities/cost/model'
+
 /**
  * The contract, as the backend states it.
  *
@@ -77,6 +79,8 @@ export interface Run {
   chapters_planned?: number | null
   /** Every published version's number, oldest first. */
   published_versions?: number[]
+  /** SPEC-EXAM-008: the novel's total across every change (local record). */
+  cost_total?: CostTotal
 }
 
 export interface Attempt {

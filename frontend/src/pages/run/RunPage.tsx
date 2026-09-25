@@ -4,6 +4,7 @@ import { gradeOf, money, tokens } from '@/shared/lib/provenance'
 import { Provenance } from '@/shared/ui/Provenance'
 import { GateTable } from '@/entities/critique/GateTable'
 import { plainStatus, titleOf } from '@/entities/run/status'
+import { CostsSection } from './CostsSection'
 
 /** One run, pyramid order: the answer in one sentence, the next thing to do,
  *  three figures, and the technical record folded underneath. */
@@ -58,6 +59,8 @@ export function RunPage({ runId, onRead, onChange }: {
           </p>
         </div>
       </div>
+
+      <CostsSection runId={runId} />
 
       <details className="more">
         <summary>Technical details — for the team</summary>

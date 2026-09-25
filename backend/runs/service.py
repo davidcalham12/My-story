@@ -29,6 +29,7 @@ from backend.brief import domain as brief_domain
 from backend.policy import forbidden
 from backend.commons.db import repository as write_repo
 from backend.commons.log import agent_usage
+from backend.costs import repository as costs_repo
 from backend.commons.log.calls import CallRow, write_call
 from backend.commons.runner.process import ReplayProcess, RunProcess
 from backend.commons.runner.watch import (
@@ -145,6 +146,8 @@ class Live:
     #: Which `changes` row (its `n`) this process is (SPEC-EXAM-007); None
     #: when the caller opened none.
     segment: int | None = None
+    #: SPEC-EXAM-008: folds this process's stream into its `changes` row.
+    meter: object | None = None
 
 
 class RunService:
@@ -166,14 +169,20 @@ class RunService:
         return (out / BIN if run.get("trashed_at") else out) / run["slug"]
 
     def list(self, trashed: bool = False) -> list[dict]:
-        return [self._titled(r) | self._standing(r)
+        return [self._titled(r) | self._standing(r) | self._cost_total(r)
                 for r in read_repo.list_runs(self.conn, trashed=trashed)]
 
     def get(self, run_id: str) -> dict:
         run = read_repo.get_run(self.conn, run_id)
         if not run:
             raise NotFound(run_id)
-        return self._titled(run) | self._standing(run)
+        return self._titled(run) | self._standing(run) | self._cost_total(run)
+
+    def _cost_total(self, run: dict) -> dict:
+        """SPEC-EXAM-008: the novel's total across every change, for the card.
+        Local — the card does not ask Langfuse; the novel page does."""
+        return {"cost_total": costs_repo.total(costs_repo.rows(self.conn, run["id"]))
+                | {"source": "local"}}
 
     # ------------------------------------------------ stopped (SPEC-EXAM-007)
 
@@ -651,7 +660,8 @@ class RunService:
 
         def run_one(n: int, left: float | None):
             return loop.run_chapter(run_dir, n, runner=runner, conn=self.conn,
-                                    run_id=live.run_id, ceiling_usd=left, stop=stop)
+                                    run_id=live.run_id, ceiling_usd=left, stop=stop,
+                                    change=live.segment)
 
         # `halt` reaches the conductor, and through this the loop's processes.
         run_one.stop = stop.set
@@ -785,6 +795,12 @@ class RunService:
             write_call(self.conn, agent_usage.row(
                 run_id, state, usage, loader.load_pricing(), _now()))
 
+        # SPEC-EXAM-008: each `result` adds to this change's row as it arrives.
+        live = self._live
+        if live is not None and live.run_id == run_id and live.segment is not None:
+            live.meter = costs_repo.observe(self.conn, run_id, live.segment,
+                                            live.meter, event)
+
     def _finish(self, live: Live, state: State, halted: tuple[str, str] | None) -> None:
         """Close the run, and **always** release whoever is following it.
 
@@ -809,6 +825,10 @@ class RunService:
 
             units = len(getattr(live, "units", []) or [])
             earlier: list[dict] = []
+            if live.segment is not None and live.meter is not None:
+                # SPEC-EXAM-008 §2: a process that ended without a `result`.
+                costs_repo.add_missing(self.conn, live.run_id, live.segment,
+                                       live.meter.unresulted)
             if live.segment is not None:
                 write_repo.close_change(
                     self.conn, live.run_id, live.segment, total_usd=state.total_cost_usd,

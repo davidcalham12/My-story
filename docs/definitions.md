@@ -106,6 +106,13 @@ so provenance and revision responsibility are traceable.
 call with agent, model, tokens in and out, cost, duration and a real timestamp,
 plus a provenance grade on every figure the panel shows.
 
+**Change** — one thing done to a novel that launches Claude Code: `generate` (the
+first run), `continue` (a SPEC-EXAM-007 continuation), `reader_change` (a fact
+changed, a new version) or `redo` (chapters of an unpublished version written
+again). One row of `changes` each; its cost is the sum of its processes'
+`result` events, split orchestrator/agents by role (SPEC-EXAM-008).
+→ **built**, `backend/costs/`.
+
 ---
 
 ## 2. Relationships

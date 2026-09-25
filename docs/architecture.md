@@ -824,6 +824,17 @@ And two things built because the gap table named them: the mechanical prose chec
 (SPEC-005) and the canonical-name check, both **script before agent**, both $0,
 both measured over everything that has ever shipped before being believed.
 
+### SPEC-EXAM-008 — the cost of every change (`backend/costs/`)
+
+Each `result` event is added to its change's `changes` row as it arrives
+(`measure.py` splits `modelUsage` by role: the process's main model is the
+orchestrator, the rest are agents; the Python loop has no orchestrator).
+`backfill.py` rebuilds rows from `events` and the streams on disk;
+`tools/export_to_langfuse.py` sends one trace per change whose two generations
+carry the measured cost, and moves the per-call estimate to metadata;
+`GET /api/runs/{id}/costs` reads Langfuse's v2 observations and falls back to the
+local rows, marked unconfirmed. One table, shared with SPEC-EXAM-007.
+
 ## 9. Limits
 
 Stated here and classified in `verification.md`.

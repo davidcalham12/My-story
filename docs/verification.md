@@ -92,6 +92,7 @@ with the reason attached — two have, and they say so.
 | G19 | state is persisted as the stream reveals it, not at the end | important | **T** for every stream line (`events`), the stage and the calls; **not held** for the gate record until the archive | **partly → §3.14**, narrowed |
 | G22 | the budget ceiling is the profile's figure, and one figure reaches both `--max-budget-usd` and the watcher | important | **T** | yes |
 | G23 | a halt asked for by the user is recorded as the user's, through the same finish as a watcher trip | incidental | **T** | yes |
+| G24 | each change to a novel (generate, continue, reader change, redo) has a `changes` row summed from its processes' `result` events as they arrive, split orchestrator/agents by role; absent is never 0; Langfuse carries only measured cost (SPEC-EXAM-008 AC-1..AC-6) | important | **T** (AC-7 **D**) | yes |
 | G20 | a feedback sheet is complete and never quotes a previous chapter | important | **T** for the validator, **I** for its being run | yes |
 | G21 | LOOP-003 §8.3's prohibitions hold: the threshold is 8, the attempts are three, the characteristics are the listed ones | incidental | **T** | yes |
 
@@ -694,6 +695,21 @@ is not filed as `process` (the orchestrator's death); the run goes through the
 same `_finish` as a watcher trip — archive, warnings, the sentinel — so nothing
 a `budget` halt does is skipped for a `user` one.
 
+### G24 — The cost of every change is measured, recorded as it arrives, and shown with its source
+
+**Important · Class T** (SPEC-EXAM-008 AC-1..AC-6); AC-7 is **D**.
+
+**Method.** `test_change_costs.py` (the split by role, minutes from Σ
+`duration_ms`, a row written at each `result` on the service, loop and reader
+change paths, a process without a result counted and left absent),
+`test_backfill_changes.py` (53.17 = 48.79 + 4.38 and 21.03 = 19.34 + 1.69; the
+v3, `_aborted-change-*` and `_redo-*` cases), `test_langfuse_export.py` (measured
+cost only on each change's two generations; the per-call estimate in metadata),
+`test_costs_api.py` (Langfuse through a fake; local fallback marked unconfirmed;
+both figures on disagreement; no credential in a response),
+`CostsSection.test.tsx` and `LibraryCardCost.test.tsx`. AC-7 — Langfuse's own UI
+showing 74.20 USD after re-export — is a demonstration after merge.
+
 ## 3. Known gaps and accepted risks
 
 **A gap listed here is an engineering decision. A gap not listed here is a
@@ -1176,6 +1192,22 @@ of `cost.json` files.
 **Also absent:** the judge's cost. `backend.publish.run_judge` reads the
 rubric out of the `--output-format json` reply and drops its `total_cost_usd`;
 the v2 judge call (2 min, Haiku) has no recorded cost.
+
+### 3.25 A redo overwrote the stream of the pass it redid (before SPEC-EXAM-008)
+
+**What is not verified:** the cost of v3's first pass at chapter 3 (4.24 USD,
+recorded by hand in `docs/handoff/from-build.md`). Until SPEC-EXAM-008 a redo
+wrote `logs/chNN.stream.jsonl` afresh, so that `result` is not on disk; the
+backfill counts it as a process without a result — absent, with a note.
+Also absent, with no stream at all: v2 and `_aborted-change-1` (before streams
+were kept), and changes run with the Python loop outside the server (the loop
+writes no stream file; the live recorder covers it from now on).
+**Why accepted:** `_set_aside` now moves the stream with the chapter, so it
+cannot happen again; the figure survives in the handoff as a hand record.
+**Scope of damage:** the example novel's v3 reads 4.57 + 1.50 USD measured and
+one process absent, not 10.31.
+**How we would find out:** the row says "incomplete: 1 process without a
+result" in the panel and in the Langfuse trace's metadata.
 
 ## 4. Code before agent
 

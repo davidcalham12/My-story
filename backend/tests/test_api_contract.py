@@ -189,6 +189,8 @@ def test_no_route_takes_a_path_and_reads_a_file():
         # database, never by the URL; traversal test in test_reader_contents.py.
         "/api/runs/{run_id}/chapters",
         "/api/runs/{run_id}/changes",
+        # SPEC-EXAM-008: rows from the database and Langfuse; no file is read.
+        "/api/runs/{run_id}/costs",
         "/api/runs/{run_id}/facts",
         "/api/runs/{run_id}/facts/{fact_id}/impact",
         "/api/runs/{run_id}/versions",

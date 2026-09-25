@@ -1,5 +1,6 @@
 import type { Run } from '@/shared/api/types'
 import { plainStatus, stepOf, titleOf } from '@/entities/run/status'
+import { CostTotalLine } from '@/entities/cost/CostTotalLine'
 
 export type LibraryPlace = 'library' | 'bin'
 
@@ -156,6 +157,7 @@ export function LibraryView(p: {
                 <p className="hint">Stopped at: {stepOf(run.resume_stage)} ({run.resume_from})</p>
               )}
               <p className="muted clamp">{run.premise}</p>
+              <CostTotalLine total={run.cost_total} />
               {binnable && asking && (
                 <div className="confirm" role="alert">
                   <p>Move «{titleOf(run)}» to the bin?</p>

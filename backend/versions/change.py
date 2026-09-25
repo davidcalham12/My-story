@@ -60,7 +60,7 @@ def impacted(conn: sqlite3.Connection, fact_id: str) -> tuple[int, ...]:
 
 
 def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
-             fact_id: str, to: str) -> dict[int, bool]:
+             fact_id: str, to: str, *, change: int | None = None) -> dict[int, bool]:
     """The boundary. `claude -p` rewrites the named chapters and the gate judges.
 
     **Not called anywhere in the test suite**, by design: it is the only part of
@@ -70,7 +70,10 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
 
     The contract, which the tests hold a stand-in to: write each named chapter
     to `<workspace>/chapters/chNN.md` and return the gate's verdict per chapter.
+    `change` is the `changes` row (its `n`) every chapter process's `result`
+    adds to, as it arrives (SPEC-EXAM-008 §8.2).
     """
+    from backend.costs import repository as costs
     import shutil as _shutil
 
     from backend.commons.config.settings import load_settings as _settings
@@ -111,7 +114,7 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
                 change_note=(f"Reader change: wherever the Bible or the outline once said "
                              f"{(old or fact_id)!r}, it now says {to!r}. "
                              f"Write the chapter so it holds."),
-                slug=f"{run_dir.name}/{workspace.name}")
+                slug=f"{run_dir.name}/{workspace.name}", change=change)
             spent += outcome.cost_usd
             if outcome.halted and outcome.halted[0] in ("budget", "api"):
                 raise UnitCut(outcome.halted[0], n)
@@ -138,11 +141,18 @@ def dispatch(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
         process.start()
         # The stream is the record: its `result` event is the unit's measured cost.
         events: list[dict] = []
+        meter = None
         with (workspace / "logs" / f"ch{n:02d}.stream.jsonl").open(
                 "w", encoding="utf-8") as log:
             for raw, event in process.lines():
                 log.write(raw.rstrip("\n") + "\n")
                 events.append(event)
+                if run_id and change is not None:
+                    meter = costs.observe(conn, run_id, change, meter, event)
+        if run_id and change is not None:
+            # A process that ended without its `result`: absent, never 0.
+            costs.add_missing(conn, run_id, change,
+                              meter.unresulted if meter else 1)
         spent += sum(float(e.get("total_cost_usd") or 0) for e in events
                      if e.get("type") == "result")
         promoted = workspace / "chapters" / f"ch{n:02d}.md"
@@ -306,7 +316,12 @@ def _set_aside(workspace: Path, chapters: tuple[int, ...]) -> None:
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     target = workspace / "chapters" / f"_redo-{stamp}"
     for c in chapters:
-        for path in (workspace / "chapters").glob(f"ch{c:02d}.*"):
+        # The earlier pass's stream too: the redo writes logs/chNN.stream.jsonl
+        # afresh, and before SPEC-EXAM-008 that overwrote the only record of
+        # what the earlier pass cost (v3 ch03, 4.24 USD).
+        stream = workspace / "logs" / f"ch{c:02d}.stream.jsonl"
+        for path in [*(workspace / "chapters").glob(f"ch{c:02d}.*"),
+                     *([stream] if stream.is_file() else [])]:
             target.mkdir(parents=True, exist_ok=True)
             path.rename(target / path.name)
 
@@ -367,6 +382,28 @@ def prepare_workspace(run_dir: Path, workspace: Path, chapters: tuple[int, ...],
         summary = run_dir / "chapters" / f"ch{n - 1:02d}.summary.md"
         if summary.is_file():
             _shutil.copyfile(summary, workspace / "chapters" / summary.name)
+
+
+def _takes_change(regenerate) -> bool:
+    """Whether an injected `regenerate` accepts `change=`. Stand-ins written
+    before SPEC-EXAM-008 take five positional arguments and are still valid."""
+    import inspect
+
+    try:
+        params = inspect.signature(regenerate).parameters.values()
+    except (TypeError, ValueError):
+        return False
+    return any(p.name == "change" or p.kind is p.VAR_KEYWORD for p in params)
+
+
+def _orchestrator_of(conn: sqlite3.Connection, run_id: str) -> str | None:
+    """The `--model` the chapter processes are launched with, as `dispatch`
+    decides it; None when the profile no longer resolves."""
+    row = conn.execute("SELECT profile FROM runs WHERE id = ?", (run_id,)).fetchone()
+    try:
+        return orchestrator_model(row[0]) if row else None
+    except Exception:  # noqa: BLE001 - a profile that no longer exists
+        return None
 
 
 def _run_id(conn: sqlite3.Connection, slug: str) -> str | None:
@@ -453,8 +490,19 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         workspace = run_dir / "dist" / f"v{n}"
         workspace.mkdir(parents=True, exist_ok=False)
 
+    # SPEC-EXAM-008 §8.2: the change's row, opened before any process starts;
+    # each chapter process's `result` adds to it. A redo is its own row, on the
+    # same version.
+    from backend.costs import repository as costs
+    change_n = costs.open_change(
+        conn, run_id, kind="redo" if args.workspace else "reader_change", version=n,
+        chapters=chapters, label=f"fact {args.fact} → {args.to}",
+        orchestrator_model=_orchestrator_of(conn, run_id))
     try:
-        verdicts = regenerate(run_dir, workspace, chapters, args.fact, args.to)
+        verdicts = (regenerate(run_dir, workspace, chapters, args.fact, args.to,
+                               change=change_n)
+                    if _takes_change(regenerate) else
+                    regenerate(run_dir, workspace, chapters, args.fact, args.to))
     except UnitCut as cut:
         # The CLI or the API stopped a unit. Saying "gate" here would blame the
         # critics for a spend limit (the v3 of 2026-09-24).
@@ -467,6 +515,8 @@ def main(argv: list[str], *, conn: sqlite3.Connection | None = None,
         print(f"change: halted: {cut.reason} at chapter {cut.chapter}; "
               f"v{parent_n} stands", file=sys.stderr)
         return 1
+    finally:
+        costs.finish(conn, run_id, change_n)
     verdicts = {**kept, **verdicts}
     chapters = tuple(sorted(set(chapters) | set(kept)))
     # A change that does not arrive is not a change (docs/spec.md §8): every

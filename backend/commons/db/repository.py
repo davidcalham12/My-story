@@ -170,14 +170,20 @@ def open_change(conn, run_id: str, *, n: int, kind: str, started_at: str,
 def close_change(conn, run_id: str, n: int, *, total_usd: float | None,
                  provenance: str) -> None:
     """`total_usd` None stays NULL: a segment that reported nothing was not
-    free. `minutes` is this clock's, from the row's own start to now."""
+    free.
+
+    SPEC-EXAM-008: a row that `backend.costs` already added `result` events to
+    keeps its figures — they are the same sum, written as each one arrived —
+    and its `minutes`, which are Σ `result.duration_ms` (measured), not a wall
+    clock. A row with no result gets no minutes: absent, never a guess."""
     finished = now()
     with tx(conn):
         conn.execute(
-            "UPDATE changes SET finished_at = ?, total_usd = ?, provenance = ?, "
-            "minutes = (julianday(?) - julianday(started_at)) * 1440.0 "
+            "UPDATE changes SET finished_at = ?, "
+            "total_usd = CASE WHEN COALESCE(results, 0) > 0 THEN total_usd ELSE ? END, "
+            "provenance = CASE WHEN COALESCE(results, 0) > 0 THEN provenance ELSE ? END "
             "WHERE run_id = ? AND n = ?",
-            (finished, total_usd, provenance, finished, run_id, n))
+            (finished, total_usd, provenance, run_id, n))
 
 
 def set_trashed(conn, run_id: str, trashed: bool) -> None:

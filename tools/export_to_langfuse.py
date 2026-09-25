@@ -20,12 +20,22 @@ What goes up, and where it comes from:
 
     session         the run's slug                       state.json / runs.slug
     trace           one per row of `versions`            versions
+    trace           one per change (SPEC-EXAM-008)       changes
+    generation      its orchestrator and its agents,     changes (Σ result.modelUsage)
+                    with the MEASURED cost
     span            one per agent call                   calls, logs/agents.jsonl
     span            one per conductor unit               events.unit
     score           every validator's verdict            validations
     score           every attempt's characteristics      attempts + scores
     prompt version  each agent's instructions            .claude/agents/*.md
     metadata        the run's measured total             cost.json / runs.cost_usd
+
+**Only measured cost goes in `cost_details`** (SPEC-EXAM-008 §4). Langfuse sums
+`cost_details` across a session; an estimate beside a measurement makes a total
+that is neither. So the change traces' two generations carry the measured cost,
+and each call keeps its four token figures while its estimated cost — with the
+input/output/cache split 07fe3fb put in `cost_details` — moves to metadata
+(`estimated_cost_usd`).
 
 **Absent is never zero, and this is the last place it could become one.** A
 characteristic nobody scored gets no score row: `scores.score` is NULL when the
@@ -67,7 +77,7 @@ import os
 import re
 import sqlite3
 import sys
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,6 +121,13 @@ class Scrubber:
         if len(out) > MAX_FIELD_CHARS:
             out = out[:MAX_FIELD_CHARS] + f"\n[... {len(out) - MAX_FIELD_CHARS} more characters]"
         return out
+
+
+def change_trace_id(run_id: str, n: int) -> str:
+    """One change's trace: the same derivation the panel's reader uses."""
+    from backend.costs.measure import change_trace_id as derive
+
+    return derive(run_id, n)
 
 
 def trace_id(seed: str) -> str:
@@ -291,8 +308,14 @@ def collect(workspace: Path, conn: sqlite3.Connection | None) -> Run:
         gaps.append(f"the database has no run with slug {slug}; this directory "
                     f"has not been archived")
 
-    versions, units, calls, attempts, validations = [], [], [], [], []
+    versions, units, calls, attempts, validations, changes = [], [], [], [], [], []
     if run is not None:
+        try:
+            from backend.costs import repository as costs
+            changes = costs.rows(conn, run_id)
+        except sqlite3.OperationalError:
+            # A database from before SPEC-EXAM-008: no per-change traces.
+            gaps.append("no `changes` table: no per-change cost traces")
         versions = [dict(r) for r in conn.execute(
             "SELECT n, parent, reason, created_at FROM versions WHERE run_id = ? "
             "ORDER BY n", (run_id,))]
@@ -329,7 +352,7 @@ def collect(workspace: Path, conn: sqlite3.Connection | None) -> Run:
                stage=(run or state).get("stage", ""),
                versions=versions, units=units, calls=calls, attempts=attempts,
                validations=validations, cost=_cost(workspace, run),
-               prompts=_prompts(), gaps=gaps)
+               prompts=_prompts(), gaps=gaps, changes=changes)
 
 
 def _attempts(conn, run_id: str) -> list[dict]:
@@ -472,21 +495,29 @@ def plan(run: Run, scrub: Scrubber | None = None) -> list[dict]:
         }
         if usage:
             op["usage_details"] = usage
-        # No cost_details when the figure is absent. Langfuse would show 0.00
-        # and a reader would believe it.
+        # Never cost_details on a call (SPEC-EXAM-008 §4): the change's two
+        # generations carry the measured cost, and anything here would be
+        # added to it. An absent figure writes nothing at all.
         if call.get("cost_usd") is not None:
-            op["cost_details"] = {"total": float(call["cost_usd"])}
-            # The four parts, so Langfuse shows input and output cost apart
-            # (estimated, at config/pricing.json's rates, like the total).
-            if call.get("output_tokens") is not None and call.get("model"):
-                from backend.commons.config import loader
-                from backend.commons.log import agent_usage
-                parts = agent_usage.estimate_parts({
-                    "model": call["model"],
-                    **{k: int(call.get(k) or 0) for k in agent_usage.FIELDS}},
-                    loader.load_pricing())
-                if parts:
-                    op["cost_details"] = parts
+            if call.get("cost_provenance") == "measured":
+                # A Python-loop process's own `result`: already in its change's
+                # `agents` generation.
+                op["metadata"]["measured_cost_usd"] = float(call["cost_usd"])
+                op["metadata"]["cost_counted_in"] = "its change's agents generation"
+            else:
+                estimate = {"total": float(call["cost_usd"])}
+                # The four parts, so input and output cost can be read apart
+                # (estimated, at config/pricing.json's rates, like the total).
+                if call.get("output_tokens") is not None and call.get("model"):
+                    from backend.commons.config import loader
+                    from backend.commons.log import agent_usage
+                    parts = agent_usage.estimate_parts({
+                        "model": call["model"],
+                        **{k: int(call.get(k) or 0) for k in agent_usage.FIELDS}},
+                        loader.load_pricing())
+                    if parts:
+                        estimate = parts
+                op["metadata"]["estimated_cost_usd"] = estimate
         ops.append(op)
 
         if call["agent"] == "chapter-writer" and call.get("chapter"):
@@ -532,6 +563,61 @@ def plan(run: Run, scrub: Scrubber | None = None) -> list[dict]:
                          "raw_value": row["value"]},
         })
 
+    # Last, so each change's generations follow its trace and nothing else is
+    # created inside a change's tag scope (see `send`).
+    for change in getattr(run, "changes", []) or []:
+        ops.extend(_change_ops(run, change))
+
+    return ops
+
+
+def _change_ops(run: Run, change: dict) -> list[dict]:
+    """One change: a trace in the novel's session and its two generations.
+
+    `cost_details` carries the MEASURED figure only, and only when it exists:
+    an absent figure is no `cost_details` at all, never 0.00.
+    """
+    n = change["n"]
+    key = f"change:{n}"
+    chapters = change.get("chapters") or []
+    tags = [change["kind"]]
+    if change.get("version") is not None:
+        tags.append(f"v{change['version']}")
+    tags += [f"ch{int(c):02d}" for c in chapters]
+    what = change["kind"].replace("_", " ")
+    name = f"{run.slug} · {what} #{n}" + (f" · v{change['version']}"
+                                        if change.get("version") is not None else "")
+    common = {"change_n": n, "kind": change["kind"], "version": change.get("version"),
+              "provenance": change.get("provenance") or "absent"}
+    ops = [{
+        "op": "observation", "key": key, "parent": None, "as_type": "chain",
+        "trace_context": {"trace_id": change_trace_id(run.run_id, n)},
+        "name": name, "tags": tags,
+        "metadata": {
+            **common, "run_id": run.run_id, "slug": run.slug,
+            "chapters": chapters, "label": change.get("label"),
+            "started_at": change.get("started_at"), "finished_at": change.get("finished_at"),
+            "total_usd": change.get("total_usd"), "minutes": change.get("minutes"),
+            "minutes_source": "Σ result.duration_ms (measured)",
+            "results": change.get("results"), "unresulted": change.get("unresulted"),
+            # Which `result` events the figures came from (§4).
+            "sources": change.get("sources") or [],
+            "note": change.get("note"),
+        },
+    }]
+    for role in ("orchestrator", "agents"):
+        usd = change.get(f"{role}_usd")
+        op = {"op": "observation", "key": f"{key}:{role}", "parent": key,
+              "as_type": "generation", "name": role,
+              "model": change.get(f"{role}_model"),
+              "metadata": {**common, "role": role,
+                           "provenance": "measured" if usd is not None else "absent"}}
+        if role == "orchestrator" and change.get("orchestrator_model") is None \
+                and "no orchestrator" in (change.get("note") or ""):
+            op["metadata"]["note"] = "no orchestrator (python loop)"
+        if usd is not None:
+            op["cost_details"] = {"total": float(usd)}
+        ops.append(op)
     return ops
 
 
@@ -543,8 +629,11 @@ def describe(ops: list[dict]) -> None:
     """What would be sent, grouped the way the dashboard will group it."""
     session = next(o for o in ops if o["op"] == "session")
     prompts = [o for o in ops if o["op"] == "prompt"]
-    traces = [o for o in ops if o["op"] == "observation" and o["parent"] is None]
-    spans = [o for o in ops if o["op"] == "observation" and o["parent"] is not None]
+    changes = [o for o in ops if o["op"] == "observation" and o["key"].startswith("change:")]
+    traces = [o for o in ops if o["op"] == "observation" and o["parent"] is None
+              and not o["key"].startswith("change:")]
+    spans = [o for o in ops if o["op"] == "observation" and o["parent"] is not None
+             and not o["key"].startswith("change:")]
     scores = [o for o in ops if o["op"] == "score"]
 
     print(f"{'session':<12}{session['session_id']}")
@@ -592,13 +681,27 @@ def describe(ops: list[dict]) -> None:
             print(f"    {score['name']:<28}{str(shown):<10}{where}")
         print()
 
+    roots = [c for c in changes if c["parent"] is None]
+    if roots:
+        print("changes     measured cost, one trace each")
+        for root in roots:
+            meta = root["metadata"]
+            gens = {c["name"]: c for c in changes if c["parent"] == root["key"]}
+            money = lambda g: (f"${g['cost_details']['total']:.2f}" if "cost_details" in g
+                               else "absent")
+            print(f"  #{meta['change_n']:<3}{meta['kind']:<15}"
+                  f"{'' if meta['total_usd'] is None else format(meta['total_usd'], '.2f'):>8}"
+                  f"  orchestrator {money(gens['orchestrator'])}"
+                  f"  agents {money(gens['agents'])}  {meta['provenance']}")
+        print()
+
     gaps = traces[0]["metadata"]["export_gaps"]
     if gaps:
         print("what the record could not give:")
         for gap in gaps:
             print(f"  - {gap}")
         print()
-    print(f"nothing was sent. {_plural(traces, 'trace')}, {_plural(spans, 'span')}, "
+    print(f"nothing was sent. {_plural(traces + roots, 'trace')}, {_plural(spans, 'span')}, "
           f"{_plural(scores, 'score')} and {_plural(prompts, 'prompt version')} would be.")
 
 
@@ -624,15 +727,25 @@ def send(ops: list[dict], client, *, session_scope=None) -> dict:
     created: list = []
     counts = {"traces": 0, "spans": 0, "scores": 0, "prompts": 0}
 
-    with scope(session_id=session["session_id"]):
+    with scope(session_id=session["session_id"]), ExitStack() as outer:
+        tagged = ExitStack()
+        outer.callback(lambda: tagged.close())
         for op in ops:
+            if op["op"] == "observation" and op["parent"] is None:
+                # A change trace's tags are trace attributes, set by the same
+                # scope as the session and held while its generations are made.
+                tagged.close()
+                tagged = ExitStack()
+                if op.get("tags"):
+                    tagged.enter_context(scope(session_id=session["session_id"],
+                                               tags=op["tags"]))
             if op["op"] == "prompt":
                 client.create_prompt(name=op["name"], prompt=op["prompt"], type="text",
                                      labels=op["labels"], config=op["config"])
                 counts["prompts"] += 1
             elif op["op"] == "observation":
                 kwargs = {k: v for k, v in op.items()
-                          if k not in ("op", "key", "parent")}
+                          if k not in ("op", "key", "parent", "tags")}
                 parent = made.get(op["parent"]) if op["parent"] else None
                 observation = (parent.start_observation(**kwargs) if parent
                                else client.start_observation(**kwargs))
@@ -682,11 +795,11 @@ def purge(client, trace_ids: list[str], *, sleep=None, timeout: float = 120) -> 
 
 
 @contextmanager
-def _propagate_attributes(*, session_id: str):
+def _propagate_attributes(*, session_id: str, tags: list[str] | None = None):
     """The SDK's own session scope, imported late so `--dry-run` never needs it."""
     from langfuse import propagate_attributes
 
-    with propagate_attributes(session_id=session_id):
+    with propagate_attributes(session_id=session_id, **({"tags": tags} if tags else {})):
         yield
 
 

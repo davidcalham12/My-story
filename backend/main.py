@@ -9,6 +9,7 @@ from backend.commons.db.connection import connect
 from backend.commons.db.migrate import migrate
 from backend.bible import router as bible_router
 from backend.brief import router as brief_router
+from backend.costs import router as costs_router
 from backend.publish import router_judge, router_versions
 from backend.runs import router as runs_router
 from backend.runs.service import RunService
@@ -45,6 +46,8 @@ app.include_router(brief_router.router, prefix="/api/briefs", tags=["briefs"])
 app.include_router(bible_router.router, prefix="/api/runs", tags=["bible"])
 app.include_router(router_judge.router, prefix="/api/runs", tags=["validations"])
 app.include_router(router_versions.router, prefix="/api/runs", tags=["versions"])
+# SPEC-EXAM-008: what each change cost, from Langfuse with the local record behind it.
+app.include_router(costs_router.router, prefix="/api/runs", tags=["costs"])
 
 
 @app.on_event("shutdown")

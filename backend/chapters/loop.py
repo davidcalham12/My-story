@@ -164,6 +164,8 @@ class Reply:
     ts: str
     #: `budget` or `api` when the CLI stopped the process rather than it answering.
     cut: str | None = None
+    #: The `result` event itself, for its change's row (SPEC-EXAM-008).
+    result: dict | None = None
 
 
 class Halt(Exception):
@@ -202,7 +204,7 @@ def _reply(call: Call, process) -> Reply:
     return Reply(call=call, text=text,
                  cost_usd=float(cost) if isinstance(cost, (int, float)) else None,
                  usage=usage, model=model, duration_ms=result.get("duration_ms"),
-                 ts=_now(), cut=cut)
+                 ts=_now(), cut=cut, result=result)
 
 
 # ------------------------------------------------------------------ the outcome
@@ -373,8 +375,10 @@ class ChapterLoop:
                  conn: sqlite3.Connection | None, run_id: str | None,
                  ceiling_usd: float | None, spent_usd: float,
                  change_note: str | None, slug: str | None, loop_dir: Path | None,
-                 stop: threading.Event | None = None):
+                 stop: threading.Event | None = None, change: int | None = None):
         self.run_dir, self.n, self.runner = run_dir, n, runner
+        #: The `changes` row (its `n`) each process's `result` adds to.
+        self.change = change
         self.stop = stop or threading.Event()
         self.conn, self.run_id = conn, run_id
         self.ceiling, self.spent = ceiling_usd, float(spent_usd or 0.0)
@@ -459,9 +463,16 @@ class ChapterLoop:
             for r in results:
                 if r is not None:
                     self._account(r)
+            self._missing(sum(1 for r in results if r is None))
         if errors:
             raise errors[0]
         return [r for r in results if r is not None]
+
+    def _missing(self, count: int) -> None:
+        """SPEC-EXAM-008 §2: processes that ended without a `result`."""
+        if count and self.conn is not None and self.run_id and self.change is not None:
+            from backend.costs import repository as costs
+            costs.add_missing(self.conn, self.run_id, self.change, count)
 
     def _account(self, reply: Reply) -> None:
         if reply.cost_usd is not None:
@@ -470,6 +481,13 @@ class ChapterLoop:
         self.pending_rows.append(reply)
         if self.conn is None or self.run_id is None:
             return
+        if self.change is not None and reply.result is not None:
+            # Each agent is its own process with no orchestrator above it: every
+            # model in its `modelUsage` is an agent (§8.3).
+            from backend.costs import measure, repository as costs
+            costs.add_result(self.conn, self.run_id, self.change,
+                             measure.split(reply.result, None),
+                             note=costs.NO_ORCHESTRATOR)
         u = reply.usage
         write_call(self.conn, CallRow(
             run_id=self.run_id, stage=STAGE, agent=reply.call.agent, model=reply.model,
@@ -938,7 +956,8 @@ def run_chapter(run_dir: Path, n: int, *, runner: Runner,
                 ceiling_usd: float | None = None, spent_usd: float = 0.0,
                 change_note: str | None = None, slug: str | None = None,
                 loop_dir: Path | None = None,
-                stop: threading.Event | None = None) -> Outcome:
+                stop: threading.Event | None = None,
+                change: int | None = None) -> Outcome:
     """Run chapter `n` of `run_dir` to accept or halt. Raises only on a defect.
 
     `ceiling_usd` is what may be spent in all, `spent_usd` what already was: the
@@ -948,7 +967,7 @@ def run_chapter(run_dir: Path, n: int, *, runner: Runner,
     return ChapterLoop(run_dir, n, runner=runner, conn=conn, run_id=run_id,
                        ceiling_usd=ceiling_usd, spent_usd=spent_usd,
                        change_note=change_note, slug=slug, loop_dir=loop_dir,
-                       stop=stop).run()
+                       stop=stop, change=change).run()
 
 
 def main(argv: list[str]) -> int:

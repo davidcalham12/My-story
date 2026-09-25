@@ -77,3 +77,9 @@ export function usd(value: number | null | undefined): string {
   if (value === null || value === undefined) return 'not measured'
   return `$${value.toFixed(2)}`
 }
+
+/** Minutes of a change: Σ `result.duration_ms`, measured. `null` is not 0. */
+export function minutes(value: number | null | undefined): string {
+  if (value === null || value === undefined) return 'not measured'
+  return value.toFixed(1)
+}
