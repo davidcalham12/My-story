@@ -10,7 +10,7 @@ identidad de Qaracter (DM Sans, naranja #FF7932, azul #1E2D3D).
 | fichero | qué es |
 |---|---|
 | `storymaker-deck.pdf` | el deck principal, 19 slides en pirámide (respuesta, tres razones, cierre), en PDF, exportado de Claude Design el 25-09 |
-| `storymaker-deck.pptx` | el mismo deck en formato editable — pendiente de exportar |
+| `storymaker-deck.pptx` | el mismo deck en formato editable, con las notas del orador |
 | fuente del deck | Claude Design, sistema *Qaracter design FRM*: https://claude.ai/artifact/9YKcBatBGdLkfGVBCJ5JAH (privado; se comparte desde su menú Share) |
 | `guion.md` | qué se dice en cada slide y la demo en directo, paso a paso, con la procedencia de cada cifra |
 | `anexo-a-arquitectura-harness.pdf` | diagrama del harness: agentes, orquestador, Story Bible, puerta de calidad |
