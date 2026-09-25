@@ -180,3 +180,12 @@ def test_the_cli_dry_run_writes_nothing(db, novel, monkeypatch, capsys):
     assert _rows(db) == []
     out = capsys.readouterr().out
     assert "53.17" in out and "21.03" in out
+
+
+def test_a_version_the_run_published_itself_is_not_a_reader_change(db, novel):
+    """dist/v2 of the example novel is the completed book (release --next after
+    the resume), not a reader change: no stream, no redo, no row of its own."""
+    (novel / "dist" / "v2").mkdir(parents=True, exist_ok=True)
+    (novel / "dist" / "v2" / "novel.html").write_text("<html></html>", encoding="utf-8")
+    labels = [p.label for p in backfill.plan(db, novel, RUN_ID)]
+    assert "dist/v2" not in labels

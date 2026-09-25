@@ -147,8 +147,10 @@ def _from_dist(run_dir: Path) -> list[Planned]:
                    if (m := STREAM.match(p.name))}
         redos = sorted(p for p in (workspace / "chapters").glob("_redo-*") if p.is_dir()) \
             if (workspace / "chapters").is_dir() else []
-        if version == 1 and not streams and not redos:
-            continue                          # the first publication: `generate`'s
+        if version is not None and not streams and not redos:
+            # A version the run published itself (v1 by `generate`, v2 by
+            # `release --next` after a continuation): no reader change ran here.
+            continue
         label = f"dist/{name}"
         started = min((p.stat().st_mtime for p in streams.values()),
                       default=workspace.stat().st_mtime)
