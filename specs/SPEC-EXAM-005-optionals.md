@@ -29,7 +29,7 @@ So only items that are **purely additive** are taken:
 |---|---|---|---|
 | O1 | new prose linters | `backend/linters/repetition.py`: a sentence restated within a few sentences (the defect the judge found in ch05), and verbal tics repeated across a chapter. Report-only, run on the published book | stdlib, read-only, not wired into the gate; running it changes no score |
 | O2 | MCP server to query and download novels | `mcp_server/`: FastMCP, read-only tools (list novels, a novel's versions, validators and cost, the PDF path) over the SQLite database opened read-only | own virtual environment, so the backend's dependencies are untouched; opens the database with `mode=ro`, so it cannot write |
-| O3 | security analysis with agents | `docs/security-review.md`: an agent reviews the repository for prompt injection, secrets, path traversal and unsafe subprocess use, with each finding checked | documentation only |
+| O3 | security analysis with agents | `docs/security-report.md`: an agent reviews the repository for prompt injection, secrets, path traversal and unsafe subprocess use, with each finding checked | documentation only |
 | O4 | TLA+ of concurrency | `tla/TwoServers.tla`: two servers sharing one database, each sweeping "orphans" at start-up. TLC should find red-team case 13 (a live run marked halted) as a counterexample, then verify the fix of checking the process before sweeping | a new spec beside `Harness.tla`, which is untouched |
 
 ## 3. Out of scope

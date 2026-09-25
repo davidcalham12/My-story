@@ -3,7 +3,8 @@
 SPEC-EXAM-005 item O3. A review of the repository at `897e5f1` (main,
 2026-09-24) for prompt injection, secrets, path traversal, unsafe subprocess
 use, XSS, personal data and budget/DoS controls. Documentation only: nothing in
-the code was changed.
+the code was changed. Fixes made afterwards are recorded on each finding
+(status `FIXED`, with the commit and the tests).
 
 **How each finding was checked.** Every finding below was verified by reading
 the code at the cited line. Where a cheap local check was possible it was run
@@ -36,18 +37,18 @@ further step; **low** = limited impact or needs an unlikely precondition;
 | SR-01 | prompt injection | medium | CONFIRMED | every brief field except `free_text` reaches the orchestrator prompt verbatim, newlines included |
 | SR-02 | prompt injection | medium | CONFIRMED | the orchestrator's allowlist includes `Bash(python *)` and `Bash(node *)`, so a steered orchestrator can run arbitrary code |
 | SR-03 | prompt injection | low | CONFIRMED | the reader-change `to` (and the old fact text) is interpolated into the chapter-unit prompt |
-| SR-04 | path traversal | medium | CONFIRMED | `profile` from the request body is a filename: `../` escapes `config/profiles/` and any `*.json` can become the run's config, budget included |
+| SR-04 | path traversal | medium | FIXED 2026-09-25 (`8ec67bb`) | `profile` from the request body is a filename: `../` escapes `config/profiles/` and any `*.json` can become the run's config, budget included |
 | SR-05 | budget | medium | MITIGATED 2026-09-24 | `POST /api/runs/{id}/resume` starts each resume with a fresh budget: a $1.00 ceiling allowed $3.60 in a local check. The owner keeps the fresh ceiling per continuation (SPEC-007 §8) and adds a per-novel cap: Continue is refused once the known spend reaches `budget.novel_ceiling_multiple` (2) × the profile's ceiling |
 | SR-06 | budget | low | CONFIRMED | the reader change and the judge spend outside the run's ceiling and outside the queue of one |
 | SR-07 | orphans | low | CONFIRMED | red-team cases 9 and 13: the shutdown hook covers a graceful stop only; the startup sweep does not check the pid |
 | SR-08 | PII | medium | CONFIRMED | the recipient alias is in the premise every orchestrator reads, contradicting "no model is given the recipient's name" |
 | SR-09 | PII | medium | CONFIRMED | the Langfuse export sends the premise (alias, memories, mandatory facts) to a third-party US host; the scrubber removes keys only |
-| SR-10 | path traversal | low | CONFIRMED | the slug is learned from model-written paths without validation; `..` is accepted |
-| SR-11 | input limits | low | CONFIRMED | brief string fields, `tone`, `profile` and reader `to` have no length limit; an unknown profile is a 500 |
+| SR-10 | path traversal | low | FIXED 2026-09-25 (`8ec67bb`) | the slug is learned from model-written paths without validation; `..` is accepted |
+| SR-11 | input limits | low | FIXED 2026-09-25 (`8ec67bb`) | brief string fields, `tone`, `profile` and reader `to` have no length limit; an unknown profile is a 500 |
 | SR-12 | HTTP surface | low | NOT CONFIRMED | no auth and no Host-header check: a bodiless `POST .../halt` or `.../resume` is CSRF-able, and DNS rebinding could reach the API |
-| SR-13 | XSS | low | CONFIRMED | `novel.html` is served same-origin with `text/html` and no CSP; safe only while `pdf.py` is its sole writer |
-| SR-14 | supply chain | info | CONFIRMED | `.mcp.json` runs `@playwright/mcp@latest`, unpinned |
-| SR-15 | authorisation | info | CONFIRMED | `POST /{run_id}/changes` looks up `fact_usage` by `fact_id` without scoping it to `run_id` |
+| SR-13 | XSS | low | FIXED 2026-09-25 (`8ec67bb`) | `novel.html` is served same-origin with `text/html` and no CSP; safe only while `pdf.py` is its sole writer |
+| SR-14 | supply chain | info | FIXED 2026-09-25 (`8ec67bb`) | `.mcp.json` runs `@playwright/mcp@latest`, unpinned |
+| SR-15 | authorisation | info | FIXED 2026-09-25 (`8ec67bb`) | `POST /{run_id}/changes` looks up `fact_usage` by `fact_id` without scoping it to `run_id` |
 | SR-16 | subprocess | info | CONFIRMED | `NOVAFORGE_CHANGE_PROCEDURE_REV` goes to `git show` unvalidated; a value starting with `-` is read as an option |
 | — | secrets | none found | CONFIRMED | no real key in tracked files or history; `.env` ignored; `.env.example` holds empty placeholders |
 | — | command injection | none found | CONFIRMED | no `shell=True` anywhere; the prompt goes on stdin |
@@ -91,6 +92,7 @@ to the local API (SR-04, SR-05).
   string at `parse()`; bound each field (`max_length` in `models.py`); and add
   the brief-04 test for the other fields (inject into `tone`, a memory and a
   mandatory fact, assert the injected line never starts a line of the prompt).
+- **Note (2026-09-25).** The `max_length` part of this fix landed with SR-11 (`8ec67bb`); the injection path itself is unchanged.
 
 ### SR-02 — The orchestrator's allowlist amounts to arbitrary code execution
 
@@ -137,10 +139,19 @@ to the local API (SR-04, SR-05).
 - **Fix.** Refuse a change whose `fact_id` is a `source='freetext'` row; write
   `to` into the workspace Bible (already done by `prepare_workspace`) and let
   the prompt name the fact id only, not its text; bound `to` (`max_length`).
+- **Note (2026-09-25).** `to` is now bounded (SR-11, `8ec67bb`); the interpolation into the prompt is unchanged.
 
 ### SR-04 — `profile` is a filename taken from the request body
 
-- **Area:** path traversal. **Severity:** medium. **Status:** CONFIRMED.
+- **Area:** path traversal. **Severity:** medium. **Status:** FIXED 2026-09-25.
+- **Resolved by:** `8ec67bb`. `loader.check_profile` accepts only `^[a-z0-9-]+$`
+  names that are files in `config/profiles/`; `StartRun.profile` runs it (and
+  `max_length`), and `load_profile` runs it again. An unknown or escaping
+  profile is a 422 on `body.profile` listing the real profiles. Tests in
+  `backend/tests/test_security_fixes.py`: `test_an_unknown_or_escaping_profile_is_a_422_naming_the_field`
+  (`../novel.config`, `../pricing`, `..\pricing`, a newline, …),
+  `test_the_loader_never_reads_outside_config_profiles`,
+  `test_every_profile_on_disk_is_accepted`.
 - **Where:** `backend/runs/models.py:18` (`profile: str`, no constraint),
   `backend/commons/config/loader.py:56-60` (`CONFIG / "profiles" / f"{name}.json"`),
   used at `backend/runs/service.py:201` and `:224`; echoed into the stdin prompt
@@ -276,7 +287,13 @@ to the local API (SR-04, SR-05).
 
 ### SR-10 — The slug is learned from model output without validation
 
-- **Area:** path traversal. **Severity:** low. **Status:** CONFIRMED.
+- **Area:** path traversal. **Severity:** low. **Status:** FIXED 2026-09-25.
+- **Resolved by:** `8ec67bb`. `watch.SLUG` (`^[a-z0-9][a-z0-9-]{0,79}$`): a
+  learned slug that does not match is ignored and the run keeps its current
+  slug. Tests in `backend/tests/test_security_fixes.py`: `test_a_learned_slug_that_is_not_a_slug_is_ignored`
+  (`..`, `.`, `_papelera`, a space), `test_a_real_slug_is_still_learned`. The
+  `resolve()` check in `_run_dir` was not added: every slug that reaches the
+  database now passes the pattern.
 - **Where:** `backend/commons/runner/watch.py:20` (`output[/\\]([^/\\]+)[/\\]`),
   `:206-212`; persisted at `backend/runs/service.py:444-449` (the `UPDATE runs SET slug` at 447); used by
   `router_versions.py:38-42` and `backend/bible/router.py:137-143`.
@@ -295,7 +312,18 @@ to the local API (SR-04, SR-05).
 
 ### SR-11 — No length limits on buyer strings; unknown profile is a 500
 
-- **Area:** input validation / DoS. **Severity:** low. **Status:** CONFIRMED.
+- **Area:** input validation / DoS. **Severity:** low. **Status:** FIXED 2026-09-25.
+- **Resolved by:** `8ec67bb`. The limits are in one place,
+  `backend/commons/limits.py` (200 for short fields, 1,000 for a memory, a
+  mandatory fact, the dedication and a change's `to`, 5,000 for `free_text`,
+  64 for `profile` and ids). Every brief string, `StartRun.tone`/`profile`/
+  `brief_id` and `ReaderChange.fact_id`/`to` carry them; an oversized field is
+  a 422 naming it (for a brief, `check()` returns `invalid` with the field's
+  path). The unknown-profile 500 is closed by SR-04. Tests in `backend/tests/test_security_fixes.py`:
+  `test_an_oversized_brief_field_is_refused_with_the_field_named`,
+  `test_an_oversized_tone_or_profile_on_a_run_is_a_422_naming_the_field`,
+  `test_an_oversized_reader_change_is_a_422_naming_the_field`,
+  `test_the_committed_briefs_fit_inside_the_limits`.
 - **Where:** `backend/brief/models.py:41-87` (no `max_length`),
   `backend/runs/models.py:18,22`, `backend/publish/router_versions.py:35`;
   `backend/runs/router.py:29-37` catches no `ValueError`.
@@ -329,8 +357,16 @@ to the local API (SR-04, SR-05).
 
 ### SR-13 — `novel.html` is same-origin HTML with no CSP
 
-- **Area:** XSS. **Severity:** low. **Status:** CONFIRMED (the escaping holds;
-  the note is about defence in depth).
+- **Area:** XSS. **Severity:** low. **Status:** FIXED 2026-09-25 (the escaping
+  held; the fix is defence in depth).
+- **Resolved by:** `8ec67bb`. `version_html` sends
+  `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'`
+  and `X-Content-Type-Options: nosniff`. `frame-ancestors 'self'` rather than
+  `'none'`, and no `sandbox` directive, because the panel frames the page from
+  the same origin. Test: `backend/tests/test_security_fixes.py`::`test_the_novel_page_is_served_with_a_restrictive_csp`;
+  a committed `novel.html` was also rendered in headless Chromium under this
+  header (not committed): the inline style applied, the index anchors navigated,
+  no CSP violation was reported.
 - **Where:** `backend/publish/router_versions.py:84-97`,
   `frontend/src/pages/read/ReadView.tsx:151-157`, `backend/publish/pdf.py:96-115`.
 - **Description.** `pdf.py` escapes before it adds tags, and the iframe is
@@ -346,7 +382,10 @@ to the local API (SR-04, SR-05).
 
 ### SR-14 — Unpinned MCP server package
 
-- **Area:** supply chain. **Severity:** info. **Status:** CONFIRMED.
+- **Area:** supply chain. **Severity:** info. **Status:** FIXED 2026-09-25.
+- **Resolved by:** `8ec67bb`. `.mcp.json` (and `docs/browser-mcp.md`) run
+  `@playwright/mcp@0.0.82`, the version `npx` had resolved in the local npm
+  cache (`_npx/*/package-lock.json`). Test: `backend/tests/test_security_fixes.py`::`test_the_mcp_server_package_is_pinned_to_an_exact_version`.
 - **Where:** `.mcp.json:5` (`"args": ["@playwright/mcp@latest"]`).
 - **Description.** Every Claude Code session in this repo that enables the
   server runs whatever `npx` resolves as `latest` at that moment.
@@ -354,7 +393,12 @@ to the local API (SR-04, SR-05).
 
 ### SR-15 — `fact_usage` is looked up without the run
 
-- **Area:** authorisation / correctness. **Severity:** info. **Status:** CONFIRMED.
+- **Area:** authorisation / correctness. **Severity:** info. **Status:** FIXED 2026-09-25.
+- **Resolved by:** `8ec67bb`. The route checks `change.fact_of_run` (`facts WHERE
+  id = ? AND run_id = ?`) and answers 404 for a fact of another run;
+  `impacted(conn, fact_id, run_id=...)` joins `facts` on `run_id`, and the CLI
+  passes its run. Tests in `backend/tests/test_security_fixes.py`: `test_a_change_with_a_fact_of_another_run_is_a_404`,
+  `test_impacted_scoped_to_a_run_does_not_see_another_runs_fact`.
 - **Where:** `backend/publish/router_versions.py:112`,
   `backend/versions/change.py:45-58`.
 - **Description.** `impacted(conn, fact_id)` does not filter by `run_id`, so a
